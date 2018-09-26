@@ -19,16 +19,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    @IBAction func saveDocument(_ sender: AnyObject) {
-        NSDocumentController.shared.currentDocument?.save(nil)
-    }
-
-    @IBAction func saveDocumentAs(_ sender: AnyObject) {
-        NSDocumentController.shared.currentDocument?.saveAs(nil)
-    }
-
-    func applicationOpenUntitledFile(_ sender: NSApplication) -> Bool {
-        return false
-    }
 }
 

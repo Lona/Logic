@@ -53,11 +53,12 @@ public enum Entity: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-
         switch self {
         case .genericType(let type):
+            try container.encode("type", forKey: .caseType)
             try container.encode(type, forKey: .data)
         case .nativeType(let type):
+            try container.encode("native", forKey: .caseType)
             try container.encode(type, forKey: .data)
         }
     }

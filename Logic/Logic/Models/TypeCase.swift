@@ -186,7 +186,7 @@ public enum GenericTypeCase: Codable {
         try container.encode(name, forKey: .name)
         switch self {
         case .normal(_, let parameters):
-            try container.encode("generic", forKey: .caseType)
+            try container.encode("normal", forKey: .caseType)
             try container.encode(parameters, forKey: .parameters)
         case .record(_, let parameters):
             try container.encode("record", forKey: .caseType)

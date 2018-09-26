@@ -76,11 +76,11 @@
 		6B5B7553215B1ABE00CDC9C6 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				6B5B7554215B1ABE00CDC9C6 /* TypeListRowView.swift */,
-				6B5B7555215B1ABE00CDC9C6 /* TypeListHeaderView.swift */,
-				6B5B755B215B1ABE00CDC9C6 /* NameCellView.swift */,
 				6B5B755C215B1ABE00CDC9C6 /* EntityCellView.swift */,
+				6B5B755B215B1ABE00CDC9C6 /* NameCellView.swift */,
 				6B5B755D215B1ABE00CDC9C6 /* TypeListEditor.swift */,
+				6B5B7555215B1ABE00CDC9C6 /* TypeListHeaderView.swift */,
+				6B5B7554215B1ABE00CDC9C6 /* TypeListRowView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -89,8 +89,8 @@
 			isa = PBXGroup;
 			children = (
 				6B5B7557215B1ABE00CDC9C6 /* Entity.swift */,
-				6B5B7558215B1ABE00CDC9C6 /* TypeListItem.swift */,
 				6B5B7559215B1ABE00CDC9C6 /* TypeCase.swift */,
+				6B5B7558215B1ABE00CDC9C6 /* TypeListItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
