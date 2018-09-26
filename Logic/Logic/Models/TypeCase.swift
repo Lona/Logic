@@ -1,0 +1,181 @@
+//
+//  TypeCase.swift
+//  LogicExample2
+//
+//  Created by Devin Abbott on 9/25/18.
+//  Copyright © 2018 BitDisco, Inc. All rights reserved.
+//
+
+import Foundation
+
+public struct GenericTypeParameterSubstitution {
+    public let generic: String
+    public let instance: String
+}
+
+public enum TypeCaseParameterEntity {
+    case type(String, [GenericTypeParameterSubstitution])
+    case generic(String)
+
+    public var name: String {
+        switch self {
+        case .type(let entity, _):
+            return entity
+        case .generic(let value):
+            return value
+        }
+    }
+
+    public var children: [TypeListItem] {
+        switch self {
+        case .type(_, let substitutions):
+            return substitutions.map { TypeListItem.genericTypeParameterSubstitution($0) }
+        case .generic:
+            return []
+        }
+    }
+
+    func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
+        return item
+    }
+}
+
+public struct NormalTypeCaseParameter {
+    public var value: TypeCaseParameterEntity
+
+    public var children: [TypeListItem] {
+        return value.children
+    }
+
+    func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
+        if path.count > 0 {
+            switch value {
+            case .type(let name, var substitution):
+                if path.count > 0 {
+                    substitution = substitution.enumerated().map { index, x in
+                        if index == path[0] {
+                            return item.genericTypeParameterSubstitution!
+                        } else {
+                            return x
+                        }
+                    }
+                    return TypeListItem.normalTypeCaseParameter(
+                        NormalTypeCaseParameter(value:
+                            TypeCaseParameterEntity.type(name, substitution)))
+                } else {
+                    return item
+                }
+            case .generic:
+                return TypeListItem.normalTypeCaseParameter(self)
+            }
+        } else {
+            return item
+        }
+    }
+}
+
+public struct RecordTypeCaseParameter {
+    public var key: String
+    public var value: TypeCaseParameterEntity
+
+    public var children: [TypeListItem] {
+        return value.children
+    }
+
+    func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
+        if path.count > 0 {
+            switch value {
+            case .type(let name, var substitution):
+                if path.count > 0 {
+                    substitution = substitution.enumerated().map { index, x in
+                        if index == path[0] {
+                            return item.genericTypeParameterSubstitution!
+                        } else {
+                            return x
+                        }
+                    }
+                    return TypeListItem.recordTypeCaseParameter(
+                        RecordTypeCaseParameter(key: key, value:
+                            TypeCaseParameterEntity.type(name, substitution)))
+                } else {
+                    return item
+                }
+            case .generic:
+                return TypeListItem.recordTypeCaseParameter(self)
+            }
+        } else {
+            return item
+        }
+    }
+}
+
+public enum GenericTypeCase {
+    case normal(String, [NormalTypeCaseParameter])
+    case record(String, [RecordTypeCaseParameter])
+
+    public var children: [TypeListItem] {
+        switch self {
+        case .normal(_, let parameters):
+            return parameters.map { TypeListItem.normalTypeCaseParameter($0) }
+        case .record(_, let parameters):
+            return parameters.map { TypeListItem.recordTypeCaseParameter($0) }
+        }
+    }
+
+    public var name: String {
+        switch self {
+        case .normal(let name, _), .record(let name, _):
+            return name
+        }
+    }
+
+    func removing(itemAtPath path: [Int]) -> GenericTypeCase {
+        switch self {
+        case .normal(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.remove(at: path[0])
+                return GenericTypeCase.normal(name, parameters)
+            }
+        case .record(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.remove(at: path[0])
+                return GenericTypeCase.record(name, parameters)
+            }
+        }
+    }
+
+    func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
+        switch self {
+        case .normal(let name, var parameters):
+            if path.count > 0 {
+                parameters = parameters.enumerated().map { index, x in
+                    if index == path[0] {
+                        return x.replacing(itemAtPath: Array(path.dropFirst()), with: item).normalTypeCaseParameter!
+                    } else {
+                        return x
+                    }
+                }
+                return TypeListItem.typeCase(.normal(name, parameters))
+            } else {
+                return item
+            }
+        case .record(let name, var parameters):
+            if path.count > 0 {
+                parameters = parameters.enumerated().map { index, x in
+                    if index == path[0] {
+                        return x.replacing(itemAtPath: Array(path.dropFirst()), with: item).recordTypeCaseParameter!
+                    } else {
+                        return x
+                    }
+                }
+                return TypeListItem.typeCase(.record(name, parameters))
+            } else {
+                return item
+            }
+        }
+    }
+}
