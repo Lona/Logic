@@ -9,6 +9,10 @@
 import AppKit
 import Logic
 
+struct Content: Codable {
+    var types: [Entity]
+}
+
 class Document: NSDocument {
 
     override init() {
@@ -17,95 +21,19 @@ class Document: NSDocument {
     }
 
     override class var autosavesInPlace: Bool {
-        return true
+        return false
     }
+
+    var content = Content(types: [])
 
     func setUpViews() -> NSView {
         let typeListEditor = TypeList()
         typeListEditor.fillColor = .white
 
         typeListEditor.onChange = { list in
+            self.content.types = list
             typeListEditor.list = list
-
-//            let types = list.map({ try? $0.typeInstance() }).compactMap({ $0 })
-//            Swift.print("Type instances", types)
-//
-//            let tcs = list.map({ try? $0.typeConstructor() }).compactMap({ $0 })
-//            Swift.print("Type constructors", tcs)
         }
-
-        typeListEditor.list = [
-            Entity.genericType(
-                GenericType(name: "Unit", cases: [
-                    GenericTypeCase.normal("undefined", [])
-                    ])
-            ),
-            Entity.genericType(
-                GenericType(name: "Boolean", cases: [
-                    GenericTypeCase.normal("true", []),
-                    GenericTypeCase.normal("false", [])
-                    ])
-            ),
-            Entity.nativeType(NativeType(name: "Number")),
-            Entity.nativeType(NativeType(name: "String")),
-            Entity.genericType(
-                GenericType(name: "Optional", cases: [
-                    GenericTypeCase.normal("value", [
-                        NormalTypeCaseParameter(value: TypeCaseParameterEntity.generic("T"))
-                        ]),
-                    GenericTypeCase.normal("null", [])
-                    ])
-            ),
-            Entity.genericType(
-                GenericType(name: "Color", cases: [
-                    GenericTypeCase.record("color", [
-                        RecordTypeCaseParameter(key: "id", value:
-                            TypeCaseParameterEntity.type("String", [])),
-                        RecordTypeCaseParameter(key: "name", value:
-                            TypeCaseParameterEntity.type("String", [])),
-                        RecordTypeCaseParameter(key: "value", value:
-                            TypeCaseParameterEntity.type("String", [])),
-                        RecordTypeCaseParameter(key: "comment", value:
-                            TypeCaseParameterEntity.type("Optional", [
-                                GenericTypeParameterSubstitution(generic: "T", instance: "String")]))
-                        ]),
-                    ])
-            ),
-            Entity.genericType(
-                GenericType(name: "Style", cases: [
-                    GenericTypeCase.record("view", [
-                        RecordTypeCaseParameter(
-                            key: "backgroundColor",
-                            value: TypeCaseParameterEntity.type("Color", [])
-                        ),
-                        RecordTypeCaseParameter(
-                            key: "alignItems",
-                            value: TypeCaseParameterEntity.type("String", [])
-                        ),
-                        RecordTypeCaseParameter(
-                            key: "alignSelf",
-                            value: TypeCaseParameterEntity.type("String", [])
-                        ),
-                        RecordTypeCaseParameter(
-                            key: "justifyContent",
-                            value: TypeCaseParameterEntity.type("String", [])
-                        ),
-                        RecordTypeCaseParameter(
-                            key: "flex",
-                            value: TypeCaseParameterEntity.type("String", [])
-                        ),
-                        ]
-                    )
-                    ]
-                )
-            )
-//            Entity(LTypeConstructor("Number", isNative: true)),
-//            Entity(LTypeConstructor("String", isNative: true)),
-//            Entity(LTypeConstructor("Optional", dataConstructors: [
-//                LDataConstructor(name: "value", types: [LType.generic("T")]),
-//                LDataConstructor(name: "null", types: [])
-//                ])),
-        ]
 
         typeListEditor.getTypeList = {
             let types = typeListEditor.list.map({ $0.name })
@@ -167,18 +95,21 @@ class Document: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        // Insert code here to write your document to data of the specified type, throwing an error in case of failure.
-        // Alternatively, you could remove this method and override fileWrapper(ofType:), write(to:ofType:), or write(to:ofType:for:originalContentsURL:) instead.
-        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        do {
+            return try JSONEncoder().encode(content)
+        } catch let error {
+            Swift.print(error)
+            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        }
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        // Insert code here to read your document from the given data of the specified type, throwing an error in case of failure.
-        // Alternatively, you could remove this method and override read(from:ofType:) instead.
-        // If you do, you should also override isEntireFileLoaded to return false if the contents are lazily loaded.
-        throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        do {
+            content = try JSONDecoder().decode(Content.self, from: data)
+        } catch let error {
+            Swift.print(error)
+            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        }
     }
-
-
 }
 

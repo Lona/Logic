@@ -8,12 +8,7 @@
 
 import Foundation
 
-public struct NormalType {
-    public var name: String
-    public var cases: [GenericTypeCase]
-}
-
-public struct GenericType {
+public struct GenericType: Codable {
     public var name: String
     public var cases: [GenericTypeCase]
 
@@ -23,7 +18,7 @@ public struct GenericType {
     }
 }
 
-public struct NativeType {
+public struct NativeType: Codable {
     public init(name: String) {
         self.name = name
     }
@@ -31,11 +26,41 @@ public struct NativeType {
     public var name: String
 }
 
-public enum Entity {
+public enum Entity: Codable {
     case genericType(GenericType)
     //    case instanceType
     //    case aliasType
     case nativeType(NativeType)
+
+    enum CodingKeys: String, CodingKey {
+        case caseType = "case"
+        case data
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let caseType = try container.decode(String.self, forKey: .caseType)
+
+        switch caseType {
+        case "type":
+            self = .genericType(try container.decode(GenericType.self, forKey: .data))
+        case "native":
+            self = .nativeType(try container.decode(NativeType.self, forKey: .data))
+        default:
+            fatalError("Failed to decode TypeCaseParameterEntity")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .genericType(let type):
+            try container.encode(type, forKey: .data)
+        case .nativeType(let type):
+            try container.encode(type, forKey: .data)
+        }
+    }
 
     public var children: [TypeListItem] {
         switch self {

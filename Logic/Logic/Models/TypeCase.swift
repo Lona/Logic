@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GenericTypeParameterSubstitution {
+public struct GenericTypeParameterSubstitution: Codable {
     public init(generic: String, instance: String) {
         self.generic = generic
         self.instance = instance
@@ -18,9 +18,42 @@ public struct GenericTypeParameterSubstitution {
     public let instance: String
 }
 
-public enum TypeCaseParameterEntity {
+public enum TypeCaseParameterEntity: Codable {
     case type(String, [GenericTypeParameterSubstitution])
     case generic(String)
+
+    enum CodingKeys: String, CodingKey {
+        case caseType = "case"
+        case name
+        case substitutions
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let caseType = try container.decode(String.self, forKey: .caseType)
+        let name = try container.decode(String.self, forKey: .name)
+
+        switch caseType {
+        case "generic":
+            self = .generic(name)
+        case "type":
+            self = .type(name, try container.decode([GenericTypeParameterSubstitution].self, forKey: .substitutions))
+        default:
+            fatalError("Failed to decode TypeCaseParameterEntity")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        switch self {
+        case .generic:
+            try container.encode("generic", forKey: .caseType)
+        case .type(_, let substitutions):
+            try container.encode("type", forKey: .caseType)
+            try container.encode(substitutions, forKey: .substitutions)
+        }
+    }
 
     public var name: String {
         switch self {
@@ -45,7 +78,7 @@ public enum TypeCaseParameterEntity {
     }
 }
 
-public struct NormalTypeCaseParameter {
+public struct NormalTypeCaseParameter: Codable {
     public init(value: TypeCaseParameterEntity) {
         self.value = value
     }
@@ -83,7 +116,7 @@ public struct NormalTypeCaseParameter {
     }
 }
 
-public struct RecordTypeCaseParameter {
+public struct RecordTypeCaseParameter: Codable {
     public init(key: String, value: TypeCaseParameterEntity) {
         self.key = key
         self.value = value
@@ -123,9 +156,43 @@ public struct RecordTypeCaseParameter {
     }
 }
 
-public enum GenericTypeCase {
+public enum GenericTypeCase: Codable {
     case normal(String, [NormalTypeCaseParameter])
     case record(String, [RecordTypeCaseParameter])
+
+    enum CodingKeys: String, CodingKey {
+        case caseType = "case"
+        case name
+        case parameters = "params"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let caseType = try container.decode(String.self, forKey: .caseType)
+        let name = try container.decode(String.self, forKey: .name)
+
+        switch caseType {
+        case "normal":
+            self = .normal(name, try container.decode([NormalTypeCaseParameter].self, forKey: .parameters))
+        case "record":
+            self = .record(name, try container.decode([RecordTypeCaseParameter].self, forKey: .parameters))
+        default:
+            fatalError("Failed to decode TypeCaseParameterEntity")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        switch self {
+        case .normal(_, let parameters):
+            try container.encode("generic", forKey: .caseType)
+            try container.encode(parameters, forKey: .parameters)
+        case .record(_, let parameters):
+            try container.encode("record", forKey: .caseType)
+            try container.encode(parameters, forKey: .parameters)
+        }
+    }
 
     public var children: [TypeListItem] {
         switch self {

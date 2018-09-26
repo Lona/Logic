@@ -204,6 +204,25 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         return []
     }
 
+    func getDisplayType(for type: String) -> String {
+        let genericParameters = getGenericParametersForType(type)
+        if genericParameters.count > 0 {
+            return "\(type)<\(genericParameters.joined(separator: ", "))>"
+        } else {
+            return type
+        }
+    }
+
+    func getType(for displayType: String) -> String {
+        for item in getTypeList() {
+            if displayType == getDisplayType(for: item) {
+                return item
+            }
+        }
+
+        return displayType
+    }
+
     private func remove(item: Any) {
         let itemPath = self.path(forItem: item)
 
@@ -500,9 +519,10 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 switch parameter.value {
                 case .type:
                     let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                    view.items = getTypeList()
-                    view.selectedItem = parameter.value.name
-                    view.onChangeSelectedItem = { selectedItem in
+                    view.items = getTypeList().map(getDisplayType)
+                    view.selectedItem = getDisplayType(for: parameter.value.name)
+                    view.onChangeSelectedItem = { displayType in
+                        let selectedItem = self.getType(for: displayType)
                         let genericParameters = self.getGenericParametersForType(selectedItem)
                         var substitutions = genericParameters.map { generic in
                             GenericTypeParameterSubstitution(generic: generic, instance: "Unit")
@@ -533,9 +553,10 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 switch parameter.value {
                 case .type:
                     let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                    view.items = getTypeList()
-                    view.selectedItem = parameter.value.name
-                    view.onChangeSelectedItem = { selectedItem in
+                    view.items = getTypeList().map(getDisplayType)
+                    view.selectedItem = getDisplayType(for: parameter.value.name)
+                    view.onChangeSelectedItem = { displayType in
+                        let selectedItem = self.getType(for: displayType)
                         let genericParameters = self.getGenericParametersForType(selectedItem)
                         var substitutions = genericParameters.map { generic in
                             GenericTypeParameterSubstitution(generic: generic, instance: "Unit")
@@ -564,9 +585,10 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
             case .genericTypeParameterSubstitution(let substitution):
                 let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.items = getTypeList()
-                view.selectedItem = substitution.instance
-                view.onChangeSelectedItem = { selectedItem in
+                view.items = getTypeList().map(getDisplayType)
+                view.selectedItem = getDisplayType(for: substitution.instance)
+                view.onChangeSelectedItem = { displayType in
+                    let selectedItem = self.getType(for: displayType)
                     self.replace(item: item, with:
                         TypeListItem.genericTypeParameterSubstitution(
                             GenericTypeParameterSubstitution(generic: substitution.generic, instance: selectedItem)))
