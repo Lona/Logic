@@ -1,6 +1,6 @@
 //
 //  Entity.swift
-//  LogicExample2
+//  Logic
 //
 //  Created by Devin Abbott on 9/25/18.
 //  Copyright © 2018 BitDisco, Inc. All rights reserved.
