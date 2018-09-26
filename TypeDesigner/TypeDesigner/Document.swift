@@ -35,8 +35,70 @@ class Document: NSDocument {
         }
 
         typeListEditor.list = [
-//            Entity(LTypeConstructor.unit),
-//            Entity(LTypeConstructor.boolean),
+            Entity.genericType(
+                GenericType(name: "Unit", cases: [
+                    GenericTypeCase.normal("undefined", [])
+                    ])
+            ),
+            Entity.genericType(
+                GenericType(name: "Boolean", cases: [
+                    GenericTypeCase.normal("true", []),
+                    GenericTypeCase.normal("false", [])
+                    ])
+            ),
+            Entity.nativeType(NativeType(name: "Number")),
+            Entity.nativeType(NativeType(name: "String")),
+            Entity.genericType(
+                GenericType(name: "Optional", cases: [
+                    GenericTypeCase.normal("value", [
+                        NormalTypeCaseParameter(value: TypeCaseParameterEntity.generic("T"))
+                        ]),
+                    GenericTypeCase.normal("null", [])
+                    ])
+            ),
+            Entity.genericType(
+                GenericType(name: "Color", cases: [
+                    GenericTypeCase.record("color", [
+                        RecordTypeCaseParameter(key: "id", value:
+                            TypeCaseParameterEntity.type("String", [])),
+                        RecordTypeCaseParameter(key: "name", value:
+                            TypeCaseParameterEntity.type("String", [])),
+                        RecordTypeCaseParameter(key: "value", value:
+                            TypeCaseParameterEntity.type("String", [])),
+                        RecordTypeCaseParameter(key: "comment", value:
+                            TypeCaseParameterEntity.type("Optional", [
+                                GenericTypeParameterSubstitution(generic: "T", instance: "String")]))
+                        ]),
+                    ])
+            ),
+            Entity.genericType(
+                GenericType(name: "Style", cases: [
+                    GenericTypeCase.record("view", [
+                        RecordTypeCaseParameter(
+                            key: "backgroundColor",
+                            value: TypeCaseParameterEntity.type("Color", [])
+                        ),
+                        RecordTypeCaseParameter(
+                            key: "alignItems",
+                            value: TypeCaseParameterEntity.type("String", [])
+                        ),
+                        RecordTypeCaseParameter(
+                            key: "alignSelf",
+                            value: TypeCaseParameterEntity.type("String", [])
+                        ),
+                        RecordTypeCaseParameter(
+                            key: "justifyContent",
+                            value: TypeCaseParameterEntity.type("String", [])
+                        ),
+                        RecordTypeCaseParameter(
+                            key: "flex",
+                            value: TypeCaseParameterEntity.type("String", [])
+                        ),
+                        ]
+                    )
+                    ]
+                )
+            )
 //            Entity(LTypeConstructor("Number", isNative: true)),
 //            Entity(LTypeConstructor("String", isNative: true)),
 //            Entity(LTypeConstructor("Optional", dataConstructors: [

@@ -16,9 +16,18 @@ public struct NormalType {
 public struct GenericType {
     public var name: String
     public var cases: [GenericTypeCase]
+
+    public init(name: String, cases: [GenericTypeCase]) {
+        self.name = name
+        self.cases = cases
+    }
 }
 
 public struct NativeType {
+    public init(name: String) {
+        self.name = name
+    }
+
     public var name: String
 }
 

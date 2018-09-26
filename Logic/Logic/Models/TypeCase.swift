@@ -9,6 +9,11 @@
 import Foundation
 
 public struct GenericTypeParameterSubstitution {
+    public init(generic: String, instance: String) {
+        self.generic = generic
+        self.instance = instance
+    }
+
     public let generic: String
     public let instance: String
 }
@@ -41,6 +46,10 @@ public enum TypeCaseParameterEntity {
 }
 
 public struct NormalTypeCaseParameter {
+    public init(value: TypeCaseParameterEntity) {
+        self.value = value
+    }
+
     public var value: TypeCaseParameterEntity
 
     public var children: [TypeListItem] {
@@ -75,6 +84,11 @@ public struct NormalTypeCaseParameter {
 }
 
 public struct RecordTypeCaseParameter {
+    public init(key: String, value: TypeCaseParameterEntity) {
+        self.key = key
+        self.value = value
+    }
+
     public var key: String
     public var value: TypeCaseParameterEntity
 
