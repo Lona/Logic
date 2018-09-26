@@ -10,7 +10,7 @@ import Foundation
 
 public enum TypeListItem {
     case entity(Entity)
-    case typeCase(GenericTypeCase)
+    case typeCase(TypeCase)
     case normalTypeCaseParameter(NormalTypeCaseParameter)
     case recordTypeCaseParameter(RecordTypeCaseParameter)
     case genericTypeParameterSubstitution(GenericTypeParameterSubstitution)
@@ -30,7 +30,7 @@ public enum TypeListItem {
         }
     }
 
-    var typeCase: GenericTypeCase? {
+    var typeCase: TypeCase? {
         switch self {
         case .typeCase(let value):
             return value

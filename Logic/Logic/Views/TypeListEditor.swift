@@ -319,7 +319,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 switch entity {
                 case .genericType(var genericType):
                     view.onPressPlus = {
-                        genericType.cases.append(GenericTypeCase.normal("", []))
+                        genericType.cases.append(TypeCase.normal("", []))
                         self.replace(item: item, with: TypeListItem.entity(Entity.genericType(genericType)))
                     }
                 case .nativeType(_):
@@ -349,21 +349,21 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         parameters.append(
                             NormalTypeCaseParameter(value:
                                 TypeCaseParameterEntity.type("Unit", [])))
-                        self.replace(item: item, with: TypeListItem.typeCase(GenericTypeCase.normal(name, parameters)))
+                        self.replace(item: item, with: TypeListItem.typeCase(TypeCase.normal(name, parameters)))
                     case .record(let name, var parameters):
                         parameters.append(
                             RecordTypeCaseParameter(key: "", value:
                                 TypeCaseParameterEntity.type("Unit", [])))
-                        self.replace(item: item, with: TypeListItem.typeCase(GenericTypeCase.record(name, parameters)))
+                        self.replace(item: item, with: TypeListItem.typeCase(TypeCase.record(name, parameters)))
                     }
                 }
                 view.onPressMinus = { self.remove(item: item) }
                 view.onChangeText = { name in
                     switch typeCase {
                     case .normal(_, let parameters):
-                        self.replace(item: item, with: TypeListItem.typeCase(GenericTypeCase.normal(name, parameters)))
+                        self.replace(item: item, with: TypeListItem.typeCase(TypeCase.normal(name, parameters)))
                     case .record(_, let parameters):
-                        self.replace(item: item, with: TypeListItem.typeCase(GenericTypeCase.record(name, parameters)))
+                        self.replace(item: item, with: TypeListItem.typeCase(TypeCase.record(name, parameters)))
                     }
                 }
             case .normalTypeCaseParameter:

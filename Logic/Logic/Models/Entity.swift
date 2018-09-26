@@ -10,9 +10,9 @@ import Foundation
 
 public struct GenericType: Codable {
     public var name: String
-    public var cases: [GenericTypeCase]
+    public var cases: [TypeCase]
 
-    public init(name: String, cases: [GenericTypeCase]) {
+    public init(name: String, cases: [TypeCase]) {
         self.name = name
         self.cases = cases
     }
