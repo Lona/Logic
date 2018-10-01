@@ -313,7 +313,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 case .nativeType:
                     view.textColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
                 }
-                view.textField?.stringValue = entity.name
+                view.textValue = entity.name
+                view.placeholderTextValue = "Type name"
                 cell = view
 
                 switch entity {
@@ -340,7 +341,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
             case .typeCase(let typeCase):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = typeCase.name
+                view.textValue = typeCase.name
+                view.placeholderTextValue = "Case name"
                 cell = view
 
                 view.onPressPlus = {
@@ -368,13 +370,14 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
             case .normalTypeCaseParameter:
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = "(Parameter \(childIndex(forItem: item)))"
+                view.textValue = "(Parameter \(childIndex(forItem: item)))"
                 cell = view
 
                 view.onPressMinus = { self.remove(item: item) }
             case .recordTypeCaseParameter(let parameter):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = parameter.key
+                view.textValue = parameter.key
+                view.placeholderTextValue = "Key name"
                 cell = view
 
                 view.onPressMinus = { self.remove(item: item) }
@@ -384,7 +387,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
             case .genericTypeParameterSubstitution(let substitution):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = substitution.generic
+                view.textValue = substitution.generic
                 cell = view
             }
         case "Entity":
@@ -509,11 +512,11 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             switch typeListItem {
             case .entity(let entity):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = "(\(entity.children.count) case\(entity.children.count == 1 ? "" : "s"))"
+                view.textValue = "(\(entity.children.count) case\(entity.children.count == 1 ? "" : "s"))"
                 cell = view
             case .typeCase(let typeCase):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                view.textField?.stringValue = "(\(typeCase.children.count) parameter\(typeCase.children.count == 1 ? "" : "s"))"
+                view.textValue = "(\(typeCase.children.count) parameter\(typeCase.children.count == 1 ? "" : "s"))"
                 cell = view
             case .normalTypeCaseParameter(let parameter):
                 switch parameter.value {
@@ -540,7 +543,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     cell = view
                 case .generic:
                     let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                    view.textField?.stringValue = parameter.value.name
+                    view.textValue = parameter.value.name
+                    view.placeholderTextValue = "Generic name"
                     view.onChangeText = { name in
                         self.replace(item: item, with:
                             TypeListItem.normalTypeCaseParameter(
@@ -574,7 +578,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     cell = view
                 case .generic:
                     let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-                    view.textField?.stringValue = parameter.value.name
+                    view.textValue = parameter.value.name
+                    view.placeholderTextValue = "Generic name"
                     view.onChangeText = { name in
                         self.replace(item: item, with:
                             TypeListItem.recordTypeCaseParameter(

@@ -40,6 +40,10 @@ class NameCellView: NSTableCellView, Selectable, Hoverable {
 
     var textColor: NSColor? { didSet { update() } }
 
+    var textValue: String? { didSet { update() } }
+
+    var placeholderTextValue: String? { didSet { update() } }
+
     override var textField: NSTextField? {
         get { return _textField }
         set { _textField = newValue ?? _textField }
@@ -121,6 +125,8 @@ class NameCellView: NSTableCellView, Selectable, Hoverable {
         minusButton.isHidden = !isHovered || onPressMinus == nil
         _textField.isEditable = isEditable
         _textField.isEnabled = isEditable
+        _textField.stringValue = textValue ?? ""
+        _textField.placeholderString = placeholderTextValue
     }
 }
 
