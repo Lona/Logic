@@ -306,7 +306,7 @@
 				CODE_SIGN_ENTITLEMENTS = TypeDesigner/TypeDesigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = K5VK634QMQ;
+				DEVELOPMENT_TEAM = CV2RHZWPY9;
 				INFOPLIST_FILE = TypeDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -326,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = TypeDesigner/TypeDesigner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = K5VK634QMQ;
+				DEVELOPMENT_TEAM = CV2RHZWPY9;
 				INFOPLIST_FILE = TypeDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
