@@ -21,8 +21,8 @@ class Document: NSDocument {
 
     var body: [LogicEditorText] = [
         .unstyled("if"),
-        .colored("index", NSColor.systemPurple),
-        .unstyled(">"),
+        .dropdown("index", NSColor.systemPurple),
+        .colored(">", NSColor.systemGray),
         .colored("10", NSColor.systemBlue),
         ]
 
