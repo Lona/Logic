@@ -83,7 +83,7 @@ private struct MeasuredEditorText {
 
 // MARK: - LogicEditor
 
-public class LogicEditor: NSBox {
+public class LogicEditor: NSView {
 
     // MARK: Lifecycle
 
@@ -121,6 +121,10 @@ public class LogicEditor: NSBox {
     public var font = TextStyle(family: "menlo", size: 13).nsFont
 
     // MARK: Overrides
+
+    public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
 
     public func getBoundingRect(for indexPath: IndexPath) -> CGRect? {
         var rect: CGRect?
@@ -328,11 +332,7 @@ public class LogicEditor: NSBox {
             height: rect.height)
     }
 
-    private func setUpViews() {
-        boxType = .custom
-        borderType = .noBorder
-        contentViewMargins = .zero
-    }
+    private func setUpViews() {}
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false

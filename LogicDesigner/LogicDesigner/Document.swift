@@ -43,6 +43,16 @@ class Document: NSDocument {
         }
     }
 
+    func suggestions() -> [SuggestionListItem] {
+        var statements: [SuggestionListItem] = [.sectionHeader(Language.title(of: .statement))]
+        statements.append(contentsOf: Language.statements.map { SuggestionListItem.row($0) })
+
+        var declarations: [SuggestionListItem] = [.sectionHeader(Language.title(of: .declaration))]
+        declarations.append(contentsOf: Language.declarations.map { SuggestionListItem.row($0) })
+
+        return Array([statements, declarations].joined())
+    }
+
     func setUpViews() -> NSView {
         let logicEditor = LogicEditor()
 
@@ -57,6 +67,8 @@ class Document: NSDocument {
                 if let indexPath = indexPath {
                     self.suggestionText = self.body[indexPath.section][indexPath.item].value
 
+                    childWindow.suggestionView.suggestionList.items = self.suggestions()
+
                     window.addChildWindow(childWindow, ordered: .above)
 
                     if let rect = logicEditor.getBoundingRect(for: indexPath) {
@@ -69,7 +81,7 @@ class Document: NSDocument {
                     childWindow.setIsVisible(false)
                 }
             }
-//
+
             Swift.print("Clicked \(indexPath)")
         }
 

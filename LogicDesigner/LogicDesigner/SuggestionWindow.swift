@@ -11,7 +11,7 @@ import AppKit
 class SuggestionWindow: NSWindow {
     convenience init() {
         self.init(
-            contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false)
@@ -33,7 +33,7 @@ class SuggestionWindow: NSWindow {
         box.shadow = shadow
         box.cornerRadius = 4
 
-        let view = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 100))
+        let view = NSView()
 
         view.addSubview(box)
         box.addSubview(suggestionView)

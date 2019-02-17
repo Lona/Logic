@@ -25,6 +25,10 @@
 		6B12C6172219EAA6005A808C /* NSImage+Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C60C2219EAA6005A808C /* NSImage+Resizing.swift */; };
 		6B12C6182219EAA6005A808C /* LNATextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C60D2219EAA6005A808C /* LNATextField.swift */; };
 		6B12C6192219EAA6005A808C /* LonaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C60E2219EAA6005A808C /* LonaViewModel.swift */; };
+		6B12C61C2219F455005A808C /* ResultSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C61A2219F455005A808C /* ResultSectionHeader.swift */; };
+		6B12C61D2219F455005A808C /* ResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C61B2219F455005A808C /* ResultRow.swift */; };
+		6B12C61F221A14D9005A808C /* SuggestionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C61E221A14D9005A808C /* SuggestionListView.swift */; };
+		6B12C621221A1E0A005A808C /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C620221A1E0A005A808C /* Language.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +53,10 @@
 		6B12C60C2219EAA6005A808C /* NSImage+Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSImage+Resizing.swift"; sourceTree = "<group>"; };
 		6B12C60D2219EAA6005A808C /* LNATextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LNATextField.swift; sourceTree = "<group>"; };
 		6B12C60E2219EAA6005A808C /* LonaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LonaViewModel.swift; sourceTree = "<group>"; };
+		6B12C61A2219F455005A808C /* ResultSectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultSectionHeader.swift; sourceTree = "<group>"; };
+		6B12C61B2219F455005A808C /* ResultRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultRow.swift; sourceTree = "<group>"; };
+		6B12C61E221A14D9005A808C /* SuggestionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListView.swift; sourceTree = "<group>"; };
+		6B12C620221A1E0A005A808C /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +101,8 @@
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
 				6B12C5FD2219E6A8005A808C /* ControlledSearchInput.swift */,
+				6B12C61E221A14D9005A808C /* SuggestionListView.swift */,
+				6B12C620221A1E0A005A808C /* Language.swift */,
 			);
 			path = LogicDesigner;
 			sourceTree = "<group>";
@@ -100,15 +110,15 @@
 		6B12C6012219EAA6005A808C /* Generated */ = {
 			isa = PBXGroup;
 			children = (
-				6B12C6022219EAA6005A808C /* TextStyles.swift */,
 				6B12C6032219EAA6005A808C /* CGSize+Resizing.swift */,
-				6B12C6042219EAA6005A808C /* Shadows.swift */,
-				6B12C6082219EAA6005A808C /* components */,
-				6B12C60A2219EAA6005A808C /* LNAImageView.swift */,
 				6B12C60B2219EAA6005A808C /* Colors.swift */,
-				6B12C60C2219EAA6005A808C /* NSImage+Resizing.swift */,
+				6B12C60A2219EAA6005A808C /* LNAImageView.swift */,
 				6B12C60D2219EAA6005A808C /* LNATextField.swift */,
 				6B12C60E2219EAA6005A808C /* LonaViewModel.swift */,
+				6B12C60C2219EAA6005A808C /* NSImage+Resizing.swift */,
+				6B12C6042219EAA6005A808C /* Shadows.swift */,
+				6B12C6022219EAA6005A808C /* TextStyles.swift */,
+				6B12C6082219EAA6005A808C /* components */,
 			);
 			path = Generated;
 			sourceTree = "<group>";
@@ -117,6 +127,8 @@
 			isa = PBXGroup;
 			children = (
 				6B12C6092219EAA6005A808C /* SuggestionView.swift */,
+				6B12C61B2219F455005A808C /* ResultRow.swift */,
+				6B12C61A2219F455005A808C /* ResultSectionHeader.swift */,
 			);
 			path = components;
 			sourceTree = "<group>";
@@ -193,11 +205,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B12C6122219EAA6005A808C /* TextStyle.swift in Sources */,
+				6B12C61D2219F455005A808C /* ResultRow.swift in Sources */,
+				6B12C61C2219F455005A808C /* ResultSectionHeader.swift in Sources */,
 				6B12C6182219EAA6005A808C /* LNATextField.swift in Sources */,
 				6B12C5FE2219E6A8005A808C /* ControlledSearchInput.swift in Sources */,
+				6B12C621221A1E0A005A808C /* Language.swift in Sources */,
 				6B12C6112219EAA6005A808C /* Shadows.swift in Sources */,
 				6B12C6162219EAA6005A808C /* Colors.swift in Sources */,
 				6B12C5F72218BE87005A808C /* LogicEditor.swift in Sources */,
+				6B12C61F221A14D9005A808C /* SuggestionListView.swift in Sources */,
 				6B12C6102219EAA6005A808C /* CGSize+Resizing.swift in Sources */,
 				6B12C60F2219EAA6005A808C /* TextStyles.swift in Sources */,
 				6B12C6192219EAA6005A808C /* LonaViewModel.swift in Sources */,

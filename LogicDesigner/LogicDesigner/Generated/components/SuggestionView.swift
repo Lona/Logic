@@ -67,6 +67,7 @@ public class SuggestionView: NSBox {
   private var searchInputView = ControlledSearchInput()
   private var dividerView = NSBox()
   private var suggestionAreaView = NSBox()
+  private var suggestionListViewView = SuggestionListView()
 
   private func setUpViews() {
     boxType = .custom
@@ -86,6 +87,7 @@ public class SuggestionView: NSBox {
     addSubview(dividerView)
     addSubview(suggestionAreaView)
     searchAreaView.addSubview(searchInputView)
+    suggestionAreaView.addSubview(suggestionListViewView)
 
     dividerView.fillColor = Colors.divider
   }
@@ -96,6 +98,7 @@ public class SuggestionView: NSBox {
     dividerView.translatesAutoresizingMaskIntoConstraints = false
     suggestionAreaView.translatesAutoresizingMaskIntoConstraints = false
     searchInputView.translatesAutoresizingMaskIntoConstraints = false
+    suggestionListViewView.translatesAutoresizingMaskIntoConstraints = false
 
     let searchAreaViewTopAnchorConstraint = searchAreaView.topAnchor.constraint(equalTo: topAnchor)
     let searchAreaViewLeadingAnchorConstraint = searchAreaView.leadingAnchor.constraint(equalTo: leadingAnchor)
@@ -126,6 +129,18 @@ public class SuggestionView: NSBox {
       .constraint(equalTo: searchAreaView.bottomAnchor, constant: -5)
     let dividerViewHeightAnchorConstraint = dividerView.heightAnchor.constraint(equalToConstant: 1)
     let suggestionAreaViewHeightAnchorConstraint = suggestionAreaView.heightAnchor.constraint(equalToConstant: 200)
+    let suggestionListViewViewTopAnchorConstraint = suggestionListViewView
+      .topAnchor
+      .constraint(equalTo: suggestionAreaView.topAnchor)
+    let suggestionListViewViewBottomAnchorConstraint = suggestionListViewView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let suggestionListViewViewLeadingAnchorConstraint = suggestionListViewView
+      .leadingAnchor
+      .constraint(equalTo: suggestionAreaView.leadingAnchor)
+    let suggestionListViewViewTrailingAnchorConstraint = suggestionListViewView
+      .trailingAnchor
+      .constraint(equalTo: suggestionAreaView.trailingAnchor)
 
     NSLayoutConstraint.activate([
       searchAreaViewTopAnchorConstraint,
@@ -144,7 +159,11 @@ public class SuggestionView: NSBox {
       searchInputViewTopAnchorConstraint,
       searchInputViewBottomAnchorConstraint,
       dividerViewHeightAnchorConstraint,
-      suggestionAreaViewHeightAnchorConstraint
+      suggestionAreaViewHeightAnchorConstraint,
+      suggestionListViewViewTopAnchorConstraint,
+      suggestionListViewViewBottomAnchorConstraint,
+      suggestionListViewViewLeadingAnchorConstraint,
+      suggestionListViewViewTrailingAnchorConstraint
     ])
   }
 
@@ -214,5 +233,9 @@ extension SuggestionView {
 extension SuggestionView {
     public var searchInput: ControlledSearchInput {
         return searchInputView
+    }
+
+    public var suggestionList: SuggestionListView {
+        return suggestionListViewView
     }
 }

@@ -1,5 +1,10 @@
 {
   "styles" : [
-
+    {
+      "color" : "textMuted",
+      "fontSize" : 10,
+      "id" : "sectionHeader",
+      "name" : "Section Header"
+    }
   ]
 }

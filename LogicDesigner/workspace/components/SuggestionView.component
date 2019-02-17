@@ -92,6 +92,15 @@
         "type" : "Lona:View"
       },
       {
+        "children" : [
+          {
+            "id" : "SuggestionListView",
+            "params" : {
+
+            },
+            "type" : "SuggestionListView"
+          }
+        ],
         "id" : "Suggestion Area",
         "params" : {
           "alignSelf" : "stretch",
