@@ -98,8 +98,9 @@ public class LogicEditor: NSBox {
     // MARK: Public
 
     public var lines: [[LogicEditorText]] = [] { didSet { update() } }
+    public var selectedIndexPath: IndexPath? { didSet { update() } }
 
-    public var onClickText: ((Int, Int) -> Void)?
+    public var onClickIndexPath: ((IndexPath?) -> Void)?
 
     public var textMargin = CGSize(width: 8, height: 6)
     public var textPadding = CGSize(width: 4, height: 1)
@@ -119,25 +120,17 @@ public class LogicEditor: NSBox {
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        var selectedLine: Int? = nil
-        var selectedIndex: Int? = nil
+        var indexPath: IndexPath? = nil
 
-        measuredLines.enumerated().forEach { lineOffset, line in
-            line.enumerated().forEach { index, measuredText in
+        measuredLines.enumerated().forEach { lineIndex, line in
+            line.enumerated().forEach { textIndex, measuredText in
                 if measuredText.backgroundRect.contains(point) {
-                    selectedLine = lineOffset
-                    selectedIndex = index
+                    indexPath = IndexPath(item: textIndex, section: lineIndex)
                 }
             }
         }
 
-//        let selectedIndex = measuredLines.firstIndex(where: { measuredText in
-//            return measuredText.backgroundRect.contains(point)
-//        })
-
-        if let selectedLine = selectedLine, let selectedIndex = selectedIndex {
-            onClickText?(selectedLine, selectedIndex)
-        }
+        onClickIndexPath?(indexPath)
     }
 
     public override var isFlipped: Bool {
@@ -149,8 +142,9 @@ public class LogicEditor: NSBox {
 
         let measuredLines = self.measuredLines
 
-        measuredLines.forEach { line in
-            line.forEach { measuredText in
+        measuredLines.enumerated().forEach { lineIndex, line in
+            line.enumerated().forEach { textIndex, measuredText in
+                let selected = IndexPath(item: textIndex, section: lineIndex) == self.selectedIndexPath
                 let text = measuredText.text
                 let rect = measuredText.attributedStringRect
                 let backgroundRect = measuredText.backgroundRect
@@ -160,6 +154,8 @@ public class LogicEditor: NSBox {
                 case .unstyled, .colored:
                     attributedString.draw(at: rect.origin)
                 case .dropdown(let value, let color):
+                    let color = selected ? NSColor.systemGreen : color
+
                     color.highlight(withLevel: 0.7)?.setFill()
                     let backgroundPath = NSBezierPath(roundedRect: backgroundRect, xRadius: 2, yRadius: 2)
                     backgroundPath.fill()
@@ -197,12 +193,13 @@ public class LogicEditor: NSBox {
 
         var yOffset = textMargin.height
 
-        lines.forEach { line in
+        lines.enumerated().forEach { lineIndex, line in
             var xOffset = textMargin.width
 
             var measuredLine: [MeasuredEditorText] = []
 
-            line.forEach { text in
+            line.enumerated().forEach { textIndex, text in
+                let selected = IndexPath(item: textIndex, section: lineIndex) == self.selectedIndexPath
                 let attributedString = NSMutableAttributedString(string: text.value)
                 let range = NSRange(location: 0, length: attributedString.length)
 
@@ -228,6 +225,8 @@ public class LogicEditor: NSBox {
 
                     measuredLine.append(measured)
                 case .colored(_, let color):
+                    let color = selected ? NSColor.systemGreen : color
+
                     let attributes: [NSAttributedString.Key: Any] = [
                         NSAttributedString.Key.foregroundColor: color,
                         NSAttributedString.Key.font: font
@@ -248,6 +247,8 @@ public class LogicEditor: NSBox {
 
                     measuredLine.append(measured)
                 case .dropdown(_, let color):
+                    let color = selected ? NSColor.systemGreen : color
+                    
                     let attributes: [NSAttributedString.Key: Any] = [
                         NSAttributedString.Key.foregroundColor: color,
                         NSAttributedString.Key.font: font

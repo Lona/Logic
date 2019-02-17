@@ -25,7 +25,6 @@ class Document: NSDocument {
             .dropdown("index", NSColor.systemPurple),
             .colored(">", NSColor.systemGray),
             .colored("10", NSColor.systemBlue),
-            .unstyled(":"),
         ],
         [
             .dropdown("", NSColor.systemGray)
@@ -41,13 +40,10 @@ class Document: NSDocument {
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
-        logicEditor.onClickText = { lineNumber, index in
-//            self.selectedTextIndex = index
-
-            self.body[lineNumber][index] = .colored(self.body[lineNumber][index].value, NSColor.systemGreen)
-            logicEditor.lines = self.body
-
-            Swift.print("Clicked \(self.body[lineNumber][index])")
+        logicEditor.onClickIndexPath = { indexPath in
+            logicEditor.selectedIndexPath = indexPath
+//
+            Swift.print("Clicked \(indexPath)")
         }
 
         return logicEditor
