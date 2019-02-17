@@ -118,7 +118,7 @@ public class LogicEditor: NSBox {
     public var lineSpacing: CGFloat = 6.0
     public var minimumLineHeight: CGFloat = 20.0
 
-    public var font = TextStyle(family: "monaco", size: 13).nsFont
+    public var font = TextStyle(family: "menlo", size: 13).nsFont
 
     // MARK: Overrides
 

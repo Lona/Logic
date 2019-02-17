@@ -1,0 +1,9 @@
+{
+  "colors" : [
+    {
+      "id" : "divider",
+      "name" : "divider",
+      "value" : "rgba(237,237,237,1.0)"
+    }
+  ]
+}

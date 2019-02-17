@@ -37,6 +37,12 @@ class Document: NSDocument {
 
     var selectedTextIndex: Int?
 
+    var suggestionText: String = "" {
+        didSet {
+            childWindow?.suggestionText = suggestionText
+        }
+    }
+
     func setUpViews() -> NSView {
         let logicEditor = LogicEditor()
 
@@ -49,11 +55,14 @@ class Document: NSDocument {
 
             if let window = self.window, let childWindow = self.childWindow {
                 if let indexPath = indexPath {
+                    self.suggestionText = self.body[indexPath.section][indexPath.item].value
+
                     window.addChildWindow(childWindow, ordered: .above)
 
                     if let rect = logicEditor.getBoundingRect(for: indexPath) {
                         let screenRect = window.convertToScreen(rect)
                         childWindow.anchorTo(rect: screenRect)
+                        childWindow.focusSearchField()
                     }
                 } else {
                     window.removeChildWindow(childWindow)
@@ -88,7 +97,14 @@ class Document: NSDocument {
         addWindowController(windowController)
 
         self.window = window
-        self.childWindow = SuggestionWindow()
+
+        let childWindow = SuggestionWindow()
+
+        childWindow.onChangeSuggestionText = { value in
+            self.suggestionText = value
+        }
+
+        self.childWindow = childWindow
     }
 
     override var windowNibName: NSNib.Name? {

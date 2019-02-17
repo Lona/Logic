@@ -1,0 +1,109 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+
+      }
+    }
+  ],
+  "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onChangeTextValue"
+      ],
+      "content" : [
+        "parameters",
+        "onChangeSearchText"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "textValue"
+      ],
+      "content" : [
+        "parameters",
+        "searchText"
+      ],
+      "type" : "AssignExpr"
+    }
+  ],
+  "params" : [
+    {
+      "name" : "searchText",
+      "type" : "String"
+    },
+    {
+      "name" : "onChangeSearchText",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "String"
+          }
+        ]
+      }
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "children" : [
+          {
+            "id" : "SearchInput",
+            "params" : {
+              "textValue" : "Search"
+            },
+            "type" : "ControlledSearchInput"
+          }
+        ],
+        "id" : "Search Area",
+        "params" : {
+          "alignSelf" : "stretch",
+          "flexDirection" : "row",
+          "height" : 32,
+          "paddingBottom" : 5,
+          "paddingLeft" : 10,
+          "paddingRight" : 10,
+          "paddingTop" : 5
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "id" : "Divider",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "divider",
+          "height" : 1
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "id" : "Suggestion Area",
+        "params" : {
+          "alignSelf" : "stretch",
+          "height" : 200
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "Container",
+    "params" : {
+      "alignSelf" : "stretch"
+    },
+    "type" : "Lona:View"
+  }
+}

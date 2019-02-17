@@ -34,7 +34,9 @@ class SuggestionWindow: NSWindow {
         box.cornerRadius = 4
 
         let view = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 100))
+
         view.addSubview(box)
+        box.addSubview(suggestionView)
 
         box.translatesAutoresizingMaskIntoConstraints = false
         box.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
@@ -42,14 +44,41 @@ class SuggestionWindow: NSWindow {
         box.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12).isActive = true
         box.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -12).isActive = true
 
+        suggestionView.translatesAutoresizingMaskIntoConstraints = false
+        suggestionView.topAnchor.constraint(equalTo: box.topAnchor).isActive = true
+        suggestionView.leadingAnchor.constraint(equalTo: box.leadingAnchor).isActive = true
+        suggestionView.trailingAnchor.constraint(equalTo: box.trailingAnchor).isActive = true
+        suggestionView.bottomAnchor.constraint(equalTo: box.bottomAnchor).isActive = true
+
         self.contentBox = box
+
+        suggestionView.searchInput.isBordered = false
+        suggestionView.searchInput.focusRingType = .none
+        suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
 
         window.contentView = view
     }
 
     var contentBox: NSView?
 
+    var suggestionView = SuggestionView()
+
     // MARK: Public
+
+    public var suggestionText: String {
+        get { return suggestionView.searchText }
+        set { suggestionView.searchText = newValue }
+    }
+
+    public var onChangeSuggestionText: ((String) -> Void)? {
+        get { return suggestionView.onChangeSearchText }
+        set { suggestionView.onChangeSearchText = newValue }
+    }
+
+    public func focusSearchField() {
+        makeKey()
+        makeFirstResponder(suggestionView.searchInput)
+    }
 
     public func anchorTo(rect: NSRect) {
         let margin: CGFloat = 2.0
@@ -60,6 +89,10 @@ class SuggestionWindow: NSWindow {
     }
 
     // MARK: Overrides
+
+    override var canBecomeKey: Bool {
+        return true
+    }
 
     override func setFrameOrigin(_ point: NSPoint) {
         super.setFrameOrigin(NSPoint(x: point.x - 12, y: point.y - 12))
