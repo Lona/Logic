@@ -27,6 +27,10 @@ class Document: NSDocument {
             .colored("10", NSColor.systemBlue),
         ],
         [
+            .indent,
+            .dropdown("", NSColor.systemGray)
+        ],
+        [
             .dropdown("", NSColor.systemGray)
         ]
     ]
@@ -42,12 +46,29 @@ class Document: NSDocument {
 
         logicEditor.onClickIndexPath = { indexPath in
             logicEditor.selectedIndexPath = indexPath
+
+            if let window = self.window, let childWindow = self.childWindow {
+                if let indexPath = indexPath {
+                    window.addChildWindow(childWindow, ordered: .above)
+
+                    if let rect = logicEditor.getBoundingRect(for: indexPath) {
+                        let screenRect = window.convertToScreen(rect)
+                        childWindow.anchorTo(rect: screenRect)
+                    }
+                } else {
+                    window.removeChildWindow(childWindow)
+                    childWindow.setIsVisible(false)
+                }
+            }
 //
             Swift.print("Clicked \(indexPath)")
         }
 
         return logicEditor
     }
+
+    var childWindow: SuggestionWindow?
+    var window: NSWindow?
 
     override func makeWindowControllers() {
         let window = NSWindow(
@@ -65,6 +86,9 @@ class Document: NSDocument {
         windowController.showWindow(nil)
 
         addWindowController(windowController)
+
+        self.window = window
+        self.childWindow = SuggestionWindow()
     }
 
     override var windowNibName: NSNib.Name? {

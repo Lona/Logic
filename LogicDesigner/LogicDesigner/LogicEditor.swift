@@ -42,6 +42,7 @@ extension NSBezierPath {
 }
 
 public enum LogicEditorText {
+    case indent
     case unstyled(String)
     case colored(String, NSColor)
     case dropdown(String, NSColor)
@@ -54,6 +55,8 @@ public enum LogicEditorText {
             return value
         case .dropdown(let value, _):
             return value
+        case .indent:
+            return ""
         }
     }
 
@@ -65,6 +68,8 @@ public enum LogicEditorText {
             return color
         case .dropdown(_, let color):
             return color
+        case .indent:
+            return NSColor.clear
         }
     }
 }
@@ -117,6 +122,20 @@ public class LogicEditor: NSBox {
 
     // MARK: Overrides
 
+    public func getBoundingRect(for indexPath: IndexPath) -> CGRect? {
+        var rect: CGRect?
+
+        measuredLines.enumerated().forEach { lineIndex, line in
+            line.enumerated().forEach { textIndex, measuredText in
+                if lineIndex == indexPath.section && textIndex == indexPath.item {
+                    rect = flip(rect: measuredText.backgroundRect)
+                }
+            }
+        }
+
+        return rect
+    }
+
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
@@ -151,6 +170,8 @@ public class LogicEditor: NSBox {
                 let attributedString = measuredText.attributedString
 
                 switch (text) {
+                case .indent:
+                    break
                 case .unstyled, .colored:
                     attributedString.draw(at: rect.origin)
                 case .dropdown(let value, let color):
@@ -204,6 +225,18 @@ public class LogicEditor: NSBox {
                 let range = NSRange(location: 0, length: attributedString.length)
 
                 switch (text) {
+                case .indent:
+                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: NSSize(width: 20, height: 0))
+
+                    let measured = MeasuredEditorText(
+                        text: text,
+                        attributedString: NSAttributedString(string: ""),
+                        attributedStringRect: rect,
+                        backgroundRect: rect)
+
+                    xOffset += rect.width + textSpacing
+
+                    measuredLine.append(measured)
                 case .unstyled:
                     let attributes: [NSAttributedString.Key: Any] = [
                         NSAttributedString.Key.foregroundColor: NSColor.black,
@@ -286,6 +319,14 @@ public class LogicEditor: NSBox {
     }
 
     // MARK: Private
+
+    private func flip(rect: CGRect) -> CGRect {
+        return CGRect(
+            x: rect.origin.x,
+            y: bounds.height - rect.height - rect.origin.y,
+            width: rect.width,
+            height: rect.height)
+    }
 
     private func setUpViews() {
         boxType = .custom
