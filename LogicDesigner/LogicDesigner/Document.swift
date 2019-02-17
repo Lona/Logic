@@ -19,29 +19,35 @@ class Document: NSDocument {
         return false
     }
 
-    var body: [LogicEditorText] = [
-        .unstyled("if"),
-        .dropdown("index", NSColor.systemPurple),
-        .colored(">", NSColor.systemGray),
-        .colored("10", NSColor.systemBlue),
+    var body: [[LogicEditorText]] = [
+        [
+            .unstyled("if"),
+            .dropdown("index", NSColor.systemPurple),
+            .colored(">", NSColor.systemGray),
+            .colored("10", NSColor.systemBlue),
+            .unstyled(":"),
+        ],
+        [
+            .dropdown("", NSColor.systemGray)
         ]
+    ]
 
     var selectedTextIndex: Int?
 
     func setUpViews() -> NSView {
         let logicEditor = LogicEditor()
 
-        logicEditor.body = body
+        logicEditor.lines = body
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
-        logicEditor.onClickText = { index in
+        logicEditor.onClickText = { lineNumber, index in
 //            self.selectedTextIndex = index
 
-            self.body[index] = .colored(self.body[index].value, NSColor.systemGreen)
-            logicEditor.body = self.body
+            self.body[lineNumber][index] = .colored(self.body[lineNumber][index].value, NSColor.systemGreen)
+            logicEditor.lines = self.body
 
-            Swift.print("Clicked \(self.body[index])")
+            Swift.print("Clicked \(self.body[lineNumber][index])")
         }
 
         return logicEditor

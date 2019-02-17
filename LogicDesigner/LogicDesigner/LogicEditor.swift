@@ -39,20 +39,6 @@ extension NSBezierPath {
 
         line(to: firstCorner)
     }
-
-    static func makeTriangle(equilateralSide: CGFloat, center: CGPoint, rotation: CGFloat = 0) -> NSBezierPath {
-        let altitude = CGFloat(sqrt(3.0) / 2.0 * equilateralSide)
-        let heightToCenter = altitude / 3
-
-        let path = NSBezierPath()
-
-        path.move(to: CGPoint(x: center.x, y: center.y - heightToCenter * 2))
-        path.line(to: CGPoint(x: center.x + equilateralSide / 2, y: center.y + heightToCenter))
-        path.line(to: CGPoint(x: center.x - equilateralSide / 2, y: center.y + heightToCenter))
-        path.close()
-
-        return path
-    }
 }
 
 public enum LogicEditorText {
@@ -111,11 +97,11 @@ public class LogicEditor: NSBox {
 
     // MARK: Public
 
-    public var body: [LogicEditorText] = [] { didSet { update() } }
+    public var lines: [[LogicEditorText]] = [] { didSet { update() } }
 
-    public var onClickText: ((Int) -> Void)?
+    public var onClickText: ((Int, Int) -> Void)?
 
-    public var textMargin = CGSize(width: 4, height: 4)
+    public var textMargin = CGSize(width: 8, height: 6)
     public var textPadding = CGSize(width: 4, height: 1)
 
     public var underlinedRange: NSRange?
@@ -123,6 +109,8 @@ public class LogicEditor: NSBox {
     public var underlineOffset: CGFloat = 2.0
 
     public var textSpacing: CGFloat = 6.0
+    public var lineSpacing: CGFloat = 6.0
+    public var minimumLineHeight: CGFloat = 20.0
 
     public var font = TextStyle(family: "monaco", size: 13).nsFont
 
@@ -131,12 +119,24 @@ public class LogicEditor: NSBox {
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        let selectedIndex = measuredBody.firstIndex(where: { measuredText in
-            return measuredText.backgroundRect.contains(point)
-        })
+        var selectedLine: Int? = nil
+        var selectedIndex: Int? = nil
 
-        if let selectedIndex = selectedIndex {
-            onClickText?(selectedIndex)
+        measuredLines.enumerated().forEach { lineOffset, line in
+            line.enumerated().forEach { index, measuredText in
+                if measuredText.backgroundRect.contains(point) {
+                    selectedLine = lineOffset
+                    selectedIndex = index
+                }
+            }
+        }
+
+//        let selectedIndex = measuredLines.firstIndex(where: { measuredText in
+//            return measuredText.backgroundRect.contains(point)
+//        })
+
+        if let selectedLine = selectedLine, let selectedIndex = selectedIndex {
+            onClickText?(selectedLine, selectedIndex)
         }
     }
 
@@ -147,122 +147,141 @@ public class LogicEditor: NSBox {
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        let measuredBody = self.measuredBody
+        let measuredLines = self.measuredLines
 
-        measuredBody.forEach { measuredText in
-            let text = measuredText.text
-            let rect = measuredText.attributedStringRect
-            let backgroundRect = measuredText.backgroundRect
-            let attributedString = measuredText.attributedString
+        measuredLines.forEach { line in
+            line.forEach { measuredText in
+                let text = measuredText.text
+                let rect = measuredText.attributedStringRect
+                let backgroundRect = measuredText.backgroundRect
+                let attributedString = measuredText.attributedString
 
-            switch (text) {
-            case .unstyled, .colored:
-                attributedString.draw(at: rect.origin)
-            case .dropdown(_, let color):
-                color.highlight(withLevel: 0.7)?.setFill()
-                let backgroundPath = NSBezierPath(roundedRect: backgroundRect, xRadius: 2, yRadius: 2)
-                backgroundPath.fill()
+                switch (text) {
+                case .unstyled, .colored:
+                    attributedString.draw(at: rect.origin)
+                case .dropdown(let value, let color):
+                    color.highlight(withLevel: 0.7)?.setFill()
+                    let backgroundPath = NSBezierPath(roundedRect: backgroundRect, xRadius: 2, yRadius: 2)
+                    backgroundPath.fill()
 
-                color.setFill()
-                let caretCenter = CGPoint(x: backgroundRect.maxX - 10, y: backgroundRect.midY - 1)
-                let caretStart = CGPoint(x: backgroundRect.maxX - 16, y: backgroundRect.midY - 1)
-                let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
-                caret.fill()
+                    color.setFill()
+                    let caretX = backgroundRect.maxX - (value.isEmpty ? 14 : 10)
+                    let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY - 1)
+                    let caretStart = CGPoint(x: caretX - 6, y: backgroundRect.midY - 1)
+                    let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
+                    caret.fill()
 
-                attributedString.draw(at: rect.origin)
+                    attributedString.draw(at: rect.origin)
+                }
             }
         }
 
-        if let range = underlinedRange, range.location + range.length < body.count {
-            let first = measuredBody[range.location]
-            let last = measuredBody[range.location + range.length]
-
-            underlineColor.setFill()
-            
-            let underlineRect = NSRect(
-                x: first.backgroundRect.minX,
-                y: first.backgroundRect.maxY + underlineOffset,
-                width: last.backgroundRect.maxX - first.backgroundRect.minX,
-                height: 2)
-
-            underlineRect.fill()
-        }
+//        if let range = underlinedRange, range.location + range.length < lines.count {
+//            let first = measuredBody[range.location]
+//            let last = measuredBody[range.location + range.length]
+//
+//            underlineColor.setFill()
+//
+//            let underlineRect = NSRect(
+//                x: first.backgroundRect.minX,
+//                y: first.backgroundRect.maxY + underlineOffset,
+//                width: last.backgroundRect.maxX - first.backgroundRect.minX,
+//                height: 2)
+//
+//            underlineRect.fill()
+//        }
     }
 
-    private var measuredBody: [MeasuredEditorText] {
-        var measuredBody: [MeasuredEditorText] = []
-        var xOffset = textMargin.width
+    private var measuredLines: [[MeasuredEditorText]] {
+        var measuredLines: [[MeasuredEditorText]] = []
 
-        body.forEach { text in
-            let attributedString = NSMutableAttributedString(string: text.value)
-            let range = NSRange(location: 0, length: attributedString.length)
+        var yOffset = textMargin.height
 
-            switch (text) {
-            case .unstyled:
-                let attributes: [NSAttributedString.Key: Any] = [
-                    NSAttributedString.Key.foregroundColor: NSColor.black,
-                    NSAttributedString.Key.font: font
-                ]
-                attributedString.setAttributes(attributes, range: range)
+        lines.forEach { line in
+            var xOffset = textMargin.width
 
-                let attributedStringSize = attributedString.size()
-                let rect = CGRect(origin: CGPoint(x: xOffset, y: textMargin.height), size: attributedStringSize)
-                let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
+            var measuredLine: [MeasuredEditorText] = []
 
-                xOffset += backgroundRect.width + textSpacing
+            line.forEach { text in
+                let attributedString = NSMutableAttributedString(string: text.value)
+                let range = NSRange(location: 0, length: attributedString.length)
 
-                let measured = MeasuredEditorText(
-                    text: text,
-                    attributedString: attributedString,
-                    attributedStringRect: rect,
-                    backgroundRect: backgroundRect)
+                switch (text) {
+                case .unstyled:
+                    let attributes: [NSAttributedString.Key: Any] = [
+                        NSAttributedString.Key.foregroundColor: NSColor.black,
+                        NSAttributedString.Key.font: font
+                    ]
+                    attributedString.setAttributes(attributes, range: range)
 
-                measuredBody.append(measured)
-            case .colored(_, let color):
-                let attributes: [NSAttributedString.Key: Any] = [
-                    NSAttributedString.Key.foregroundColor: color,
-                    NSAttributedString.Key.font: font
-                ]
-                attributedString.setAttributes(attributes, range: range)
+                    let attributedStringSize = attributedString.size()
+                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
+                    let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
 
-                let attributedStringSize = attributedString.size()
-                let rect = CGRect(origin: CGPoint(x: xOffset, y: textMargin.height), size: attributedStringSize)
-                let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
+                    xOffset += backgroundRect.width + textSpacing
 
-                xOffset += backgroundRect.width + textSpacing
+                    let measured = MeasuredEditorText(
+                        text: text,
+                        attributedString: attributedString,
+                        attributedStringRect: rect,
+                        backgroundRect: backgroundRect)
 
-                let measured = MeasuredEditorText(
-                    text: text,
-                    attributedString: attributedString,
-                    attributedStringRect: rect,
-                    backgroundRect: backgroundRect)
+                    measuredLine.append(measured)
+                case .colored(_, let color):
+                    let attributes: [NSAttributedString.Key: Any] = [
+                        NSAttributedString.Key.foregroundColor: color,
+                        NSAttributedString.Key.font: font
+                    ]
+                    attributedString.setAttributes(attributes, range: range)
 
-                measuredBody.append(measured)
-            case .dropdown(_, let color):
-                let attributes: [NSAttributedString.Key: Any] = [
-                    NSAttributedString.Key.foregroundColor: color,
-                    NSAttributedString.Key.font: font
-                ]
-                attributedString.setAttributes(attributes, range: range)
+                    let attributedStringSize = attributedString.size()
+                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
+                    let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
 
-                let attributedStringSize = attributedString.size()
-                let rect = CGRect(origin: CGPoint(x: xOffset, y: textMargin.height), size: attributedStringSize)
-                var backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
-                backgroundRect.size.width += 20
+                    xOffset += backgroundRect.width + textSpacing
 
-                xOffset += backgroundRect.width + textSpacing
+                    let measured = MeasuredEditorText(
+                        text: text,
+                        attributedString: attributedString,
+                        attributedStringRect: rect,
+                        backgroundRect: backgroundRect)
 
-                let measured = MeasuredEditorText(
-                    text: text,
-                    attributedString: attributedString,
-                    attributedStringRect: rect,
-                    backgroundRect: backgroundRect)
+                    measuredLine.append(measured)
+                case .dropdown(_, let color):
+                    let attributes: [NSAttributedString.Key: Any] = [
+                        NSAttributedString.Key.foregroundColor: color,
+                        NSAttributedString.Key.font: font
+                    ]
+                    attributedString.setAttributes(attributes, range: range)
 
-                measuredBody.append(measured)
+                    let attributedStringSize = attributedString.size()
+                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
+                    var backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
+                    backgroundRect.size.width += 20
+
+                    xOffset += backgroundRect.width + textSpacing
+
+                    let measured = MeasuredEditorText(
+                        text: text,
+                        attributedString: attributedString,
+                        attributedStringRect: rect,
+                        backgroundRect: backgroundRect)
+
+                    measuredLine.append(measured)
+                }
             }
+
+            measuredLines.append(measuredLine)
+
+            if let maxY = measuredLine.map({ measuredText in measuredText.backgroundRect.maxY }).max() {
+                yOffset = maxY + self.lineSpacing
+            } else {
+                yOffset += self.minimumLineHeight + self.lineSpacing
+            }
+
         }
 
-        return measuredBody
+        return measuredLines
     }
 
     // MARK: Private
