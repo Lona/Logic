@@ -21,10 +21,10 @@ class Document: NSDocument {
 
     var body: [[LogicEditorText]] = [
         [
-            .unstyled("if"),
+            .dropdown("if", NSColor.black),
             .dropdown("index", NSColor.systemPurple),
-            .colored(">", NSColor.systemGray),
-            .colored("10", NSColor.systemBlue),
+            .dropdown("is greater than", NSColor.black),
+            .dropdown("10", NSColor.systemBlue),
         ],
         [
             .indent,
@@ -44,13 +44,19 @@ class Document: NSDocument {
     }
 
     func suggestions() -> [SuggestionListItem] {
-        var statements: [SuggestionListItem] = [.sectionHeader(Language.title(of: .statement))]
-        statements.append(contentsOf: Language.statements.map { SuggestionListItem.row($0) })
+        var statements: [SuggestionListItem] = []
+        statements.append(.sectionHeader(Language.StatementType.titleText))
+        statements.append(contentsOf: Language.StatementType.all.map { SuggestionListItem.row($0.titleText) })
 
-        var declarations: [SuggestionListItem] = [.sectionHeader(Language.title(of: .declaration))]
-        declarations.append(contentsOf: Language.declarations.map { SuggestionListItem.row($0) })
+        var declarations: [SuggestionListItem] = []
+        declarations.append(.sectionHeader(Language.DeclarationType.titleText))
+        declarations.append(contentsOf: Language.DeclarationType.all.map { SuggestionListItem.row($0.titleText) })
 
-        return Array([statements, declarations].joined())
+        var expressions: [SuggestionListItem] = []
+        expressions.append(.sectionHeader(Language.ExpressionType.titleText))
+        expressions.append(contentsOf: Language.ExpressionType.all.map { SuggestionListItem.row($0.titleText) })
+
+        return Array([statements, declarations, expressions].joined())
     }
 
     func setUpViews() -> NSView {

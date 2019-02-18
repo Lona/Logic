@@ -107,8 +107,9 @@ public class LogicEditor: NSView {
 
     public var onClickIndexPath: ((IndexPath?) -> Void)?
 
-    public var textMargin = CGSize(width: 8, height: 6)
-    public var textPadding = CGSize(width: 4, height: 1)
+    public var textMargin = CGSize(width: 6, height: 6)
+    public var textPadding = CGSize(width: 4, height: 3)
+    public var textBackgroundRadius = CGSize(width: 2, height: 2)
 
     public var underlinedRange: NSRange?
     public var underlineColor: NSColor = NSColor.systemBlue
@@ -118,7 +119,8 @@ public class LogicEditor: NSView {
     public var lineSpacing: CGFloat = 6.0
     public var minimumLineHeight: CGFloat = 20.0
 
-    public var font = TextStyle(family: "menlo", size: 13).nsFont
+    public var font = TextStyle(family: "San Francisco", size: 13).nsFont
+//    public var font = TextStyle(family: "menlo", size: 13).nsFont
 
     // MARK: Overrides
 
@@ -163,6 +165,8 @@ public class LogicEditor: NSView {
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
+        NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
+
         let measuredLines = self.measuredLines
 
         measuredLines.enumerated().forEach { lineIndex, line in
@@ -179,20 +183,50 @@ public class LogicEditor: NSView {
                 case .unstyled, .colored:
                     attributedString.draw(at: rect.origin)
                 case .dropdown(let value, let color):
-                    let color = selected ? NSColor.systemGreen : color
+                    let color = selected ? NSColor.selectedMenuItemColor : color
 
-                    color.highlight(withLevel: 0.7)?.setFill()
-                    let backgroundPath = NSBezierPath(roundedRect: backgroundRect, xRadius: 2, yRadius: 2)
+                    let shadow = NSShadow()
+                    shadow.shadowBlurRadius = 1
+                    shadow.shadowOffset = NSSize(width: 0, height: -1)
+                    shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
+                    shadow.set()
+
+                    if selected {
+                        color.setFill()
+                    } else {
+                        NSColor.clear.setFill()
+//                        NSColor.white.withAlphaComponent(0.2).setFill()
+//                        color.highlight(withLevel: 0.7)?.setFill()
+                    }
+
+                    let backgroundPath = NSBezierPath(
+                        roundedRect: backgroundRect,
+                        xRadius: textBackgroundRadius.width,
+                        yRadius: textBackgroundRadius.height)
                     backgroundPath.fill()
 
-                    color.setFill()
-                    let caretX = backgroundRect.maxX - (value.isEmpty ? 14 : 10)
-                    let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY - 1)
-                    let caretStart = CGPoint(x: caretX - 6, y: backgroundRect.midY - 1)
+                    NSShadow().set()
+
+                    if selected {
+                        NSColor.white.setFill()
+                    } else {
+                        color.setFill()
+                    }
+                    let caretX = backgroundRect.maxX - (value.isEmpty ? 13 : 9)
+                    let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY)
+                    let caretStart = CGPoint(x: caretX - 4, y: backgroundRect.midY)
                     let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
                     caret.fill()
 
-                    attributedString.draw(at: rect.origin)
+                    if selected {
+                        let attributedString = NSMutableAttributedString(attributedString: attributedString)
+                        attributedString.addAttributes(
+                            [NSAttributedString.Key.foregroundColor: NSColor.white],
+                            range: NSRange(location: 0, length: attributedString.length))
+                        attributedString.draw(at: rect.origin)
+                    } else {
+                        attributedString.draw(at: rect.origin)
+                    }
                 }
             }
         }
@@ -295,7 +329,7 @@ public class LogicEditor: NSView {
                     let attributedStringSize = attributedString.size()
                     let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
                     var backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
-                    backgroundRect.size.width += 20
+                    backgroundRect.size.width += 14
 
                     xOffset += backgroundRect.width + textSpacing
 
