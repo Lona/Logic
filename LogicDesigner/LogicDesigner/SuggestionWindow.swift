@@ -56,7 +56,15 @@ class SuggestionWindow: NSWindow {
         suggestionView.searchInput.focusRingType = .none
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
 
+        suggestionView.onSubmit = {
+            if let selectedIndex = self.selectedIndex {
+                let selectedItem = self.suggestionItems[selectedIndex]
+                Swift.print("Submit", selectedItem, self.suggestionText)
+            }
+        }
+
         suggestionView.onSelectIndex = { selectedIndex in
+            Swift.print("On select")
             self.selectedIndex = selectedIndex
         }
 

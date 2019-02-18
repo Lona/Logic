@@ -58,6 +58,12 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "onSubmit",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {

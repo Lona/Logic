@@ -88,7 +88,7 @@ class Document: NSDocument {
                 }
             }
 
-            Swift.print("Clicked \(indexPath)")
+//            Swift.print("Clicked \(indexPath)")
         }
 
         return logicEditor

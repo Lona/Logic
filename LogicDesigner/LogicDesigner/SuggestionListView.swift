@@ -90,7 +90,6 @@ public class SuggestionListView: NSBox {
 
     public var selectedIndex: Int? {
         didSet {
-            Swift.print("Set selected index", selectedIndex)
             if let selectedIndex = selectedIndex {
                 tableView.selectRowIndexes(IndexSet(integer: selectedIndex), byExtendingSelection: false)
                 tableView.scrollRowToVisible(selectedIndex)

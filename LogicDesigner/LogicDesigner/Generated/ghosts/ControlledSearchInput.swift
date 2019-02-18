@@ -63,6 +63,11 @@ public class ControlledSearchInput: NSBox {
     set { parameters.onPressUpKey = newValue }
   }
 
+  public var onSubmit: (() -> Void)? {
+    get { return parameters.onSubmit }
+    set { parameters.onSubmit = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -137,6 +142,10 @@ public class ControlledSearchInput: NSBox {
   private func handleOnPressUpKey() {
     onPressUpKey?()
   }
+
+  private func handleOnSubmit() {
+    onSubmit?()
+  }
 }
 
 // MARK: - Parameters
@@ -147,17 +156,20 @@ extension ControlledSearchInput {
     public var onChangeTextValue: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
+    public var onSubmit: (() -> Void)?
 
     public init(
       textValue: String,
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
-      onPressUpKey: (() -> Void)? = nil)
+      onPressUpKey: (() -> Void)? = nil,
+      onSubmit: (() -> Void)? = nil)
     {
       self.textValue = textValue
       self.onChangeTextValue = onChangeTextValue
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
+      self.onSubmit = onSubmit
     }
 
     public init() {
@@ -193,7 +205,8 @@ extension ControlledSearchInput {
       textValue: String,
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
-      onPressUpKey: (() -> Void)? = nil)
+      onPressUpKey: (() -> Void)? = nil,
+      onSubmit: (() -> Void)? = nil)
     {
       self
         .init(
@@ -201,7 +214,8 @@ extension ControlledSearchInput {
             textValue: textValue,
             onChangeTextValue: onChangeTextValue,
             onPressDownKey: onPressDownKey,
-            onPressUpKey: onPressUpKey))
+            onPressUpKey: onPressUpKey,
+            onSubmit: onSubmit))
     }
 
     public init() {
