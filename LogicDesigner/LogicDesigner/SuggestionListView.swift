@@ -176,14 +176,12 @@ extension SuggestionListView: NSTableViewDelegate {
 
         switch item {
         case .row(let value):
-            return ResultRow(titleText: value, selected: row == selectedIndex)
+            let rowView = ResultRow(titleText: value, selected: row == selectedIndex)
+            rowView.fillColor = row == selectedIndex ? NSColor.selectedMenuItemColor : NSColor.clear
+            return rowView
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)
         }
-    }
-
-    public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
-        return SuggestionListRowView()
     }
 
     public func tableView(_ tableView: NSTableView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet {
@@ -236,19 +234,5 @@ extension SuggestionListView {
 class SuggestionListTableView: NSTableView {
     override var acceptsFirstResponder: Bool {
         return false
-    }
-}
-
-// MARK: - SuggestionListRowView
-
-class SuggestionListRowView: NSTableRowView {
-
-    override func drawSelection(in dirtyRect: NSRect) {
-        super.drawSelection(in: dirtyRect)
-
-        if self.selectionHighlightStyle != .none {
-            NSColor.selectedMenuItemColor.setFill()
-            bounds.fill()
-        }
     }
 }

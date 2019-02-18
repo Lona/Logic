@@ -133,9 +133,9 @@ class SuggestionWindow: NSWindow {
         makeKey()
         makeFirstResponder(suggestionView.searchInput)
 
-        if suggestionItems.count > 0 {
-            selectedIndex = 0
-        }
+        let selectablePairs = self.suggestionItems.enumerated().filter { $0.element.isSelectable }
+
+        selectedIndex = selectablePairs.first?.offset
     }
 
     public func anchorTo(rect: NSRect) {
