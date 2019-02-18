@@ -53,6 +53,16 @@ public class ControlledSearchInput: NSBox {
     set { parameters.onChangeTextValue = newValue }
   }
 
+  public var onPressDownKey: (() -> Void)? {
+    get { return parameters.onPressDownKey }
+    set { parameters.onPressDownKey = newValue }
+  }
+
+  public var onPressUpKey: (() -> Void)? {
+    get { return parameters.onPressUpKey }
+    set { parameters.onPressUpKey = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -119,6 +129,14 @@ public class ControlledSearchInput: NSBox {
   private func handleOnChangeTextValue(_ arg0: String) {
     onChangeTextValue?(arg0)
   }
+
+  private func handleOnPressDownKey() {
+    onPressDownKey?()
+  }
+
+  private func handleOnPressUpKey() {
+    onPressUpKey?()
+  }
 }
 
 // MARK: - Parameters
@@ -127,10 +145,19 @@ extension ControlledSearchInput {
   public struct Parameters: Equatable {
     public var textValue: String
     public var onChangeTextValue: ((String) -> Void)?
+    public var onPressDownKey: (() -> Void)?
+    public var onPressUpKey: (() -> Void)?
 
-    public init(textValue: String, onChangeTextValue: ((String) -> Void)? = nil) {
+    public init(
+      textValue: String,
+      onChangeTextValue: ((String) -> Void)? = nil,
+      onPressDownKey: (() -> Void)? = nil,
+      onPressUpKey: (() -> Void)? = nil)
+    {
       self.textValue = textValue
       self.onChangeTextValue = onChangeTextValue
+      self.onPressDownKey = onPressDownKey
+      self.onPressUpKey = onPressUpKey
     }
 
     public init() {
@@ -162,8 +189,19 @@ extension ControlledSearchInput {
       self.parameters = parameters
     }
 
-    public init(textValue: String, onChangeTextValue: ((String) -> Void)? = nil) {
-      self.init(Parameters(textValue: textValue, onChangeTextValue: onChangeTextValue))
+    public init(
+      textValue: String,
+      onChangeTextValue: ((String) -> Void)? = nil,
+      onPressDownKey: (() -> Void)? = nil,
+      onPressUpKey: (() -> Void)? = nil)
+    {
+      self
+        .init(
+          Parameters(
+            textValue: textValue,
+            onChangeTextValue: onChangeTextValue,
+            onPressDownKey: onPressDownKey,
+            onPressUpKey: onPressUpKey))
     }
 
     public init() {

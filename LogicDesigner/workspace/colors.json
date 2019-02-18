@@ -19,6 +19,16 @@
       "id" : "text",
       "name" : "Text",
       "value" : "black"
+    },
+    {
+      "id" : "editableText",
+      "name" : "editableText",
+      "value" : "#4a90e2"
+    },
+    {
+      "id" : "white",
+      "name" : "white",
+      "value" : "white"
     }
   ]
 }

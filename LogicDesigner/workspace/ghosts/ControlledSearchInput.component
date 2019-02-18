@@ -46,6 +46,18 @@
           }
         ]
       }
+    },
+    {
+      "name" : "onPressDownKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressUpKey",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {

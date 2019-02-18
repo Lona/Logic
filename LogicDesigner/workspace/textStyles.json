@@ -5,6 +5,15 @@
       "fontSize" : 10,
       "id" : "sectionHeader",
       "name" : "Section Header"
+    },
+    {
+      "id" : "row",
+      "name" : "Row"
+    },
+    {
+      "color" : "white",
+      "id" : "rowInverse",
+      "name" : "Row Inverse"
     }
   ]
 }

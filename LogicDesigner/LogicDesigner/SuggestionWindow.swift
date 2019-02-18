@@ -56,12 +56,58 @@ class SuggestionWindow: NSWindow {
         suggestionView.searchInput.focusRingType = .none
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
 
+        suggestionView.onSelectIndex = { selectedIndex in
+            self.selectedIndex = selectedIndex
+        }
+
+        suggestionView.onPressDownKey = {
+            let selectablePairs = self.suggestionItems.enumerated().filter { $0.element.isSelectable }
+
+            if let filteredIndex = selectablePairs.firstIndex(where: { index, item in
+                return self.selectedIndex == index
+            }) {
+                let nextFilteredIndex = min(filteredIndex + 1, selectablePairs.count - 1)
+                let nextIndex = selectablePairs[nextFilteredIndex].offset
+                self.selectedIndex = nextIndex
+            } else if let first = selectablePairs.first {
+                self.selectedIndex = first.offset
+            } else {
+                self.selectedIndex = nil
+            }
+        }
+
+        suggestionView.onPressUpKey = {
+            let selectablePairs = self.suggestionItems.enumerated().filter { $0.element.isSelectable }
+
+            if let filteredIndex = selectablePairs.firstIndex(where: { index, item in
+                return self.selectedIndex == index
+            }) {
+                let nextFilteredIndex = max(filteredIndex - 1, 0)
+                let nextIndex = selectablePairs[nextFilteredIndex].offset
+                self.selectedIndex = nextIndex
+            } else if let last = selectablePairs.last {
+                self.selectedIndex = last.offset
+            } else {
+                self.selectedIndex = nil
+            }
+        }
+
         window.contentView = view
     }
 
     var contentBox: NSView?
 
     var suggestionView = SuggestionView()
+
+    public var selectedIndex: Int? {
+        get { return suggestionView.selectedIndex }
+        set { suggestionView.selectedIndex = newValue }
+    }
+
+    public var suggestionItems: [SuggestionListItem] {
+        get { return suggestionView.suggestionList.items }
+        set { suggestionView.suggestionList.items = newValue }
+    }
 
     // MARK: Public
 
@@ -78,6 +124,10 @@ class SuggestionWindow: NSWindow {
     public func focusSearchField() {
         makeKey()
         makeFirstResponder(suggestionView.searchInput)
+
+        if suggestionItems.count > 0 {
+            selectedIndex = 0
+        }
     }
 
     public func anchorTo(rect: NSRect) {

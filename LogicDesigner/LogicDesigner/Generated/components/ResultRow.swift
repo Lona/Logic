@@ -18,8 +18,8 @@ public class ResultRow: NSBox {
     update()
   }
 
-  public convenience init(titleText: String) {
-    self.init(Parameters(titleText: titleText))
+  public convenience init(titleText: String, selected: Bool) {
+    self.init(Parameters(titleText: titleText, selected: selected))
   }
 
   public convenience init() {
@@ -48,6 +48,15 @@ public class ResultRow: NSBox {
     }
   }
 
+  public var selected: Bool {
+    get { return parameters.selected }
+    set {
+      if parameters.selected != newValue {
+        parameters.selected = newValue
+      }
+    }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -60,7 +69,7 @@ public class ResultRow: NSBox {
 
   private var textView = LNATextField(labelWithString: "")
 
-  private var textViewTextStyle = TextStyles.defaultStyle
+  private var textViewTextStyle = TextStyles.row
 
   private func setUpViews() {
     boxType = .custom
@@ -91,7 +100,13 @@ public class ResultRow: NSBox {
   }
 
   private func update() {
+    textViewTextStyle = TextStyles.row
+    textView.attributedStringValue = textViewTextStyle.apply(to: textView.attributedStringValue)
     textView.attributedStringValue = textViewTextStyle.apply(to: titleText)
+    if selected {
+      textViewTextStyle = TextStyles.rowInverse
+      textView.attributedStringValue = textViewTextStyle.apply(to: textView.attributedStringValue)
+    }
   }
 }
 
@@ -100,17 +115,19 @@ public class ResultRow: NSBox {
 extension ResultRow {
   public struct Parameters: Equatable {
     public var titleText: String
+    public var selected: Bool
 
-    public init(titleText: String) {
+    public init(titleText: String, selected: Bool) {
       self.titleText = titleText
+      self.selected = selected
     }
 
     public init() {
-      self.init(titleText: "")
+      self.init(titleText: "", selected: false)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.titleText == rhs.titleText
+      return lhs.titleText == rhs.titleText && lhs.selected == rhs.selected
     }
   }
 }
@@ -134,12 +151,12 @@ extension ResultRow {
       self.parameters = parameters
     }
 
-    public init(titleText: String) {
-      self.init(Parameters(titleText: titleText))
+    public init(titleText: String, selected: Bool) {
+      self.init(Parameters(titleText: titleText, selected: selected))
     }
 
     public init() {
-      self.init(titleText: "")
+      self.init(titleText: "", selected: false)
     }
   }
 }

@@ -38,6 +38,54 @@
         "searchText"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressDownKey"
+      ],
+      "content" : [
+        "parameters",
+        "onPressDownKey"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressUpKey"
+      ],
+      "content" : [
+        "parameters",
+        "onPressUpKey"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SuggestionListView",
+        "selectedIndex"
+      ],
+      "content" : [
+        "parameters",
+        "selectedIndex"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SuggestionListView",
+        "onSelectIndex"
+      ],
+      "content" : [
+        "parameters",
+        "onSelectIndex"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -53,6 +101,34 @@
           {
             "label" : "_",
             "type" : "String"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "onPressDownKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressUpKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "selectedIndex",
+      "type" : "WholeNumber?"
+    },
+    {
+      "name" : "onSelectIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber?"
           }
         ]
       }

@@ -18,6 +18,10 @@ public class SuggestionListView: NSBox {
     update()
   }
 
+  public convenience init(selectedIndex: Int?) {
+    self.init(Parameters(selectedIndex: selectedIndex))
+  }
+
   public convenience init() {
     self.init(Parameters())
   }
@@ -35,6 +39,20 @@ public class SuggestionListView: NSBox {
 
   // MARK: Public
 
+  public var onSelectIndex: ((Int?) -> Void)? {
+    get { return parameters.onSelectIndex }
+    set { parameters.onSelectIndex = newValue }
+  }
+
+  public var selectedIndex: Int? {
+    get { return parameters.selectedIndex }
+    set {
+      if parameters.selectedIndex != newValue {
+        parameters.selectedIndex = newValue
+      }
+    }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -45,24 +63,81 @@ public class SuggestionListView: NSBox {
 
   // MARK: Private
 
+  private var resultSectionHeaderView = ResultSectionHeader()
+  private var resultRowView = ResultRow()
+  private var resultRow1View = ResultRow()
+
   private func setUpViews() {
     boxType = .custom
     borderType = .noBorder
     contentViewMargins = .zero
+
+    addSubview(resultSectionHeaderView)
+    addSubview(resultRowView)
+    addSubview(resultRow1View)
+
+    resultSectionHeaderView.titleText = "STATEMENTS"
+    resultRowView.titleText = "If condition"
+    resultRow1View.titleText = "For loop"
   }
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
+    resultSectionHeaderView.translatesAutoresizingMaskIntoConstraints = false
+    resultRowView.translatesAutoresizingMaskIntoConstraints = false
+    resultRow1View.translatesAutoresizingMaskIntoConstraints = false
+
+    let resultSectionHeaderViewTopAnchorConstraint = resultSectionHeaderView.topAnchor.constraint(equalTo: topAnchor)
+    let resultSectionHeaderViewLeadingAnchorConstraint = resultSectionHeaderView
+      .leadingAnchor
+      .constraint(equalTo: leadingAnchor)
+    let resultSectionHeaderViewTrailingAnchorConstraint = resultSectionHeaderView
+      .trailingAnchor
+      .constraint(equalTo: trailingAnchor)
+    let resultRowViewTopAnchorConstraint = resultRowView
+      .topAnchor
+      .constraint(equalTo: resultSectionHeaderView.bottomAnchor)
+    let resultRowViewLeadingAnchorConstraint = resultRowView.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let resultRowViewTrailingAnchorConstraint = resultRowView.trailingAnchor.constraint(equalTo: trailingAnchor)
+    let resultRow1ViewTopAnchorConstraint = resultRow1View.topAnchor.constraint(equalTo: resultRowView.bottomAnchor)
+    let resultRow1ViewLeadingAnchorConstraint = resultRow1View.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let resultRow1ViewTrailingAnchorConstraint = resultRow1View.trailingAnchor.constraint(equalTo: trailingAnchor)
+
+    NSLayoutConstraint.activate([
+      resultSectionHeaderViewTopAnchorConstraint,
+      resultSectionHeaderViewLeadingAnchorConstraint,
+      resultSectionHeaderViewTrailingAnchorConstraint,
+      resultRowViewTopAnchorConstraint,
+      resultRowViewLeadingAnchorConstraint,
+      resultRowViewTrailingAnchorConstraint,
+      resultRow1ViewTopAnchorConstraint,
+      resultRow1ViewLeadingAnchorConstraint,
+      resultRow1ViewTrailingAnchorConstraint
+    ])
   }
 
   private func update() {}
+
+  private func handleOnSelectIndex(_ arg0: Int?) {
+    onSelectIndex?(arg0)
+  }
 }
 
 // MARK: - Parameters
 
 extension SuggestionListView {
   public struct Parameters: Equatable {
-    public init() {}
+    public var selectedIndex: Int?
+    public var onSelectIndex: ((Int?) -> Void)?
+
+    public init(selectedIndex: Int? = nil, onSelectIndex: ((Int?) -> Void)? = nil) {
+      self.selectedIndex = selectedIndex
+      self.onSelectIndex = onSelectIndex
+    }
+
+    public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
+      return lhs.selectedIndex == rhs.selectedIndex
+    }
   }
 }
 
@@ -85,8 +160,8 @@ extension SuggestionListView {
       self.parameters = parameters
     }
 
-    public init() {
-      self.init(Parameters())
+    public init(selectedIndex: Int? = nil, onSelectIndex: ((Int?) -> Void)? = nil) {
+      self.init(Parameters(selectedIndex: selectedIndex, onSelectIndex: onSelectIndex))
     }
   }
 }

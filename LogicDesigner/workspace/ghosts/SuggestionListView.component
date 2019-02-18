@@ -22,9 +22,47 @@
 
   ],
   "params" : [
-
+    {
+      "name" : "onSelectIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber?"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "selectedIndex",
+      "type" : "WholeNumber?"
+    }
   ],
   "root" : {
+    "children" : [
+      {
+        "id" : "ResultSectionHeader",
+        "params" : {
+          "titleText" : "STATEMENTS"
+        },
+        "type" : "ResultSectionHeader"
+      },
+      {
+        "id" : "ResultRow",
+        "params" : {
+          "titleText" : "If condition"
+        },
+        "type" : "ResultRow"
+      },
+      {
+        "id" : "ResultRow 1",
+        "params" : {
+          "titleText" : "For loop"
+        },
+        "type" : "ResultRow"
+      }
+    ],
     "id" : "View",
     "params" : {
       "alignSelf" : "stretch",

@@ -18,8 +18,8 @@ public class SuggestionView: NSBox {
     update()
   }
 
-  public convenience init(searchText: String) {
-    self.init(Parameters(searchText: searchText))
+  public convenience init(searchText: String, selectedIndex: Int?) {
+    self.init(Parameters(searchText: searchText, selectedIndex: selectedIndex))
   }
 
   public convenience init() {
@@ -51,6 +51,30 @@ public class SuggestionView: NSBox {
   public var onChangeSearchText: ((String) -> Void)? {
     get { return parameters.onChangeSearchText }
     set { parameters.onChangeSearchText = newValue }
+  }
+
+  public var onPressDownKey: (() -> Void)? {
+    get { return parameters.onPressDownKey }
+    set { parameters.onPressDownKey = newValue }
+  }
+
+  public var onPressUpKey: (() -> Void)? {
+    get { return parameters.onPressUpKey }
+    set { parameters.onPressUpKey = newValue }
+  }
+
+  public var selectedIndex: Int? {
+    get { return parameters.selectedIndex }
+    set {
+      if parameters.selectedIndex != newValue {
+        parameters.selectedIndex = newValue
+      }
+    }
+  }
+
+  public var onSelectIndex: ((Int?) -> Void)? {
+    get { return parameters.onSelectIndex }
+    set { parameters.onSelectIndex = newValue }
   }
 
   public var parameters: Parameters {
@@ -170,10 +194,26 @@ public class SuggestionView: NSBox {
   private func update() {
     searchInputView.onChangeTextValue = handleOnChangeSearchText
     searchInputView.textValue = searchText
+    searchInputView.onPressDownKey = handleOnPressDownKey
+    searchInputView.onPressUpKey = handleOnPressUpKey
+    suggestionListViewView.selectedIndex = selectedIndex
+    suggestionListViewView.onSelectIndex = handleOnSelectIndex
   }
 
   private func handleOnChangeSearchText(_ arg0: String) {
     onChangeSearchText?(arg0)
+  }
+
+  private func handleOnPressDownKey() {
+    onPressDownKey?()
+  }
+
+  private func handleOnPressUpKey() {
+    onPressUpKey?()
+  }
+
+  private func handleOnSelectIndex(_ arg0: Int?) {
+    onSelectIndex?(arg0)
   }
 }
 
@@ -182,19 +222,34 @@ public class SuggestionView: NSBox {
 extension SuggestionView {
   public struct Parameters: Equatable {
     public var searchText: String
+    public var selectedIndex: Int?
     public var onChangeSearchText: ((String) -> Void)?
+    public var onPressDownKey: (() -> Void)?
+    public var onPressUpKey: (() -> Void)?
+    public var onSelectIndex: ((Int?) -> Void)?
 
-    public init(searchText: String, onChangeSearchText: ((String) -> Void)? = nil) {
+    public init(
+      searchText: String,
+      selectedIndex: Int? = nil,
+      onChangeSearchText: ((String) -> Void)? = nil,
+      onPressDownKey: (() -> Void)? = nil,
+      onPressUpKey: (() -> Void)? = nil,
+      onSelectIndex: ((Int?) -> Void)? = nil)
+    {
       self.searchText = searchText
+      self.selectedIndex = selectedIndex
       self.onChangeSearchText = onChangeSearchText
+      self.onPressDownKey = onPressDownKey
+      self.onPressUpKey = onPressUpKey
+      self.onSelectIndex = onSelectIndex
     }
 
     public init() {
-      self.init(searchText: "")
+      self.init(searchText: "", selectedIndex: nil)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.searchText == rhs.searchText
+      return lhs.searchText == rhs.searchText && lhs.selectedIndex == rhs.selectedIndex
     }
   }
 }
@@ -218,12 +273,27 @@ extension SuggestionView {
       self.parameters = parameters
     }
 
-    public init(searchText: String, onChangeSearchText: ((String) -> Void)? = nil) {
-      self.init(Parameters(searchText: searchText, onChangeSearchText: onChangeSearchText))
+    public init(
+      searchText: String,
+      selectedIndex: Int? = nil,
+      onChangeSearchText: ((String) -> Void)? = nil,
+      onPressDownKey: (() -> Void)? = nil,
+      onPressUpKey: (() -> Void)? = nil,
+      onSelectIndex: ((Int?) -> Void)? = nil)
+    {
+      self
+        .init(
+          Parameters(
+            searchText: searchText,
+            selectedIndex: selectedIndex,
+            onChangeSearchText: onChangeSearchText,
+            onPressDownKey: onPressDownKey,
+            onPressUpKey: onPressUpKey,
+            onSelectIndex: onSelectIndex))
     }
 
     public init() {
-      self.init(searchText: "")
+      self.init(searchText: "", selectedIndex: nil)
     }
   }
 }

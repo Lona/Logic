@@ -4,6 +4,15 @@ import Foundation
 public enum SuggestionListItem {
     case sectionHeader(String)
     case row(String)
+
+    public var isSelectable: Bool {
+        switch self {
+        case .row:
+            return true
+        case .sectionHeader:
+            return false
+        }
+    }
 }
 
 private extension NSTableColumn {
@@ -79,9 +88,31 @@ public class SuggestionListView: NSBox {
         }
     }
 
+    public var selectedIndex: Int? {
+        didSet {
+            Swift.print("Set selected index", selectedIndex)
+            if let selectedIndex = selectedIndex {
+                tableView.selectRowIndexes(IndexSet(integer: selectedIndex), byExtendingSelection: false)
+                tableView.scrollRowToVisible(selectedIndex)
+
+                var reloadIndexSet = IndexSet(integer: selectedIndex)
+
+                if let oldValue = oldValue {
+                    reloadIndexSet.insert(oldValue)
+                }
+
+                tableView.reloadData(forRowIndexes: reloadIndexSet, columnIndexes: IndexSet(integer: 0))
+            } else {
+                tableView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
+            }
+        }
+    }
+
+    public var onSelectIndex: ((Int?) -> Void)?
+
     // MARK: Private
 
-    private var tableView = NSTableView()
+    private var tableView = SuggestionListTableView()
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
 
@@ -126,6 +157,10 @@ public class SuggestionListView: NSBox {
 // MARK: - Delegate
 
 extension SuggestionListView: NSTableViewDelegate {
+    public func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+        return items[row].isSelectable
+    }
+
     public func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
         let item = items[row]
 
@@ -142,10 +177,31 @@ extension SuggestionListView: NSTableViewDelegate {
 
         switch item {
         case .row(let value):
-            return ResultRow(titleText: value)
+            return ResultRow(titleText: value, selected: row == selectedIndex)
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)
         }
+    }
+
+    public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
+        return SuggestionListRowView()
+    }
+
+    public func tableView(_ tableView: NSTableView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+
+            if let proposedIndex = proposedSelectionIndexes.first {
+                let item = self.items[proposedIndex]
+                if item.isSelectable {
+                    self.onSelectIndex?(proposedIndex)
+                }
+            } else {
+                self.onSelectIndex?(nil)
+            }
+        }
+
+        return tableView.selectedRowIndexes
     }
 }
 
@@ -176,27 +232,24 @@ extension SuggestionListView {
     }
 }
 
-// MARK: - Model
+// MARK: - SuggestionListTableView
 
-extension SuggestionListView {
-    public struct Model: LonaViewModel, Equatable {
-        public var id: String?
-        public var parameters: Parameters
-        public var type: String {
-            return "SuggestionListView"
-        }
+class SuggestionListTableView: NSTableView {
+    override var acceptsFirstResponder: Bool {
+        return false
+    }
+}
 
-        public init(id: String? = nil, parameters: Parameters) {
-            self.id = id
-            self.parameters = parameters
-        }
+// MARK: - SuggestionListRowView
 
-        public init(_ parameters: Parameters) {
-            self.parameters = parameters
-        }
+class SuggestionListRowView: NSTableRowView {
 
-        public init() {
-            self.init(Parameters())
+    override func drawSelection(in dirtyRect: NSRect) {
+        super.drawSelection(in: dirtyRect)
+
+        if self.selectionHighlightStyle != .none {
+            NSColor.selectedMenuItemColor.setFill()
+            bounds.fill()
         }
     }
 }

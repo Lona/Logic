@@ -30,12 +30,51 @@
         "titleText"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Text",
+            "textStyle"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "rowInverse",
+              "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "parameters",
+          "selected"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
     }
   ],
   "params" : [
     {
       "name" : "titleText",
       "type" : "String"
+    },
+    {
+      "name" : "selected",
+      "type" : "Boolean"
     }
   ],
   "root" : {
@@ -43,6 +82,7 @@
       {
         "id" : "Text",
         "params" : {
+          "font" : "row",
           "text" : "Text goes here"
         },
         "type" : "Lona:Text"

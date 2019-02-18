@@ -115,7 +115,7 @@ public class LogicEditor: NSView {
     public var underlineColor: NSColor = NSColor.systemBlue
     public var underlineOffset: CGFloat = 2.0
 
-    public var textSpacing: CGFloat = 6.0
+    public var textSpacing: CGFloat = 4.0
     public var lineSpacing: CGFloat = 6.0
     public var minimumLineHeight: CGFloat = 20.0
 

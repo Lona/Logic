@@ -28,12 +28,14 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
         super.init(frame: frameRect)
 
         setUpSelectionObserver()
+        self.delegate = self
     }
 
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
 
         setUpSelectionObserver()
+        self.delegate = self
     }
 
     // MARK: Public
@@ -41,6 +43,8 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     public var onChangeTextValue: ((String) -> Void)?
     public var onSubmit: (() -> Void)?
     public var onPressEscape: (() -> Void)?
+    public var onPressUpKey: (() -> Void)?
+    public var onPressDownKey: (() -> Void)?
 
     public var textValue: String = "" {
         didSet {
@@ -118,6 +122,12 @@ extension ControlledSearchInput: NSTextFieldDelegate {
             return true
         } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
             onPressEscape?()
+            return true
+        } else if let onPressUpKey = onPressUpKey, commandSelector == #selector(moveUp(_:)) {
+            onPressUpKey()
+            return true
+        } else if let onPressDownKey = onPressDownKey, commandSelector == #selector(moveDown(_:)) {
+            onPressDownKey()
             return true
         }
 

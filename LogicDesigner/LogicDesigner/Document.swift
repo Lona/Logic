@@ -22,9 +22,9 @@ class Document: NSDocument {
     var body: [[LogicEditorText]] = [
         [
             .dropdown("if", NSColor.black),
-            .dropdown("index", NSColor.systemPurple),
+            .dropdown("index", Colors.editableText),
             .dropdown("is greater than", NSColor.black),
-            .dropdown("10", NSColor.systemBlue),
+            .dropdown("10", Colors.editableText),
         ],
         [
             .indent,
@@ -73,7 +73,7 @@ class Document: NSDocument {
                 if let indexPath = indexPath {
                     self.suggestionText = self.body[indexPath.section][indexPath.item].value
 
-                    childWindow.suggestionView.suggestionList.items = self.suggestions()
+                    childWindow.suggestionItems = self.suggestions()
 
                     window.addChildWindow(childWindow, ordered: .above)
 
@@ -103,6 +103,8 @@ class Document: NSDocument {
             styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false)
+
+        window.backgroundColor = NSColor.white
 
         window.center()
 
