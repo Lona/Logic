@@ -8,12 +8,14 @@ public struct SwiftIdentifier: Codable & Equatable {
 public struct SwiftLoop: Codable & Equatable {
   public var pattern: SwiftIdentifier
   public var expression: SwiftIdentifier
-  public var statements: SwiftList<SwiftStatement>
+  public var block: SwiftList<SwiftStatement>
   public var id: SwiftUUID
 }
 
 public struct SwiftBranch: Codable & Equatable {
   public var id: SwiftUUID
+  public var condition: SwiftIdentifier
+  public var block: SwiftList<SwiftStatement>
 }
 
 public struct SwiftDecl: Codable & Equatable {

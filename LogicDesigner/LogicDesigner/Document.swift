@@ -8,13 +8,6 @@
 
 import Cocoa
 
-let exampleSyntax = SwiftStatement.loop(
-    SwiftLoop(
-        pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
-        expression: SwiftIdentifier(id: NSUUID().uuidString, string: "array"),
-        statements: SwiftList<SwiftStatement>.empty, id: NSUUID().uuidString)
-)
-
 class Document: NSDocument {
 
     override init() {
@@ -26,9 +19,21 @@ class Document: NSDocument {
         return false
     }
 
-    var body: [[LogicEditorText]] = [
-        exampleSyntax.textElements,
-    ]
+    var syntax: SwiftSyntaxNode = SwiftSyntaxNode.statement(
+        SwiftStatement.loop(
+            SwiftLoop(
+                pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
+                expression: SwiftIdentifier(id: NSUUID().uuidString, string: "array"),
+                block: SwiftList<SwiftStatement>.empty,
+                id: NSUUID().uuidString)
+        )
+    )
+
+    var body: [[LogicEditorText]] {
+        return [
+            syntax.textElements,
+        ]
+    }
 
     var selectedTextIndex: Int?
 
@@ -38,20 +43,30 @@ class Document: NSDocument {
         }
     }
 
-    func suggestions() -> [SuggestionListItem] {
-        var statements: [SuggestionListItem] = []
-        statements.append(.sectionHeader(Language.StatementType.titleText))
-        statements.append(contentsOf: Language.StatementType.all.map { SuggestionListItem.row($0.titleText) })
+    func suggestions(for syntaxNode: SwiftSyntaxNode) -> [SuggestionListItem] {
+        let items: [SuggestionListItem] = Array(syntaxNode.suggestionCategories.map { $0.suggestionListItems }.joined())
+        return items
+    }
 
-        var declarations: [SuggestionListItem] = []
-        declarations.append(.sectionHeader(Language.DeclarationType.titleText))
-        declarations.append(contentsOf: Language.DeclarationType.all.map { SuggestionListItem.row($0.titleText) })
+    func suggestedSyntaxNode(for syntaxNode: SwiftSyntaxNode, at selectedIndex: Int) -> SwiftSyntaxNode? {
+        var found: SwiftSyntaxNode?
+        var index = -1
 
-        var expressions: [SuggestionListItem] = []
-        expressions.append(.sectionHeader(Language.ExpressionType.titleText))
-        expressions.append(contentsOf: Language.ExpressionType.all.map { SuggestionListItem.row($0.titleText) })
+        syntaxNode.suggestionCategories.forEach { category in
 
-        return Array([statements, declarations, expressions].joined())
+            // Category offset
+            index += 1
+
+            category.items.forEach { item in
+                index += 1
+
+                if index == selectedIndex {
+                    found = item.node
+                }
+            }
+        }
+
+        return found
     }
 
     func setUpViews() -> NSView {
@@ -69,13 +84,28 @@ class Document: NSDocument {
                     let textElement = self.body[indexPath.section][indexPath.item]
 
                     Swift.print("Clicked \(textElement)")
-                    if let id = textElement.syntaxNodeID, let syntaxNode = exampleSyntax.find(id: id) {
+                    if let id = textElement.syntaxNodeID, let syntaxNode = self.syntax.find(id: id) {
                         Swift.print("Matches \(syntaxNode)")
+
+                        childWindow.suggestionItems = self.suggestions(for: syntaxNode)
+
+                        childWindow.onSubmit = { index in 
+                            if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
+                                Swift.print("Chose suggestion", suggestedNode)
+
+                                let replacement = self.syntax.replace(id: id, with: suggestedNode)
+
+                                self.syntax = replacement
+
+                                logicEditor.lines = self.body
+
+                                window.removeChildWindow(childWindow)
+                                childWindow.setIsVisible(false)
+                            }
+                        }
                     }
 
                     self.suggestionText = textElement.value
-
-                    childWindow.suggestionItems = self.suggestions()
 
                     window.addChildWindow(childWindow, ordered: .above)
 

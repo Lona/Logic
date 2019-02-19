@@ -63,7 +63,7 @@
                 }
               },
               {
-                "key" : "statements",
+                "key" : "block",
                 "value" : {
                   "case" : "type",
                   "name" : "List",
@@ -98,6 +98,29 @@
                   "name" : "UUID",
                   "substitutions" : [
 
+                  ]
+                }
+              },
+              {
+                "key" : "condition",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "block",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "Statement"
+                    }
                   ]
                 }
               }

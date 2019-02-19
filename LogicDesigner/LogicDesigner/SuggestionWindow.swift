@@ -58,8 +58,7 @@ class SuggestionWindow: NSWindow {
 
         suggestionView.onSubmit = {
             if let selectedIndex = self.selectedIndex {
-                let selectedItem = self.suggestionItems[selectedIndex]
-                Swift.print("Submit", selectedItem, self.suggestionText)
+                self.onSubmit?(selectedIndex)
             }
         }
 
@@ -106,6 +105,8 @@ class SuggestionWindow: NSWindow {
     var contentBox: NSView?
 
     var suggestionView = SuggestionView()
+
+    public var onSubmit: ((Int) -> Void)?
 
     public var selectedIndex: Int? {
         get { return suggestionView.selectedIndex }
