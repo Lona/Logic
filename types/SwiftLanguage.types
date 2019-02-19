@@ -151,6 +151,32 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "record",
+            "name" : "expressionStatement",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "Statement"
@@ -295,6 +321,86 @@
       "case" : "native",
       "data" : {
         "name" : "String"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "binaryExpression",
+            "params" : [
+              {
+                "key" : "left",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "right",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "op",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "identifierExpression",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "identifier",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Expression"
       }
     }
   ]

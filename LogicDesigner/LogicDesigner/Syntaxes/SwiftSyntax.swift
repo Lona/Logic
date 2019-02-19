@@ -23,6 +23,11 @@ public struct SwiftDecl: Codable & Equatable {
   public var id: SwiftUUID
 }
 
+public struct SwiftExpressionStatement: Codable & Equatable {
+  public var id: SwiftUUID
+  public var expression: SwiftExpression
+}
+
 public struct SwiftVariable: Codable & Equatable {
   public var id: SwiftUUID
 }
@@ -31,10 +36,23 @@ public struct SwiftFunction: Codable & Equatable {
   public var id: SwiftUUID
 }
 
+public struct SwiftBinaryExpression: Codable & Equatable {
+  public var left: SwiftExpression
+  public var right: SwiftExpression
+  public var op: SwiftString
+  public var id: SwiftUUID
+}
+
+public struct SwiftIdentifierExpression: Codable & Equatable {
+  public var id: SwiftUUID
+  public var identifier: SwiftIdentifier
+}
+
 public enum SwiftStatement: Codable & Equatable {
   case loop(SwiftLoop)
   case branch(SwiftBranch)
   case decl(SwiftDecl)
+  case expressionStatement(SwiftExpressionStatement)
 
   // MARK: Codable
 
@@ -54,6 +72,8 @@ public enum SwiftStatement: Codable & Equatable {
         self = .branch(try container.decode(SwiftBranch.self, forKey: .data))
       case "decl":
         self = .decl(try container.decode(SwiftDecl.self, forKey: .data))
+      case "expressionStatement":
+        self = .expressionStatement(try container.decode(SwiftExpressionStatement.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -71,6 +91,9 @@ public enum SwiftStatement: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .decl(let value):
         try container.encode("decl", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .expressionStatement(let value):
+        try container.encode("expressionStatement", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
@@ -184,6 +207,45 @@ public enum SwiftSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .identifier(let value):
         try container.encode("identifier", forKey: .type)
+        try container.encode(value, forKey: .data)
+    }
+  }
+}
+
+public indirect enum SwiftExpression: Codable & Equatable {
+  case binaryExpression(SwiftBinaryExpression)
+  case identifierExpression(SwiftIdentifierExpression)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "binaryExpression":
+        self = .binaryExpression(try container.decode(SwiftBinaryExpression.self, forKey: .data))
+      case "identifierExpression":
+        self = .identifierExpression(try container.decode(SwiftIdentifierExpression.self, forKey: .data))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .binaryExpression(let value):
+        try container.encode("binaryExpression", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .identifierExpression(let value):
+        try container.encode("identifierExpression", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
