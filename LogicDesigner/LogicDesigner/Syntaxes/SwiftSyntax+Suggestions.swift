@@ -28,6 +28,13 @@ private func id(_ string: String) -> SwiftIdentifier {
     return SwiftIdentifier(id: NSUUID().uuidString, string: string)
 }
 
+private func idExpression(_ string: String) -> SwiftExpression {
+    return SwiftExpression.identifierExpression(
+        SwiftIdentifierExpression(
+            id: NSUUID().uuidString,
+            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: string)))
+}
+
 extension SwiftIdentifier {
     static var suggestionCategories: [LogicSuggestionCategory] {
         let variables = LogicSuggestionCategory(
@@ -45,20 +52,54 @@ extension SwiftIdentifier {
     }
 }
 
+extension SwiftExpression {
+    static var suggestionCategories: [LogicSuggestionCategory] {
+        let comparison = SwiftSyntaxNode.expression(
+            SwiftExpression.binaryExpression(
+                SwiftBinaryExpression(
+                    left: SwiftExpression.identifierExpression(
+                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
+                    right: SwiftExpression.identifierExpression(
+                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
+                    op: ">",
+                    id: NSUUID().uuidString)))
+
+        let assignment = SwiftSyntaxNode.expression(
+            SwiftExpression.binaryExpression(
+                SwiftBinaryExpression(
+                    left: SwiftExpression.identifierExpression(
+                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
+                    right: SwiftExpression.identifierExpression(
+                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
+                    op: "=",
+                    id: NSUUID().uuidString)))
+
+        let expressions = LogicSuggestionCategory(
+            title: "Expressions",
+            items: [
+                LogicSuggestionItem(title: "Comparison", node: comparison),
+                LogicSuggestionItem(title: "Assignment", node: assignment)
+            ]
+        )
+
+        return Array([[expressions], SwiftIdentifier.suggestionCategories].joined())
+    }
+}
+
 extension SwiftStatement {
     static var suggestionCategories: [LogicSuggestionCategory] {
         let ifCondition = SwiftSyntaxNode.statement(
             SwiftStatement.branch(
                 SwiftBranch(
                     id: NSUUID().uuidString,
-                    condition: id("value"),
+                    condition: idExpression("value"),
                     block: SwiftList<SwiftStatement>.empty)))
 
         let forLoop = SwiftSyntaxNode.statement(
             SwiftStatement.loop(
                 SwiftLoop(
                     pattern: id("item"),
-                    expression: id("array"),
+                    expression: idExpression("array"),
                     block: SwiftList<SwiftStatement>.empty,
                     id: NSUUID().uuidString)))
 
@@ -70,7 +111,7 @@ extension SwiftStatement {
             ]
         )
 
-        return Array([[statements], SwiftIdentifier.suggestionCategories].joined())
+        return Array([[statements], SwiftExpression.suggestionCategories].joined())
     }
 }
 
@@ -83,6 +124,8 @@ extension SwiftSyntaxNode {
             return []
         case .identifier:
             return SwiftIdentifier.suggestionCategories
+        case .expression:
+            return []
         }
     }
 }

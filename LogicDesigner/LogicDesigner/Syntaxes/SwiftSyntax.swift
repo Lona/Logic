@@ -7,14 +7,14 @@ public struct SwiftIdentifier: Codable & Equatable {
 
 public struct SwiftLoop: Codable & Equatable {
   public var pattern: SwiftIdentifier
-  public var expression: SwiftIdentifier
+  public var expression: SwiftExpression
   public var block: SwiftList<SwiftStatement>
   public var id: SwiftUUID
 }
 
 public struct SwiftBranch: Codable & Equatable {
   public var id: SwiftUUID
-  public var condition: SwiftIdentifier
+  public var condition: SwiftExpression
   public var block: SwiftList<SwiftStatement>
 }
 
@@ -48,7 +48,7 @@ public struct SwiftIdentifierExpression: Codable & Equatable {
   public var identifier: SwiftIdentifier
 }
 
-public enum SwiftStatement: Codable & Equatable {
+public indirect enum SwiftStatement: Codable & Equatable {
   case loop(SwiftLoop)
   case branch(SwiftBranch)
   case decl(SwiftDecl)
@@ -128,7 +128,7 @@ public indirect enum SwiftList<T: Equatable & Codable>: Codable & Equatable {
   }
 }
 
-public enum SwiftDeclaration: Codable & Equatable {
+public indirect enum SwiftDeclaration: Codable & Equatable {
   case variable(SwiftVariable)
   case function(SwiftFunction)
 
@@ -167,10 +167,11 @@ public enum SwiftDeclaration: Codable & Equatable {
   }
 }
 
-public enum SwiftSyntaxNode: Codable & Equatable {
+public indirect enum SwiftSyntaxNode: Codable & Equatable {
   case statement(SwiftStatement)
   case declaration(SwiftDeclaration)
   case identifier(SwiftIdentifier)
+  case expression(SwiftExpression)
 
   // MARK: Codable
 
@@ -190,6 +191,8 @@ public enum SwiftSyntaxNode: Codable & Equatable {
         self = .declaration(try container.decode(SwiftDeclaration.self, forKey: .data))
       case "identifier":
         self = .identifier(try container.decode(SwiftIdentifier.self, forKey: .data))
+      case "expression":
+        self = .expression(try container.decode(SwiftExpression.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -207,6 +210,9 @@ public enum SwiftSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .identifier(let value):
         try container.encode("identifier", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .expression(let value):
+        try container.encode("expression", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

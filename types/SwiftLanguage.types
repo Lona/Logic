@@ -56,7 +56,7 @@
                 "key" : "expression",
                 "value" : {
                   "case" : "type",
-                  "name" : "Identifier",
+                  "name" : "Expression",
                   "substitutions" : [
 
                   ]
@@ -105,7 +105,7 @@
                 "key" : "condition",
                 "value" : {
                   "case" : "type",
-                  "name" : "Identifier",
+                  "name" : "Expression",
                   "substitutions" : [
 
                   ]
@@ -306,6 +306,21 @@
                 "value" : {
                   "case" : "type",
                   "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "expression",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
                   "substitutions" : [
 
                   ]

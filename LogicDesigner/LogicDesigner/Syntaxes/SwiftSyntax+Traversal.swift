@@ -33,6 +33,50 @@ extension SwiftIdentifier: LogicTextEditable {
     var uuid: SwiftUUID { return id }
 }
 
+extension SwiftExpression: LogicTextEditable {
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftExpression {
+        switch syntaxNode {
+        case .expression(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .binaryExpression(let value):
+                return .binaryExpression(SwiftBinaryExpression(
+                    left: value.left.replace(id: id, with: syntaxNode),
+                    right: value.right.replace(id: id, with: syntaxNode),
+                    op: value.op,
+                    id: NSUUID().uuidString))
+            case .identifierExpression(let value):
+                return .identifierExpression(SwiftIdentifierExpression(
+                    id: NSUUID().uuidString,
+                    identifier: value.identifier.replace(id: id, with: syntaxNode)))
+            }
+        }
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        if id == uuid {
+            return SwiftSyntaxNode.expression(self)
+        }
+
+        switch self {
+        case .binaryExpression(let value):
+            return value.left.find(id: id) ?? value.right.find(id: id)
+        case .identifierExpression(let value):
+            return value.identifier.find(id: id)
+        }
+    }
+
+    var uuid: SwiftUUID {
+        switch self {
+        case .binaryExpression(let value):
+            return value.id
+        case .identifierExpression(let value):
+            return value.id
+        }
+    }
+}
+
 extension SwiftStatement: LogicTextEditable {
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftStatement {
         switch syntaxNode {
@@ -96,10 +140,12 @@ extension SwiftSyntaxNode {
         switch self {
         case .statement(let statement):
             return .statement(statement.replace(id: id, with: syntaxNode))
-        case .declaration(let declaration):
+        case .declaration:
             return self
         case .identifier(let identifier):
             return .identifier(identifier.replace(id: id, with: syntaxNode))
+        case .expression(let value):
+            return .expression(value.replace(id: id, with: syntaxNode))
         }
     }
 
@@ -107,10 +153,12 @@ extension SwiftSyntaxNode {
         switch self {
         case .statement(let statement):
             return statement.find(id: id)
-        case .declaration(let declaration):
+        case .declaration:
             return nil
         case .identifier(let identifier):
             return identifier.find(id: id)
+        case .expression(let value):
+            return value.find(id: id)
         }
     }
 }

@@ -23,7 +23,10 @@ class Document: NSDocument {
         SwiftStatement.loop(
             SwiftLoop(
                 pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
-                expression: SwiftIdentifier(id: NSUUID().uuidString, string: "array"),
+                expression: SwiftExpression.identifierExpression(
+                    SwiftIdentifierExpression(
+                        id: NSUUID().uuidString,
+                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "array"))),
                 block: SwiftList<SwiftStatement>.empty,
                 id: NSUUID().uuidString)
         )
