@@ -8,6 +8,10 @@
 
 import Cocoa
 
+let exampleSyntax = SwiftStatement.loop(
+    SwiftLoop(pattern: "item", expression: "array", statements: SwiftList<SwiftStatement>.empty, id: NSUUID().uuidString)
+)
+
 class Document: NSDocument {
 
     override init() {
@@ -20,6 +24,7 @@ class Document: NSDocument {
     }
 
     var body: [[LogicEditorText]] = [
+        exampleSyntax.textElements,
         [
             .dropdown("if", NSColor.black),
             .dropdown("index", Colors.editableText),

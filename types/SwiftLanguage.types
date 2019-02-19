@@ -1,0 +1,191 @@
+{
+  "types" : [
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "Identifier"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "loop",
+            "params" : [
+              {
+                "key" : "pattern",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "statements",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "Statement"
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "branch",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "decl",
+            "params" : [
+              {
+                "key" : "content",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Declaration",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Statement"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "normal",
+            "name" : "next",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "generic",
+                  "name" : "T"
+                }
+              },
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "empty",
+            "params" : [
+
+            ]
+          }
+        ],
+        "name" : "List"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "variable",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "function",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Declaration"
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "UUID"
+      }
+    }
+  ]
+}

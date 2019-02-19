@@ -9,6 +9,7 @@
 import AppKit
 
 public typealias SwiftIdentifier = String
+public typealias SwiftUUID = String
 
 protocol LogicTextEditable {
     var textElements: [LogicEditorText] { get }
