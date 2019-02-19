@@ -37,6 +37,18 @@
     {
       "name" : "selectedIndex",
       "type" : "WholeNumber?"
+    },
+    {
+      "name" : "onActivateIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber"
+          }
+        ]
+      }
     }
   ],
   "root" : {

@@ -77,6 +77,11 @@ public class SuggestionView: NSBox {
     set { parameters.onSelectIndex = newValue }
   }
 
+  public var onActivateIndex: ((Int) -> Void)? {
+    get { return parameters.onActivateIndex }
+    set { parameters.onActivateIndex = newValue }
+  }
+
   public var onSubmit: (() -> Void)? {
     get { return parameters.onSubmit }
     set { parameters.onSubmit = newValue }
@@ -203,6 +208,7 @@ public class SuggestionView: NSBox {
     searchInputView.onPressUpKey = handleOnPressUpKey
     suggestionListViewView.selectedIndex = selectedIndex
     suggestionListViewView.onSelectIndex = handleOnSelectIndex
+    suggestionListViewView.onActivateIndex = handleOnActivateIndex
     searchInputView.onSubmit = handleOnSubmit
   }
 
@@ -222,6 +228,10 @@ public class SuggestionView: NSBox {
     onSelectIndex?(arg0)
   }
 
+  private func handleOnActivateIndex(_ arg0: Int) {
+    onActivateIndex?(arg0)
+  }
+
   private func handleOnSubmit() {
     onSubmit?()
   }
@@ -237,6 +247,7 @@ extension SuggestionView {
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
     public var onSelectIndex: ((Int?) -> Void)?
+    public var onActivateIndex: ((Int) -> Void)?
     public var onSubmit: (() -> Void)?
 
     public init(
@@ -246,6 +257,7 @@ extension SuggestionView {
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
       onSelectIndex: ((Int?) -> Void)? = nil,
+      onActivateIndex: ((Int) -> Void)? = nil,
       onSubmit: (() -> Void)? = nil)
     {
       self.searchText = searchText
@@ -254,6 +266,7 @@ extension SuggestionView {
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
       self.onSelectIndex = onSelectIndex
+      self.onActivateIndex = onActivateIndex
       self.onSubmit = onSubmit
     }
 
@@ -293,6 +306,7 @@ extension SuggestionView {
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
       onSelectIndex: ((Int?) -> Void)? = nil,
+      onActivateIndex: ((Int) -> Void)? = nil,
       onSubmit: (() -> Void)? = nil)
     {
       self
@@ -304,6 +318,7 @@ extension SuggestionView {
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
             onSelectIndex: onSelectIndex,
+            onActivateIndex: onActivateIndex,
             onSubmit: onSubmit))
     }
 

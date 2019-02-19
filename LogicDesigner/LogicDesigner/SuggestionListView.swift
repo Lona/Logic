@@ -108,6 +108,7 @@ public class SuggestionListView: NSBox {
     }
 
     public var onSelectIndex: ((Int?) -> Void)?
+    public var onActivateIndex: ((Int) -> Void)?
 
     // MARK: Private
 
@@ -125,6 +126,8 @@ public class SuggestionListView: NSBox {
         tableView.headerView = nil
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.target = self
+        tableView.doubleAction = #selector(handleDoubleAction)
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
@@ -150,6 +153,18 @@ public class SuggestionListView: NSBox {
     private func update() {
         tableView.reloadData()
         tableView.sizeToFit()
+    }
+}
+
+// MARK: - Target
+extension SuggestionListView {
+    @objc func handleDoubleAction(_ sender: AnyObject) {
+        guard tableView.clickedRow > 0 else { return }
+
+        let item = self.items[tableView.clickedRow]
+        if item.isSelectable {
+            self.onActivateIndex?(tableView.clickedRow)
+        }
     }
 }
 

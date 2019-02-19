@@ -53,6 +53,11 @@ public class SuggestionListView: NSBox {
     }
   }
 
+  public var onActivateIndex: ((Int) -> Void)? {
+    get { return parameters.onActivateIndex }
+    set { parameters.onActivateIndex = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -121,6 +126,10 @@ public class SuggestionListView: NSBox {
   private func handleOnSelectIndex(_ arg0: Int?) {
     onSelectIndex?(arg0)
   }
+
+  private func handleOnActivateIndex(_ arg0: Int) {
+    onActivateIndex?(arg0)
+  }
 }
 
 // MARK: - Parameters
@@ -129,10 +138,16 @@ extension SuggestionListView {
   public struct Parameters: Equatable {
     public var selectedIndex: Int?
     public var onSelectIndex: ((Int?) -> Void)?
+    public var onActivateIndex: ((Int) -> Void)?
 
-    public init(selectedIndex: Int? = nil, onSelectIndex: ((Int?) -> Void)? = nil) {
+    public init(
+      selectedIndex: Int? = nil,
+      onSelectIndex: ((Int?) -> Void)? = nil,
+      onActivateIndex: ((Int) -> Void)? = nil)
+    {
       self.selectedIndex = selectedIndex
       self.onSelectIndex = onSelectIndex
+      self.onActivateIndex = onActivateIndex
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
@@ -160,8 +175,13 @@ extension SuggestionListView {
       self.parameters = parameters
     }
 
-    public init(selectedIndex: Int? = nil, onSelectIndex: ((Int?) -> Void)? = nil) {
-      self.init(Parameters(selectedIndex: selectedIndex, onSelectIndex: onSelectIndex))
+    public init(
+      selectedIndex: Int? = nil,
+      onSelectIndex: ((Int?) -> Void)? = nil,
+      onActivateIndex: ((Int) -> Void)? = nil)
+    {
+      self
+        .init(Parameters(selectedIndex: selectedIndex, onSelectIndex: onSelectIndex, onActivateIndex: onActivateIndex))
     }
   }
 }

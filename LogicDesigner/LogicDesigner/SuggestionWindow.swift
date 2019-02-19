@@ -62,8 +62,11 @@ class SuggestionWindow: NSWindow {
             }
         }
 
+        suggestionView.onActivateIndex = { index in
+            self.onSubmit?(index)
+        }
+
         suggestionView.onSelectIndex = { selectedIndex in
-            Swift.print("On select")
             self.selectedIndex = selectedIndex
         }
 

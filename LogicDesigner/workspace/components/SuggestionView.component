@@ -90,6 +90,18 @@
     {
       "assignee" : [
         "layers",
+        "SuggestionListView",
+        "onActivateIndex"
+      ],
+      "content" : [
+        "parameters",
+        "onActivateIndex"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "SearchInput",
         "onSubmit"
       ],
@@ -141,6 +153,18 @@
           {
             "label" : "_",
             "type" : "WholeNumber?"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "onActivateIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber"
           }
         ]
       }
