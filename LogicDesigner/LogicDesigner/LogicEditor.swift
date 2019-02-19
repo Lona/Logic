@@ -1,10 +1,25 @@
 import AppKit
 
+public typealias LogicTextID = String
+
 public enum LogicEditorText {
     case indent
     case unstyled(String)
     case colored(String, NSColor)
-    case dropdown(String, NSColor)
+    case dropdown(LogicTextID, String, NSColor)
+
+    var syntaxNodeID: String? {
+        switch self {
+        case .unstyled:
+            return nil
+        case .colored:
+            return nil
+        case .dropdown(let id, _, _):
+            return id
+        case .indent:
+            return nil
+        }
+    }
 
     var value: String {
         switch self {
@@ -12,7 +27,7 @@ public enum LogicEditorText {
             return value
         case .colored(let value, _):
             return value
-        case .dropdown(let value, _):
+        case .dropdown(_, let value, _):
             return value
         case .indent:
             return ""
@@ -25,7 +40,7 @@ public enum LogicEditorText {
             return NSColor.black
         case .colored(_, let color):
             return color
-        case .dropdown(_, let color):
+        case .dropdown(_, _, let color):
             return color
         case .indent:
             return NSColor.clear
@@ -141,7 +156,7 @@ public class LogicEditor: NSView {
                     break
                 case .unstyled, .colored:
                     attributedString.draw(at: rect.origin)
-                case .dropdown(let value, let color):
+                case .dropdown(_, let value, let color):
                     let color = selected ? NSColor.selectedMenuItemColor : color
 
                     let shadow = NSShadow()
@@ -276,7 +291,7 @@ public class LogicEditor: NSView {
                         backgroundRect: backgroundRect)
 
                     measuredLine.append(measured)
-                case .dropdown(_, let color):
+                case .dropdown(_, _, let color):
                     let color = selected ? NSColor.systemGreen : color
                     
                     let attributes: [NSAttributedString.Key: Any] = [

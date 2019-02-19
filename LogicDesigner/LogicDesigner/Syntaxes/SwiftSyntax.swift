@@ -1,5 +1,10 @@
 import AppKit
 
+public struct SwiftIdentifier: Codable & Equatable {
+  public var id: SwiftUUID
+  public var string: SwiftString
+}
+
 public struct SwiftLoop: Codable & Equatable {
   public var pattern: SwiftIdentifier
   public var expression: SwiftIdentifier
@@ -132,6 +137,51 @@ public enum SwiftDeclaration: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .function(let value):
         try container.encode("function", forKey: .type)
+        try container.encode(value, forKey: .data)
+    }
+  }
+}
+
+public enum SwiftSyntaxNode: Codable & Equatable {
+  case statement(SwiftStatement)
+  case declaration(SwiftDeclaration)
+  case identifier(SwiftIdentifier)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "statement":
+        self = .statement(try container.decode(SwiftStatement.self, forKey: .data))
+      case "declaration":
+        self = .declaration(try container.decode(SwiftDeclaration.self, forKey: .data))
+      case "identifier":
+        self = .identifier(try container.decode(SwiftIdentifier.self, forKey: .data))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .statement(let value):
+        try container.encode("statement", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .declaration(let value):
+        try container.encode("declaration", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .identifier(let value):
+        try container.encode("identifier", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

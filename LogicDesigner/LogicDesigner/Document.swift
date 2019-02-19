@@ -9,7 +9,10 @@
 import Cocoa
 
 let exampleSyntax = SwiftStatement.loop(
-    SwiftLoop(pattern: "item", expression: "array", statements: SwiftList<SwiftStatement>.empty, id: NSUUID().uuidString)
+    SwiftLoop(
+        pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
+        expression: SwiftIdentifier(id: NSUUID().uuidString, string: "array"),
+        statements: SwiftList<SwiftStatement>.empty, id: NSUUID().uuidString)
 )
 
 class Document: NSDocument {
@@ -25,19 +28,6 @@ class Document: NSDocument {
 
     var body: [[LogicEditorText]] = [
         exampleSyntax.textElements,
-        [
-            .dropdown("if", NSColor.black),
-            .dropdown("index", Colors.editableText),
-            .dropdown("is greater than", NSColor.black),
-            .dropdown("10", Colors.editableText),
-        ],
-        [
-            .indent,
-            .dropdown("", NSColor.systemGray)
-        ],
-        [
-            .dropdown("", NSColor.systemGray)
-        ]
     ]
 
     var selectedTextIndex: Int?
@@ -76,7 +66,14 @@ class Document: NSDocument {
 
             if let window = self.window, let childWindow = self.childWindow {
                 if let indexPath = indexPath {
-                    self.suggestionText = self.body[indexPath.section][indexPath.item].value
+                    let textElement = self.body[indexPath.section][indexPath.item]
+
+                    Swift.print("Clicked \(textElement)")
+                    if let id = textElement.syntaxNodeID, let syntaxNode = exampleSyntax.find(id: id) {
+                        Swift.print("Matches \(syntaxNode)")
+                    }
+
+                    self.suggestionText = textElement.value
 
                     childWindow.suggestionItems = self.suggestions()
 

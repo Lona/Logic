@@ -1,8 +1,36 @@
 {
   "types" : [
     {
-      "case" : "native",
+      "case" : "type",
       "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "identifier",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "string",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
         "name" : "Identifier"
       }
     },
@@ -185,6 +213,65 @@
       "case" : "native",
       "data" : {
         "name" : "UUID"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "normal",
+            "name" : "statement",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Statement",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "declaration",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Declaration",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "identifier",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "SyntaxNode"
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "String"
       }
     }
   ]
