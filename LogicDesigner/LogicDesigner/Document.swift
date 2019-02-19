@@ -76,7 +76,7 @@ class Document: NSDocument {
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
-        logicEditor.onClickIndexPath = { indexPath in
+        logicEditor.onActivateIndexPath = { indexPath in
             logicEditor.selectedIndexPath = indexPath
 
             if let window = self.window, let childWindow = self.childWindow {

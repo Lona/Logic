@@ -79,7 +79,7 @@ public class LogicEditor: NSView {
     public var lines: [[LogicEditorText]] = [] { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
 
-    public var onClickIndexPath: ((IndexPath?) -> Void)?
+    public var onActivateIndexPath: ((IndexPath?) -> Void)?
 
     public var textMargin = CGSize(width: 6, height: 6)
     public var textPadding = CGSize(width: 4, height: 3)
@@ -99,6 +99,10 @@ public class LogicEditor: NSView {
     // MARK: Overrides
 
     public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
+
+    public override var acceptsFirstResponder: Bool {
         return true
     }
 
@@ -129,7 +133,28 @@ public class LogicEditor: NSView {
             }
         }
 
-        onClickIndexPath?(indexPath)
+        onActivateIndexPath?(indexPath)
+    }
+
+    public override func keyDown(with event: NSEvent) {
+        Swift.print("LogicEditor kd", event.keyCode)
+
+        switch Int(event.keyCode) {
+        case 36: // Enter
+            onActivateIndexPath?(selectedIndexPath)
+        case 48: // Tab
+            Swift.print("Tab")
+        case 123: // Left
+            Swift.print("Left arrow")
+        case 124: // Right
+            Swift.print("Right arrow")
+        case 125: // Down
+            Swift.print("Down arrow")
+        case 126: // Up
+            Swift.print("Up arrow")
+        default:
+            break
+        }
     }
 
     public override var isFlipped: Bool {
