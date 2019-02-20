@@ -9,29 +9,12 @@
 import AppKit
 
 extension SwiftIdentifier {
-    var textElements: [LogicEditorElement] {
-        return [LogicEditorElement.dropdown(id, string, Colors.editableText)]
-    }
-
     var formatted: LogicEditorFormatCommand {
         return .element(LogicEditorElement.dropdown(id, string, Colors.editableText))
     }
 }
 
 extension SwiftExpression {
-    var textElements: [LogicEditorElement] {
-        switch self {
-        case .identifierExpression(let value):
-            return value.identifier.textElements
-        case .binaryExpression(let value):
-            return Array([
-                value.left.textElements,
-                [LogicEditorElement.text(value.op)],
-                value.right.textElements
-                ].joined())
-        }
-    }
-
     var formatted: LogicEditorFormatCommand {
         switch self {
         case .identifierExpression(let value):
@@ -49,26 +32,6 @@ extension SwiftExpression {
 }
 
 extension SwiftStatement {
-    var textElements: [LogicEditorElement] {
-        switch self {
-        case .loop(let loop):
-            return Array([
-                [LogicEditorElement.dropdown(loop.id, "For", NSColor.black)],
-                loop.pattern.textElements,
-                [LogicEditorElement.text("in")],
-                loop.expression.textElements
-                ].joined())
-        case .branch(let branch):
-            return Array([
-                [LogicEditorElement.dropdown(branch.id, "If", NSColor.black)],
-                branch.condition.textElements,
-                [LogicEditorElement.dropdown("???", "", NSColor.systemGray)]
-                ].joined())
-        default:
-            return []
-        }
-    }
-
     var formatted: LogicEditorFormatCommand {
         switch self {
         case .loop(let loop):
@@ -102,19 +65,6 @@ extension SwiftStatement {
 }
 
 extension SwiftSyntaxNode {
-    var textElements: [LogicEditorElement] {
-        switch self {
-        case .statement(let value):
-            return value.textElements
-        case .declaration:
-            return []
-        case .identifier(let value):
-            return value.textElements
-        case .expression(let value):
-            return value.textElements
-        }
-    }
-
     var formatted: LogicEditorFormatCommand {
         switch self {
         case .statement(let value):
