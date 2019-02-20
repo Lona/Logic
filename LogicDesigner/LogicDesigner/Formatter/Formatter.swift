@@ -12,14 +12,14 @@ public protocol FormattableElement {
     var width: CGFloat { get }
 }
 
-public enum Formatter {
+public enum Formatter<Element: FormattableElement> {
     public struct FormattedElement {
-        var element: FormattableElement
+        var element: Element
         var position: CGFloat
     }
 
     public indirect enum Command {
-        case element(FormattableElement)
+        case element(Element)
         case line
         case indent(() -> Command)
         case hardLine
@@ -31,11 +31,11 @@ public enum Formatter {
         width maxLineWidth: CGFloat,
         spaceWidth: CGFloat,
         indentWidth: CGFloat
-        ) -> [[FormattedElement]] {
+        ) -> [[Formatter<Element>.FormattedElement]] {
 
-        var rows: [[FormattedElement]] = []
+        var rows: [[Formatter<Element>.FormattedElement]] = []
 
-        var currentRow: [FormattedElement] = []
+        var currentRow: [Formatter<Element>.FormattedElement] = []
         var currentOffset: CGFloat = 0
         var currentIndentLevel: Int = 0
 
@@ -66,7 +66,8 @@ public enum Formatter {
                     moveToNextRow()
                 }
 
-                currentRow.append(FormattedElement(element: element, position: currentOffset))
+                let formattedElement = Formatter<Element>.FormattedElement(element: element, position: currentOffset)
+                currentRow.append(formattedElement)
 
                 currentOffset += elementWidth
             case .concat(let commands):
@@ -91,7 +92,7 @@ extension String: FormattableElement {
 }
 
 func testFormatter() {
-    let command: Formatter.Command = .concat {
+    let command: Formatter<String>.Command = .concat {
         [
             .element("Hello"),
             .line,
