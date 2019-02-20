@@ -24,7 +24,7 @@ public class LogicEditor: NSView {
     public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
     public var selectedIndex: Int? { didSet { update() } }
     public var underlinedRange: NSRange?
-    public var onActivateIndex: ((Int?) -> Void)?
+    public var onActivate: ((Int?, LogicEditorElement?) -> Void)?
 
     // MARK: Styles
 
@@ -62,7 +62,11 @@ public class LogicEditor: NSView {
 
         let index = measuredLines.firstIndex(where: { $0.backgroundRect.contains(point) })
 
-        onActivateIndex?(index)
+        if let index = index, index < measuredLines.count {
+            onActivate?(index, measuredLines[index].text)
+        } else {
+            onActivate?(index, nil)
+        }
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -70,7 +74,11 @@ public class LogicEditor: NSView {
 
         switch Int(event.keyCode) {
         case 36: // Enter
-            onActivateIndex?(selectedIndex)
+            if let index = selectedIndex, index < measuredLines.count {
+                onActivate?(index, measuredLines[index].text)
+            } else {
+                onActivate?(selectedIndex, nil)
+            }
         case 48: // Tab
             Swift.print("Tab")
         case 123: // Left

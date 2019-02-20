@@ -34,12 +34,6 @@ class Document: NSDocument {
         )
     )
 
-    var body: [[LogicEditorElement]] {
-        return [
-            syntax.textElements,
-        ]
-    }
-
     var selectedTextIndex: Int?
 
     var suggestionText: String = "" {
@@ -77,21 +71,18 @@ class Document: NSDocument {
     func setUpViews() -> NSView {
         let logicEditor = LogicEditor()
 
-//        logicEditor.lines = body
-
         // TODO Determine index of clicked item
         logicEditor.formattedContent = syntax.formatted
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
-        logicEditor.onActivateIndex = { activatedIndex in
+        logicEditor.onActivate = { activatedIndex, element in
             logicEditor.selectedIndex = activatedIndex
 
             if let window = self.window, let childWindow = self.childWindow {
-                if let activatedIndex = activatedIndex {
-                    let textElement = self.body[0][activatedIndex]
-
+                if let activatedIndex = activatedIndex, let textElement = element {
                     Swift.print("Clicked \(textElement)")
+
                     if let id = textElement.syntaxNodeID, let syntaxNode = self.syntax.find(id: id) {
                         Swift.print("Matches \(syntaxNode)")
 
