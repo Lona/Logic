@@ -9,20 +9,20 @@
 import AppKit
 
 extension SwiftIdentifier {
-    var textElements: [LogicEditorTextElement] {
-        return [LogicEditorTextElement.dropdown(id, string, Colors.editableText)]
+    var textElements: [LogicEditorElement] {
+        return [LogicEditorElement.dropdown(id, string, Colors.editableText)]
     }
 }
 
 extension SwiftExpression {
-    var textElements: [LogicEditorTextElement] {
+    var textElements: [LogicEditorElement] {
         switch self {
         case .identifierExpression(let value):
             return value.identifier.textElements
         case .binaryExpression(let value):
             return Array([
                 value.left.textElements,
-                [LogicEditorTextElement.unstyled(value.op)],
+                [LogicEditorElement.text(value.op)],
                 value.right.textElements
                 ].joined())
         }
@@ -30,20 +30,20 @@ extension SwiftExpression {
 }
 
 extension SwiftStatement {
-    var textElements: [LogicEditorTextElement] {
+    var textElements: [LogicEditorElement] {
         switch self {
         case .loop(let loop):
             return Array([
-                [LogicEditorTextElement.dropdown(loop.id, "For", NSColor.black)],
+                [LogicEditorElement.dropdown(loop.id, "For", NSColor.black)],
                 loop.pattern.textElements,
-                [LogicEditorTextElement.unstyled("in")],
+                [LogicEditorElement.text("in")],
                 loop.expression.textElements
                 ].joined())
         case .branch(let branch):
             return Array([
-                [LogicEditorTextElement.dropdown(branch.id, "If", NSColor.black)],
+                [LogicEditorElement.dropdown(branch.id, "If", NSColor.black)],
                 branch.condition.textElements,
-                [LogicEditorTextElement.dropdown("???", "", NSColor.systemGray)]
+                [LogicEditorElement.dropdown("???", "", NSColor.systemGray)]
                 ].joined())
         default:
             return []
@@ -52,7 +52,7 @@ extension SwiftStatement {
 }
 
 extension SwiftSyntaxNode /*: LogicTextEditable */ {
-    var textElements: [LogicEditorTextElement] {
+    var textElements: [LogicEditorElement] {
         switch self {
         case .statement(let value):
             return value.textElements

@@ -1,5 +1,5 @@
 //
-//  LogicEditorTextElement.swift
+//  LogicEditorElement.swift
 //  LogicDesigner
 //
 //  Created by Devin Abbott on 2/19/19.
@@ -10,16 +10,16 @@ import AppKit
 
 public typealias LogicTextID = String
 
-public enum LogicEditorTextElement {
-    case unstyled(String)
-    case colored(String, NSColor)
+public enum LogicEditorElement {
+    case text(String)
+    case coloredText(String, NSColor)
     case dropdown(LogicTextID, String, NSColor)
 
     var syntaxNodeID: String? {
         switch self {
-        case .unstyled:
+        case .text:
             return nil
-        case .colored:
+        case .coloredText:
             return nil
         case .dropdown(let id, _, _):
             return id
@@ -28,9 +28,9 @@ public enum LogicEditorTextElement {
 
     var value: String {
         switch self {
-        case .unstyled(let value):
+        case .text(let value):
             return value
-        case .colored(let value, _):
+        case .coloredText(let value, _):
             return value
         case .dropdown(_, let value, _):
             return value
@@ -39,9 +39,9 @@ public enum LogicEditorTextElement {
 
     var color: NSColor {
         switch self {
-        case .unstyled:
+        case .text:
             return NSColor.black
-        case .colored(_, let color):
+        case .coloredText(_, let color):
             return color
         case .dropdown(_, _, let color):
             return color
@@ -53,7 +53,7 @@ public enum LogicEditorTextElement {
         let range = NSRange(location: 0, length: attributedString.length)
 
         switch self {
-        case .unstyled:
+        case .text:
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: NSColor.black,
                 NSAttributedString.Key.font: LogicEditor.font
@@ -69,7 +69,7 @@ public enum LogicEditorTextElement {
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
-        case .colored(_, let color):
+        case .coloredText(_, let color):
             let color = selected ? NSColor.systemGreen : color
 
             let attributes: [NSAttributedString.Key: Any] = [
@@ -111,7 +111,7 @@ public enum LogicEditorTextElement {
 }
 
 struct MeasuredEditorText {
-    var text: LogicEditorTextElement
+    var text: LogicEditorElement
     var attributedString: NSAttributedString
     var attributedStringRect: CGRect
     var backgroundRect: CGRect

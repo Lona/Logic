@@ -21,7 +21,7 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var lines: [[LogicEditorTextElement]] = [] { didSet { update() } }
+    public var lines: [[LogicEditorElement]] = [] { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
     public var underlinedRange: NSRange?
     public var onActivateIndexPath: ((IndexPath?) -> Void)?
@@ -123,7 +123,7 @@ public class LogicEditor: NSView {
                 let attributedString = measuredText.attributedString
 
                 switch (text) {
-                case .unstyled, .colored:
+                case .text, .coloredText:
                     attributedString.draw(at: rect.origin)
                 case .dropdown(_, let value, let color):
                     let color = selected ? NSColor.selectedMenuItemColor : color

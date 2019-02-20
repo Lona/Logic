@@ -34,7 +34,7 @@ class Document: NSDocument {
         )
     )
 
-    var body: [[LogicEditorTextElement]] {
+    var body: [[LogicEditorElement]] {
         return [
             syntax.textElements,
         ]
