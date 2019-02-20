@@ -65,8 +65,54 @@ class Document: NSDocument {
         return found
     }
 
+    func showSuggestionWindow(for nodeIndex: Int, syntaxNode: SwiftSyntaxNode) {
+        guard let window = self.window, let childWindow = self.childWindow else { return }
+
+        childWindow.suggestionItems = self.suggestions(for: syntaxNode)
+
+        childWindow.onSubmit = { index in
+            if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
+                Swift.print("Chose suggestion", suggestedNode)
+
+                let replacement = self.syntax.replace(id: syntaxNode.uuid, with: suggestedNode)
+
+                self.syntax = replacement
+
+                self.logicEditor.formattedContent = self.syntax.formatted
+
+                if let (offset, element) = self.logicEditor.nextActivatable(after: nodeIndex),
+                    let nextNodeID = element.syntaxNodeID,
+                    let nextSyntaxNode = self.syntax.find(id: nextNodeID) {
+
+                    self.logicEditor.selectedIndex = offset
+                    self.suggestionText = element.value
+
+                    self.showSuggestionWindow(for: offset, syntaxNode: nextSyntaxNode)
+                } else {
+                    self.hideSuggestionWindow()
+                }
+            }
+        }
+
+        window.addChildWindow(childWindow, ordered: .above)
+
+        if let rect = self.logicEditor.getBoundingRect(for: nodeIndex) {
+            let screenRect = window.convertToScreen(rect)
+            childWindow.anchorTo(rect: screenRect)
+            childWindow.focusSearchField()
+        }
+    }
+
+    func hideSuggestionWindow() {
+        guard let window = self.window, let childWindow = self.childWindow else { return }
+
+        window.removeChildWindow(childWindow)
+        childWindow.setIsVisible(false)
+    }
+
+    private let logicEditor = LogicEditor()
+
     func setUpViews() -> NSView {
-        let logicEditor = LogicEditor()
 
         // TODO Determine index of clicked item
         logicEditor.formattedContent = syntax.formatted
@@ -74,46 +120,15 @@ class Document: NSDocument {
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
         logicEditor.onActivate = { activatedIndex, element in
-            logicEditor.selectedIndex = activatedIndex
+            self.logicEditor.selectedIndex = activatedIndex
+            self.suggestionText = element?.value ?? ""
 
-            if let window = self.window, let childWindow = self.childWindow {
-                if let activatedIndex = activatedIndex, let textElement = element {
-                    Swift.print("Clicked \(textElement)")
-
-                    if let id = textElement.syntaxNodeID, let syntaxNode = self.syntax.find(id: id) {
-                        Swift.print("Matches \(syntaxNode)")
-
-                        childWindow.suggestionItems = self.suggestions(for: syntaxNode)
-
-                        childWindow.onSubmit = { index in 
-                            if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
-                                Swift.print("Chose suggestion", suggestedNode)
-
-                                let replacement = self.syntax.replace(id: syntaxNode.uuid, with: suggestedNode)
-
-                                self.syntax = replacement
-
-                                logicEditor.formattedContent = self.syntax.formatted
-
-                                window.removeChildWindow(childWindow)
-                                childWindow.setIsVisible(false)
-                            }
-                        }
-                    }
-
-                    self.suggestionText = textElement.value
-
-                    window.addChildWindow(childWindow, ordered: .above)
-
-                    if let rect = logicEditor.getBoundingRect(for: activatedIndex) {
-                        let screenRect = window.convertToScreen(rect)
-                        childWindow.anchorTo(rect: screenRect)
-                        childWindow.focusSearchField()
-                    }
-                } else {
-                    window.removeChildWindow(childWindow)
-                    childWindow.setIsVisible(false)
-                }
+            if let activatedIndex = activatedIndex,
+                let id = element?.syntaxNodeID,
+                let syntaxNode = self.syntax.find(id: id) {
+                self.showSuggestionWindow(for: activatedIndex, syntaxNode: syntaxNode)
+            } else {
+                self.hideSuggestionWindow()
             }
         }
 

@@ -41,6 +41,15 @@ public class LogicEditor: NSView {
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
 
+    var selectedElement: LogicEditorElement? {
+        return selectedMeasuredElement?.element
+    }
+
+    var selectedMeasuredElement: LogicEditorMeasuredElement? {
+        guard let index = selectedIndex else { return nil }
+        return measuredElements[index]
+    }
+
     // MARK: Overrides
 
     public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
@@ -51,19 +60,49 @@ public class LogicEditor: NSView {
         return true
     }
 
-    public func getBoundingRect(for index: Int) -> CGRect? {
-        if index >= measuredLines.count { return nil }
+    public func nextActivatableIndex(after currentIndex: Int?) -> Int? {
+        let measuredElements = self.measuredElements
 
-        return flip(rect: measuredLines[index].backgroundRect)
+        let activatableElements = measuredElements.enumerated()
+            .filter { $0.element.element.syntaxNodeID != nil }
+
+        if activatableElements.isEmpty { return nil }
+
+        // If there is no selection, focus the first element
+        guard let currentIndex = currentIndex else { return activatableElements.first?.offset }
+
+        guard currentIndex < measuredElements.count,
+            let currentID = measuredElements[currentIndex].element.syntaxNodeID else { return nil }
+
+        if let index = activatableElements.firstIndex(where: { $0.element.element.syntaxNodeID == currentID }),
+            index + 1 < activatableElements.count {
+            return activatableElements[index + 1].offset
+        } else {
+            return nil
+        }
+    }
+
+    public func nextActivatable(after currentIndex: Int?) -> (offset: Int, element: LogicEditorElement)? {
+        if let nextIndex = nextActivatableIndex(after: currentIndex) {
+            return (nextIndex, measuredElements[nextIndex].element)
+        } else {
+            return nil
+        }
+    }
+
+    public func getBoundingRect(for index: Int) -> CGRect? {
+        if index >= measuredElements.count { return nil }
+
+        return flip(rect: measuredElements[index].backgroundRect)
     }
 
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        let index = measuredLines.firstIndex(where: { $0.backgroundRect.contains(point) })
+        let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) })
 
-        if let index = index, index < measuredLines.count {
-            onActivate?(index, measuredLines[index].text)
+        if let index = index, index < measuredElements.count {
+            onActivate?(index, measuredElements[index].element)
         } else {
             onActivate?(index, nil)
         }
@@ -74,12 +113,12 @@ public class LogicEditor: NSView {
 
         switch Int(event.keyCode) {
         case 36: // Enter
-            if let index = selectedIndex, index < measuredLines.count {
-                onActivate?(index, measuredLines[index].text)
-            } else {
-                onActivate?(selectedIndex, nil)
-            }
+            onActivate?(selectedIndex, selectedElement)
         case 48: // Tab
+            if let selectedIndex = selectedIndex, let nextIndex = nextActivatableIndex(after: selectedIndex) {
+                Swift.print(selectedIndex, nextIndex)
+                onActivate?(nextIndex, measuredElements[nextIndex].element)
+            }
             Swift.print("Tab")
         case 123: // Left
             Swift.print("Left arrow")
@@ -103,11 +142,11 @@ public class LogicEditor: NSView {
 
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
-        let measuredLines = self.measuredLines
+        let measuredLines = self.measuredElements
 
         measuredLines.enumerated().forEach { textIndex, measuredText in
             let selected = textIndex == self.selectedIndex
-            let text = measuredText.text
+            let text = measuredText.element
             let rect = measuredText.attributedStringRect
             let backgroundRect = measuredText.backgroundRect
             let attributedString = measuredText.attributedString
@@ -164,10 +203,10 @@ public class LogicEditor: NSView {
         }
     }
 
-    private var measuredLines: [MeasuredEditorText] {
+    private var measuredElements: [LogicEditorMeasuredElement] {
         let yOffset = LogicEditor.textMargin.height
 
-        var measuredLine: [MeasuredEditorText] = []
+        var measuredLine: [LogicEditorMeasuredElement] = []
 
         let formattedElementLines = formattedContent.print(
             width: bounds.width - LogicEditor.textMargin.width * 2,

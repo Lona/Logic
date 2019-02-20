@@ -49,15 +49,15 @@ public enum LogicEditorElement {
     }
 }
 
-struct MeasuredEditorText {
-    var text: LogicEditorElement
+struct LogicEditorMeasuredElement {
+    var element: LogicEditorElement
     var attributedString: NSAttributedString
     var attributedStringRect: CGRect
     var backgroundRect: CGRect
 }
 
 extension LogicEditorElement {
-    func measured(selected: Bool, offset: CGPoint) -> MeasuredEditorText {
+    func measured(selected: Bool, offset: CGPoint) -> LogicEditorMeasuredElement {
         let attributedString = NSMutableAttributedString(string: self.value)
         let range = NSRange(location: 0, length: attributedString.length)
 
@@ -73,8 +73,8 @@ extension LogicEditorElement {
             let rect = CGRect(origin: offset, size: attributedStringSize)
             let backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
 
-            return MeasuredEditorText(
-                text: self,
+            return LogicEditorMeasuredElement(
+                element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
@@ -91,8 +91,8 @@ extension LogicEditorElement {
             let rect = CGRect(origin: offset, size: attributedStringSize)
             let backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
 
-            return MeasuredEditorText(
-                text: self,
+            return LogicEditorMeasuredElement(
+                element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
@@ -110,8 +110,8 @@ extension LogicEditorElement {
             var backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
             backgroundRect.size.width += 14
 
-            return MeasuredEditorText(
-                text: self,
+            return LogicEditorMeasuredElement(
+                element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
