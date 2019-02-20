@@ -102,7 +102,11 @@ class Document: NSDocument {
 
                 self.logicEditor.formattedContent = self.syntax.formatted
 
-                self.nextNode()
+                if suggestedNode.movementAfterInsertion == .next {
+                    self.nextNode()
+                } else {
+                    self.logicEditor.reactivate()
+                }
             }
         }
 

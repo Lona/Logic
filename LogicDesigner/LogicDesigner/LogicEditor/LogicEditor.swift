@@ -50,6 +50,10 @@ public class LogicEditor: NSView {
         return measuredElements[index]
     }
 
+    func reactivate() {
+        onActivate?(selectedIndex, selectedElement)
+    }
+
     // MARK: Overrides
 
     public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {

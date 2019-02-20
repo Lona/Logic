@@ -8,6 +8,10 @@
 
 import AppKit
 
+enum Movement {
+    case none, next
+}
+
 protocol LogicTextEditable {
 //    var uuid: SwiftUUID { get }
 //    var textElements: [LogicEditorText] { get }
@@ -31,6 +35,10 @@ extension SwiftIdentifier: LogicTextEditable {
     }
 
     var uuid: SwiftUUID { return id }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
 }
 
 extension SwiftExpression: LogicTextEditable {
@@ -79,6 +87,15 @@ extension SwiftExpression: LogicTextEditable {
             return value.id
         case .identifierExpression(let value):
             return value.id
+        }
+    }
+
+    var movementAfterInsertion: Movement {
+        switch self {
+        case .binaryExpression(let value):
+            return .none
+        case .identifierExpression(let value):
+            return .next
         }
     }
 }
@@ -139,6 +156,10 @@ extension SwiftStatement: LogicTextEditable {
             return expr.id
         }
     }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
 }
 
 extension SwiftSyntaxNode {
@@ -178,6 +199,19 @@ extension SwiftSyntaxNode {
             return value.uuid
         case .expression(let value):
             return value.uuid
+        }
+    }
+
+    var movementAfterInsertion: Movement {
+        switch self {
+        case .statement(let value):
+            return value.movementAfterInsertion
+        case .declaration:
+            return .none
+        case .identifier(let value):
+            return value.movementAfterInsertion
+        case .expression(let value):
+            return value.movementAfterInsertion
         }
     }
 }
