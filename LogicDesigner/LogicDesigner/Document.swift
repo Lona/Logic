@@ -84,12 +84,12 @@ class Document: NSDocument {
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
-        logicEditor.onActivateIndexPath = { indexPath in
-            logicEditor.selectedIndexPath = indexPath
+        logicEditor.onActivateIndex = { activatedIndex in
+            logicEditor.selectedIndex = activatedIndex
 
             if let window = self.window, let childWindow = self.childWindow {
-                if let indexPath = indexPath {
-                    let textElement = self.body[indexPath.section][indexPath.item]
+                if let activatedIndex = activatedIndex {
+                    let textElement = self.body[0][activatedIndex]
 
                     Swift.print("Clicked \(textElement)")
                     if let id = textElement.syntaxNodeID, let syntaxNode = self.syntax.find(id: id) {
@@ -117,7 +117,7 @@ class Document: NSDocument {
 
                     window.addChildWindow(childWindow, ordered: .above)
 
-                    if let rect = logicEditor.getBoundingRect(for: indexPath) {
+                    if let rect = logicEditor.getBoundingRect(for: activatedIndex) {
                         let screenRect = window.convertToScreen(rect)
                         childWindow.anchorTo(rect: screenRect)
                         childWindow.focusSearchField()
@@ -127,8 +127,6 @@ class Document: NSDocument {
                     childWindow.setIsVisible(false)
                 }
             }
-
-//            Swift.print("Clicked \(indexPath)")
         }
 
         return logicEditor

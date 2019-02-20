@@ -22,9 +22,9 @@ public class LogicEditor: NSView {
     // MARK: Public
 
     public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
-    public var selectedIndexPath: IndexPath? { didSet { update() } }
+    public var selectedIndex: Int? { didSet { update() } }
     public var underlinedRange: NSRange?
-    public var onActivateIndexPath: ((IndexPath?) -> Void)?
+    public var onActivateIndex: ((Int?) -> Void)?
 
     // MARK: Styles
 
@@ -51,30 +51,18 @@ public class LogicEditor: NSView {
         return true
     }
 
-    public func getBoundingRect(for indexPath: IndexPath) -> CGRect? {
-        var rect: CGRect?
+    public func getBoundingRect(for index: Int) -> CGRect? {
+        if index >= measuredLines.count { return nil }
 
-        measuredLines.enumerated().forEach { textIndex, measuredText in
-            if textIndex == indexPath.item {
-                rect = flip(rect: measuredText.backgroundRect)
-            }
-        }
-
-        return rect
+        return flip(rect: measuredLines[index].backgroundRect)
     }
 
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        var indexPath: IndexPath? = nil
+        let index = measuredLines.firstIndex(where: { $0.backgroundRect.contains(point) })
 
-        measuredLines.enumerated().forEach { textIndex, measuredText in
-            if measuredText.backgroundRect.contains(point) {
-                indexPath = IndexPath(item: textIndex, section: 0)
-            }
-        }
-
-        onActivateIndexPath?(indexPath)
+        onActivateIndex?(index)
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -82,7 +70,7 @@ public class LogicEditor: NSView {
 
         switch Int(event.keyCode) {
         case 36: // Enter
-            onActivateIndexPath?(selectedIndexPath)
+            onActivateIndex?(selectedIndex)
         case 48: // Tab
             Swift.print("Tab")
         case 123: // Left
@@ -110,7 +98,7 @@ public class LogicEditor: NSView {
         let measuredLines = self.measuredLines
 
         measuredLines.enumerated().forEach { textIndex, measuredText in
-            let selected = textIndex == self.selectedIndexPath?.item
+            let selected = textIndex == self.selectedIndex
             let text = measuredText.text
             let rect = measuredText.attributedStringRect
             let backgroundRect = measuredText.backgroundRect
@@ -169,7 +157,7 @@ public class LogicEditor: NSView {
     }
 
     private var measuredLines: [MeasuredEditorText] {
-        var yOffset = LogicEditor.textMargin.height
+        let yOffset = LogicEditor.textMargin.height
 
         var measuredLine: [MeasuredEditorText] = []
 
@@ -183,7 +171,7 @@ public class LogicEditor: NSView {
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
             formattedElementLine.forEach { formattedElement in
                 let measured = formattedElement.element.measured(
-                    selected: self.selectedIndexPath?.item == formattedElementIndex,
+                    selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
                         x: LogicEditor.textMargin.width + formattedElement.position,
                         y: yOffset + CGFloat(rowIndex) * LogicEditor.minimumLineHeight))
