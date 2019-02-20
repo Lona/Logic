@@ -38,7 +38,7 @@ private func idExpression(_ string: String) -> SwiftExpression {
 extension SwiftIdentifier {
     static var suggestionCategories: [LogicSuggestionCategory] {
         let variables = LogicSuggestionCategory(
-            title: "Variables",
+            title: "Variables".uppercased(),
             items: [
                 LogicSuggestionItem(
                     title: "bar",
@@ -75,7 +75,7 @@ extension SwiftExpression {
                     id: NSUUID().uuidString)))
 
         let expressions = LogicSuggestionCategory(
-            title: "Expressions",
+            title: "Expressions".uppercased(),
             items: [
                 LogicSuggestionItem(title: "Comparison", node: comparison),
                 LogicSuggestionItem(title: "Assignment", node: assignment)
@@ -92,7 +92,7 @@ extension SwiftStatement {
             SwiftStatement.branch(
                 SwiftBranch(
                     id: NSUUID().uuidString,
-                    condition: idExpression("value"),
+                    condition: idExpression("condition"),
                     block: SwiftList<SwiftStatement>.empty)))
 
         let forLoop = SwiftSyntaxNode.statement(
@@ -104,10 +104,10 @@ extension SwiftStatement {
                     id: NSUUID().uuidString)))
 
         let statements = LogicSuggestionCategory(
-            title: "Statements",
+            title: "Statements".uppercased(),
             items: [
-                LogicSuggestionItem(title: "Condition (If)", node: ifCondition),
-                LogicSuggestionItem(title: "Loop (For)", node: forLoop)
+                LogicSuggestionItem(title: "If condition", node: ifCondition),
+                LogicSuggestionItem(title: "For loop", node: forLoop)
             ]
         )
 

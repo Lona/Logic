@@ -172,7 +172,7 @@ extension SwiftSyntaxNode {
         switch self {
         case .statement(let value):
             return value.uuid
-        case .declaration(let value):
+        case .declaration:
             return ""
         case .identifier(let value):
             return value.uuid
