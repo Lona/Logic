@@ -53,32 +53,40 @@ extension SwiftIdentifier {
 }
 
 extension SwiftExpression {
+    static var assignmentSuggestionItem: LogicSuggestionItem {
+        return LogicSuggestionItem(
+            title: "Assignment",
+            node: SwiftSyntaxNode.expression(
+                SwiftExpression.binaryExpression(
+                    SwiftBinaryExpression(
+                        left: SwiftExpression.identifierExpression(
+                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
+                        right: SwiftExpression.identifierExpression(
+                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
+                        op: "=",
+                        id: NSUUID().uuidString))))
+    }
+
+    static var comparisonSuggestionItem: LogicSuggestionItem {
+        return LogicSuggestionItem(
+            title: "Comparison",
+            node: SwiftSyntaxNode.expression(
+                SwiftExpression.binaryExpression(
+                    SwiftBinaryExpression(
+                        left: SwiftExpression.identifierExpression(
+                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
+                        right: SwiftExpression.identifierExpression(
+                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
+                        op: ">",
+                        id: NSUUID().uuidString))))
+    }
+
     static var suggestionCategories: [LogicSuggestionCategory] {
-        let comparison = SwiftSyntaxNode.expression(
-            SwiftExpression.binaryExpression(
-                SwiftBinaryExpression(
-                    left: SwiftExpression.identifierExpression(
-                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
-                    right: SwiftExpression.identifierExpression(
-                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
-                    op: ">",
-                    id: NSUUID().uuidString)))
-
-        let assignment = SwiftSyntaxNode.expression(
-            SwiftExpression.binaryExpression(
-                SwiftBinaryExpression(
-                    left: SwiftExpression.identifierExpression(
-                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
-                    right: SwiftExpression.identifierExpression(
-                        SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
-                    op: "=",
-                    id: NSUUID().uuidString)))
-
         let expressions = LogicSuggestionCategory(
             title: "Expressions".uppercased(),
             items: [
-                LogicSuggestionItem(title: "Comparison", node: comparison),
-                LogicSuggestionItem(title: "Assignment", node: assignment)
+                comparisonSuggestionItem,
+                assignmentSuggestionItem
             ]
         )
 
@@ -111,7 +119,14 @@ extension SwiftStatement {
             ]
         )
 
-        return Array([[statements], SwiftExpression.suggestionCategories].joined())
+        let expressions = LogicSuggestionCategory(
+            title: "Expressions".uppercased(),
+            items: [
+                SwiftExpression.assignmentSuggestionItem
+            ]
+        )
+
+        return [statements, expressions]
     }
 }
 
