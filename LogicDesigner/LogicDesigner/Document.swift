@@ -80,7 +80,7 @@ class Document: NSDocument {
 //        logicEditor.lines = body
 
         // TODO Determine index of clicked item
-        logicEditor.lines = [syntax.formatted]
+        logicEditor.formattedContent = syntax.formatted
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
@@ -105,7 +105,7 @@ class Document: NSDocument {
 
                                 self.syntax = replacement
 
-                                logicEditor.lines = [self.syntax.formatted]
+                                logicEditor.formattedContent = self.syntax.formatted
 
                                 window.removeChildWindow(childWindow)
                                 childWindow.setIsVisible(false)

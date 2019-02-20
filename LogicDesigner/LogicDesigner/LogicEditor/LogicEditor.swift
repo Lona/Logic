@@ -21,7 +21,7 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var lines: [Formatter<LogicEditorElement>.Command] = [] { didSet { update() } }
+    public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
     public var underlinedRange: NSRange?
     public var onActivateIndexPath: ((IndexPath?) -> Void)?
@@ -54,11 +54,9 @@ public class LogicEditor: NSView {
     public func getBoundingRect(for indexPath: IndexPath) -> CGRect? {
         var rect: CGRect?
 
-        measuredLines.enumerated().forEach { lineIndex, line in
-            line.enumerated().forEach { textIndex, measuredText in
-                if lineIndex == indexPath.section && textIndex == indexPath.item {
-                    rect = flip(rect: measuredText.backgroundRect)
-                }
+        measuredLines.enumerated().forEach { textIndex, measuredText in
+            if textIndex == indexPath.item {
+                rect = flip(rect: measuredText.backgroundRect)
             }
         }
 
@@ -70,11 +68,9 @@ public class LogicEditor: NSView {
 
         var indexPath: IndexPath? = nil
 
-        measuredLines.enumerated().forEach { lineIndex, line in
-            line.enumerated().forEach { textIndex, measuredText in
-                if measuredText.backgroundRect.contains(point) {
-                    indexPath = IndexPath(item: textIndex, section: lineIndex)
-                }
+        measuredLines.enumerated().forEach { textIndex, measuredText in
+            if measuredText.backgroundRect.contains(point) {
+                indexPath = IndexPath(item: textIndex, section: 0)
             }
         }
 
@@ -113,122 +109,92 @@ public class LogicEditor: NSView {
 
         let measuredLines = self.measuredLines
 
-        measuredLines.enumerated().forEach { lineIndex, line in
-            line.enumerated().forEach { textIndex, measuredText in
-                let selected = IndexPath(item: textIndex, section: lineIndex) == self.selectedIndexPath
-                let text = measuredText.text
-                let rect = measuredText.attributedStringRect
-                let backgroundRect = measuredText.backgroundRect
-                let attributedString = measuredText.attributedString
+        measuredLines.enumerated().forEach { textIndex, measuredText in
+            let selected = textIndex == self.selectedIndexPath?.item
+            let text = measuredText.text
+            let rect = measuredText.attributedStringRect
+            let backgroundRect = measuredText.backgroundRect
+            let attributedString = measuredText.attributedString
 
-                switch (text) {
-                case .text, .coloredText:
+            switch (text) {
+            case .text, .coloredText:
+                attributedString.draw(at: rect.origin)
+            case .dropdown(_, let value, let color):
+                let color = selected ? NSColor.selectedMenuItemColor : color
+
+                let shadow = NSShadow()
+                shadow.shadowBlurRadius = 1
+                shadow.shadowOffset = NSSize(width: 0, height: -1)
+                shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
+                shadow.set()
+
+                if selected {
+                    color.setFill()
+                } else {
+                    NSColor.clear.setFill()
+                    //                        NSColor.white.withAlphaComponent(0.2).setFill()
+                    //                        color.highlight(withLevel: 0.7)?.setFill()
+                }
+
+                let backgroundPath = NSBezierPath(
+                    roundedRect: backgroundRect,
+                    xRadius: LogicEditor.textBackgroundRadius.width,
+                    yRadius: LogicEditor.textBackgroundRadius.height)
+                backgroundPath.fill()
+
+                NSShadow().set()
+
+                if selected {
+                    NSColor.white.setFill()
+                } else {
+                    color.setFill()
+                }
+                let caretX = backgroundRect.maxX - (value.isEmpty ? 13 : 9)
+                let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY)
+                let caretStart = CGPoint(x: caretX - 4, y: backgroundRect.midY)
+                let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
+                caret.fill()
+
+                if selected {
+                    let attributedString = NSMutableAttributedString(attributedString: attributedString)
+                    attributedString.addAttributes(
+                        [NSAttributedString.Key.foregroundColor: NSColor.white],
+                        range: NSRange(location: 0, length: attributedString.length))
                     attributedString.draw(at: rect.origin)
-                case .dropdown(_, let value, let color):
-                    let color = selected ? NSColor.selectedMenuItemColor : color
-
-                    let shadow = NSShadow()
-                    shadow.shadowBlurRadius = 1
-                    shadow.shadowOffset = NSSize(width: 0, height: -1)
-                    shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
-                    shadow.set()
-
-                    if selected {
-                        color.setFill()
-                    } else {
-                        NSColor.clear.setFill()
-//                        NSColor.white.withAlphaComponent(0.2).setFill()
-//                        color.highlight(withLevel: 0.7)?.setFill()
-                    }
-
-                    let backgroundPath = NSBezierPath(
-                        roundedRect: backgroundRect,
-                        xRadius: LogicEditor.textBackgroundRadius.width,
-                        yRadius: LogicEditor.textBackgroundRadius.height)
-                    backgroundPath.fill()
-
-                    NSShadow().set()
-
-                    if selected {
-                        NSColor.white.setFill()
-                    } else {
-                        color.setFill()
-                    }
-                    let caretX = backgroundRect.maxX - (value.isEmpty ? 13 : 9)
-                    let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY)
-                    let caretStart = CGPoint(x: caretX - 4, y: backgroundRect.midY)
-                    let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
-                    caret.fill()
-
-                    if selected {
-                        let attributedString = NSMutableAttributedString(attributedString: attributedString)
-                        attributedString.addAttributes(
-                            [NSAttributedString.Key.foregroundColor: NSColor.white],
-                            range: NSRange(location: 0, length: attributedString.length))
-                        attributedString.draw(at: rect.origin)
-                    } else {
-                        attributedString.draw(at: rect.origin)
-                    }
+                } else {
+                    attributedString.draw(at: rect.origin)
                 }
             }
         }
-
-//        if let range = underlinedRange, range.location + range.length < lines.count {
-//            let first = measuredBody[range.location]
-//            let last = measuredBody[range.location + range.length]
-//
-//            underlineColor.setFill()
-//
-//            let underlineRect = NSRect(
-//                x: first.backgroundRect.minX,
-//                y: first.backgroundRect.maxY + underlineOffset,
-//                width: last.backgroundRect.maxX - first.backgroundRect.minX,
-//                height: 2)
-//
-//            underlineRect.fill()
-//        }
     }
 
-    private var measuredLines: [[MeasuredEditorText]] {
-        var measuredLines: [[MeasuredEditorText]] = []
-
+    private var measuredLines: [MeasuredEditorText] {
         var yOffset = LogicEditor.textMargin.height
 
-        lines.enumerated().forEach { lineIndex, line in
-            var measuredLine: [MeasuredEditorText] = []
+        var measuredLine: [MeasuredEditorText] = []
 
-            let formattedElementLines = line.print(
-                width: bounds.width - LogicEditor.textMargin.width * 2,
-                spaceWidth: LogicEditor.textSpacing,
-                indentWidth: 20)
+        let formattedElementLines = formattedContent.print(
+            width: bounds.width - LogicEditor.textMargin.width * 2,
+            spaceWidth: LogicEditor.textSpacing,
+            indentWidth: 20)
 
-            var formattedElementIndex = 0
+        var formattedElementIndex = 0
 
-            formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
-                formattedElementLine.forEach { formattedElement in
-                    let selected = IndexPath(item: formattedElementIndex, section: lineIndex) == self.selectedIndexPath
-                    let measured = formattedElement.element.measured(
-                        selected: selected,
-                        offset: CGPoint(
-                            x: LogicEditor.textMargin.width + formattedElement.position,
-                            y: yOffset + CGFloat(rowIndex) * LogicEditor.minimumLineHeight))
+        formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
+            formattedElementLine.forEach { formattedElement in
+                let measured = formattedElement.element.measured(
+                    selected: self.selectedIndexPath?.item == formattedElementIndex,
+                    offset: CGPoint(
+                        x: LogicEditor.textMargin.width + formattedElement.position,
+                        y: yOffset + CGFloat(rowIndex) * LogicEditor.minimumLineHeight))
 
-                    measuredLine.append(measured)
+                measuredLine.append(measured)
 
-                    formattedElementIndex += 1
-                }
-            }
-
-            measuredLines.append(measuredLine)
-
-            if let maxY = measuredLine.map({ measuredText in measuredText.backgroundRect.maxY }).max() {
-                yOffset = maxY + LogicEditor.lineSpacing
-            } else {
-                yOffset += LogicEditor.minimumLineHeight + LogicEditor.lineSpacing
+                formattedElementIndex += 1
             }
         }
 
-        return measuredLines
+        return measuredLine
     }
 
     // MARK: Private
