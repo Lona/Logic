@@ -1,60 +1,5 @@
 import AppKit
 
-public typealias LogicTextID = String
-
-public enum LogicEditorTextElement {
-    case indent
-    case unstyled(String)
-    case colored(String, NSColor)
-    case dropdown(LogicTextID, String, NSColor)
-
-    var syntaxNodeID: String? {
-        switch self {
-        case .unstyled:
-            return nil
-        case .colored:
-            return nil
-        case .dropdown(let id, _, _):
-            return id
-        case .indent:
-            return nil
-        }
-    }
-
-    var value: String {
-        switch self {
-        case .unstyled(let value):
-            return value
-        case .colored(let value, _):
-            return value
-        case .dropdown(_, let value, _):
-            return value
-        case .indent:
-            return ""
-        }
-    }
-
-    var color: NSColor {
-        switch self {
-        case .unstyled:
-            return NSColor.black
-        case .colored(_, let color):
-            return color
-        case .dropdown(_, _, let color):
-            return color
-        case .indent:
-            return NSColor.clear
-        }
-    }
-}
-
-private struct MeasuredEditorText {
-    var text: LogicEditorTextElement
-    var attributedString: NSAttributedString
-    var attributedStringRect: CGRect
-    var backgroundRect: CGRect
-}
-
 // MARK: - LogicEditor
 
 public class LogicEditor: NSView {
@@ -78,22 +23,23 @@ public class LogicEditor: NSView {
 
     public var lines: [[LogicEditorTextElement]] = [] { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
-
+    public var underlinedRange: NSRange?
     public var onActivateIndexPath: ((IndexPath?) -> Void)?
 
-    public var textMargin = CGSize(width: 6, height: 6)
-    public var textPadding = CGSize(width: 4, height: 3)
-    public var textBackgroundRadius = CGSize(width: 2, height: 2)
+    // MARK: Styles
 
-    public var underlinedRange: NSRange?
-    public var underlineColor: NSColor = NSColor.systemBlue
-    public var underlineOffset: CGFloat = 2.0
+    public static var textMargin = CGSize(width: 6, height: 6)
+    public static var textPadding = CGSize(width: 4, height: 3)
+    public static var textBackgroundRadius = CGSize(width: 2, height: 2)
 
-    public var textSpacing: CGFloat = 4.0
-    public var lineSpacing: CGFloat = 6.0
-    public var minimumLineHeight: CGFloat = 20.0
+    public static var underlineColor: NSColor = NSColor.systemBlue
+    public static var underlineOffset: CGFloat = 2.0
 
-    public var font = TextStyle(family: "San Francisco", size: 13).nsFont
+    public static var textSpacing: CGFloat = 4.0
+    public static var lineSpacing: CGFloat = 6.0
+    public static var minimumLineHeight: CGFloat = 20.0
+
+    public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
 //    public var font = TextStyle(family: "menlo", size: 13).nsFont
 
     // MARK: Overrides
@@ -177,8 +123,6 @@ public class LogicEditor: NSView {
                 let attributedString = measuredText.attributedString
 
                 switch (text) {
-                case .indent:
-                    break
                 case .unstyled, .colored:
                     attributedString.draw(at: rect.origin)
                 case .dropdown(_, let value, let color):
@@ -200,8 +144,8 @@ public class LogicEditor: NSView {
 
                     let backgroundPath = NSBezierPath(
                         roundedRect: backgroundRect,
-                        xRadius: textBackgroundRadius.width,
-                        yRadius: textBackgroundRadius.height)
+                        xRadius: LogicEditor.textBackgroundRadius.width,
+                        yRadius: LogicEditor.textBackgroundRadius.height)
                     backgroundPath.fill()
 
                     NSShadow().set()
@@ -249,105 +193,28 @@ public class LogicEditor: NSView {
     private var measuredLines: [[MeasuredEditorText]] {
         var measuredLines: [[MeasuredEditorText]] = []
 
-        var yOffset = textMargin.height
+        var yOffset = LogicEditor.textMargin.height
 
         lines.enumerated().forEach { lineIndex, line in
-            var xOffset = textMargin.width
+            var xOffset = LogicEditor.textMargin.width
 
             var measuredLine: [MeasuredEditorText] = []
 
             line.enumerated().forEach { textIndex, text in
                 let selected = IndexPath(item: textIndex, section: lineIndex) == self.selectedIndexPath
-                let attributedString = NSMutableAttributedString(string: text.value)
-                let range = NSRange(location: 0, length: attributedString.length)
 
-                switch (text) {
-                case .indent:
-                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: NSSize(width: 20, height: 0))
+                let measured = text.measured(selected: selected, offset: CGPoint(x: xOffset, y: yOffset))
+                xOffset += measured.backgroundRect.width + LogicEditor.textSpacing
 
-                    let measured = MeasuredEditorText(
-                        text: text,
-                        attributedString: NSAttributedString(string: ""),
-                        attributedStringRect: rect,
-                        backgroundRect: rect)
-
-                    xOffset += rect.width + textSpacing
-
-                    measuredLine.append(measured)
-                case .unstyled:
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.foregroundColor: NSColor.black,
-                        NSAttributedString.Key.font: font
-                    ]
-                    attributedString.setAttributes(attributes, range: range)
-
-                    let attributedStringSize = attributedString.size()
-                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
-                    let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
-
-                    xOffset += backgroundRect.width + textSpacing
-
-                    let measured = MeasuredEditorText(
-                        text: text,
-                        attributedString: attributedString,
-                        attributedStringRect: rect,
-                        backgroundRect: backgroundRect)
-
-                    measuredLine.append(measured)
-                case .colored(_, let color):
-                    let color = selected ? NSColor.systemGreen : color
-
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.foregroundColor: color,
-                        NSAttributedString.Key.font: font
-                    ]
-                    attributedString.setAttributes(attributes, range: range)
-
-                    let attributedStringSize = attributedString.size()
-                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
-                    let backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
-
-                    xOffset += backgroundRect.width + textSpacing
-
-                    let measured = MeasuredEditorText(
-                        text: text,
-                        attributedString: attributedString,
-                        attributedStringRect: rect,
-                        backgroundRect: backgroundRect)
-
-                    measuredLine.append(measured)
-                case .dropdown(_, _, let color):
-                    let color = selected ? NSColor.systemGreen : color
-                    
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.foregroundColor: color,
-                        NSAttributedString.Key.font: font
-                    ]
-                    attributedString.setAttributes(attributes, range: range)
-
-                    let attributedStringSize = attributedString.size()
-                    let rect = CGRect(origin: CGPoint(x: xOffset, y: yOffset), size: attributedStringSize)
-                    var backgroundRect = rect.insetBy(dx: -textPadding.width, dy: -textPadding.height)
-                    backgroundRect.size.width += 14
-
-                    xOffset += backgroundRect.width + textSpacing
-
-                    let measured = MeasuredEditorText(
-                        text: text,
-                        attributedString: attributedString,
-                        attributedStringRect: rect,
-                        backgroundRect: backgroundRect)
-
-                    measuredLine.append(measured)
-                }
+                measuredLine.append(measured)
             }
 
             measuredLines.append(measuredLine)
 
             if let maxY = measuredLine.map({ measuredText in measuredText.backgroundRect.maxY }).max() {
-                yOffset = maxY + self.lineSpacing
+                yOffset = maxY + LogicEditor.lineSpacing
             } else {
-                yOffset += self.minimumLineHeight + self.lineSpacing
+                yOffset += LogicEditor.minimumLineHeight + LogicEditor.lineSpacing
             }
 
         }
