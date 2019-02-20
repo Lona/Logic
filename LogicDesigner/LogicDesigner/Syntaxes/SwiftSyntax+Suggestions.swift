@@ -125,7 +125,7 @@ extension SwiftSyntaxNode {
         case .identifier:
             return SwiftIdentifier.suggestionCategories
         case .expression:
-            return []
+            return SwiftExpression.suggestionCategories
         }
     }
 }

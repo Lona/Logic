@@ -96,7 +96,7 @@ class Document: NSDocument {
                             if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
                                 Swift.print("Chose suggestion", suggestedNode)
 
-                                let replacement = self.syntax.replace(id: id, with: suggestedNode)
+                                let replacement = self.syntax.replace(id: syntaxNode.uuid, with: suggestedNode)
 
                                 self.syntax = replacement
 

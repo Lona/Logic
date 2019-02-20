@@ -60,7 +60,7 @@ extension SwiftSyntaxNode /*: LogicTextEditable */ {
         case .identifier(let value):
             return value.textElements
         case .expression(let value):
-            return []
+            return value.textElements
         }
     }
 }

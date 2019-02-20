@@ -35,22 +35,24 @@ extension SwiftIdentifier: LogicTextEditable {
 
 extension SwiftExpression: LogicTextEditable {
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftExpression {
-        switch syntaxNode {
-        case .expression(let newNode) where id == uuid:
+        switch (syntaxNode, self) {
+        case (.expression(let newNode), _) where id == uuid:
             return newNode
-        default:
-            switch self {
-            case .binaryExpression(let value):
-                return .binaryExpression(SwiftBinaryExpression(
-                    left: value.left.replace(id: id, with: syntaxNode),
-                    right: value.right.replace(id: id, with: syntaxNode),
-                    op: value.op,
-                    id: NSUUID().uuidString))
-            case .identifierExpression(let value):
-                return .identifierExpression(SwiftIdentifierExpression(
-                    id: NSUUID().uuidString,
-                    identifier: value.identifier.replace(id: id, with: syntaxNode)))
-            }
+        case (_, .binaryExpression(let value)):
+            return .binaryExpression(SwiftBinaryExpression(
+                left: value.left.replace(id: id, with: syntaxNode),
+                right: value.right.replace(id: id, with: syntaxNode),
+                op: value.op,
+                id: NSUUID().uuidString))
+        // Identifier can replace IdentifierExpression
+        case (.identifier(let newNode), .identifierExpression) where id == uuid:
+            return .identifierExpression(SwiftIdentifierExpression(
+                id: NSUUID().uuidString,
+                identifier: newNode))
+        case (_, .identifierExpression(let value)):
+            return .identifierExpression(SwiftIdentifierExpression(
+                id: NSUUID().uuidString,
+                identifier: value.identifier.replace(id: id, with: syntaxNode)))
         }
     }
 
@@ -63,6 +65,10 @@ extension SwiftExpression: LogicTextEditable {
         case .binaryExpression(let value):
             return value.left.find(id: id) ?? value.right.find(id: id)
         case .identifierExpression(let value):
+            if id == value.identifier.uuid {
+                return SwiftSyntaxNode.expression(self)
+            }
+
             return value.identifier.find(id: id)
         }
     }
@@ -84,18 +90,18 @@ extension SwiftStatement: LogicTextEditable {
             return newNode
         default:
             switch self {
-            case .branch(let branch):
+            case .branch(let value):
                 return .branch(SwiftBranch(
                     id: NSUUID().uuidString,
-                    condition: branch.condition.replace(id: id, with: syntaxNode),
+                    condition: value.condition.replace(id: id, with: syntaxNode),
                     block: SwiftList<SwiftStatement>.empty))
-            case .decl(let decl):
+            case .decl:
                 return self
-            case .loop(let loop):
+            case .loop(let value):
                 return SwiftStatement.loop(
                     SwiftLoop(
-                        pattern: loop.pattern.replace(id: id, with: syntaxNode),
-                        expression: loop.expression.replace(id: id, with: syntaxNode),
+                        pattern: value.pattern.replace(id: id, with: syntaxNode),
+                        expression: value.expression.replace(id: id, with: syntaxNode),
                         block: SwiftList<SwiftStatement>.empty,
                         id: NSUUID().uuidString))
             case .expressionStatement(_):
@@ -110,14 +116,14 @@ extension SwiftStatement: LogicTextEditable {
         }
 
         switch self {
-        case .branch(let branch):
-            return branch.condition.find(id: id)
-        case .decl(let decl):
+        case .branch(let value):
+            return value.condition.find(id: id)
+        case .decl:
             return nil
-        case .loop(let loop):
-            return loop.expression.find(id: id) ?? loop.pattern.find(id: id)
-        case .expressionStatement(let expr):
-            return nil
+        case .loop(let value):
+            return value.expression.find(id: id) ?? value.pattern.find(id: id)
+        case .expressionStatement(let value):
+            return value.expression.find(id: id)
         }
     }
 
@@ -151,14 +157,27 @@ extension SwiftSyntaxNode {
 
     func find(id: SwiftUUID) -> SwiftSyntaxNode? {
         switch self {
-        case .statement(let statement):
-            return statement.find(id: id)
+        case .statement(let value):
+            return value.find(id: id)
         case .declaration:
             return nil
-        case .identifier(let identifier):
-            return identifier.find(id: id)
+        case .identifier(let value):
+            return value.find(id: id)
         case .expression(let value):
             return value.find(id: id)
+        }
+    }
+
+    var uuid: SwiftUUID {
+        switch self {
+        case .statement(let value):
+            return value.uuid
+        case .declaration(let value):
+            return ""
+        case .identifier(let value):
+            return value.uuid
+        case .expression(let value):
+            return value.uuid
         }
     }
 }
