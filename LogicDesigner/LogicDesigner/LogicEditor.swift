@@ -2,7 +2,7 @@ import AppKit
 
 public typealias LogicTextID = String
 
-public enum LogicEditorText {
+public enum LogicEditorTextElement {
     case indent
     case unstyled(String)
     case colored(String, NSColor)
@@ -49,7 +49,7 @@ public enum LogicEditorText {
 }
 
 private struct MeasuredEditorText {
-    var text: LogicEditorText
+    var text: LogicEditorTextElement
     var attributedString: NSAttributedString
     var attributedStringRect: CGRect
     var backgroundRect: CGRect
@@ -76,7 +76,7 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var lines: [[LogicEditorText]] = [] { didSet { update() } }
+    public var lines: [[LogicEditorTextElement]] = [] { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
 
     public var onActivateIndexPath: ((IndexPath?) -> Void)?

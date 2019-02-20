@@ -12,7 +12,9 @@ class Document: NSDocument {
 
     override init() {
         super.init()
-        // Add your subclass-specific initialization here.
+
+
+        testFormatter()
     }
 
     override class var autosavesInPlace: Bool {
@@ -32,7 +34,7 @@ class Document: NSDocument {
         )
     )
 
-    var body: [[LogicEditorText]] {
+    var body: [[LogicEditorTextElement]] {
         return [
             syntax.textElements,
         ]

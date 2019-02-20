@@ -35,6 +35,7 @@
 		6B12C62C221CB66A005A808C /* SwiftSyntax+Suggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */; };
 		6B12C62E221CB867005A808C /* SwiftSyntax+NativeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */; };
 		6B12C630221CB8D8005A808C /* SwiftSyntax+TextElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */; };
+		6B12C633221CDDCA005A808C /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C632221CDDCA005A808C /* Formatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,7 @@
 		6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Suggestions.swift"; sourceTree = "<group>"; };
 		6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+NativeTypes.swift"; sourceTree = "<group>"; };
 		6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+TextElements.swift"; sourceTree = "<group>"; };
+		6B12C632221CDDCA005A808C /* Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +116,7 @@
 				6B12C6052219EAA6005A808C /* TextStyle.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
 				6B12C5E72218BD75005A808C /* Document.xib */,
+				6B12C631221CDDAB005A808C /* Formatter */,
 				6B12C6012219EAA6005A808C /* Generated */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
 				6B12C624221B5FA1005A808C /* Syntaxes */,
@@ -157,6 +160,14 @@
 				6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */,
 			);
 			path = Syntaxes;
+			sourceTree = "<group>";
+		};
+		6B12C631221CDDAB005A808C /* Formatter */ = {
+			isa = PBXGroup;
+			children = (
+				6B12C632221CDDCA005A808C /* Formatter.swift */,
+			);
+			path = Formatter;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,6 +255,7 @@
 				6B12C5F72218BE87005A808C /* LogicEditor.swift in Sources */,
 				6B12C61F221A14D9005A808C /* SuggestionListView.swift in Sources */,
 				6B12C6102219EAA6005A808C /* CGSize+Resizing.swift in Sources */,
+				6B12C633221CDDCA005A808C /* Formatter.swift in Sources */,
 				6B12C60F2219EAA6005A808C /* TextStyles.swift in Sources */,
 				6B12C628221B5FE5005A808C /* SwiftSyntax+Traversal.swift in Sources */,
 				6B12C6192219EAA6005A808C /* LonaViewModel.swift in Sources */,
