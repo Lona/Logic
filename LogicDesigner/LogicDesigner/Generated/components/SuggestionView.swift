@@ -87,6 +87,21 @@ public class SuggestionView: NSBox {
     set { parameters.onSubmit = newValue }
   }
 
+  public var onPressTabKey: (() -> Void)? {
+    get { return parameters.onPressTabKey }
+    set { parameters.onPressTabKey = newValue }
+  }
+
+  public var onPressShiftTabKey: (() -> Void)? {
+    get { return parameters.onPressShiftTabKey }
+    set { parameters.onPressShiftTabKey = newValue }
+  }
+
+  public var onPressEscapeKey: (() -> Void)? {
+    get { return parameters.onPressEscapeKey }
+    set { parameters.onPressEscapeKey = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -210,6 +225,9 @@ public class SuggestionView: NSBox {
     suggestionListViewView.onSelectIndex = handleOnSelectIndex
     suggestionListViewView.onActivateIndex = handleOnActivateIndex
     searchInputView.onSubmit = handleOnSubmit
+    searchInputView.onPressEscape = handleOnPressEscapeKey
+    searchInputView.onPressTab = handleOnPressTabKey
+    searchInputView.onPressShiftTab = handleOnPressShiftTabKey
   }
 
   private func handleOnChangeSearchText(_ arg0: String) {
@@ -235,6 +253,18 @@ public class SuggestionView: NSBox {
   private func handleOnSubmit() {
     onSubmit?()
   }
+
+  private func handleOnPressTabKey() {
+    onPressTabKey?()
+  }
+
+  private func handleOnPressShiftTabKey() {
+    onPressShiftTabKey?()
+  }
+
+  private func handleOnPressEscapeKey() {
+    onPressEscapeKey?()
+  }
 }
 
 // MARK: - Parameters
@@ -249,6 +279,9 @@ extension SuggestionView {
     public var onSelectIndex: ((Int?) -> Void)?
     public var onActivateIndex: ((Int) -> Void)?
     public var onSubmit: (() -> Void)?
+    public var onPressTabKey: (() -> Void)?
+    public var onPressShiftTabKey: (() -> Void)?
+    public var onPressEscapeKey: (() -> Void)?
 
     public init(
       searchText: String,
@@ -258,7 +291,10 @@ extension SuggestionView {
       onPressUpKey: (() -> Void)? = nil,
       onSelectIndex: ((Int?) -> Void)? = nil,
       onActivateIndex: ((Int) -> Void)? = nil,
-      onSubmit: (() -> Void)? = nil)
+      onSubmit: (() -> Void)? = nil,
+      onPressTabKey: (() -> Void)? = nil,
+      onPressShiftTabKey: (() -> Void)? = nil,
+      onPressEscapeKey: (() -> Void)? = nil)
     {
       self.searchText = searchText
       self.selectedIndex = selectedIndex
@@ -268,6 +304,9 @@ extension SuggestionView {
       self.onSelectIndex = onSelectIndex
       self.onActivateIndex = onActivateIndex
       self.onSubmit = onSubmit
+      self.onPressTabKey = onPressTabKey
+      self.onPressShiftTabKey = onPressShiftTabKey
+      self.onPressEscapeKey = onPressEscapeKey
     }
 
     public init() {
@@ -307,7 +346,10 @@ extension SuggestionView {
       onPressUpKey: (() -> Void)? = nil,
       onSelectIndex: ((Int?) -> Void)? = nil,
       onActivateIndex: ((Int) -> Void)? = nil,
-      onSubmit: (() -> Void)? = nil)
+      onSubmit: (() -> Void)? = nil,
+      onPressTabKey: (() -> Void)? = nil,
+      onPressShiftTabKey: (() -> Void)? = nil,
+      onPressEscapeKey: (() -> Void)? = nil)
     {
       self
         .init(
@@ -319,7 +361,10 @@ extension SuggestionView {
             onPressUpKey: onPressUpKey,
             onSelectIndex: onSelectIndex,
             onActivateIndex: onActivateIndex,
-            onSubmit: onSubmit))
+            onSubmit: onSubmit,
+            onPressTabKey: onPressTabKey,
+            onPressShiftTabKey: onPressShiftTabKey,
+            onPressEscapeKey: onPressEscapeKey))
     }
 
     public init() {

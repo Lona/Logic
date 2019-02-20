@@ -64,6 +64,24 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "onPressEscape",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressTab",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressShiftTab",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {

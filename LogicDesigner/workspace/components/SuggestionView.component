@@ -110,6 +110,42 @@
         "onSubmit"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressEscape"
+      ],
+      "content" : [
+        "parameters",
+        "onPressEscapeKey"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressTab"
+      ],
+      "content" : [
+        "parameters",
+        "onPressTabKey"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressShiftTab"
+      ],
+      "content" : [
+        "parameters",
+        "onPressShiftTabKey"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -171,6 +207,24 @@
     },
     {
       "name" : "onSubmit",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressTabKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressShiftTabKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressEscapeKey",
       "type" : {
         "name" : "Function"
       }

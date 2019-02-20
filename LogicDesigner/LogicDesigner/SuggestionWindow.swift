@@ -116,6 +116,21 @@ class SuggestionWindow: NSWindow {
         set { suggestionView.selectedIndex = newValue }
     }
 
+    public var onPressEscapeKey: (() -> Void)? {
+        get { return suggestionView.onPressEscapeKey }
+        set { suggestionView.onPressEscapeKey = newValue }
+    }
+
+    public var onPressTabKey: (() -> Void)? {
+        get { return suggestionView.onPressTabKey }
+        set { suggestionView.onPressTabKey = newValue }
+    }
+
+    public var onPressShiftTabKey: (() -> Void)? {
+        get { return suggestionView.onPressShiftTabKey }
+        set { suggestionView.onPressShiftTabKey = newValue }
+    }
+
     public var suggestionItems: [SuggestionListItem] {
         get { return suggestionView.suggestionList.items }
         set { suggestionView.suggestionList.items = newValue }

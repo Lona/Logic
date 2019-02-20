@@ -45,6 +45,8 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     public var onPressEscape: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
     public var onPressDownKey: (() -> Void)?
+    public var onPressTab: (() -> Void)?
+    public var onPressShiftTab: (() -> Void)?
 
     public var textValue: String = "" {
         didSet {
@@ -117,7 +119,15 @@ extension ControlledSearchInput: NSTextFieldDelegate {
     }
 
     public func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
+        if (commandSelector == #selector(NSResponder.insertTab(_:))) {
+            Swift.print("Tab")
+            onPressTab?()
+            return true
+        } else if (commandSelector == #selector(NSResponder.insertBacktab(_:))) {
+            Swift.print("Back tab")
+            onPressShiftTab?()
+            return true
+        } else if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
             onSubmit?()
             return true
         } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {

@@ -68,6 +68,21 @@ public class ControlledSearchInput: NSBox {
     set { parameters.onSubmit = newValue }
   }
 
+  public var onPressEscape: (() -> Void)? {
+    get { return parameters.onPressEscape }
+    set { parameters.onPressEscape = newValue }
+  }
+
+  public var onPressTab: (() -> Void)? {
+    get { return parameters.onPressTab }
+    set { parameters.onPressTab = newValue }
+  }
+
+  public var onPressShiftTab: (() -> Void)? {
+    get { return parameters.onPressShiftTab }
+    set { parameters.onPressShiftTab = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -146,6 +161,18 @@ public class ControlledSearchInput: NSBox {
   private func handleOnSubmit() {
     onSubmit?()
   }
+
+  private func handleOnPressEscape() {
+    onPressEscape?()
+  }
+
+  private func handleOnPressTab() {
+    onPressTab?()
+  }
+
+  private func handleOnPressShiftTab() {
+    onPressShiftTab?()
+  }
 }
 
 // MARK: - Parameters
@@ -157,19 +184,28 @@ extension ControlledSearchInput {
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
     public var onSubmit: (() -> Void)?
+    public var onPressEscape: (() -> Void)?
+    public var onPressTab: (() -> Void)?
+    public var onPressShiftTab: (() -> Void)?
 
     public init(
       textValue: String,
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
-      onSubmit: (() -> Void)? = nil)
+      onSubmit: (() -> Void)? = nil,
+      onPressEscape: (() -> Void)? = nil,
+      onPressTab: (() -> Void)? = nil,
+      onPressShiftTab: (() -> Void)? = nil)
     {
       self.textValue = textValue
       self.onChangeTextValue = onChangeTextValue
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
       self.onSubmit = onSubmit
+      self.onPressEscape = onPressEscape
+      self.onPressTab = onPressTab
+      self.onPressShiftTab = onPressShiftTab
     }
 
     public init() {
@@ -206,7 +242,10 @@ extension ControlledSearchInput {
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
-      onSubmit: (() -> Void)? = nil)
+      onSubmit: (() -> Void)? = nil,
+      onPressEscape: (() -> Void)? = nil,
+      onPressTab: (() -> Void)? = nil,
+      onPressShiftTab: (() -> Void)? = nil)
     {
       self
         .init(
@@ -215,7 +254,10 @@ extension ControlledSearchInput {
             onChangeTextValue: onChangeTextValue,
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
-            onSubmit: onSubmit))
+            onSubmit: onSubmit,
+            onPressEscape: onPressEscape,
+            onPressTab: onPressTab,
+            onPressShiftTab: onPressShiftTab))
     }
 
     public init() {
