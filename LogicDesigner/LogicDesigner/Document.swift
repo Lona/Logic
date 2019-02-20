@@ -13,7 +13,6 @@ class Document: NSDocument {
     override init() {
         super.init()
 
-
         testFormatter()
     }
 
@@ -33,8 +32,6 @@ class Document: NSDocument {
                 id: NSUUID().uuidString)
         )
     )
-
-    var selectedTextIndex: Int?
 
     var suggestionText: String = "" {
         didSet {

@@ -22,7 +22,7 @@ extension SwiftIdentifier: LogicTextEditable {
         case .identifier(let newNode) where id == uuid:
             return SwiftIdentifier(id: NSUUID().uuidString, string: newNode.string)
         default:
-            return self
+            return SwiftIdentifier(id: NSUUID().uuidString, string: string)
         }
     }
 
