@@ -47,7 +47,16 @@ public enum LogicEditorElement {
             return color
         }
     }
+}
 
+struct MeasuredEditorText {
+    var text: LogicEditorElement
+    var attributedString: NSAttributedString
+    var attributedStringRect: CGRect
+    var backgroundRect: CGRect
+}
+
+extension LogicEditorElement {
     func measured(selected: Bool, offset: CGPoint) -> MeasuredEditorText {
         let attributedString = NSMutableAttributedString(string: self.value)
         let range = NSRange(location: 0, length: attributedString.length)
@@ -108,11 +117,4 @@ public enum LogicEditorElement {
                 backgroundRect: backgroundRect)
         }
     }
-}
-
-struct MeasuredEditorText {
-    var text: LogicEditorElement
-    var attributedString: NSAttributedString
-    var attributedStringRect: CGRect
-    var backgroundRect: CGRect
 }

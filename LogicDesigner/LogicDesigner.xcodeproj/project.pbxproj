@@ -107,7 +107,6 @@
 		6B12C5E22218BD75005A808C /* LogicDesigner */ = {
 			isa = PBXGroup;
 			children = (
-				6B12C634221CF951005A808C /* LogicEditor */,
 				6B12C5F02218BD77005A808C /* LogicDesigner.entitlements */,
 				6B12C5EF2218BD77005A808C /* Info.plist */,
 				6B12C5E32218BD75005A808C /* AppDelegate.swift */,
@@ -122,6 +121,7 @@
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C631221CDDAB005A808C /* Formatter */,
 				6B12C6012219EAA6005A808C /* Generated */,
+				6B12C634221CF951005A808C /* LogicEditor */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
 				6B12C624221B5FA1005A808C /* Syntaxes */,
 			);
