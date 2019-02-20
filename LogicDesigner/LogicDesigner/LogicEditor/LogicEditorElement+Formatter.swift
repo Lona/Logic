@@ -14,4 +14,4 @@ extension LogicEditorElement: FormattableElement {
     }
 }
 
-public typealias LogicEditorFormattedElement = Formatter<LogicEditorElement>.FormattedElement
+public typealias LogicEditorFormatCommand = Formatter<LogicEditorElement>.Command

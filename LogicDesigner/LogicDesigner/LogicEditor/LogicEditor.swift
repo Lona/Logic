@@ -21,7 +21,7 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var lines: [[LogicEditorElement]] = [] { didSet { update() } }
+    public var lines: [Formatter<LogicEditorElement>.Command] = [] { didSet { update() } }
     public var selectedIndexPath: IndexPath? { didSet { update() } }
     public var underlinedRange: NSRange?
     public var onActivateIndexPath: ((IndexPath?) -> Void)?
@@ -40,7 +40,6 @@ public class LogicEditor: NSView {
     public static var minimumLineHeight: CGFloat = 20.0
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
-//    public var font = TextStyle(family: "menlo", size: 13).nsFont
 
     // MARK: Overrides
 
@@ -196,17 +195,28 @@ public class LogicEditor: NSView {
         var yOffset = LogicEditor.textMargin.height
 
         lines.enumerated().forEach { lineIndex, line in
-            var xOffset = LogicEditor.textMargin.width
-
             var measuredLine: [MeasuredEditorText] = []
 
-            line.enumerated().forEach { textIndex, text in
-                let selected = IndexPath(item: textIndex, section: lineIndex) == self.selectedIndexPath
+            let formattedElementLines = line.print(
+                width: bounds.width - LogicEditor.textMargin.width * 2,
+                spaceWidth: LogicEditor.textSpacing,
+                indentWidth: 20)
 
-                let measured = text.measured(selected: selected, offset: CGPoint(x: xOffset, y: yOffset))
-                xOffset += measured.backgroundRect.width + LogicEditor.textSpacing
+            var formattedElementIndex = 0
 
-                measuredLine.append(measured)
+            formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
+                formattedElementLine.forEach { formattedElement in
+                    let selected = IndexPath(item: formattedElementIndex, section: lineIndex) == self.selectedIndexPath
+                    let measured = formattedElement.element.measured(
+                        selected: selected,
+                        offset: CGPoint(
+                            x: LogicEditor.textMargin.width + formattedElement.position,
+                            y: yOffset + CGFloat(rowIndex) * LogicEditor.minimumLineHeight))
+
+                    measuredLine.append(measured)
+
+                    formattedElementIndex += 1
+                }
             }
 
             measuredLines.append(measuredLine)
@@ -216,7 +226,6 @@ public class LogicEditor: NSView {
             } else {
                 yOffset += LogicEditor.minimumLineHeight + LogicEditor.lineSpacing
             }
-
         }
 
         return measuredLines

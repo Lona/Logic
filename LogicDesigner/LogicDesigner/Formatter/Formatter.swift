@@ -24,6 +24,19 @@ public enum Formatter<Element: FormattableElement> {
         case indent(() -> Command)
         case hardLine
         case concat(() -> [Command])
+
+        func print(
+            width maxLineWidth: CGFloat,
+            spaceWidth: CGFloat,
+            indentWidth: CGFloat
+            ) -> [[Formatter<Element>.FormattedElement]] {
+
+            return Formatter<Element>.print(
+                command: self,
+                width: maxLineWidth,
+                spaceWidth: spaceWidth,
+                indentWidth: indentWidth)
+        }
     }
 
     static func print(
