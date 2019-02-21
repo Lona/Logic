@@ -158,6 +158,54 @@
         "onPressShiftTabKey"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "onChangeIndex"
+      ],
+      "content" : [
+        "parameters",
+        "onSelectDropdownIndex"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "values"
+      ],
+      "content" : [
+        "parameters",
+        "dropdownValues"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "selectedIndex"
+      ],
+      "content" : [
+        "parameters",
+        "dropdownIndex"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "onHighlightIndex"
+      ],
+      "content" : [
+        "parameters",
+        "onHighlightDropdownIndex"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -244,6 +292,41 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "onSelectDropdownIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "onHighlightDropdownIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber?"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "dropdownIndex",
+      "type" : "WholeNumber"
+    },
+    {
+      "name" : "dropdownValues",
+      "type" : {
+        "name" : "Array",
+        "of" : "String"
+      }
     }
   ],
   "root" : {
@@ -251,22 +334,55 @@
       {
         "children" : [
           {
-            "id" : "SearchInput",
+            "children" : [
+              {
+                "id" : "SearchInput",
+                "params" : {
+                  "textValue" : "Search"
+                },
+                "type" : "ControlledSearchInput"
+              }
+            ],
+            "id" : "SearchInputContainer",
             "params" : {
-              "textValue" : "Search"
+              "flex" : 1,
+              "paddingBottom" : 5,
+              "paddingLeft" : 10,
+              "paddingRight" : 10,
+              "paddingTop" : 5
             },
-            "type" : "ControlledSearchInput"
+            "type" : "Lona:View"
+          },
+          {
+            "children" : [
+              {
+                "id" : "ControlledDropdown",
+                "params" : {
+                  "onChangeIndex" : "Text",
+                  "selectedIndex" : 0,
+                  "values" : [
+
+                  ]
+                },
+                "type" : "ControlledDropdown"
+              }
+            ],
+            "id" : "ControlledDropdownContainer",
+            "params" : {
+              "alignItems" : "center",
+              "alignSelf" : "stretch",
+              "flexDirection" : "row",
+              "paddingLeft" : 5,
+              "paddingRight" : 5
+            },
+            "type" : "Lona:View"
           }
         ],
         "id" : "Search Area",
         "params" : {
           "alignSelf" : "stretch",
           "flexDirection" : "row",
-          "height" : 32,
-          "paddingBottom" : 5,
-          "paddingLeft" : 10,
-          "paddingRight" : 10,
-          "paddingTop" : 5
+          "height" : 32
         },
         "type" : "Lona:View"
       },

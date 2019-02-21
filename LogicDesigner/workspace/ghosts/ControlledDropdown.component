@@ -1,0 +1,100 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+
+      }
+    }
+  ],
+  "logic" : [
+
+  ],
+  "params" : [
+    {
+      "name" : "selectedIndex",
+      "type" : "WholeNumber"
+    },
+    {
+      "name" : "onChangeIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "onHighlightIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber?"
+          }
+        ]
+      }
+    },
+    {
+      "name" : "values",
+      "type" : {
+        "name" : "Array",
+        "of" : "String"
+      }
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "children" : [
+          {
+            "id" : "Text",
+            "params" : {
+              "text" : "Dropdown"
+            },
+            "type" : "Lona:Text"
+          }
+        ],
+        "id" : "View 1",
+        "params" : {
+          "flex" : 1,
+          "height" : 22,
+          "justifyContent" : "center",
+          "paddingLeft" : 8,
+          "paddingRight" : 8
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "id" : "View 2",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "editableText",
+          "width" : 40
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "View",
+    "params" : {
+      "backgroundColor" : "divider",
+      "flexDirection" : "row"
+    },
+    "type" : "Lona:View"
+  }
+}

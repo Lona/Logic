@@ -103,6 +103,12 @@ class SuggestionWindow: NSWindow {
         }
 
         window.contentView = view
+
+        suggestionView.dropdownIndex = 0
+        suggestionView.dropdownValues = ["Identifier", "Expression", "Statement"]
+        suggestionView.onHighlightDropdownIndex = { index in
+            Swift.print("Highlighted \(index ?? -1)")
+        }
     }
 
     var contentBox: NSView?

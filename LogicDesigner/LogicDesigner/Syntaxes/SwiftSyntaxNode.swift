@@ -17,14 +17,20 @@ protocol SyntaxNodeProtocol {
     var lastNode: SwiftSyntaxNode { get }
     var movementAfterInsertion: Movement { get }
     var node: SwiftSyntaxNode { get }
+    var nodeTypeDescription: String { get }
 
     func find(id: SwiftUUID) -> SwiftSyntaxNode?
     func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]?
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
+
     //    static var suggestionCategories: [LogicSuggestionCategory] { get }
 }
 
 extension SwiftIdentifier: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Identifier"
+    }
+
     var node: SwiftSyntaxNode {
         return .identifier(self)
     }
@@ -58,6 +64,10 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
 }
 
 extension SwiftExpression: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Expression"
+    }
+
     var node: SwiftSyntaxNode {
         return .expression(self)
     }
@@ -146,15 +156,19 @@ extension SwiftExpression: SyntaxNodeProtocol {
 
     var movementAfterInsertion: Movement {
         switch self {
-        case .binaryExpression(let value):
+        case .binaryExpression:
             return .none
-        case .identifierExpression(let value):
+        case .identifierExpression:
             return .next
         }
     }
 }
 
 extension SwiftStatement: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Statement"
+    }
+
     var node: SwiftSyntaxNode {
         return .statement(self)
     }
@@ -311,6 +325,10 @@ extension SwiftSyntaxNode {
 
     var movementAfterInsertion: Movement {
         return contents.movementAfterInsertion
+    }
+
+    var nodeTypeDescription: String {
+        return contents.nodeTypeDescription
     }
 }
 
