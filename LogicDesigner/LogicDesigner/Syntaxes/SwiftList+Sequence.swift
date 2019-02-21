@@ -8,27 +8,28 @@
 
 import AppKit
 
-extension SwiftList: Sequence {
-    public struct Iterator<T: Equatable & Codable>: IteratorProtocol {
-        var list: SwiftList<T>
+public struct SwiftListIterator<T: Equatable & Codable>: IteratorProtocol {
+    var list: SwiftList<T>
 
-        init(_ list: SwiftList<T>) {
-            self.list = list
-        }
-
-        public mutating func next() -> T? {
-            switch list {
-            case .empty:
-                return nil
-            case .next(let value, let list):
-                self.list = list
-                return value
-            }
-        }
+    init(_ list: SwiftList<T>) {
+        self.list = list
     }
 
-    public func makeIterator() -> Iterator<T> {
-        return Iterator(self)
+    public mutating func next() -> T? {
+        switch list {
+        case .empty:
+            return nil
+        case .next(let value, let list):
+            self.list = list
+            return value
+        }
+    }
+}
+
+
+extension SwiftList: Sequence {
+    public func makeIterator() -> SwiftListIterator<T> {
+        return SwiftListIterator(self)
     }
 }
 
@@ -48,7 +49,7 @@ extension SwiftList: Collection {
         return count
     }
 
-    public subscript(index: Index) -> Iterator<T>.Element {
+    public subscript(index: Index) -> SwiftListIterator<T>.Element {
         get {
             var count = 0
 
