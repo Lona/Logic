@@ -28,6 +28,10 @@ public struct SwiftExpressionStatement: Codable & Equatable {
   public var expression: SwiftExpression
 }
 
+public struct SwiftPlaceholderStatement: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
 public struct SwiftVariable: Codable & Equatable {
   public var id: SwiftUUID
 }
@@ -53,6 +57,7 @@ public indirect enum SwiftStatement: Codable & Equatable {
   case branch(SwiftBranch)
   case decl(SwiftDecl)
   case expressionStatement(SwiftExpressionStatement)
+  case placeholderStatement(SwiftPlaceholderStatement)
 
   // MARK: Codable
 
@@ -74,6 +79,8 @@ public indirect enum SwiftStatement: Codable & Equatable {
         self = .decl(try container.decode(SwiftDecl.self, forKey: .data))
       case "expressionStatement":
         self = .expressionStatement(try container.decode(SwiftExpressionStatement.self, forKey: .data))
+      case "placeholderStatement":
+        self = .placeholderStatement(try container.decode(SwiftPlaceholderStatement.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -94,6 +101,9 @@ public indirect enum SwiftStatement: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .expressionStatement(let value):
         try container.encode("expressionStatement", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .placeholderStatement(let value):
+        try container.encode("placeholderStatement", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

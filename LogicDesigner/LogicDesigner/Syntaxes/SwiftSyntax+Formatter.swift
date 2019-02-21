@@ -44,10 +44,6 @@ extension SwiftStatement {
                 ]
             }
         case .branch(let branch):
-            var statements = branch.block.map { $0.formatted }
-            statements.append(
-                .element(LogicEditorElement.dropdown("???", "", NSColor.systemGray))
-            )
             return .concat {
                 [
                     .element(LogicEditorElement.dropdown(branch.id, "If", NSColor.black)),
@@ -56,12 +52,16 @@ extension SwiftStatement {
                         .concat {
                             [
                                 .hardLine,
-                                .join(with: .hardLine) { statements }
+                                .join(with: .hardLine) {
+                                    branch.block.map { $0.formatted }
+                                }
                             ]
                         }
                     }
                 ]
             }
+        case .placeholderStatement(let value):
+            return .element(LogicEditorElement.dropdown(value.id, "", Colors.editableText))
         default:
             return .hardLine
         }

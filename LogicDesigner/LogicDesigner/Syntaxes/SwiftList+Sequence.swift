@@ -31,3 +31,41 @@ extension SwiftList: Sequence {
         return Iterator(self)
     }
 }
+
+extension SwiftList: Collection {
+    public typealias Index = Int
+    public typealias Element = T
+
+    public var startIndex: Index { return 0 }
+    public var endIndex: Index {
+        var count = 0
+
+        var iterator = self.makeIterator()
+        while let _ = iterator.next() {
+            count += 1
+        }
+
+        return count
+    }
+
+    public subscript(index: Index) -> Iterator<T>.Element {
+        get {
+            var count = 0
+
+            var iterator = self.makeIterator()
+            while let value = iterator.next() {
+                if count == index {
+                    return value
+                }
+
+                count += 1
+            }
+
+            fatalError("SwiftList.Index out of range")
+        }
+    }
+
+    public func index(after i: Index) -> Index {
+        return i + 1
+    }
+}

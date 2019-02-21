@@ -101,7 +101,15 @@ extension SwiftStatement {
                 SwiftBranch(
                     id: NSUUID().uuidString,
                     condition: idExpression("condition"),
-                    block: SwiftList<SwiftStatement>.empty)))
+                    block: SwiftList<SwiftStatement>.next(
+                        SwiftStatement.placeholderStatement(
+                            SwiftPlaceholderStatement(id: NSUUID().uuidString)
+                        ),
+                        .empty
+                    )
+                )
+            )
+        )
 
         let forLoop = SwiftSyntaxNode.statement(
             SwiftStatement.loop(

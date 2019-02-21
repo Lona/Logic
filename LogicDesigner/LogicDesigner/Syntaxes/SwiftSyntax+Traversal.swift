@@ -12,15 +12,15 @@ enum Movement {
     case none, next
 }
 
-protocol LogicTextEditable {
+protocol SyntaxNodeProtocol {
 //    var uuid: SwiftUUID { get }
 //    var textElements: [LogicEditorText] { get }
-//    func find(id: SwiftUUID) -> SwiftSyntaxNode?
+    func find(id: SwiftUUID) -> SwiftSyntaxNode?
 //    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
 //    static var suggestionCategories: [LogicSuggestionCategory] { get }
 }
 
-extension SwiftIdentifier: LogicTextEditable {
+extension SwiftIdentifier: SyntaxNodeProtocol {
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftIdentifier {
         switch syntaxNode {
         case .identifier(let newNode) where id == uuid:
@@ -41,7 +41,7 @@ extension SwiftIdentifier: LogicTextEditable {
     }
 }
 
-extension SwiftExpression: LogicTextEditable {
+extension SwiftExpression: SyntaxNodeProtocol {
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftExpression {
         switch (syntaxNode, self) {
         case (.expression(let newNode), _) where id == uuid:
@@ -100,7 +100,7 @@ extension SwiftExpression: LogicTextEditable {
     }
 }
 
-extension SwiftStatement: LogicTextEditable {
+extension SwiftStatement: SyntaxNodeProtocol {
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftStatement {
         switch syntaxNode {
         case .statement(let newNode) where id == uuid:
@@ -108,10 +108,13 @@ extension SwiftStatement: LogicTextEditable {
         default:
             switch self {
             case .branch(let value):
-                return .branch(SwiftBranch(
-                    id: NSUUID().uuidString,
-                    condition: value.condition.replace(id: id, with: syntaxNode),
-                    block: SwiftList<SwiftStatement>.empty))
+                return .branch(
+                    SwiftBranch(
+                        id: NSUUID().uuidString,
+                        condition: value.condition.replace(id: id, with: syntaxNode),
+                        block: value.block.replace(id: id, with: syntaxNode)
+                    )
+                )
             case .decl:
                 return self
             case .loop(let value):
@@ -122,6 +125,8 @@ extension SwiftStatement: LogicTextEditable {
                         block: SwiftList<SwiftStatement>.empty,
                         id: NSUUID().uuidString))
             case .expressionStatement(_):
+                return self
+            case .placeholderStatement(_):
                 return self
             }
         }
@@ -134,26 +139,30 @@ extension SwiftStatement: LogicTextEditable {
 
         switch self {
         case .branch(let value):
-            return value.condition.find(id: id)
+            return value.condition.find(id: id) ?? value.block.find(id: id)
         case .decl:
             return nil
         case .loop(let value):
             return value.expression.find(id: id) ?? value.pattern.find(id: id)
         case .expressionStatement(let value):
             return value.expression.find(id: id)
+        case .placeholderStatement:
+            return nil
         }
     }
 
     var uuid: SwiftUUID {
         switch self {
-        case .branch(let branch):
-            return branch.id
-        case .decl(let decl):
-            return decl.id
-        case .loop(let loop):
-            return loop.id
-        case .expressionStatement(let expr):
-            return expr.id
+        case .branch(let value):
+            return value.id
+        case .decl(let value):
+            return value.id
+        case .loop(let value):
+            return value.id
+        case .expressionStatement(let value):
+            return value.id
+        case .placeholderStatement(let value):
+            return value.id
         }
     }
 
@@ -213,5 +222,32 @@ extension SwiftSyntaxNode {
         case .expression(let value):
             return value.movementAfterInsertion
         }
+    }
+}
+
+extension SwiftList where T == SwiftStatement {
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return self.reduce(nil, { result, item in
+            return result ?? item.find(id: id)
+        })
+    }
+
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftList {
+        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
+
+        var resultIterator = result.makeIterator()
+        var output = SwiftList<T>.empty
+
+        if let first = result.first, case .placeholderStatement = first {
+
+        } else {
+            output = .next(.placeholderStatement(SwiftPlaceholderStatement(id: NSUUID().uuidString)), output)
+        }
+
+        while let current = resultIterator.next() {
+            output = .next(current, output)
+        }
+
+        return output
     }
 }

@@ -177,6 +177,22 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "record",
+            "name" : "placeholderStatement",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "Statement"
