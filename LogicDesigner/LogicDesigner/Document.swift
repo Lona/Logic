@@ -71,6 +71,7 @@ class Document: NSDocument {
             let nextSyntaxNode = self.syntax.find(id: nextNodeID) {
 
             self.logicEditor.selectedIndex = offset
+            self.logicEditor.selectionEndID = nextSyntaxNode.lastNode.uuid
             self.suggestionText = ""
 //            childWindow?.placeholderText = element.value
 
@@ -144,6 +145,7 @@ class Document: NSDocument {
             if let activatedIndex = activatedIndex,
                 let id = element?.syntaxNodeID,
                 let syntaxNode = self.syntax.find(id: id) {
+                self.logicEditor.selectionEndID = syntaxNode.lastNode.uuid
                 self.showSuggestionWindow(for: activatedIndex, syntaxNode: syntaxNode)
             } else {
                 self.hideSuggestionWindow()

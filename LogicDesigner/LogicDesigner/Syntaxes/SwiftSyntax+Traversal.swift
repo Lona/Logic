@@ -16,6 +16,7 @@ protocol SyntaxNodeProtocol {
 //    var uuid: SwiftUUID { get }
 //    var textElements: [LogicEditorText] { get }
     func find(id: SwiftUUID) -> SwiftSyntaxNode?
+    var lastNode: SwiftSyntaxNode { get }
 //    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
 //    static var suggestionCategories: [LogicSuggestionCategory] { get }
 }
@@ -32,6 +33,10 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
 
     func find(id: SwiftUUID) -> SwiftSyntaxNode? {
         return id == uuid ? SwiftSyntaxNode.identifier(self) : nil
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        return .identifier(self)
     }
 
     var uuid: SwiftUUID { return id }
@@ -78,6 +83,15 @@ extension SwiftExpression: SyntaxNodeProtocol {
             }
 
             return value.identifier.find(id: id)
+        }
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        switch self {
+        case .binaryExpression(let value):
+            return value.right.lastNode
+        case .identifierExpression(let value):
+            return value.identifier.lastNode
         }
     }
 
@@ -151,6 +165,21 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
+    var lastNode: SwiftSyntaxNode {
+        switch self {
+        case .branch(let value):
+            return value.block.map { $0 }.last?.lastNode ?? value.condition.lastNode
+        case .decl:
+            return .statement(self)
+        case .loop(let value):
+            return value.expression.lastNode
+        case .expressionStatement(let value):
+            return value.expression.lastNode
+        case .placeholderStatement:
+            return .statement(self)
+        }
+    }
+
     var uuid: SwiftUUID {
         switch self {
         case .branch(let value):
@@ -195,6 +224,19 @@ extension SwiftSyntaxNode {
             return value.find(id: id)
         case .expression(let value):
             return value.find(id: id)
+        }
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        switch self {
+        case .statement(let value):
+            return value.lastNode
+        case .declaration:
+            return self
+        case .identifier(let value):
+            return value.lastNode
+        case .expression(let value):
+            return value.lastNode
         }
     }
 

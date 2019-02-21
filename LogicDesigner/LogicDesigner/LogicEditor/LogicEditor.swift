@@ -23,6 +23,7 @@ public class LogicEditor: NSView {
 
     public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
     public var selectedIndex: Int? { didSet { update() } }
+    public var selectionEndID: LogicTextID? { didSet { update() } }
     public var underlinedRange: NSRange?
     public var onActivate: ((Int?, LogicEditorElement?) -> Void)?
 
@@ -37,11 +38,17 @@ public class LogicEditor: NSView {
 
     public static var textSpacing: CGFloat = 4.0
     public static var lineSpacing: CGFloat = 6.0
-    public static var minimumLineHeight: CGFloat = 20.0
+    public static var minimumLineHeight: CGFloat = 22.0
     public static var dropdownCarets: Bool = false
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
-    
+
+    var selectionEndIndex: Int? {
+        return measuredElements.firstIndex(where: { measuredElement in
+            measuredElement.element.syntaxNodeID == selectionEndID
+        })
+    }
+
     var selectedElement: LogicEditorElement? {
         return selectedMeasuredElement?.element
     }
@@ -148,6 +155,18 @@ public class LogicEditor: NSView {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
         let measuredLines = self.measuredElements
+
+        if let start = selectedIndex, let end = selectionEndIndex {
+            var rect = measuredElements[start].backgroundRect
+            for index in start...end {
+                rect = rect.union(measuredElements[index].backgroundRect)
+            }
+            NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
+            NSBezierPath(
+                roundedRect: rect,
+                xRadius: LogicEditor.textBackgroundRadius.width,
+                yRadius: LogicEditor.textBackgroundRadius.height).fill()
+        }
 
         measuredLines.enumerated().forEach { textIndex, measuredText in
             let selected = textIndex == self.selectedIndex
