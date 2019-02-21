@@ -38,9 +38,10 @@ public class LogicEditor: NSView {
     public static var textSpacing: CGFloat = 4.0
     public static var lineSpacing: CGFloat = 6.0
     public static var minimumLineHeight: CGFloat = 20.0
+    public static var dropdownCarets: Bool = false
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
-
+    
     var selectedElement: LogicEditorElement? {
         return selectedMeasuredElement?.element
     }
@@ -183,16 +184,19 @@ public class LogicEditor: NSView {
 
                 NSShadow().set()
 
-                if selected {
-                    NSColor.white.setFill()
-                } else {
-                    color.setFill()
+                if LogicEditor.dropdownCarets || value.isEmpty {
+                    if selected {
+                        NSColor.white.setStroke()
+                    } else {
+                        color.setStroke()
+                    }
+
+                    let caretX = rect.maxX + (value.isEmpty ? 0 : 3)
+                    let caret = NSBezierPath(downwardCaretWithin:
+                        CGRect(x: caretX, y: backgroundRect.midY, width: 5, height: 2.5))
+
+                    caret.stroke()
                 }
-                let caretX = backgroundRect.maxX - (value.isEmpty ? 13 : 9)
-                let caretCenter = CGPoint(x: caretX, y: backgroundRect.midY)
-                let caretStart = CGPoint(x: caretX - 4, y: backgroundRect.midY)
-                let caret = NSBezierPath(regularPolygonAt: caretCenter, startPoint: caretStart, sides: 3)
-                caret.fill()
 
                 if selected {
                     let attributedString = NSMutableAttributedString(attributedString: attributedString)

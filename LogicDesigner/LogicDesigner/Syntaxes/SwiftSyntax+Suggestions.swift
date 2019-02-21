@@ -77,7 +77,7 @@ extension SwiftExpression {
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
                         right: SwiftExpression.identifierExpression(
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
-                        op: ">",
+                        op: "is greater than",
                         id: NSUUID().uuidString))))
     }
 

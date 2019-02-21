@@ -9,6 +9,21 @@
 import AppKit
 
 extension NSBezierPath {
+    convenience init(downwardCaretWithin rect: CGRect) {
+        self.init()
+
+        let start = CGPoint(x: rect.minX, y: rect.minY)
+        let middle = CGPoint(x: rect.midX, y: rect.maxY)
+        let end = CGPoint(x: rect.maxX, y: rect.minY)
+
+        move(to: start)
+        line(to: middle)
+        line(to: end)
+
+        lineWidth = 1.5
+        lineCapStyle = .round
+    }
+
     convenience init(regularPolygonAt centre: NSPoint, startPoint startCorner: NSPoint, sides: Int) {
         self.init()
 

@@ -64,7 +64,7 @@ extension LogicEditorElement {
         switch self {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: NSColor.black,
+                NSAttributedString.Key.foregroundColor: NSColor.systemGray,
                 NSAttributedString.Key.font: LogicEditor.font
             ]
             attributedString.setAttributes(attributes, range: range)
@@ -108,7 +108,10 @@ extension LogicEditorElement {
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
             var backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
-            backgroundRect.size.width += 14
+
+            if LogicEditor.dropdownCarets || value.isEmpty {
+                backgroundRect.size.width += value.isEmpty ? 5 : 11
+            }
 
             return LogicEditorMeasuredElement(
                 element: self,
