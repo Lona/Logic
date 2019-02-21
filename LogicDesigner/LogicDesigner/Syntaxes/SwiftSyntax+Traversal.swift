@@ -16,6 +16,7 @@ protocol SyntaxNodeProtocol {
 //    var uuid: SwiftUUID { get }
 //    var textElements: [LogicEditorText] { get }
     func find(id: SwiftUUID) -> SwiftSyntaxNode?
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]?
     var lastNode: SwiftSyntaxNode { get }
 //    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
 //    static var suggestionCategories: [LogicSuggestionCategory] { get }
@@ -33,6 +34,10 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
 
     func find(id: SwiftUUID) -> SwiftSyntaxNode? {
         return id == uuid ? SwiftSyntaxNode.identifier(self) : nil
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        return id == uuid ? [.identifier(self)] : nil
     }
 
     var lastNode: SwiftSyntaxNode {
@@ -83,6 +88,31 @@ extension SwiftExpression: SyntaxNodeProtocol {
             }
 
             return value.identifier.find(id: id)
+        }
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        if id == uuid {
+            return [.expression(self)]
+        }
+
+        var found: [SwiftSyntaxNode]?
+
+        switch self {
+        case .binaryExpression(let value):
+            found = value.left.pathTo(id: id) ?? value.right.pathTo(id: id)
+        case .identifierExpression(let value):
+            if id == value.identifier.uuid {
+                return [.expression(self)]
+            }
+
+            found = value.identifier.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [.expression(self)] + found
+        } else {
+            return nil
         }
     }
 
@@ -165,6 +195,37 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        if id == uuid {
+            return [.statement(self)]
+        }
+
+        var found: [SwiftSyntaxNode]?
+
+        switch self {
+        case .branch(let value):
+            let foundInBlock: [SwiftSyntaxNode]? = value.block.reduce(nil, { result, node in
+                if result != nil { return result }
+                return node.pathTo(id: id)
+            })
+            found = value.condition.pathTo(id: id) ?? foundInBlock
+        case .decl:
+            return nil
+        case .loop(let value):
+            found = value.expression.pathTo(id: id) ?? value.pattern.pathTo(id: id)
+        case .expressionStatement(let value):
+            found = value.expression.pathTo(id: id)
+        case .placeholderStatement:
+            return nil
+        }
+
+        if let found = found {
+            return [.statement(self)] + found
+        } else {
+            return nil
+        }
+    }
+
     var lastNode: SwiftSyntaxNode {
         switch self {
         case .branch(let value):
@@ -225,6 +286,23 @@ extension SwiftSyntaxNode {
         case .expression(let value):
             return value.find(id: id)
         }
+    }
+
+    var contents: SyntaxNodeProtocol {
+        switch self {
+        case .statement(let value):
+            return value
+        case .declaration:
+            fatalError("Declarations not implemented")
+        case .identifier(let value):
+            return value
+        case .expression(let value):
+            return value
+        }
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        return contents.pathTo(id: id)
     }
 
     var lastNode: SwiftSyntaxNode {
