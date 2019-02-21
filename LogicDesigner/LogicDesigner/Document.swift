@@ -71,7 +71,8 @@ class Document: NSDocument {
             let nextSyntaxNode = self.syntax.find(id: nextNodeID) {
 
             self.logicEditor.selectedIndex = offset
-            self.suggestionText = element.value
+            self.suggestionText = ""
+//            childWindow?.placeholderText = element.value
 
             self.showSuggestionWindow(for: offset, syntaxNode: nextSyntaxNode)
         } else {
@@ -137,7 +138,8 @@ class Document: NSDocument {
 
         logicEditor.onActivate = { activatedIndex, element in
             self.logicEditor.selectedIndex = activatedIndex
-            self.suggestionText = element?.value ?? ""
+            self.suggestionText = ""
+//            self.childWindow?.placeholderText = element?.value ?? ""
 
             if let activatedIndex = activatedIndex,
                 let id = element?.syntaxNodeID,

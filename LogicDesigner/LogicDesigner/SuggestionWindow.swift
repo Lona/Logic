@@ -143,6 +143,11 @@ class SuggestionWindow: NSWindow {
         set { suggestionView.searchText = newValue }
     }
 
+    public var placeholderText: String? {
+        get { return suggestionView.placeholderText }
+        set { suggestionView.placeholderText = newValue }
+    }
+
     public var onChangeSuggestionText: ((String) -> Void)? {
         get { return suggestionView.onChangeSearchText }
         set { suggestionView.onChangeSearchText = newValue }
@@ -159,8 +164,11 @@ class SuggestionWindow: NSWindow {
 
     public func anchorTo(rect: NSRect) {
         let margin: CGFloat = 2.0
+        let textInset: CGFloat = 12.0
         if let contentBox = contentBox {
-            let origin = NSPoint(x: rect.minX, y: rect.minY - contentBox.frame.height - margin)
+            let origin = NSPoint(
+                x: rect.minX - textInset + LogicEditor.textPadding.width,
+                y: rect.minY - contentBox.frame.height - margin)
             setFrameOrigin(origin)
         }
     }

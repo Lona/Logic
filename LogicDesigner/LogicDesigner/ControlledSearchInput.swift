@@ -48,6 +48,11 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     public var onPressTab: (() -> Void)?
     public var onPressShiftTab: (() -> Void)?
 
+    public var placeholderText: String? {
+        get { return placeholderString }
+        set { placeholderString = newValue }
+    }
+
     public var textValue: String = "" {
         didSet {
             textDidChangeInCallback = true

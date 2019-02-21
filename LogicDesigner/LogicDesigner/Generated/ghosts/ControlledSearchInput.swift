@@ -18,8 +18,8 @@ public class ControlledSearchInput: NSBox {
     update()
   }
 
-  public convenience init(textValue: String) {
-    self.init(Parameters(textValue: textValue))
+  public convenience init(textValue: String, placeholderText: String?) {
+    self.init(Parameters(textValue: textValue, placeholderText: placeholderText))
   }
 
   public convenience init() {
@@ -44,6 +44,15 @@ public class ControlledSearchInput: NSBox {
     set {
       if parameters.textValue != newValue {
         parameters.textValue = newValue
+      }
+    }
+  }
+
+  public var placeholderText: String? {
+    get { return parameters.placeholderText }
+    set {
+      if parameters.placeholderText != newValue {
+        parameters.placeholderText = newValue
       }
     }
   }
@@ -180,6 +189,7 @@ public class ControlledSearchInput: NSBox {
 extension ControlledSearchInput {
   public struct Parameters: Equatable {
     public var textValue: String
+    public var placeholderText: String?
     public var onChangeTextValue: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
@@ -190,6 +200,7 @@ extension ControlledSearchInput {
 
     public init(
       textValue: String,
+      placeholderText: String? = nil,
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -199,6 +210,7 @@ extension ControlledSearchInput {
       onPressShiftTab: (() -> Void)? = nil)
     {
       self.textValue = textValue
+      self.placeholderText = placeholderText
       self.onChangeTextValue = onChangeTextValue
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
@@ -209,11 +221,11 @@ extension ControlledSearchInput {
     }
 
     public init() {
-      self.init(textValue: "")
+      self.init(textValue: "", placeholderText: nil)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.textValue == rhs.textValue
+      return lhs.textValue == rhs.textValue && lhs.placeholderText == rhs.placeholderText
     }
   }
 }
@@ -239,6 +251,7 @@ extension ControlledSearchInput {
 
     public init(
       textValue: String,
+      placeholderText: String? = nil,
       onChangeTextValue: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -251,6 +264,7 @@ extension ControlledSearchInput {
         .init(
           Parameters(
             textValue: textValue,
+            placeholderText: placeholderText,
             onChangeTextValue: onChangeTextValue,
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
@@ -261,7 +275,7 @@ extension ControlledSearchInput {
     }
 
     public init() {
-      self.init(textValue: "")
+      self.init(textValue: "", placeholderText: nil)
     }
   }
 }

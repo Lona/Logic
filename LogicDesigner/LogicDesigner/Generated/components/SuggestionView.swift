@@ -18,8 +18,8 @@ public class SuggestionView: NSBox {
     update()
   }
 
-  public convenience init(searchText: String, selectedIndex: Int?) {
-    self.init(Parameters(searchText: searchText, selectedIndex: selectedIndex))
+  public convenience init(searchText: String, placeholderText: String?, selectedIndex: Int?) {
+    self.init(Parameters(searchText: searchText, placeholderText: placeholderText, selectedIndex: selectedIndex))
   }
 
   public convenience init() {
@@ -44,6 +44,15 @@ public class SuggestionView: NSBox {
     set {
       if parameters.searchText != newValue {
         parameters.searchText = newValue
+      }
+    }
+  }
+
+  public var placeholderText: String? {
+    get { return parameters.placeholderText }
+    set {
+      if parameters.placeholderText != newValue {
+        parameters.placeholderText = newValue
       }
     }
   }
@@ -219,6 +228,7 @@ public class SuggestionView: NSBox {
   private func update() {
     searchInputView.onChangeTextValue = handleOnChangeSearchText
     searchInputView.textValue = searchText
+    searchInputView.placeholderText = placeholderText
     searchInputView.onPressDownKey = handleOnPressDownKey
     searchInputView.onPressUpKey = handleOnPressUpKey
     suggestionListViewView.selectedIndex = selectedIndex
@@ -272,6 +282,7 @@ public class SuggestionView: NSBox {
 extension SuggestionView {
   public struct Parameters: Equatable {
     public var searchText: String
+    public var placeholderText: String?
     public var selectedIndex: Int?
     public var onChangeSearchText: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
@@ -285,6 +296,7 @@ extension SuggestionView {
 
     public init(
       searchText: String,
+      placeholderText: String? = nil,
       selectedIndex: Int? = nil,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
@@ -297,6 +309,7 @@ extension SuggestionView {
       onPressEscapeKey: (() -> Void)? = nil)
     {
       self.searchText = searchText
+      self.placeholderText = placeholderText
       self.selectedIndex = selectedIndex
       self.onChangeSearchText = onChangeSearchText
       self.onPressDownKey = onPressDownKey
@@ -310,11 +323,12 @@ extension SuggestionView {
     }
 
     public init() {
-      self.init(searchText: "", selectedIndex: nil)
+      self.init(searchText: "", placeholderText: nil, selectedIndex: nil)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.searchText == rhs.searchText && lhs.selectedIndex == rhs.selectedIndex
+      return lhs.searchText == rhs.searchText &&
+        lhs.placeholderText == rhs.placeholderText && lhs.selectedIndex == rhs.selectedIndex
     }
   }
 }
@@ -340,6 +354,7 @@ extension SuggestionView {
 
     public init(
       searchText: String,
+      placeholderText: String? = nil,
       selectedIndex: Int? = nil,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
@@ -355,6 +370,7 @@ extension SuggestionView {
         .init(
           Parameters(
             searchText: searchText,
+            placeholderText: placeholderText,
             selectedIndex: selectedIndex,
             onChangeSearchText: onChangeSearchText,
             onPressDownKey: onPressDownKey,
@@ -368,7 +384,7 @@ extension SuggestionView {
     }
 
     public init() {
-      self.init(searchText: "", selectedIndex: nil)
+      self.init(searchText: "", placeholderText: nil, selectedIndex: nil)
     }
   }
 }
