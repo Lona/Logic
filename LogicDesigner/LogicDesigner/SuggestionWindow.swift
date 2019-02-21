@@ -115,6 +115,8 @@ class SuggestionWindow: NSWindow {
 
     var suggestionView = SuggestionView()
 
+    // MARK: Public
+
     public var onSubmit: ((Int) -> Void)?
 
     public var selectedIndex: Int? {
@@ -142,8 +144,6 @@ class SuggestionWindow: NSWindow {
         set { suggestionView.suggestionList.items = newValue }
     }
 
-    // MARK: Public
-
     public var suggestionText: String {
         get { return suggestionView.searchText }
         set { suggestionView.searchText = newValue }
@@ -158,6 +158,30 @@ class SuggestionWindow: NSWindow {
         get { return suggestionView.onChangeSearchText }
         set { suggestionView.onChangeSearchText = newValue }
     }
+
+    // MARK: Dropdown
+
+    public var dropdownIndex: Int {
+        get { return suggestionView.dropdownIndex }
+        set { suggestionView.dropdownIndex = newValue }
+    }
+
+    public var dropdownValues: [String] {
+        get { return suggestionView.dropdownValues }
+        set { suggestionView.dropdownValues = newValue }
+    }
+
+    public var onSelectDropdownIndex: ((Int) -> Void)? {
+        get { return suggestionView.onSelectDropdownIndex }
+        set { suggestionView.onSelectDropdownIndex = newValue }
+    }
+
+    public var onHighlightDropdownIndex: ((Int?) -> Void)? {
+        get { return suggestionView.onHighlightDropdownIndex }
+        set { suggestionView.onHighlightDropdownIndex = newValue }
+    }
+
+    // MARK: Focus
 
     public func focusSearchField() {
         makeKey()

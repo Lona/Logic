@@ -86,13 +86,27 @@ class Document: NSDocument {
     func showSuggestionWindow(for nodeIndex: Int, syntaxNode: SwiftSyntaxNode) {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
+        let syntaxNodePath = self.syntax.pathTo(id: syntaxNode.uuid) ?? []
+
         childWindow.suggestionItems = self.suggestions(for: syntaxNode)
+        childWindow.dropdownValues = syntaxNodePath.reversed().map { $0.nodeTypeDescription }
 
         childWindow.onPressEscapeKey = {
             self.hideSuggestionWindow()
         }
 
         childWindow.onPressTabKey = self.nextNode
+
+//        childWindow.onHighlightDropdownIndex = { highlightedIndex in
+//            if let highlightedIndex = highlightedIndex {
+//                Swift.print("Full path", self.syntax.pathTo(id: id)?.map { $0.nodeTypeDescription })
+//
+//                self.logicEditor.selectionEndID = syntaxNode.lastNode.uuid
+//                self.showSuggestionWindow(for: activatedIndex, syntaxNode: syntaxNode)
+//            } else {
+//                self.hideSuggestionWindow()
+//            }
+//        }
 
         childWindow.onSubmit = { index in
             if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
