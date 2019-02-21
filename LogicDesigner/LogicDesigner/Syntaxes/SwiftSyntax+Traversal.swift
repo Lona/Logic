@@ -13,16 +13,22 @@ enum Movement {
 }
 
 protocol SyntaxNodeProtocol {
-//    var uuid: SwiftUUID { get }
-//    var textElements: [LogicEditorText] { get }
+    var uuid: SwiftUUID { get }
+    var lastNode: SwiftSyntaxNode { get }
+    var movementAfterInsertion: Movement { get }
+    var node: SwiftSyntaxNode { get }
+
     func find(id: SwiftUUID) -> SwiftSyntaxNode?
     func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]?
-    var lastNode: SwiftSyntaxNode { get }
-//    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
-//    static var suggestionCategories: [LogicSuggestionCategory] { get }
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
+    //    static var suggestionCategories: [LogicSuggestionCategory] { get }
 }
 
 extension SwiftIdentifier: SyntaxNodeProtocol {
+    var node: SwiftSyntaxNode {
+        return .identifier(self)
+    }
+
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftIdentifier {
         switch syntaxNode {
         case .identifier(let newNode) where id == uuid:
@@ -33,15 +39,15 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
     }
 
     func find(id: SwiftUUID) -> SwiftSyntaxNode? {
-        return id == uuid ? SwiftSyntaxNode.identifier(self) : nil
+        return id == uuid ? node : nil
     }
 
     func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
-        return id == uuid ? [.identifier(self)] : nil
+        return id == uuid ? [node] : nil
     }
 
     var lastNode: SwiftSyntaxNode {
-        return .identifier(self)
+        return node
     }
 
     var uuid: SwiftUUID { return id }
@@ -52,6 +58,10 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
 }
 
 extension SwiftExpression: SyntaxNodeProtocol {
+    var node: SwiftSyntaxNode {
+        return .expression(self)
+    }
+
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftExpression {
         switch (syntaxNode, self) {
         case (.expression(let newNode), _) where id == uuid:
@@ -145,6 +155,10 @@ extension SwiftExpression: SyntaxNodeProtocol {
 }
 
 extension SwiftStatement: SyntaxNodeProtocol {
+    var node: SwiftSyntaxNode {
+        return .statement(self)
+    }
+
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftStatement {
         switch syntaxNode {
         case .statement(let newNode) where id == uuid:
@@ -262,32 +276,6 @@ extension SwiftStatement: SyntaxNodeProtocol {
 }
 
 extension SwiftSyntaxNode {
-    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftSyntaxNode {
-        switch self {
-        case .statement(let statement):
-            return .statement(statement.replace(id: id, with: syntaxNode))
-        case .declaration:
-            return self
-        case .identifier(let identifier):
-            return .identifier(identifier.replace(id: id, with: syntaxNode))
-        case .expression(let value):
-            return .expression(value.replace(id: id, with: syntaxNode))
-        }
-    }
-
-    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
-        switch self {
-        case .statement(let value):
-            return value.find(id: id)
-        case .declaration:
-            return nil
-        case .identifier(let value):
-            return value.find(id: id)
-        case .expression(let value):
-            return value.find(id: id)
-        }
-    }
-
     var contents: SyntaxNodeProtocol {
         switch self {
         case .statement(let value):
@@ -301,47 +289,28 @@ extension SwiftSyntaxNode {
         }
     }
 
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftSyntaxNode {
+        return contents.replace(id: id, with: syntaxNode).node
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return contents.find(id: id)
+    }
+
     func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
         return contents.pathTo(id: id)
     }
 
     var lastNode: SwiftSyntaxNode {
-        switch self {
-        case .statement(let value):
-            return value.lastNode
-        case .declaration:
-            return self
-        case .identifier(let value):
-            return value.lastNode
-        case .expression(let value):
-            return value.lastNode
-        }
+        return contents.lastNode
     }
 
     var uuid: SwiftUUID {
-        switch self {
-        case .statement(let value):
-            return value.uuid
-        case .declaration:
-            return ""
-        case .identifier(let value):
-            return value.uuid
-        case .expression(let value):
-            return value.uuid
-        }
+        return contents.uuid
     }
 
     var movementAfterInsertion: Movement {
-        switch self {
-        case .statement(let value):
-            return value.movementAfterInsertion
-        case .declaration:
-            return .none
-        case .identifier(let value):
-            return value.movementAfterInsertion
-        case .expression(let value):
-            return value.movementAfterInsertion
-        }
+        return contents.movementAfterInsertion
     }
 }
 
