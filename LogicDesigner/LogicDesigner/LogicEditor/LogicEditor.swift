@@ -156,7 +156,7 @@ public class LogicEditor: NSView {
 
         let measuredLines = self.measuredElements
 
-        if let start = selectedIndex, let end = selectionEndIndex {
+        if let start = selectedIndex, let end = selectionEndIndex, start < end {
             var rect = measuredElements[start].backgroundRect
             for index in start...end {
                 rect = rect.union(measuredElements[index].backgroundRect)
