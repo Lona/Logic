@@ -23,6 +23,7 @@ public enum Formatter<Element: FormattableElement> {
         case line
         case indent(() -> Command)
         case hardLine
+        case join(with: Command, () -> [Command])
         case concat(() -> [Command])
 
         func print(
@@ -85,6 +86,19 @@ public enum Formatter<Element: FormattableElement> {
                 currentOffset += elementWidth
             case .concat(let commands):
                 commands().forEach(process)
+            case .join(with: let separator, let commands):
+                var joinedCommands: [Command] = []
+                let commands = commands()
+
+                commands.enumerated().forEach { offset, command in
+                    joinedCommands.append(command)
+
+                    if offset < commands.count - 1 {
+                        joinedCommands.append(separator)
+                    }
+                }
+
+                process(command: .concat { joinedCommands })
             }
         }
 

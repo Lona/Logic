@@ -34,10 +34,11 @@
 		6B12C62A221B9854005A808C /* NSBezierPath+Polygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C629221B9854005A808C /* NSBezierPath+Polygon.swift */; };
 		6B12C62C221CB66A005A808C /* SwiftSyntax+Suggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */; };
 		6B12C62E221CB867005A808C /* SwiftSyntax+NativeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */; };
-		6B12C630221CB8D8005A808C /* SwiftSyntax+TextElements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */; };
+		6B12C630221CB8D8005A808C /* SwiftSyntax+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C62F221CB8D8005A808C /* SwiftSyntax+Formatter.swift */; };
 		6B12C633221CDDCA005A808C /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C632221CDDCA005A808C /* Formatter.swift */; };
 		6B12C636221CF963005A808C /* LogicEditorElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C635221CF963005A808C /* LogicEditorElement.swift */; };
 		6B12C638221CFAA3005A808C /* LogicEditorElement+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C637221CFAA3005A808C /* LogicEditorElement+Formatter.swift */; };
+		6B12C63A221E3F95005A808C /* SwiftList+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C639221E3F95005A808C /* SwiftList+Sequence.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,10 +72,11 @@
 		6B12C629221B9854005A808C /* NSBezierPath+Polygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSBezierPath+Polygon.swift"; sourceTree = "<group>"; };
 		6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Suggestions.swift"; sourceTree = "<group>"; };
 		6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+NativeTypes.swift"; sourceTree = "<group>"; };
-		6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+TextElements.swift"; sourceTree = "<group>"; };
+		6B12C62F221CB8D8005A808C /* SwiftSyntax+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Formatter.swift"; sourceTree = "<group>"; };
 		6B12C632221CDDCA005A808C /* Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
 		6B12C635221CF963005A808C /* LogicEditorElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicEditorElement.swift; sourceTree = "<group>"; };
 		6B12C637221CFAA3005A808C /* LogicEditorElement+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicEditorElement+Formatter.swift"; sourceTree = "<group>"; };
+		6B12C639221E3F95005A808C /* SwiftList+Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftList+Sequence.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,7 +163,8 @@
 				6B12C627221B5FE5005A808C /* SwiftSyntax+Traversal.swift */,
 				6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */,
 				6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */,
-				6B12C62F221CB8D8005A808C /* SwiftSyntax+TextElements.swift */,
+				6B12C62F221CB8D8005A808C /* SwiftSyntax+Formatter.swift */,
+				6B12C639221E3F95005A808C /* SwiftList+Sequence.swift */,
 			);
 			path = Syntaxes;
 			sourceTree = "<group>";
@@ -273,10 +276,11 @@
 				6B12C633221CDDCA005A808C /* Formatter.swift in Sources */,
 				6B12C60F2219EAA6005A808C /* TextStyles.swift in Sources */,
 				6B12C628221B5FE5005A808C /* SwiftSyntax+Traversal.swift in Sources */,
+				6B12C63A221E3F95005A808C /* SwiftList+Sequence.swift in Sources */,
 				6B12C6192219EAA6005A808C /* LonaViewModel.swift in Sources */,
 				6B12C62A221B9854005A808C /* NSBezierPath+Polygon.swift in Sources */,
 				6B12C6152219EAA6005A808C /* LNAImageView.swift in Sources */,
-				6B12C630221CB8D8005A808C /* SwiftSyntax+TextElements.swift in Sources */,
+				6B12C630221CB8D8005A808C /* SwiftSyntax+Formatter.swift in Sources */,
 				6B12C638221CFAA3005A808C /* LogicEditorElement+Formatter.swift in Sources */,
 				6B12C6172219EAA6005A808C /* NSImage+Resizing.swift in Sources */,
 				6B12C5E62218BD75005A808C /* Document.swift in Sources */,
