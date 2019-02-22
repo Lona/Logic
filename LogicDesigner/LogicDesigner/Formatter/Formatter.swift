@@ -38,6 +38,40 @@ public enum Formatter<Element: FormattableElement> {
                 spaceWidth: spaceWidth,
                 indentWidth: indentWidth)
         }
+
+        var elements: [Element] {
+            var allElements: [Element] = []
+
+            func process(command: Command) {
+                switch command {
+                case .indent(let child):
+                    process(command: child())
+                case .line, .hardLine:
+                    break
+                case .element(let element):
+                    allElements.append(element)
+                case .concat(let commands):
+                    commands().forEach(process)
+                case .join(with: let separator, let commands):
+                    var joinedCommands: [Command] = []
+                    let commands = commands()
+
+                    commands.enumerated().forEach { offset, command in
+                        joinedCommands.append(command)
+
+                        if offset < commands.count - 1 {
+                            joinedCommands.append(separator)
+                        }
+                    }
+
+                    process(command: .concat { joinedCommands })
+                }
+            }
+
+            process(command: self)
+
+            return allElements
+        }
     }
 
     static func print(

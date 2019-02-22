@@ -49,13 +49,6 @@ public enum LogicEditorElement {
     }
 }
 
-struct LogicEditorMeasuredElement {
-    var element: LogicEditorElement
-    var attributedString: NSAttributedString
-    var attributedStringRect: CGRect
-    var backgroundRect: CGRect
-}
-
 extension LogicEditorElement {
     func measured(selected: Bool, offset: CGPoint) -> LogicEditorMeasuredElement {
         let attributedString = NSMutableAttributedString(string: self.value)
