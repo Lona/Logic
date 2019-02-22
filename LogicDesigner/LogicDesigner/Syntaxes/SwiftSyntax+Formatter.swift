@@ -82,11 +82,33 @@ extension SwiftSyntaxNode {
         }
     }
 
+    var formattedElements: [LogicEditorElement] {
+        return formatted.elements
+    }
+
+    var focusableFormattedElements: [LogicEditorElement] {
+        return formattedElements.filter { $0.syntaxNodeID != nil }
+    }
+
     var formattedElementRange: Range<Int>? {
         let startId = self.uuid
         let endId = self.lastNode.uuid
 
-        let elements = formatted.elements
+        let elements = formattedElements
+
+        if let startIndex = elements.firstIndex(where: { $0.syntaxNodeID == startId }),
+            let endIndex = elements.firstIndex(where: { $0.syntaxNodeID == endId }) {
+            return Range(startIndex...endIndex)
+        }
+
+        return nil
+    }
+
+    var focusableFormattedElementRange: Range<Int>? {
+        let startId = self.uuid
+        let endId = self.lastNode.uuid
+
+        let elements = focusableFormattedElements
 
         if let startIndex = elements.firstIndex(where: { $0.syntaxNodeID == startId }),
             let endIndex = elements.firstIndex(where: { $0.syntaxNodeID == endId }) {
@@ -100,6 +122,18 @@ extension SwiftSyntaxNode {
         let elements = formatted.elements
 
 //        guard index < elements.count else { return nil }
+
+        if let id = elements[index].syntaxNodeID {
+            return find(id: id)
+        } else {
+            return nil
+        }
+    }
+
+    func node(atFocusableFormattedElementIndex index: Int) -> SwiftSyntaxNode? {
+        let elements = focusableFormattedElements
+
+        //        guard index < elements.count else { return nil }
 
         if let id = elements[index].syntaxNodeID {
             return find(id: id)
