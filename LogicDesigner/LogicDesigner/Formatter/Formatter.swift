@@ -53,18 +53,7 @@ public enum Formatter<Element: FormattableElement> {
                 case .concat(let commands):
                     commands().forEach(process)
                 case .join(with: let separator, let commands):
-                    var joinedCommands: [Command] = []
-                    let commands = commands()
-
-                    commands.enumerated().forEach { offset, command in
-                        joinedCommands.append(command)
-
-                        if offset < commands.count - 1 {
-                            joinedCommands.append(separator)
-                        }
-                    }
-
-                    process(command: .concat { joinedCommands })
+                    process(command: Formatter.performJoin(with: separator, commands))
                 }
             }
 
@@ -121,18 +110,7 @@ public enum Formatter<Element: FormattableElement> {
             case .concat(let commands):
                 commands().forEach(process)
             case .join(with: let separator, let commands):
-                var joinedCommands: [Command] = []
-                let commands = commands()
-
-                commands.enumerated().forEach { offset, command in
-                    joinedCommands.append(command)
-
-                    if offset < commands.count - 1 {
-                        joinedCommands.append(separator)
-                    }
-                }
-
-                process(command: .concat { joinedCommands })
+                process(command: Formatter.performJoin(with: separator, commands))
             }
         }
 
@@ -143,6 +121,21 @@ public enum Formatter<Element: FormattableElement> {
         }
 
         return rows
+    }
+
+    private static func performJoin(with separator: Command, _ commands: () -> [Command]) -> Command {
+        var joinedCommands: [Command] = []
+        let commands = commands()
+
+        commands.enumerated().forEach { offset, command in
+            joinedCommands.append(command)
+
+            if offset < commands.count - 1 {
+                joinedCommands.append(separator)
+            }
+        }
+
+        return .concat { joinedCommands }
     }
 }
 
