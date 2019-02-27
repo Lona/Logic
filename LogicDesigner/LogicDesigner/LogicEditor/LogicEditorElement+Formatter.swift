@@ -14,4 +14,10 @@ extension LogicEditorElement: FormattableElement {
     }
 }
 
+extension Formatter.Command where Element == LogicEditorElement {
+    var focusableElements: [LogicEditorElement] {
+        return elements.filter { $0.syntaxNodeID != nil }
+    }
+}
+
 public typealias LogicEditorFormatCommand = Formatter<LogicEditorElement>.Command

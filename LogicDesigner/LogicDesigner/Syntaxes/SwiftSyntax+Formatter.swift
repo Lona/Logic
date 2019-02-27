@@ -82,63 +82,32 @@ extension SwiftSyntaxNode {
         }
     }
 
-    var formattedElements: [LogicEditorElement] {
-        return formatted.elements
+    func elementRange(for targetID: SwiftUUID) -> Range<Int>? {
+        let topNode = topNodeWithEqualElement(as: targetID)
+        let topNodeFormattedElements = topNode.formatted.elements
+
+        guard let topFirstFocusableIndex = topNodeFormattedElements.firstIndex(where: { $0.syntaxNodeID != nil }) else { return nil }
+
+        guard let firstIndex = formatted.elements.firstIndex(where: { formattedElement in
+            guard let id = formattedElement.syntaxNodeID else { return false }
+            return id == topNodeFormattedElements[topFirstFocusableIndex].syntaxNodeID
+        }) else { return nil }
+
+        let lastIndex = firstIndex + (topNodeFormattedElements.count - topFirstFocusableIndex - 1)
+
+        return firstIndex..<lastIndex
     }
 
-    var focusableFormattedElements: [LogicEditorElement] {
-        return formattedElements.filter { $0.syntaxNodeID != nil }
-    }
-
-    var formattedElementRange: Range<Int>? {
-        let startId = self.uuid
-        let endId = self.lastNode.uuid
-
-        let elements = formattedElements
-
-        if let startIndex = elements.firstIndex(where: { $0.syntaxNodeID == startId }),
-            let endIndex = elements.firstIndex(where: { $0.syntaxNodeID == endId }) {
-            return Range(startIndex...endIndex)
+    func topNodeWithEqualElement(as targetID: SwiftUUID) -> SwiftSyntaxNode {
+        guard let pathToTarget = pathTo(id: targetID) else {
+            fatalError("Node not found")
         }
 
-        return nil
-    }
+        let allFormattedElements = pathToTarget.map({ $0.formatted.elements })
+        guard let minimumElementCount = allFormattedElements.map({ $0.count }).min(),
+            let topIndex = allFormattedElements.firstIndex(where: { $0.count == minimumElementCount })
+            else { fatalError("Bad index logic") }
 
-    var focusableFormattedElementRange: Range<Int>? {
-        let startId = self.uuid
-        let endId = self.lastNode.uuid
-
-        let elements = focusableFormattedElements
-
-        if let startIndex = elements.firstIndex(where: { $0.syntaxNodeID == startId }),
-            let endIndex = elements.firstIndex(where: { $0.syntaxNodeID == endId }) {
-            return Range(startIndex...endIndex)
-        }
-
-        return nil
-    }
-
-    func node(atFormattedElementIndex index: Int) -> SwiftSyntaxNode? {
-        let elements = formatted.elements
-
-//        guard index < elements.count else { return nil }
-
-        if let id = elements[index].syntaxNodeID {
-            return find(id: id)
-        } else {
-            return nil
-        }
-    }
-
-    func node(atFocusableFormattedElementIndex index: Int) -> SwiftSyntaxNode? {
-        let elements = focusableFormattedElements
-
-        //        guard index < elements.count else { return nil }
-
-        if let id = elements[index].syntaxNodeID {
-            return find(id: id)
-        } else {
-            return nil
-        }
+        return pathToTarget[topIndex]
     }
 }

@@ -12,15 +12,14 @@ class Document: NSDocument {
 
     override init() {
         super.init()
-
-        testFormatter()
+//        testFormatter()
     }
 
     override class var autosavesInPlace: Bool {
         return false
     }
 
-    var syntax: SwiftSyntaxNode = SwiftSyntaxNode.statement(
+    var rootNode: SwiftSyntaxNode = SwiftSyntaxNode.statement(
         SwiftStatement.loop(
             SwiftLoop(
                 pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
@@ -40,7 +39,12 @@ class Document: NSDocument {
     }
 
     func suggestions(for syntaxNode: SwiftSyntaxNode) -> [SuggestionListItem] {
-        let items: [SuggestionListItem] = Array(syntaxNode.suggestionCategories.map { $0.suggestionListItems }.joined())
+        guard let range = rootNode.elementRange(for: syntaxNode.uuid),
+            let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
+
+        let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
+
+        let items: [SuggestionListItem] = Array(highestMatch.suggestionCategories.map { $0.suggestionListItems }.joined())
         return items
     }
 
@@ -66,15 +70,16 @@ class Document: NSDocument {
     }
 
     func nextNode() {
-        if let (offset, element) = self.logicEditor.nextActivatable(after: self.logicEditor.selectedIndex),
-            let nextNodeID = element.syntaxNodeID,
-            let nextSyntaxNode = self.syntax.find(id: nextNodeID) {
+        if let (offset, element) = self.logicEditor.nextActivatable(after: self.logicEditor.selectedRange?.lowerBound),
+            let nextNodeID = element.syntaxNodeID {
 
-            self.logicEditor.selectedIndex = offset
-            self.logicEditor.selectionEndID = nextSyntaxNode.lastNode.uuid
+            self.logicEditor.selectedRange = self.rootNode.elementRange(for: nextNodeID)
+//            self.logicEditor.selectedRange = Range(offset...nextSyntaxNode
+//            self.logicEditor.selectionEndID = nextSyntaxNode.lastNode.uuid
             self.suggestionText = ""
 //            childWindow?.placeholderText = element.value
 
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: nextNodeID)
             self.showSuggestionWindow(for: offset, syntaxNode: nextSyntaxNode)
         } else {
             Swift.print("No next node to activate")
@@ -86,7 +91,7 @@ class Document: NSDocument {
     func showSuggestionWindow(for nodeIndex: Int, syntaxNode: SwiftSyntaxNode) {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
-        let syntaxNodePath = self.syntax.pathTo(id: syntaxNode.uuid) ?? []
+        let syntaxNodePath = self.rootNode.pathTo(id: syntaxNode.uuid) ?? []
 
         childWindow.suggestionItems = self.suggestions(for: syntaxNode)
         childWindow.dropdownValues = syntaxNodePath.reversed().map { $0.nodeTypeDescription }
@@ -112,11 +117,11 @@ class Document: NSDocument {
             if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
                 Swift.print("Chose suggestion", suggestedNode)
 
-                let replacement = self.syntax.replace(id: syntaxNode.uuid, with: suggestedNode)
+                let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
 
-                self.syntax = replacement
+                self.rootNode = replacement
 
-                self.logicEditor.formattedContent = self.syntax.formatted
+                self.logicEditor.formattedContent = self.rootNode.formatted
 
                 if suggestedNode.movementAfterInsertion == .next {
                     self.nextNode()
@@ -142,28 +147,33 @@ class Document: NSDocument {
         childWindow.setIsVisible(false)
     }
 
+    func select(index activatedIndex: Int?) {
+        self.suggestionText = ""
+
+        if let activatedIndex = activatedIndex,
+            let syntaxNodeId = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID {
+
+            let topNode = self.rootNode.topNodeWithEqualElement(as: syntaxNodeId)
+
+            self.logicEditor.selectedRange = self.rootNode.elementRange(for: syntaxNodeId)
+            self.showSuggestionWindow(for: activatedIndex, syntaxNode: topNode)
+        } else {
+            self.logicEditor.selectedRange = nil
+            self.hideSuggestionWindow()
+        }
+    }
+
     private let logicEditor = LogicEditor()
 
     func setUpViews() -> NSView {
 
         // TODO Determine index of clicked item
-        logicEditor.formattedContent = syntax.formatted
+        logicEditor.formattedContent = rootNode.formatted
 
         logicEditor.underlinedRange = NSRange(location: 1, length: 2)
 
         logicEditor.onActivate = { activatedIndex, element in
-            self.logicEditor.selectedIndex = activatedIndex
-            self.suggestionText = ""
-//            self.childWindow?.placeholderText = element?.value ?? ""
-
-            if let activatedIndex = activatedIndex,
-                let id = element?.syntaxNodeID,
-                let syntaxNode = self.syntax.find(id: id) {
-                self.logicEditor.selectionEndID = syntaxNode.lastNode.uuid
-                self.showSuggestionWindow(for: activatedIndex, syntaxNode: syntaxNode)
-            } else {
-                self.hideSuggestionWindow()
-            }
+            self.select(index: activatedIndex)
         }
 
         return logicEditor

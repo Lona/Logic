@@ -103,10 +103,6 @@ extension SwiftExpression: SyntaxNodeProtocol {
         case .binaryExpression(let value):
             return value.left.find(id: id) ?? value.right.find(id: id)
         case .identifierExpression(let value):
-            if id == value.identifier.uuid {
-                return SwiftSyntaxNode.expression(self)
-            }
-
             return value.identifier.find(id: id)
         }
     }
@@ -122,10 +118,6 @@ extension SwiftExpression: SyntaxNodeProtocol {
         case .binaryExpression(let value):
             found = value.left.pathTo(id: id) ?? value.right.pathTo(id: id)
         case .identifierExpression(let value):
-            if id == value.identifier.uuid {
-                return [.expression(self)]
-            }
-
             found = value.identifier.pathTo(id: id)
         }
 

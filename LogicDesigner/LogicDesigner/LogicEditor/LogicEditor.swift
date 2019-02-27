@@ -22,12 +22,23 @@ public class LogicEditor: NSView {
     // MARK: Public
 
     public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
-    public var selectedIndex: Int? { didSet { update() } }
-    public var selectionEndID: LogicTextID? { didSet { update() } }
+    public var selectedRange: Range<Int>? {
+        didSet {
+            update()
+        }
+    }
     public var underlinedRange: NSRange?
     public var onActivate: ((Int?, LogicEditorElement?) -> Void)?
 
     // MARK: Styles
+
+    private var selectedIndex: Int? {
+        return selectedRange?.lowerBound
+    }
+
+    public var selectionEndIndex: Int? {
+        return selectedRange?.upperBound
+    }
 
     public static var textMargin = CGSize(width: 6, height: 6)
     public static var textPadding = CGSize(width: 4, height: 3)
@@ -42,12 +53,6 @@ public class LogicEditor: NSView {
     public static var dropdownCarets: Bool = false
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
-
-    var selectionEndIndex: Int? {
-        return measuredElements.firstIndex(where: { measuredElement in
-            measuredElement.element.syntaxNodeID == selectionEndID
-        })
-    }
 
     var selectedElement: LogicEditorElement? {
         return selectedMeasuredElement?.element
@@ -155,6 +160,8 @@ public class LogicEditor: NSView {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
         let measuredLines = self.measuredElements
+
+        Swift.print("Range \(selectedIndex) -> \(selectionEndIndex)")
 
         if let start = selectedIndex, let end = selectionEndIndex, start < end {
             var rect = measuredElements[start].backgroundRect
