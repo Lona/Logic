@@ -85,7 +85,12 @@ public class ControlledDropdown: NSPopUpButton {
     private func update() {
         if itemTitles != parameters.values {
             removeAllItems()
-            addItems(withTitles: parameters.values)
+
+            // Add items without going through NSPopUpButton methods, since those filter duplicates.
+            parameters.values.forEach { value in
+                let item = NSMenuItem(title: value, action: nil, keyEquivalent: "")
+                menu?.addItem(item)
+            }
         }
 
         if parameters.selectedIndex != indexOfSelectedItem &&
