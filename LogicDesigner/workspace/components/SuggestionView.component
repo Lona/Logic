@@ -206,6 +206,30 @@
         "onHighlightDropdownIndex"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "onCloseMenu"
+      ],
+      "content" : [
+        "parameters",
+        "onCloseDropdown"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "onOpenMenu"
+      ],
+      "content" : [
+        "parameters",
+        "onOpenDropdown"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -326,6 +350,18 @@
       "type" : {
         "name" : "Array",
         "of" : "String"
+      }
+    },
+    {
+      "name" : "onCloseDropdown",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onOpenDropdown",
+      "type" : {
+        "name" : "Function"
       }
     }
   ],

@@ -90,8 +90,6 @@ extension LogicEditorElement {
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
         case .dropdown(_, _, let color):
-            let color = selected ? NSColor.systemGreen : color
-
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
                 NSAttributedString.Key.font: LogicEditor.font

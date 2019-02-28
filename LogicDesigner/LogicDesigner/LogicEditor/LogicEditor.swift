@@ -27,7 +27,11 @@ public class LogicEditor: NSView {
             update()
         }
     }
-    public var underlinedRange: NSRange?
+    public var outlinedRange: Range<Int>? {
+        didSet {
+            update()
+        }
+    }
     public var onActivate: ((Int?, LogicEditorElement?) -> Void)?
 
     // MARK: Styles
@@ -44,8 +48,7 @@ public class LogicEditor: NSView {
     public static var textPadding = CGSize(width: 4, height: 3)
     public static var textBackgroundRadius = CGSize(width: 2, height: 2)
 
-    public static var underlineColor: NSColor = NSColor.systemBlue
-    public static var underlineOffset: CGFloat = 2.0
+    public static var outlineWidth: CGFloat = 2.0
 
     public static var textSpacing: CGFloat = 4.0
     public static var lineSpacing: CGFloat = 6.0
@@ -161,18 +164,30 @@ public class LogicEditor: NSView {
 
         let measuredLines = self.measuredElements
 
-        Swift.print("Range \(selectedIndex) -> \(selectionEndIndex)")
-
-        if let start = selectedIndex, let end = selectionEndIndex, start < end {
-            var rect = measuredElements[start].backgroundRect
-            for index in start...end {
+        if let range = outlinedRange {
+            var rect = measuredElements[range.startIndex].backgroundRect
+            for index in range.startIndex...range.endIndex {
                 rect = rect.union(measuredElements[index].backgroundRect)
             }
-            NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
-            NSBezierPath(
-                roundedRect: rect,
+            NSColor.selectedMenuItemColor.setStroke()
+            let path = NSBezierPath(
+                roundedRect: rect.insetBy(dx: LogicEditor.outlineWidth / 2, dy: LogicEditor.outlineWidth / 2),
                 xRadius: LogicEditor.textBackgroundRadius.width,
-                yRadius: LogicEditor.textBackgroundRadius.height).fill()
+                yRadius: LogicEditor.textBackgroundRadius.height)
+            path.lineWidth = LogicEditor.outlineWidth
+            path.stroke()
+        } else {
+            if let start = selectedIndex, let end = selectionEndIndex, start < end {
+                var rect = measuredElements[start].backgroundRect
+                for index in start...end {
+                    rect = rect.union(measuredElements[index].backgroundRect)
+                }
+                NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
+                NSBezierPath(
+                    roundedRect: rect,
+                    xRadius: LogicEditor.textBackgroundRadius.width,
+                    yRadius: LogicEditor.textBackgroundRadius.height).fill()
+            }
         }
 
         measuredLines.enumerated().forEach { textIndex, measuredText in
@@ -186,7 +201,8 @@ public class LogicEditor: NSView {
             case .text, .coloredText:
                 attributedString.draw(at: rect.origin)
             case .dropdown(_, let value, let color):
-                let color = selected ? NSColor.selectedMenuItemColor : color
+                let drawSelection = selected && outlinedRange == nil
+                let color = drawSelection ? NSColor.selectedMenuItemColor : color
 
                 let shadow = NSShadow()
                 shadow.shadowBlurRadius = 1
@@ -194,12 +210,10 @@ public class LogicEditor: NSView {
                 shadow.shadowColor = NSColor.black.withAlphaComponent(0.2)
                 shadow.set()
 
-                if selected {
+                if drawSelection {
                     color.setFill()
                 } else {
                     NSColor.clear.setFill()
-                    //                        NSColor.white.withAlphaComponent(0.2).setFill()
-                    //                        color.highlight(withLevel: 0.7)?.setFill()
                 }
 
                 let backgroundPath = NSBezierPath(
@@ -211,7 +225,7 @@ public class LogicEditor: NSView {
                 NSShadow().set()
 
                 if LogicEditor.dropdownCarets || value.isEmpty {
-                    if selected {
+                    if drawSelection {
                         NSColor.white.setStroke()
                     } else {
                         color.setStroke()
@@ -224,7 +238,7 @@ public class LogicEditor: NSView {
                     caret.stroke()
                 }
 
-                if selected {
+                if drawSelection {
                     let attributedString = NSMutableAttributedString(attributedString: attributedString)
                     attributedString.addAttributes(
                         [NSAttributedString.Key.foregroundColor: NSColor.white],

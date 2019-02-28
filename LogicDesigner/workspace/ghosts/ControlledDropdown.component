@@ -56,6 +56,18 @@
         "name" : "Array",
         "of" : "String"
       }
+    },
+    {
+      "name" : "onCloseMenu",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onOpenMenu",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {

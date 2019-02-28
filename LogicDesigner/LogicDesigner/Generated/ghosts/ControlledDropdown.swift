@@ -67,6 +67,16 @@ public class ControlledDropdown: NSBox {
     }
   }
 
+  public var onCloseMenu: (() -> Void)? {
+    get { return parameters.onCloseMenu }
+    set { parameters.onCloseMenu = newValue }
+  }
+
+  public var onOpenMenu: (() -> Void)? {
+    get { return parameters.onOpenMenu }
+    set { parameters.onOpenMenu = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -157,6 +167,14 @@ public class ControlledDropdown: NSBox {
   private func handleOnHighlightIndex(_ arg0: Int?) {
     onHighlightIndex?(arg0)
   }
+
+  private func handleOnCloseMenu() {
+    onCloseMenu?()
+  }
+
+  private func handleOnOpenMenu() {
+    onOpenMenu?()
+  }
 }
 
 // MARK: - Parameters
@@ -167,17 +185,23 @@ extension ControlledDropdown {
     public var values: [String]
     public var onChangeIndex: ((Int) -> Void)?
     public var onHighlightIndex: ((Int?) -> Void)?
+    public var onCloseMenu: (() -> Void)?
+    public var onOpenMenu: (() -> Void)?
 
     public init(
       selectedIndex: Int,
       values: [String],
       onChangeIndex: ((Int) -> Void)? = nil,
-      onHighlightIndex: ((Int?) -> Void)? = nil)
+      onHighlightIndex: ((Int?) -> Void)? = nil,
+      onCloseMenu: (() -> Void)? = nil,
+      onOpenMenu: (() -> Void)? = nil)
     {
       self.selectedIndex = selectedIndex
       self.values = values
       self.onChangeIndex = onChangeIndex
       self.onHighlightIndex = onHighlightIndex
+      self.onCloseMenu = onCloseMenu
+      self.onOpenMenu = onOpenMenu
     }
 
     public init() {
@@ -213,7 +237,9 @@ extension ControlledDropdown {
       selectedIndex: Int,
       values: [String],
       onChangeIndex: ((Int) -> Void)? = nil,
-      onHighlightIndex: ((Int?) -> Void)? = nil)
+      onHighlightIndex: ((Int?) -> Void)? = nil,
+      onCloseMenu: (() -> Void)? = nil,
+      onOpenMenu: (() -> Void)? = nil)
     {
       self
         .init(
@@ -221,7 +247,9 @@ extension ControlledDropdown {
             selectedIndex: selectedIndex,
             values: values,
             onChangeIndex: onChangeIndex,
-            onHighlightIndex: onHighlightIndex))
+            onHighlightIndex: onHighlightIndex,
+            onCloseMenu: onCloseMenu,
+            onOpenMenu: onOpenMenu))
     }
 
     public init() {
