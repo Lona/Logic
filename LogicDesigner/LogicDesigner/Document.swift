@@ -106,11 +106,6 @@ class Document: NSDocument {
                 let range = self.rootNode.elementRange(for: selected.uuid)
 
                 self.logicEditor.outlinedRange = range
-
-//                Swift.print("Full path", self.syntax.pathTo(id: id)?.map { $0.nodeTypeDescription })
-//
-//                self.logicEditor.selectionEndID = syntaxNode.lastNode.uuid
-//                self.showSuggestionWindow(for: activatedIndex, syntaxNode: syntaxNode)
             } else {
                 self.logicEditor.outlinedRange = nil
             }
@@ -118,6 +113,7 @@ class Document: NSDocument {
 
         childWindow.onSelectDropdownIndex = { selectedIndex in
             self.logicEditor.outlinedRange = nil
+            self.select(nodeByID: dropdownNodes[selectedIndex].uuid)
         }
 
         childWindow.onSubmit = { index in
@@ -154,16 +150,19 @@ class Document: NSDocument {
         childWindow.setIsVisible(false)
     }
 
-    func select(index activatedIndex: Int?) {
+    func select(nodeByID syntaxNodeId: SwiftUUID?) {
         self.suggestionText = ""
 
-        if let activatedIndex = activatedIndex,
-            let syntaxNodeId = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID {
-
+        if let syntaxNodeId = syntaxNodeId {
             let topNode = self.rootNode.topNodeWithEqualElement(as: syntaxNodeId)
 
-            self.logicEditor.selectedRange = self.rootNode.elementRange(for: syntaxNodeId)
-            self.showSuggestionWindow(for: activatedIndex, syntaxNode: topNode)
+            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
+                self.logicEditor.selectedRange = selectedRange
+                self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
+            } else {
+                self.logicEditor.selectedRange = nil
+                self.hideSuggestionWindow()
+            }
         } else {
             self.logicEditor.selectedRange = nil
             self.hideSuggestionWindow()
@@ -175,7 +174,14 @@ class Document: NSDocument {
     func setUpViews() -> NSView {
 
         logicEditor.formattedContent = rootNode.formatted
-        logicEditor.onActivate = { activatedIndex, element in self.select(index: activatedIndex) }
+        logicEditor.onActivate = { activatedIndex, _ in
+            if let activatedIndex = activatedIndex {
+                let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
+                self.select(nodeByID: id)
+            } else {
+                self.select(nodeByID: nil)
+            }
+        }
 
         return logicEditor
     }
