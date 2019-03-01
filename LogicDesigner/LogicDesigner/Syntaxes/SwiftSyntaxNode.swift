@@ -76,17 +76,17 @@ extension SwiftExpression: SyntaxNodeProtocol {
         switch (syntaxNode, self) {
         case (.expression(let newNode), _) where id == uuid:
             return newNode
+        // Identifier can become an IdentifierExpression and replace an expression
+        case (.identifier(let newNode), _) where id == uuid:
+            return .identifierExpression(SwiftIdentifierExpression(
+                id: NSUUID().uuidString,
+                identifier: newNode))
         case (_, .binaryExpression(let value)):
             return .binaryExpression(SwiftBinaryExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
                 op: value.op,
                 id: NSUUID().uuidString))
-        // Identifier can replace IdentifierExpression
-        case (.identifier(let newNode), .identifierExpression) where id == uuid:
-            return .identifierExpression(SwiftIdentifierExpression(
-                id: NSUUID().uuidString,
-                identifier: newNode))
         case (_, .identifierExpression(let value)):
             return .identifierExpression(SwiftIdentifierExpression(
                 id: NSUUID().uuidString,
