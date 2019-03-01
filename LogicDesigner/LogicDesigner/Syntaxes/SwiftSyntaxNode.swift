@@ -63,6 +63,43 @@ extension SwiftIdentifier: SyntaxNodeProtocol {
     }
 }
 
+extension SwiftPattern: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Pattern"
+    }
+
+    var node: SwiftSyntaxNode {
+        return .pattern(self)
+    }
+
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftPattern {
+        switch syntaxNode {
+        case .pattern(let newNode) where id == uuid:
+            return SwiftPattern(id: NSUUID().uuidString, name: newNode.name)
+        default:
+            return SwiftPattern(id: NSUUID().uuidString, name: name)
+        }
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return id == uuid ? node : nil
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        return id == uuid ? [node] : nil
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        return node
+    }
+
+    var uuid: SwiftUUID { return id }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension SwiftExpression: SyntaxNodeProtocol {
     var nodeTypeDescription: String {
         return "Expression"
@@ -174,6 +211,13 @@ extension SwiftStatement: SyntaxNodeProtocol {
                 SwiftExpressionStatement(
                     id: NSUUID().uuidString,
                     expression: newNode
+                )
+            )
+        case .declaration(let newNode) where id == uuid:
+            return .decl(
+                SwiftDecl(
+                    content: newNode,
+                    id: NSUUID().uuidString
                 )
             )
         default:
@@ -300,9 +344,11 @@ extension SwiftSyntaxNode {
             return value
         case .declaration:
             fatalError("Declarations not implemented")
+        case .expression(let value):
+            return value
         case .identifier(let value):
             return value
-        case .expression(let value):
+        case .pattern(let value):
             return value
         }
     }

@@ -14,6 +14,12 @@ extension SwiftIdentifier {
     }
 }
 
+extension SwiftPattern {
+    var formatted: LogicEditorFormatCommand {
+        return .element(LogicEditorElement.dropdown(id, name, Colors.editableText))
+    }
+}
+
 extension SwiftExpression {
     var formatted: LogicEditorFormatCommand {
         switch self {
@@ -78,6 +84,8 @@ extension SwiftSyntaxNode {
         case .declaration:
             fatalError("Handle declarations")
         case .identifier(let value):
+            return value.formatted
+        case .pattern(let value):
             return value.formatted
         case .expression(let value):
             return value.formatted

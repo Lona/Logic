@@ -114,7 +114,7 @@ extension SwiftStatement {
         let forLoop = SwiftSyntaxNode.statement(
             SwiftStatement.loop(
                 SwiftLoop(
-                    pattern: id("item"),
+                    pattern: SwiftPattern(id: NSUUID().uuidString, name: "item"),
                     expression: idExpression("array"),
                     block: SwiftList<SwiftStatement>.empty,
                     id: NSUUID().uuidString)))
@@ -147,6 +147,8 @@ extension SwiftSyntaxNode {
             return []
         case .identifier:
             return SwiftIdentifier.suggestionCategories
+        case .pattern:
+            return []
         case .expression:
             return SwiftExpression.suggestionCategories
         }

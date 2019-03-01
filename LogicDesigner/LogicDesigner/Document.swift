@@ -22,7 +22,7 @@ class Document: NSDocument {
     var rootNode: SwiftSyntaxNode = SwiftSyntaxNode.statement(
         SwiftStatement.loop(
             SwiftLoop(
-                pattern: SwiftIdentifier(id: NSUUID().uuidString, string: "item"),
+                pattern: SwiftPattern(id: NSUUID().uuidString, name: "item"),
                 expression: SwiftExpression.identifierExpression(
                     SwiftIdentifierExpression(
                         id: NSUUID().uuidString,

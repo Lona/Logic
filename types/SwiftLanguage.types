@@ -46,7 +46,7 @@
                 "key" : "pattern",
                 "value" : {
                   "case" : "type",
-                  "name" : "Identifier",
+                  "name" : "Pattern",
                   "substitutions" : [
 
                   ]
@@ -343,6 +343,21 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "normal",
+            "name" : "pattern",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Pattern",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "SyntaxNode"
@@ -432,6 +447,40 @@
           }
         ],
         "name" : "Expression"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "pattern",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "name",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Pattern"
       }
     }
   ]

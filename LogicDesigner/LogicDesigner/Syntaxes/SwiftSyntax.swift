@@ -6,7 +6,7 @@ public struct SwiftIdentifier: Codable & Equatable {
 }
 
 public struct SwiftLoop: Codable & Equatable {
-  public var pattern: SwiftIdentifier
+  public var pattern: SwiftPattern
   public var expression: SwiftExpression
   public var block: SwiftList<SwiftStatement>
   public var id: SwiftUUID
@@ -50,6 +50,11 @@ public struct SwiftBinaryExpression: Codable & Equatable {
 public struct SwiftIdentifierExpression: Codable & Equatable {
   public var id: SwiftUUID
   public var identifier: SwiftIdentifier
+}
+
+public struct SwiftPattern: Codable & Equatable {
+  public var id: SwiftUUID
+  public var name: SwiftString
 }
 
 public indirect enum SwiftStatement: Codable & Equatable {
@@ -182,6 +187,7 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
   case declaration(SwiftDeclaration)
   case identifier(SwiftIdentifier)
   case expression(SwiftExpression)
+  case pattern(SwiftPattern)
 
   // MARK: Codable
 
@@ -203,6 +209,8 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         self = .identifier(try container.decode(SwiftIdentifier.self, forKey: .data))
       case "expression":
         self = .expression(try container.decode(SwiftExpression.self, forKey: .data))
+      case "pattern":
+        self = .pattern(try container.decode(SwiftPattern.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -223,6 +231,9 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .expression(let value):
         try container.encode("expression", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .pattern(let value):
+        try container.encode("pattern", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
