@@ -169,6 +169,13 @@ extension SwiftStatement: SyntaxNodeProtocol {
         switch syntaxNode {
         case .statement(let newNode) where id == uuid:
             return newNode
+        case .expression(let newNode) where id == uuid:
+            return .expressionStatement(
+                SwiftExpressionStatement(
+                    id: NSUUID().uuidString,
+                    expression: newNode
+                )
+            )
         default:
             switch self {
             case .branch(let value):
@@ -188,8 +195,13 @@ extension SwiftStatement: SyntaxNodeProtocol {
                         expression: value.expression.replace(id: id, with: syntaxNode),
                         block: SwiftList<SwiftStatement>.empty,
                         id: NSUUID().uuidString))
-            case .expressionStatement(_):
-                return self
+            case .expressionStatement(let value):
+                return SwiftStatement.expressionStatement(
+                    SwiftExpressionStatement(
+                        id: NSUUID().uuidString,
+                        expression: value.expression.replace(id: id, with: syntaxNode)
+                    )
+                )
             case .placeholderStatement(_):
                 return self
             }

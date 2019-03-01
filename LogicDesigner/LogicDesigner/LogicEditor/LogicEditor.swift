@@ -177,7 +177,7 @@ public class LogicEditor: NSView {
             path.lineWidth = LogicEditor.outlineWidth
             path.stroke()
         } else {
-            if let start = selectedIndex, let end = selectionEndIndex, start < end {
+            if let start = selectedIndex, let end = selectionEndIndex, start < end, end < measuredElements.count {
                 var rect = measuredElements[start].backgroundRect
                 for index in start...end {
                     rect = rect.union(measuredElements[index].backgroundRect)

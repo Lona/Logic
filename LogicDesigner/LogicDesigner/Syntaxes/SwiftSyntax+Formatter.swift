@@ -62,6 +62,8 @@ extension SwiftStatement {
             }
         case .placeholderStatement(let value):
             return .element(LogicEditorElement.dropdown(value.id, "", Colors.editableText))
+        case .expressionStatement(let value):
+            return value.expression.formatted
         default:
             return .hardLine
         }
