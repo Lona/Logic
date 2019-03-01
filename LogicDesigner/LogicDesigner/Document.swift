@@ -70,16 +70,32 @@ class Document: NSDocument {
     }
 
     func nextNode() {
-        if let (offset, element) = self.logicEditor.nextActivatable(after: self.logicEditor.selectedRange?.lowerBound),
-            let nextNodeID = element.syntaxNodeID {
+        if let index = self.logicEditor.nextActivatableIndex(after: self.logicEditor.selectedRange?.lowerBound),
+            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.logicEditor.selectedRange = self.rootNode.elementRange(for: nextNodeID)
+            self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: nextNodeID)
-            self.showSuggestionWindow(for: offset, syntaxNode: nextSyntaxNode)
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: id)
+            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
         } else {
             Swift.print("No next node to activate")
+
+            self.hideSuggestionWindow()
+        }
+    }
+
+    func previousNode() {
+        if let index = self.logicEditor.previousActivatableIndex(before: self.logicEditor.selectedRange?.lowerBound),
+            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
+
+            self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
+            self.suggestionText = ""
+
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: id)
+            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
+        } else {
+            Swift.print("No previous node to activate")
 
             self.hideSuggestionWindow()
         }
@@ -99,6 +115,8 @@ class Document: NSDocument {
         }
 
         childWindow.onPressTabKey = self.nextNode
+
+        childWindow.onPressShiftTabKey = self.previousNode
 
         childWindow.onHighlightDropdownIndex = { highlightedIndex in
             if let highlightedIndex = highlightedIndex {
@@ -174,7 +192,7 @@ class Document: NSDocument {
     func setUpViews() -> NSView {
 
         logicEditor.formattedContent = rootNode.formatted
-        logicEditor.onActivate = { activatedIndex, _ in
+        logicEditor.onActivate = { activatedIndex in
             if let activatedIndex = activatedIndex {
                 let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
                 self.select(nodeByID: id)

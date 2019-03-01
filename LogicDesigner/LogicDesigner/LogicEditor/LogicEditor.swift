@@ -32,7 +32,7 @@ public class LogicEditor: NSView {
             update()
         }
     }
-    public var onActivate: ((Int?, LogicEditorElement?) -> Void)?
+    public var onActivate: ((Int?) -> Void)?
 
     // MARK: Styles
 
@@ -67,7 +67,7 @@ public class LogicEditor: NSView {
     }
 
     func reactivate() {
-        onActivate?(selectedIndex, selectedElement)
+        onActivate?(selectedIndex)
     }
 
     // MARK: Overrides
@@ -102,9 +102,23 @@ public class LogicEditor: NSView {
         }
     }
 
-    public func nextActivatable(after currentIndex: Int?) -> (offset: Int, element: LogicEditorElement)? {
-        if let nextIndex = nextActivatableIndex(after: currentIndex) {
-            return (nextIndex, measuredElements[nextIndex].element)
+    public func previousActivatableIndex(before currentIndex: Int?) -> Int? {
+        let measuredElements = self.measuredElements
+
+        let activatableElements = measuredElements.enumerated()
+            .filter { $0.element.element.syntaxNodeID != nil }
+
+        if activatableElements.isEmpty { return nil }
+
+        // If there is no selection, focus the last element
+        guard let currentIndex = currentIndex else { return activatableElements.last?.offset }
+
+        guard currentIndex < measuredElements.count,
+            let currentID = measuredElements[currentIndex].element.syntaxNodeID else { return nil }
+
+        if let index = activatableElements.firstIndex(where: { $0.element.element.syntaxNodeID == currentID }),
+            index - 1 >= 0 {
+            return activatableElements[index - 1].offset
         } else {
             return nil
         }
@@ -121,11 +135,7 @@ public class LogicEditor: NSView {
 
         let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) })
 
-        if let index = index, index < measuredElements.count {
-            onActivate?(index, measuredElements[index].element)
-        } else {
-            onActivate?(index, nil)
-        }
+        onActivate?(index)
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -133,13 +143,21 @@ public class LogicEditor: NSView {
 
         switch Int(event.keyCode) {
         case 36: // Enter
-            onActivate?(selectedIndex, selectedElement)
+            onActivate?(selectedIndex)
         case 48: // Tab
-            if let selectedIndex = selectedIndex, let nextIndex = nextActivatableIndex(after: selectedIndex) {
-                Swift.print(selectedIndex, nextIndex)
-                onActivate?(nextIndex, measuredElements[nextIndex].element)
+            let shiftKey = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
+
+            Swift.print("Tab \(shiftKey ? "shift" : "no shift")")
+
+            if shiftKey {
+                if let previousIndex = previousActivatableIndex(before: selectedIndex) {
+                    onActivate?(previousIndex)
+                }
+            } else {
+                if let nextIndex = nextActivatableIndex(after: selectedIndex) {
+                    onActivate?(nextIndex)
+                }
             }
-            Swift.print("Tab")
         case 123: // Left
             Swift.print("Left arrow")
         case 124: // Right
