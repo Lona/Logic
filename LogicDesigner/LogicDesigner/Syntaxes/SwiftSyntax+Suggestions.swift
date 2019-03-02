@@ -10,6 +10,7 @@ import AppKit
 
 struct LogicSuggestionItem {
     var title: String
+    var category: String
     var node: SwiftSyntaxNode
 }
 
@@ -36,19 +37,21 @@ private func idExpression(_ string: String) -> SwiftExpression {
 }
 
 extension SwiftIdentifier {
-    static var suggestionCategories: [LogicSuggestionCategory] {
-        let variables = LogicSuggestionCategory(
-            title: "Variables".uppercased(),
-            items: [
-                LogicSuggestionItem(
-                    title: "bar",
-                    node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "bar"))),
-                LogicSuggestionItem(
-                    title: "foo",
-                    node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "foo"))),
-                ])
+    static var suggestionCategories: [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "bar",
+                category: "Variables".uppercased(),
+                node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "bar"))
+            ),
+            LogicSuggestionItem(
+                title: "foo",
+                category: "Variables".uppercased(),
+                node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "foo"))
+            )
+        ]
 
-        return [variables]
+        return items
     }
 }
 
@@ -56,6 +59,7 @@ extension SwiftExpression {
     static var assignmentSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Assignment",
+            category: "Expressions".uppercased(),
             node: SwiftSyntaxNode.expression(
                 SwiftExpression.binaryExpression(
                     SwiftBinaryExpression(
@@ -70,6 +74,7 @@ extension SwiftExpression {
     static var comparisonSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Comparison",
+            category: "Expressions".uppercased(),
             node: SwiftSyntaxNode.expression(
                 SwiftExpression.binaryExpression(
                     SwiftBinaryExpression(
@@ -81,21 +86,18 @@ extension SwiftExpression {
                         id: NSUUID().uuidString))))
     }
 
-    static var suggestionCategories: [LogicSuggestionCategory] {
-        let expressions = LogicSuggestionCategory(
-            title: "Expressions".uppercased(),
-            items: [
-                comparisonSuggestionItem,
-                assignmentSuggestionItem
-            ]
-        )
+    static var suggestionCategories: [LogicSuggestionItem] {
+        let items = [
+            comparisonSuggestionItem,
+            assignmentSuggestionItem
+        ]
 
-        return Array([[expressions], SwiftIdentifier.suggestionCategories].joined())
+        return items + SwiftIdentifier.suggestionCategories
     }
 }
 
 extension SwiftStatement {
-    static var suggestionCategories: [LogicSuggestionCategory] {
+    static var suggestionCategories: [LogicSuggestionItem] {
         let ifCondition = SwiftSyntaxNode.statement(
             SwiftStatement.branch(
                 SwiftBranch(
@@ -119,27 +121,26 @@ extension SwiftStatement {
                     block: SwiftList<SwiftStatement>.empty,
                     id: NSUUID().uuidString)))
 
-        let statements = LogicSuggestionCategory(
-            title: "Statements".uppercased(),
-            items: [
-                LogicSuggestionItem(title: "If condition", node: ifCondition),
-                LogicSuggestionItem(title: "For loop", node: forLoop)
-            ]
-        )
+        let items = [
+            LogicSuggestionItem(
+                title: "If condition",
+                category: "Statements".uppercased(),
+                node: ifCondition
+            ),
+            LogicSuggestionItem(
+                title: "For loop",
+                category: "Statements".uppercased(),
+                node: forLoop
+            ),
+            SwiftExpression.assignmentSuggestionItem
+        ]
 
-        let expressions = LogicSuggestionCategory(
-            title: "Expressions".uppercased(),
-            items: [
-                SwiftExpression.assignmentSuggestionItem
-            ]
-        )
-
-        return [statements, expressions]
+        return items
     }
 }
 
 extension SwiftSyntaxNode {
-    var suggestionCategories: [LogicSuggestionCategory] {
+    var suggestionCategories: [LogicSuggestionItem] {
         switch self {
         case .statement:
             return SwiftStatement.suggestionCategories

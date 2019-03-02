@@ -38,35 +38,64 @@ class Document: NSDocument {
         }
     }
 
+    func suggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
+        var categories: [(name: String, list: [(offset: Int, item: LogicSuggestionItem)])] = []
+
+        logicSuggestionItems.enumerated().forEach { offset, item in
+            if let categoryIndex = categories.firstIndex(where: { $0.name == item.category }) {
+                let category = categories[categoryIndex]
+                categories[categoryIndex] = (category.name, category.list + [(offset, item)])
+            } else {
+                categories.append((item.category, [(offset, item)]))
+            }
+        }
+
+        var suggestionListItems: [(Int, SuggestionListItem)] = []
+
+        categories.forEach { category in
+            suggestionListItems.append((0, .sectionHeader(category.name)))
+
+            category.list.forEach { logicItem in
+                suggestionListItems.append((logicItem.offset, .row(logicItem.item.title)))
+            }
+        }
+
+        return suggestionListItems
+    }
+
     func suggestions(for syntaxNode: SwiftSyntaxNode) -> [SuggestionListItem] {
         guard let range = rootNode.elementRange(for: syntaxNode.uuid),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-        let items: [SuggestionListItem] = Array(highestMatch.suggestionCategories.map { $0.suggestionListItems }.joined())
-        return items
+        return suggestionListItems(for: highestMatch.suggestionCategories).map { $0.item }
     }
 
     func suggestedSyntaxNode(for syntaxNode: SwiftSyntaxNode, at selectedIndex: Int) -> SwiftSyntaxNode? {
-        var found: SwiftSyntaxNode?
-        var index = -1
+        let suggestions = syntaxNode.suggestionCategories
+        let offset = suggestionListItems(for: suggestions)[selectedIndex].offset
 
-        syntaxNode.suggestionCategories.forEach { category in
-
-            // Category offset
-            index += 1
-
-            category.items.forEach { item in
-                index += 1
-
-                if index == selectedIndex {
-                    found = item.node
-                }
-            }
-        }
-
-        return found
+        return suggestions[offset].node
+//        return suggestionListItems(for: syntaxNode.suggestionCategories)[selectedIndex]
+//        var found: SwiftSyntaxNode?
+//        var index = -1
+//
+//        syntaxNode.suggestionCategories.forEach { category in
+//
+//            // Category offset
+//            index += 1
+//
+//            category.items.forEach { item in
+//                index += 1
+//
+//                if index == selectedIndex {
+//                    found = item.node
+//                }
+//            }
+//        }
+//
+//        return found
     }
 
     func nextNode() {
