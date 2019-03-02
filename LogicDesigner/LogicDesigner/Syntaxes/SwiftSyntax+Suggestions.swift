@@ -37,7 +37,7 @@ private func idExpression(_ string: String) -> SwiftExpression {
 }
 
 extension SwiftIdentifier {
-    static var suggestions: [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "bar",
@@ -48,6 +48,20 @@ extension SwiftIdentifier {
                 title: "foo",
                 category: "Variables".uppercased(),
                 node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "foo"))
+            )
+        ]
+
+        return items
+    }
+}
+
+extension SwiftPattern {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "Variable name: \(prefix)",
+                category: "Pattern".uppercased(),
+                node: SwiftSyntaxNode.pattern(SwiftPattern(id: NSUUID().uuidString, name: prefix))
             )
         ]
 
@@ -86,18 +100,18 @@ extension SwiftExpression {
                         id: NSUUID().uuidString))))
     }
 
-    static var suggestions: [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             comparisonSuggestionItem,
             assignmentSuggestionItem
         ]
 
-        return items + SwiftIdentifier.suggestions
+        return items + SwiftIdentifier.suggestions(for: prefix)
     }
 }
 
 extension SwiftStatement {
-    static var suggestions: [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = SwiftSyntaxNode.statement(
             SwiftStatement.branch(
                 SwiftBranch(
@@ -140,18 +154,18 @@ extension SwiftStatement {
 }
 
 extension SwiftSyntaxNode {
-    var suggestions: [LogicSuggestionItem] {
+    func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         switch self {
         case .statement:
-            return SwiftStatement.suggestions
+            return SwiftStatement.suggestions(for: prefix)
         case .declaration:
             return []
         case .identifier:
-            return SwiftIdentifier.suggestions
+            return SwiftIdentifier.suggestions(for: prefix)
         case .pattern:
-            return []
+            return SwiftPattern.suggestions(for: prefix)
         case .expression:
-            return SwiftExpression.suggestions
+            return SwiftExpression.suggestions(for: prefix)
         }
     }
 }

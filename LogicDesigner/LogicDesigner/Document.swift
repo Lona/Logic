@@ -38,7 +38,7 @@ class Document: NSDocument {
         }
     }
 
-    func suggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
+    func indexedSuggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
         var categories: [(name: String, list: [(offset: Int, item: LogicSuggestionItem)])] = []
 
         logicSuggestionItems.enumerated().forEach { offset, item in
@@ -63,20 +63,13 @@ class Document: NSDocument {
         return suggestionListItems
     }
 
-    func suggestions(for syntaxNode: SwiftSyntaxNode) -> [SuggestionListItem] {
+    func logicSuggestionItems(for syntaxNode: SwiftSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
         guard let range = rootNode.elementRange(for: syntaxNode.uuid),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-        return suggestionListItems(for: highestMatch.suggestions).map { $0.item }
-    }
-
-    func suggestedSyntaxNode(for syntaxNode: SwiftSyntaxNode, at selectedIndex: Int) -> SwiftSyntaxNode? {
-        let suggestions = syntaxNode.suggestions
-        let offset = suggestionListItems(for: suggestions)[selectedIndex].offset
-
-        return suggestions[offset].node
+        return highestMatch.suggestions(for: prefix)
     }
 
     func nextNode() {
@@ -117,7 +110,9 @@ class Document: NSDocument {
         let syntaxNodePath = self.rootNode.pathTo(id: syntaxNode.uuid) ?? []
         let dropdownNodes = Array(syntaxNodePath.reversed())
 
-        childWindow.suggestionItems = self.suggestions(for: syntaxNode)
+        var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
+
+        childWindow.suggestionItems = indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
 
         childWindow.onPressEscapeKey = {
@@ -145,21 +140,31 @@ class Document: NSDocument {
         }
 
         childWindow.onSubmit = { index in
-            if let suggestedNode = self.suggestedSyntaxNode(for: syntaxNode, at: index) {
-                Swift.print("Chose suggestion", suggestedNode)
+            let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
+            let suggestedNode = logicSuggestions[indexedSuggestions[index].offset].node
 
-                let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
+            Swift.print("Chose suggestion", suggestedNode)
 
-                self.rootNode = replacement
+            let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
 
-                self.logicEditor.formattedContent = self.rootNode.formatted
+            self.rootNode = replacement
 
-                if suggestedNode.movementAfterInsertion == .next {
-                    self.nextNode()
-                } else {
-                    self.logicEditor.reactivate()
-                }
+            self.logicEditor.formattedContent = self.rootNode.formatted
+
+            if suggestedNode.movementAfterInsertion == .next {
+                self.nextNode()
+            } else {
+                self.logicEditor.reactivate()
             }
+        }
+
+        childWindow.onChangeSuggestionText = { value in
+            self.suggestionText = value
+
+            // Update logicSuggestions
+            logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
+
+            childWindow.suggestionItems = self.indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
         }
 
         window.addChildWindow(childWindow, ordered: .above)
@@ -239,10 +244,6 @@ class Document: NSDocument {
         self.window = window
 
         let childWindow = SuggestionWindow()
-
-        childWindow.onChangeSuggestionText = { value in
-            self.suggestionText = value
-        }
 
         self.childWindow = childWindow
     }
