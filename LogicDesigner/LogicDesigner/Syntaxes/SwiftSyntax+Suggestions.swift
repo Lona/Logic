@@ -37,7 +37,7 @@ private func idExpression(_ string: String) -> SwiftExpression {
 }
 
 extension SwiftIdentifier {
-    static var suggestionCategories: [LogicSuggestionItem] {
+    static var suggestions: [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "bar",
@@ -86,18 +86,18 @@ extension SwiftExpression {
                         id: NSUUID().uuidString))))
     }
 
-    static var suggestionCategories: [LogicSuggestionItem] {
+    static var suggestions: [LogicSuggestionItem] {
         let items = [
             comparisonSuggestionItem,
             assignmentSuggestionItem
         ]
 
-        return items + SwiftIdentifier.suggestionCategories
+        return items + SwiftIdentifier.suggestions
     }
 }
 
 extension SwiftStatement {
-    static var suggestionCategories: [LogicSuggestionItem] {
+    static var suggestions: [LogicSuggestionItem] {
         let ifCondition = SwiftSyntaxNode.statement(
             SwiftStatement.branch(
                 SwiftBranch(
@@ -140,18 +140,18 @@ extension SwiftStatement {
 }
 
 extension SwiftSyntaxNode {
-    var suggestionCategories: [LogicSuggestionItem] {
+    var suggestions: [LogicSuggestionItem] {
         switch self {
         case .statement:
-            return SwiftStatement.suggestionCategories
+            return SwiftStatement.suggestions
         case .declaration:
             return []
         case .identifier:
-            return SwiftIdentifier.suggestionCategories
+            return SwiftIdentifier.suggestions
         case .pattern:
             return []
         case .expression:
-            return SwiftExpression.suggestionCategories
+            return SwiftExpression.suggestions
         }
     }
 }

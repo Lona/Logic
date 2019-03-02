@@ -69,33 +69,14 @@ class Document: NSDocument {
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-        return suggestionListItems(for: highestMatch.suggestionCategories).map { $0.item }
+        return suggestionListItems(for: highestMatch.suggestions).map { $0.item }
     }
 
     func suggestedSyntaxNode(for syntaxNode: SwiftSyntaxNode, at selectedIndex: Int) -> SwiftSyntaxNode? {
-        let suggestions = syntaxNode.suggestionCategories
+        let suggestions = syntaxNode.suggestions
         let offset = suggestionListItems(for: suggestions)[selectedIndex].offset
 
         return suggestions[offset].node
-//        return suggestionListItems(for: syntaxNode.suggestionCategories)[selectedIndex]
-//        var found: SwiftSyntaxNode?
-//        var index = -1
-//
-//        syntaxNode.suggestionCategories.forEach { category in
-//
-//            // Category offset
-//            index += 1
-//
-//            category.items.forEach { item in
-//                index += 1
-//
-//                if index == selectedIndex {
-//                    found = item.node
-//                }
-//            }
-//        }
-//
-//        return found
     }
 
     func nextNode() {
