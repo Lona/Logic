@@ -1,8 +1,10 @@
 {
   "devices" : [
     {
-      "deviceId" : "iPhone SE",
-      "heightMode" : "At Least"
+      "height" : 380,
+      "heightMode" : "At Least",
+      "name" : "Window",
+      "width" : 610
     }
   ],
   "examples" : [
@@ -230,6 +232,18 @@
         "onOpenDropdown"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SuggestionDetailView",
+        "detailView"
+      ],
+      "content" : [
+        "parameters",
+        "detailView"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -363,6 +377,10 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "detailView",
+      "type" : "CustomDetailView"
     }
   ],
   "root" : {
@@ -434,17 +452,55 @@
       {
         "children" : [
           {
-            "id" : "SuggestionListView",
-            "params" : {
+            "children" : [
+              {
+                "id" : "SuggestionListView",
+                "params" : {
 
+                },
+                "type" : "SuggestionListView"
+              }
+            ],
+            "id" : "Suggestion List Container",
+            "params" : {
+              "alignSelf" : "stretch",
+              "width" : 200
             },
-            "type" : "SuggestionListView"
+            "type" : "Lona:View"
+          },
+          {
+            "id" : "VDivider",
+            "params" : {
+              "alignSelf" : "stretch",
+              "backgroundColor" : "divider",
+              "width" : 1
+            },
+            "type" : "Lona:View"
+          },
+          {
+            "children" : [
+              {
+                "id" : "SuggestionDetailView",
+                "params" : {
+
+                },
+                "type" : "SuggestionDetailView"
+              }
+            ],
+            "id" : "Detail Area",
+            "params" : {
+              "alignSelf" : "stretch",
+              "backgroundColor" : "greyBackground",
+              "flex" : 1
+            },
+            "type" : "Lona:View"
           }
         ],
         "id" : "Suggestion Area",
         "params" : {
           "alignSelf" : "stretch",
-          "height" : 200
+          "flex" : 1,
+          "flexDirection" : "row"
         },
         "type" : "Lona:View"
       }

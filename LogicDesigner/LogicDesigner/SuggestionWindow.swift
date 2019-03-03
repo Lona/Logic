@@ -11,7 +11,7 @@ import AppKit
 class SuggestionWindow: NSWindow {
     convenience init() {
         self.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 200),
+            contentRect: NSRect(x: 0, y: 0, width: 610, height: 380),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false)

@@ -21,7 +21,12 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine { didSet { update() } }
+    public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine {
+        didSet {
+//            invalidateIntrinsicContentSize()
+            update()
+        }
+    }
     public var selectedRange: Range<Int>? {
         didSet {
             update()
@@ -171,8 +176,14 @@ public class LogicEditor: NSView {
         }
     }
 
+    private var heightConstraint: NSLayoutConstraint = NSLayoutConstraint()
+
     public override var isFlipped: Bool {
         return true
+    }
+
+    public override var intrinsicContentSize: NSSize {
+        return NSSize(width: NSView.noIntrinsicMetric, height: minHeight)
     }
 
     public override func draw(_ dirtyRect: NSRect) {
@@ -298,6 +309,14 @@ public class LogicEditor: NSView {
         return measuredLine
     }
 
+    private var minHeight: CGFloat {
+        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicEditor.textMargin.height
+        let minHeight = contentHeight + LogicEditor.textMargin.height
+        return minHeight
+    }
+
+    private var previousHeight: CGFloat = -1
+
     // MARK: Private
 
     private func flip(rect: CGRect) -> CGRect {
@@ -316,5 +335,15 @@ public class LogicEditor: NSView {
 
     private func update() {
         needsDisplay = true
+    }
+
+    public override func layout() {
+        super.layout()
+
+        let minHeight = self.minHeight
+        if minHeight != previousHeight {
+            previousHeight = minHeight
+            invalidateIntrinsicContentSize()
+        }
     }
 }

@@ -23,7 +23,8 @@ public class SuggestionView: NSBox {
     placeholderText: String?,
     selectedIndex: Int?,
     dropdownIndex: Int,
-    dropdownValues: [String])
+    dropdownValues: [String],
+    detailView: CustomDetailView)
   {
     self
       .init(
@@ -32,7 +33,8 @@ public class SuggestionView: NSBox {
           placeholderText: placeholderText,
           selectedIndex: selectedIndex,
           dropdownIndex: dropdownIndex,
-          dropdownValues: dropdownValues))
+          dropdownValues: dropdownValues,
+          detailView: detailView))
   }
 
   public convenience init() {
@@ -162,6 +164,15 @@ public class SuggestionView: NSBox {
     set { parameters.onOpenDropdown = newValue }
   }
 
+  public var detailView: CustomDetailView {
+    get { return parameters.detailView }
+    set {
+      if parameters.detailView != newValue {
+        parameters.detailView = newValue
+      }
+    }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -179,7 +190,11 @@ public class SuggestionView: NSBox {
   private var controlledDropdownView = ControlledDropdown()
   private var dividerView = NSBox()
   private var suggestionAreaView = NSBox()
+  private var suggestionListContainerView = NSBox()
   private var suggestionListViewView = SuggestionListView()
+  private var vDividerView = NSBox()
+  private var detailAreaView = NSBox()
+  private var suggestionDetailViewView = SuggestionDetailView()
 
   private func setUpViews() {
     boxType = .custom
@@ -200,6 +215,15 @@ public class SuggestionView: NSBox {
     controlledDropdownContainerView.boxType = .custom
     controlledDropdownContainerView.borderType = .noBorder
     controlledDropdownContainerView.contentViewMargins = .zero
+    suggestionListContainerView.boxType = .custom
+    suggestionListContainerView.borderType = .noBorder
+    suggestionListContainerView.contentViewMargins = .zero
+    vDividerView.boxType = .custom
+    vDividerView.borderType = .noBorder
+    vDividerView.contentViewMargins = .zero
+    detailAreaView.boxType = .custom
+    detailAreaView.borderType = .noBorder
+    detailAreaView.contentViewMargins = .zero
 
     addSubview(searchAreaView)
     addSubview(dividerView)
@@ -208,9 +232,15 @@ public class SuggestionView: NSBox {
     searchAreaView.addSubview(controlledDropdownContainerView)
     searchInputContainerView.addSubview(searchInputView)
     controlledDropdownContainerView.addSubview(controlledDropdownView)
-    suggestionAreaView.addSubview(suggestionListViewView)
+    suggestionAreaView.addSubview(suggestionListContainerView)
+    suggestionAreaView.addSubview(vDividerView)
+    suggestionAreaView.addSubview(detailAreaView)
+    suggestionListContainerView.addSubview(suggestionListViewView)
+    detailAreaView.addSubview(suggestionDetailViewView)
 
     dividerView.fillColor = Colors.divider
+    vDividerView.fillColor = Colors.divider
+    detailAreaView.fillColor = Colors.greyBackground
   }
 
   private func setUpConstraints() {
@@ -222,7 +252,11 @@ public class SuggestionView: NSBox {
     controlledDropdownContainerView.translatesAutoresizingMaskIntoConstraints = false
     searchInputView.translatesAutoresizingMaskIntoConstraints = false
     controlledDropdownView.translatesAutoresizingMaskIntoConstraints = false
+    suggestionListContainerView.translatesAutoresizingMaskIntoConstraints = false
+    vDividerView.translatesAutoresizingMaskIntoConstraints = false
+    detailAreaView.translatesAutoresizingMaskIntoConstraints = false
     suggestionListViewView.translatesAutoresizingMaskIntoConstraints = false
+    suggestionDetailViewView.translatesAutoresizingMaskIntoConstraints = false
 
     let searchAreaViewTopAnchorConstraint = searchAreaView.topAnchor.constraint(equalTo: topAnchor)
     let searchAreaViewLeadingAnchorConstraint = searchAreaView.leadingAnchor.constraint(equalTo: leadingAnchor)
@@ -261,19 +295,32 @@ public class SuggestionView: NSBox {
       .bottomAnchor
       .constraint(equalTo: searchAreaView.bottomAnchor)
     let dividerViewHeightAnchorConstraint = dividerView.heightAnchor.constraint(equalToConstant: 1)
-    let suggestionAreaViewHeightAnchorConstraint = suggestionAreaView.heightAnchor.constraint(equalToConstant: 200)
-    let suggestionListViewViewTopAnchorConstraint = suggestionListViewView
-      .topAnchor
-      .constraint(equalTo: suggestionAreaView.topAnchor)
-    let suggestionListViewViewBottomAnchorConstraint = suggestionListViewView
-      .bottomAnchor
-      .constraint(equalTo: suggestionAreaView.bottomAnchor)
-    let suggestionListViewViewLeadingAnchorConstraint = suggestionListViewView
+    let suggestionListContainerViewLeadingAnchorConstraint = suggestionListContainerView
       .leadingAnchor
       .constraint(equalTo: suggestionAreaView.leadingAnchor)
-    let suggestionListViewViewTrailingAnchorConstraint = suggestionListViewView
+    let suggestionListContainerViewTopAnchorConstraint = suggestionListContainerView
+      .topAnchor
+      .constraint(equalTo: suggestionAreaView.topAnchor)
+    let suggestionListContainerViewBottomAnchorConstraint = suggestionListContainerView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let vDividerViewLeadingAnchorConstraint = vDividerView
+      .leadingAnchor
+      .constraint(equalTo: suggestionListContainerView.trailingAnchor)
+    let vDividerViewTopAnchorConstraint = vDividerView.topAnchor.constraint(equalTo: suggestionAreaView.topAnchor)
+    let vDividerViewBottomAnchorConstraint = vDividerView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let detailAreaViewTrailingAnchorConstraint = detailAreaView
       .trailingAnchor
       .constraint(equalTo: suggestionAreaView.trailingAnchor)
+    let detailAreaViewLeadingAnchorConstraint = detailAreaView
+      .leadingAnchor
+      .constraint(equalTo: vDividerView.trailingAnchor)
+    let detailAreaViewTopAnchorConstraint = detailAreaView.topAnchor.constraint(equalTo: suggestionAreaView.topAnchor)
+    let detailAreaViewBottomAnchorConstraint = detailAreaView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
     let searchInputViewTopAnchorConstraint = searchInputView
       .topAnchor
       .constraint(equalTo: searchInputContainerView.topAnchor, constant: 5)
@@ -301,6 +348,34 @@ public class SuggestionView: NSBox {
     let controlledDropdownViewBottomAnchorConstraint = controlledDropdownView
       .bottomAnchor
       .constraint(lessThanOrEqualTo: controlledDropdownContainerView.bottomAnchor)
+    let suggestionListContainerViewWidthAnchorConstraint = suggestionListContainerView
+      .widthAnchor
+      .constraint(equalToConstant: 200)
+    let suggestionListViewViewTopAnchorConstraint = suggestionListViewView
+      .topAnchor
+      .constraint(equalTo: suggestionListContainerView.topAnchor)
+    let suggestionListViewViewBottomAnchorConstraint = suggestionListViewView
+      .bottomAnchor
+      .constraint(equalTo: suggestionListContainerView.bottomAnchor)
+    let suggestionListViewViewLeadingAnchorConstraint = suggestionListViewView
+      .leadingAnchor
+      .constraint(equalTo: suggestionListContainerView.leadingAnchor)
+    let suggestionListViewViewTrailingAnchorConstraint = suggestionListViewView
+      .trailingAnchor
+      .constraint(equalTo: suggestionListContainerView.trailingAnchor)
+    let vDividerViewWidthAnchorConstraint = vDividerView.widthAnchor.constraint(equalToConstant: 1)
+    let suggestionDetailViewViewTopAnchorConstraint = suggestionDetailViewView
+      .topAnchor
+      .constraint(equalTo: detailAreaView.topAnchor)
+    let suggestionDetailViewViewBottomAnchorConstraint = suggestionDetailViewView
+      .bottomAnchor
+      .constraint(equalTo: detailAreaView.bottomAnchor)
+    let suggestionDetailViewViewLeadingAnchorConstraint = suggestionDetailViewView
+      .leadingAnchor
+      .constraint(equalTo: detailAreaView.leadingAnchor)
+    let suggestionDetailViewViewTrailingAnchorConstraint = suggestionDetailViewView
+      .trailingAnchor
+      .constraint(equalTo: detailAreaView.trailingAnchor)
 
     NSLayoutConstraint.activate([
       searchAreaViewTopAnchorConstraint,
@@ -322,11 +397,16 @@ public class SuggestionView: NSBox {
       controlledDropdownContainerViewTopAnchorConstraint,
       controlledDropdownContainerViewBottomAnchorConstraint,
       dividerViewHeightAnchorConstraint,
-      suggestionAreaViewHeightAnchorConstraint,
-      suggestionListViewViewTopAnchorConstraint,
-      suggestionListViewViewBottomAnchorConstraint,
-      suggestionListViewViewLeadingAnchorConstraint,
-      suggestionListViewViewTrailingAnchorConstraint,
+      suggestionListContainerViewLeadingAnchorConstraint,
+      suggestionListContainerViewTopAnchorConstraint,
+      suggestionListContainerViewBottomAnchorConstraint,
+      vDividerViewLeadingAnchorConstraint,
+      vDividerViewTopAnchorConstraint,
+      vDividerViewBottomAnchorConstraint,
+      detailAreaViewTrailingAnchorConstraint,
+      detailAreaViewLeadingAnchorConstraint,
+      detailAreaViewTopAnchorConstraint,
+      detailAreaViewBottomAnchorConstraint,
       searchInputViewTopAnchorConstraint,
       searchInputViewBottomAnchorConstraint,
       searchInputViewLeadingAnchorConstraint,
@@ -335,7 +415,17 @@ public class SuggestionView: NSBox {
       controlledDropdownViewTrailingAnchorConstraint,
       controlledDropdownViewTopAnchorConstraint,
       controlledDropdownViewCenterYAnchorConstraint,
-      controlledDropdownViewBottomAnchorConstraint
+      controlledDropdownViewBottomAnchorConstraint,
+      suggestionListContainerViewWidthAnchorConstraint,
+      suggestionListViewViewTopAnchorConstraint,
+      suggestionListViewViewBottomAnchorConstraint,
+      suggestionListViewViewLeadingAnchorConstraint,
+      suggestionListViewViewTrailingAnchorConstraint,
+      vDividerViewWidthAnchorConstraint,
+      suggestionDetailViewViewTopAnchorConstraint,
+      suggestionDetailViewViewBottomAnchorConstraint,
+      suggestionDetailViewViewLeadingAnchorConstraint,
+      suggestionDetailViewViewTrailingAnchorConstraint
     ])
   }
 
@@ -358,6 +448,7 @@ public class SuggestionView: NSBox {
     controlledDropdownView.onHighlightIndex = handleOnHighlightDropdownIndex
     controlledDropdownView.onCloseMenu = handleOnCloseDropdown
     controlledDropdownView.onOpenMenu = handleOnOpenDropdown
+    suggestionDetailViewView.detailView = detailView
   }
 
   private func handleOnChangeSearchText(_ arg0: String) {
@@ -422,6 +513,7 @@ extension SuggestionView {
     public var selectedIndex: Int?
     public var dropdownIndex: Int
     public var dropdownValues: [String]
+    public var detailView: CustomDetailView
     public var onChangeSearchText: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
@@ -442,6 +534,7 @@ extension SuggestionView {
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
+      detailView: CustomDetailView,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -461,6 +554,7 @@ extension SuggestionView {
       self.selectedIndex = selectedIndex
       self.dropdownIndex = dropdownIndex
       self.dropdownValues = dropdownValues
+      self.detailView = detailView
       self.onChangeSearchText = onChangeSearchText
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
@@ -477,14 +571,22 @@ extension SuggestionView {
     }
 
     public init() {
-      self.init(searchText: "", placeholderText: nil, selectedIndex: nil, dropdownIndex: 0, dropdownValues: [])
+      self
+        .init(
+          searchText: "",
+          placeholderText: nil,
+          selectedIndex: nil,
+          dropdownIndex: 0,
+          dropdownValues: [],
+          detailView: nil)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
       return lhs.searchText == rhs.searchText &&
         lhs.placeholderText == rhs.placeholderText &&
           lhs.selectedIndex == rhs.selectedIndex &&
-            lhs.dropdownIndex == rhs.dropdownIndex && lhs.dropdownValues == rhs.dropdownValues
+            lhs.dropdownIndex == rhs.dropdownIndex &&
+              lhs.dropdownValues == rhs.dropdownValues && lhs.detailView == rhs.detailView
     }
   }
 }
@@ -514,6 +616,7 @@ extension SuggestionView {
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
+      detailView: CustomDetailView,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -536,6 +639,7 @@ extension SuggestionView {
             selectedIndex: selectedIndex,
             dropdownIndex: dropdownIndex,
             dropdownValues: dropdownValues,
+            detailView: detailView,
             onChangeSearchText: onChangeSearchText,
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
@@ -552,7 +656,14 @@ extension SuggestionView {
     }
 
     public init() {
-      self.init(searchText: "", placeholderText: nil, selectedIndex: nil, dropdownIndex: 0, dropdownValues: [])
+      self
+        .init(
+          searchText: "",
+          placeholderText: nil,
+          selectedIndex: nil,
+          dropdownIndex: 0,
+          dropdownValues: [],
+          detailView: nil)
     }
   }
 }
