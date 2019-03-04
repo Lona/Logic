@@ -92,6 +92,16 @@ public class ControlledSearchInput: NSBox {
     set { parameters.onPressShiftTab = newValue }
   }
 
+  public var onPressCommandUpKey: (() -> Void)? {
+    get { return parameters.onPressCommandUpKey }
+    set { parameters.onPressCommandUpKey = newValue }
+  }
+
+  public var onPressCommandDownKey: (() -> Void)? {
+    get { return parameters.onPressCommandDownKey }
+    set { parameters.onPressCommandDownKey = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -182,6 +192,14 @@ public class ControlledSearchInput: NSBox {
   private func handleOnPressShiftTab() {
     onPressShiftTab?()
   }
+
+  private func handleOnPressCommandUpKey() {
+    onPressCommandUpKey?()
+  }
+
+  private func handleOnPressCommandDownKey() {
+    onPressCommandDownKey?()
+  }
 }
 
 // MARK: - Parameters
@@ -197,6 +215,8 @@ extension ControlledSearchInput {
     public var onPressEscape: (() -> Void)?
     public var onPressTab: (() -> Void)?
     public var onPressShiftTab: (() -> Void)?
+    public var onPressCommandUpKey: (() -> Void)?
+    public var onPressCommandDownKey: (() -> Void)?
 
     public init(
       textValue: String,
@@ -207,7 +227,9 @@ extension ControlledSearchInput {
       onSubmit: (() -> Void)? = nil,
       onPressEscape: (() -> Void)? = nil,
       onPressTab: (() -> Void)? = nil,
-      onPressShiftTab: (() -> Void)? = nil)
+      onPressShiftTab: (() -> Void)? = nil,
+      onPressCommandUpKey: (() -> Void)? = nil,
+      onPressCommandDownKey: (() -> Void)? = nil)
     {
       self.textValue = textValue
       self.placeholderText = placeholderText
@@ -218,6 +240,8 @@ extension ControlledSearchInput {
       self.onPressEscape = onPressEscape
       self.onPressTab = onPressTab
       self.onPressShiftTab = onPressShiftTab
+      self.onPressCommandUpKey = onPressCommandUpKey
+      self.onPressCommandDownKey = onPressCommandDownKey
     }
 
     public init() {
@@ -258,7 +282,9 @@ extension ControlledSearchInput {
       onSubmit: (() -> Void)? = nil,
       onPressEscape: (() -> Void)? = nil,
       onPressTab: (() -> Void)? = nil,
-      onPressShiftTab: (() -> Void)? = nil)
+      onPressShiftTab: (() -> Void)? = nil,
+      onPressCommandUpKey: (() -> Void)? = nil,
+      onPressCommandDownKey: (() -> Void)? = nil)
     {
       self
         .init(
@@ -271,7 +297,9 @@ extension ControlledSearchInput {
             onSubmit: onSubmit,
             onPressEscape: onPressEscape,
             onPressTab: onPressTab,
-            onPressShiftTab: onPressShiftTab))
+            onPressShiftTab: onPressShiftTab,
+            onPressCommandUpKey: onPressCommandUpKey,
+            onPressCommandDownKey: onPressCommandDownKey))
     }
 
     public init() {

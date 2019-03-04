@@ -114,13 +114,14 @@ class Document: NSDocument {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
         let syntaxNodePath = self.rootNode.pathTo(id: syntaxNode.uuid) ?? []
-        let dropdownNodes = Array(syntaxNodePath.reversed())
+        let dropdownNodes = Array(syntaxNodePath)
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
         childWindow.detailView = logicSuggestions.first?.node.documentation(for: suggestionText).makeScrollView()
         childWindow.suggestionItems = indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
+        childWindow.dropdownIndex = dropdownNodes.count - 1
 
         childWindow.onSelectIndex = { index in
             self.selectedSuggestionIndex = index

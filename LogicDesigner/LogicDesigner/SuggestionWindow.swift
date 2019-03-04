@@ -107,6 +107,12 @@ class SuggestionWindow: NSWindow {
             self.onHighlightDropdownIndex?(nil)
         }
 
+        suggestionView.onPressCommandUpKey = {
+            if self.dropdownIndex - 1 >= 0 {
+                self.onSelectDropdownIndex?(self.dropdownIndex - 1)
+            }
+        }
+
         window.contentView = view
     }
 

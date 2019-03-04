@@ -173,6 +173,16 @@ public class SuggestionView: NSBox {
     }
   }
 
+  public var onPressCommandUpKey: (() -> Void)? {
+    get { return parameters.onPressCommandUpKey }
+    set { parameters.onPressCommandUpKey = newValue }
+  }
+
+  public var onPressCommandDownKey: (() -> Void)? {
+    get { return parameters.onPressCommandDownKey }
+    set { parameters.onPressCommandDownKey = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -449,6 +459,8 @@ public class SuggestionView: NSBox {
     controlledDropdownView.onCloseMenu = handleOnCloseDropdown
     controlledDropdownView.onOpenMenu = handleOnOpenDropdown
     suggestionDetailViewView.detailView = detailView
+    searchInputView.onPressCommandDownKey = handleOnPressCommandDownKey
+    searchInputView.onPressCommandUpKey = handleOnPressCommandUpKey
   }
 
   private func handleOnChangeSearchText(_ arg0: String) {
@@ -502,6 +514,14 @@ public class SuggestionView: NSBox {
   private func handleOnOpenDropdown() {
     onOpenDropdown?()
   }
+
+  private func handleOnPressCommandUpKey() {
+    onPressCommandUpKey?()
+  }
+
+  private func handleOnPressCommandDownKey() {
+    onPressCommandDownKey?()
+  }
 }
 
 // MARK: - Parameters
@@ -527,6 +547,8 @@ extension SuggestionView {
     public var onHighlightDropdownIndex: ((Int?) -> Void)?
     public var onCloseDropdown: (() -> Void)?
     public var onOpenDropdown: (() -> Void)?
+    public var onPressCommandUpKey: (() -> Void)?
+    public var onPressCommandDownKey: (() -> Void)?
 
     public init(
       searchText: String,
@@ -547,7 +569,9 @@ extension SuggestionView {
       onSelectDropdownIndex: ((Int) -> Void)? = nil,
       onHighlightDropdownIndex: ((Int?) -> Void)? = nil,
       onCloseDropdown: (() -> Void)? = nil,
-      onOpenDropdown: (() -> Void)? = nil)
+      onOpenDropdown: (() -> Void)? = nil,
+      onPressCommandUpKey: (() -> Void)? = nil,
+      onPressCommandDownKey: (() -> Void)? = nil)
     {
       self.searchText = searchText
       self.placeholderText = placeholderText
@@ -568,6 +592,8 @@ extension SuggestionView {
       self.onHighlightDropdownIndex = onHighlightDropdownIndex
       self.onCloseDropdown = onCloseDropdown
       self.onOpenDropdown = onOpenDropdown
+      self.onPressCommandUpKey = onPressCommandUpKey
+      self.onPressCommandDownKey = onPressCommandDownKey
     }
 
     public init() {
@@ -629,7 +655,9 @@ extension SuggestionView {
       onSelectDropdownIndex: ((Int) -> Void)? = nil,
       onHighlightDropdownIndex: ((Int?) -> Void)? = nil,
       onCloseDropdown: (() -> Void)? = nil,
-      onOpenDropdown: (() -> Void)? = nil)
+      onOpenDropdown: (() -> Void)? = nil,
+      onPressCommandUpKey: (() -> Void)? = nil,
+      onPressCommandDownKey: (() -> Void)? = nil)
     {
       self
         .init(
@@ -652,7 +680,9 @@ extension SuggestionView {
             onSelectDropdownIndex: onSelectDropdownIndex,
             onHighlightDropdownIndex: onHighlightDropdownIndex,
             onCloseDropdown: onCloseDropdown,
-            onOpenDropdown: onOpenDropdown))
+            onOpenDropdown: onOpenDropdown,
+            onPressCommandUpKey: onPressCommandUpKey,
+            onPressCommandDownKey: onPressCommandDownKey))
     }
 
     public init() {

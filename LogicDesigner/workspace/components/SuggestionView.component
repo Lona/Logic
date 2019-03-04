@@ -244,6 +244,30 @@
         "detailView"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressCommandDownKey"
+      ],
+      "content" : [
+        "parameters",
+        "onPressCommandDownKey"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SearchInput",
+        "onPressCommandUpKey"
+      ],
+      "content" : [
+        "parameters",
+        "onPressCommandUpKey"
+      ],
+      "type" : "AssignExpr"
     }
   ],
   "params" : [
@@ -381,6 +405,18 @@
     {
       "name" : "detailView",
       "type" : "CustomDetailView"
+    },
+    {
+      "name" : "onPressCommandUpKey",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressCommandDownKey",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {

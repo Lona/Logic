@@ -47,6 +47,8 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     public var onPressDownKey: (() -> Void)?
     public var onPressTab: (() -> Void)?
     public var onPressShiftTab: (() -> Void)?
+    public var onPressCommandUpKey: (() -> Void)?
+    public var onPressCommandDownKey: (() -> Void)?
 
     public var placeholderText: String? {
         get { return placeholderString }
@@ -124,7 +126,13 @@ extension ControlledSearchInput: NSTextFieldDelegate {
     }
 
     public func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if (commandSelector == #selector(NSResponder.insertTab(_:))) {
+        if (commandSelector == #selector(NSResponder.moveToBeginningOfDocument(_:))) {
+            onPressCommandUpKey?()
+            return true
+        } else if (commandSelector == #selector(NSResponder.moveToEndOfDocument(_:))) {
+            onPressCommandDownKey?()
+            return true
+        } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
             Swift.print("Tab")
             onPressTab?()
             return true
