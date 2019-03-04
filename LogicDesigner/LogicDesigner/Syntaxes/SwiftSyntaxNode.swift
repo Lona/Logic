@@ -108,6 +108,75 @@ extension SwiftPattern: SyntaxNodeProtocol {
     }
 }
 
+extension SwiftBinaryOperator: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Binary Operator"
+    }
+
+    var node: SwiftSyntaxNode {
+        return .binaryOperator(self)
+    }
+
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftBinaryOperator {
+        switch syntaxNode {
+        case .binaryOperator(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .isEqualTo:
+                return SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString))
+            case .isNotEqualTo:
+                return SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString))
+            case .isLessThan:
+                return SwiftBinaryOperator.isLessThan(SwiftIsLessThan(id: NSUUID().uuidString))
+            case .isGreaterThan:
+                return SwiftBinaryOperator.isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString))
+            case .isLessThanOrEqualTo:
+                return SwiftBinaryOperator.isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo(id: NSUUID().uuidString))
+            case .isGreaterThanOrEqualTo:
+                return SwiftBinaryOperator.isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo(id: NSUUID().uuidString))
+            case .setEqualTo:
+                return SwiftBinaryOperator.setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString))
+            }
+        }
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return id == uuid ? node : nil
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        return id == uuid ? [node] : nil
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        return node
+    }
+
+    var uuid: SwiftUUID {
+        switch self {
+        case .isEqualTo(let value):
+            return value.id
+        case .isNotEqualTo(let value):
+            return value.id
+        case .isLessThan(let value):
+            return value.id
+        case .isGreaterThan(let value):
+            return value.id
+        case .isLessThanOrEqualTo(let value):
+            return value.id
+        case .isGreaterThanOrEqualTo(let value):
+            return value.id
+        case .setEqualTo(let value):
+            return value.id
+        }
+    }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension SwiftExpression: SyntaxNodeProtocol {
     var nodeTypeDescription: String {
         return "Expression"
@@ -130,7 +199,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
             return .binaryExpression(SwiftBinaryExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
-                op: value.op,
+                op: value.op.replace(id: id, with: syntaxNode),
                 id: NSUUID().uuidString))
         case (_, .identifierExpression(let value)):
             return .identifierExpression(SwiftIdentifierExpression(
@@ -146,7 +215,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
 
         switch self {
         case .binaryExpression(let value):
-            return value.left.find(id: id) ?? value.right.find(id: id)
+            return value.left.find(id: id) ?? value.op.find(id: id) ?? value.right.find(id: id)
         case .identifierExpression(let value):
             return value.identifier.find(id: id)
         }
@@ -161,7 +230,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
 
         switch self {
         case .binaryExpression(let value):
-            found = value.left.pathTo(id: id) ?? value.right.pathTo(id: id)
+            found = value.left.pathTo(id: id) ?? value.op.pathTo(id: id) ?? value.right.pathTo(id: id)
         case .identifierExpression(let value):
             found = value.identifier.pathTo(id: id)
         }
@@ -357,6 +426,8 @@ extension SwiftSyntaxNode {
         case .identifier(let value):
             return value
         case .pattern(let value):
+            return value
+        case .binaryOperator(let value):
             return value
         }
     }

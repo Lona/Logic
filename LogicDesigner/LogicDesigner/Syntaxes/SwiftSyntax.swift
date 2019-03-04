@@ -43,7 +43,7 @@ public struct SwiftFunction: Codable & Equatable {
 public struct SwiftBinaryExpression: Codable & Equatable {
   public var left: SwiftExpression
   public var right: SwiftExpression
-  public var op: SwiftString
+  public var op: SwiftBinaryOperator
   public var id: SwiftUUID
 }
 
@@ -55,6 +55,34 @@ public struct SwiftIdentifierExpression: Codable & Equatable {
 public struct SwiftPattern: Codable & Equatable {
   public var id: SwiftUUID
   public var name: SwiftString
+}
+
+public struct SwiftIsEqualTo: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftIsNotEqualTo: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftIsLessThan: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftIsGreaterThan: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftIsLessThanOrEqualTo: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftIsGreaterThanOrEqualTo: Codable & Equatable {
+  public var id: SwiftUUID
+}
+
+public struct SwiftSetEqualTo: Codable & Equatable {
+  public var id: SwiftUUID
 }
 
 public indirect enum SwiftStatement: Codable & Equatable {
@@ -188,6 +216,7 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
   case identifier(SwiftIdentifier)
   case expression(SwiftExpression)
   case pattern(SwiftPattern)
+  case binaryOperator(SwiftBinaryOperator)
 
   // MARK: Codable
 
@@ -211,6 +240,8 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         self = .expression(try container.decode(SwiftExpression.self, forKey: .data))
       case "pattern":
         self = .pattern(try container.decode(SwiftPattern.self, forKey: .data))
+      case "binaryOperator":
+        self = .binaryOperator(try container.decode(SwiftBinaryOperator.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -234,6 +265,9 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .pattern(let value):
         try container.encode("pattern", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .binaryOperator(let value):
+        try container.encode("binaryOperator", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
@@ -273,6 +307,75 @@ public indirect enum SwiftExpression: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .identifierExpression(let value):
         try container.encode("identifierExpression", forKey: .type)
+        try container.encode(value, forKey: .data)
+    }
+  }
+}
+
+public indirect enum SwiftBinaryOperator: Codable & Equatable {
+  case isEqualTo(SwiftIsEqualTo)
+  case isNotEqualTo(SwiftIsNotEqualTo)
+  case isLessThan(SwiftIsLessThan)
+  case isGreaterThan(SwiftIsGreaterThan)
+  case isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo)
+  case isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo)
+  case setEqualTo(SwiftSetEqualTo)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "isEqualTo":
+        self = .isEqualTo(try container.decode(SwiftIsEqualTo.self, forKey: .data))
+      case "isNotEqualTo":
+        self = .isNotEqualTo(try container.decode(SwiftIsNotEqualTo.self, forKey: .data))
+      case "isLessThan":
+        self = .isLessThan(try container.decode(SwiftIsLessThan.self, forKey: .data))
+      case "isGreaterThan":
+        self = .isGreaterThan(try container.decode(SwiftIsGreaterThan.self, forKey: .data))
+      case "isLessThanOrEqualTo":
+        self = .isLessThanOrEqualTo(try container.decode(SwiftIsLessThanOrEqualTo.self, forKey: .data))
+      case "isGreaterThanOrEqualTo":
+        self = .isGreaterThanOrEqualTo(try container.decode(SwiftIsGreaterThanOrEqualTo.self, forKey: .data))
+      case "setEqualTo":
+        self = .setEqualTo(try container.decode(SwiftSetEqualTo.self, forKey: .data))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .isEqualTo(let value):
+        try container.encode("isEqualTo", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .isNotEqualTo(let value):
+        try container.encode("isNotEqualTo", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .isLessThan(let value):
+        try container.encode("isLessThan", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .isGreaterThan(let value):
+        try container.encode("isGreaterThan", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .isLessThanOrEqualTo(let value):
+        try container.encode("isLessThanOrEqualTo", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .isGreaterThanOrEqualTo(let value):
+        try container.encode("isGreaterThanOrEqualTo", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .setEqualTo(let value):
+        try container.encode("setEqualTo", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

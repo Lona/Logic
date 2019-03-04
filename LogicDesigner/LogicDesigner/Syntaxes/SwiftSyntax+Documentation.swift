@@ -12,7 +12,8 @@ extension SwiftExpression {
     func documentation(for prefix: String) -> RichText {
         switch self {
         case .binaryExpression(let value):
-            if value.op == "=" {
+            switch value.op {
+            case .setEqualTo:
                 let blocks: [RichText.BlockElement] = [
                     .heading(.title) { "Assignment" },
                     .paragraph(
@@ -23,18 +24,18 @@ extension SwiftExpression {
                 ]
 
                 return RichText(blocks: blocks)
+            default:
+                let blocks: [RichText.BlockElement] = [
+                    .heading(.title) { "Comparison" },
+                    .paragraph(
+                        [
+                            .text(.none) { "Compare two variables." }
+                        ]
+                    )
+                ]
+
+                return RichText(blocks: blocks)
             }
-
-            let blocks: [RichText.BlockElement] = [
-                .heading(.title) { "Comparison" },
-                .paragraph(
-                    [
-                        .text(.none) { "Compare two variables." }
-                    ]
-                )
-            ]
-
-            return RichText(blocks: blocks)
         default:
             return RichText(blocks: [])
         }

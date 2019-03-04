@@ -69,6 +69,29 @@ extension SwiftPattern {
     }
 }
 
+extension SwiftBinaryOperator {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "is equal to",
+                category: "Operators".uppercased(),
+                node: SwiftSyntaxNode.binaryOperator(
+                    SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString))
+                )
+            ),
+            LogicSuggestionItem(
+                title: "is not equal to",
+                category: "Operators".uppercased(),
+                node: SwiftSyntaxNode.binaryOperator(
+                    SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString))
+                )
+            ),
+        ]
+
+        return items
+    }
+}
+
 extension SwiftExpression {
     static var assignmentSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
@@ -81,7 +104,7 @@ extension SwiftExpression {
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
                         right: SwiftExpression.identifierExpression(
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
-                        op: "=",
+                        op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
                         id: NSUUID().uuidString))))
     }
 
@@ -96,7 +119,7 @@ extension SwiftExpression {
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
                         right: SwiftExpression.identifierExpression(
                             SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
-                        op: "is greater than",
+                        op: .isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString)),
                         id: NSUUID().uuidString))))
     }
 
@@ -166,6 +189,8 @@ extension SwiftSyntaxNode {
             return SwiftPattern.suggestions(for: prefix)
         case .expression:
             return SwiftExpression.suggestions(for: prefix)
+        case .binaryOperator:
+            return SwiftBinaryOperator.suggestions(for: prefix)
         }
     }
 }
