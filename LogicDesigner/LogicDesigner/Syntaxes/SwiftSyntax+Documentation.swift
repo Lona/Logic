@@ -58,7 +58,7 @@ extension SwiftStatement {
                     [
                         .text(.none) { "Suppose our program has a variable " },
                         .text(.bold) { "age" },
-                        .text(.none) { ", representing the current user's age. We might want to print a specific message depending on the value of age. We could use an " },
+                        .text(.none) { ", representing the current user's age. We might want to display a specific message depending on the value of age. We could use an " },
                         .text(.bold) { "if condition " },
                         .text(.none) { "to accomplish this:" }
                     ]
@@ -68,10 +68,22 @@ extension SwiftStatement {
                         SwiftStatement.branch(
                             SwiftBranch(
                                 id: NSUUID().uuidString,
-                                condition: SwiftExpression.identifierExpression(
-                                    SwiftIdentifierExpression(
-                                        id: NSUUID().uuidString,
-                                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "age")
+                                condition: SwiftExpression.binaryExpression(
+                                    SwiftBinaryExpression(
+                                        left: SwiftExpression.identifierExpression(
+                                            SwiftIdentifierExpression(
+                                                id: NSUUID().uuidString,
+                                                identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "age")
+                                            )
+                                        ),
+                                        right: SwiftExpression.identifierExpression(
+                                            SwiftIdentifierExpression(
+                                                id: NSUUID().uuidString,
+                                                identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "17")
+                                            )
+                                        ),
+                                        op: .isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
+                                        id: NSUUID().uuidString
                                     )
                                 ),
                                 block: SwiftList<SwiftStatement>.next(

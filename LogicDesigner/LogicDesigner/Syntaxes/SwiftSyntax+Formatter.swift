@@ -22,14 +22,7 @@ extension SwiftPattern {
 
 extension SwiftBinaryOperator {
     var formatted: LogicEditorFormatCommand {
-        switch self {
-        case .isEqualTo(let value):
-            return .element(LogicEditorElement.dropdown(value.id, "is equal to", Colors.text))
-        case .isNotEqualTo(let value):
-            return .element(LogicEditorElement.dropdown(value.id, "is not equal to", Colors.text))
-        default:
-            return .element(LogicEditorElement.text("placeholder"))
-        }
+        return .element(LogicEditorElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
@@ -39,12 +32,23 @@ extension SwiftExpression {
         case .identifierExpression(let value):
             return value.identifier.formatted
         case .binaryExpression(let value):
-            return .concat {
-                [
-                    value.left.formatted,
-                    value.op.formatted,
-                    value.right.formatted
-                ]
+            switch value.op {
+            case .setEqualTo:
+                return .concat {
+                    [
+                        value.left.formatted,
+                        .element(.text("=")),
+                        value.right.formatted
+                    ]
+                }
+            default:
+                return .concat {
+                    [
+                        value.left.formatted,
+                        value.op.formatted,
+                        value.right.formatted
+                    ]
+                }
             }
         }
     }

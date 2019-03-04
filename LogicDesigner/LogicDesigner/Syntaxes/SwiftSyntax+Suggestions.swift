@@ -70,25 +70,42 @@ extension SwiftPattern {
 }
 
 extension SwiftBinaryOperator {
+    var displayText: String {
+        switch self {
+        case .isEqualTo:
+            return "is equal to"
+        case .isGreaterThan:
+            return "is greater than"
+        case .isGreaterThanOrEqualTo:
+            return "is greater than or equal to"
+        case .isLessThan:
+            return "is less than"
+        case .isLessThanOrEqualTo:
+            return "is less than or equal to"
+        case .isNotEqualTo:
+            return "is not equal to"
+        case .setEqualTo:
+            return "now equals"
+        }
+    }
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let items = [
-            LogicSuggestionItem(
-                title: "is equal to",
-                category: "Operators".uppercased(),
-                node: SwiftSyntaxNode.binaryOperator(
-                    SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString))
-                )
-            ),
-            LogicSuggestionItem(
-                title: "is not equal to",
-                category: "Operators".uppercased(),
-                node: SwiftSyntaxNode.binaryOperator(
-                    SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString))
-                )
-            ),
+        let operatorNodes = [
+            SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString)),
+            SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString)),
+            SwiftBinaryOperator.isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
+            SwiftBinaryOperator.isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo(id: NSUUID().uuidString)),
+            SwiftBinaryOperator.isLessThan(SwiftIsLessThan(id: NSUUID().uuidString)),
+            SwiftBinaryOperator.isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo(id: NSUUID().uuidString)),
         ]
 
-        return items
+        return operatorNodes.map { node in
+            LogicSuggestionItem(
+                title: node.displayText,
+                category: "Operators".uppercased(),
+                node: SwiftSyntaxNode.binaryOperator(node)
+            )
+        }
     }
 }
 
