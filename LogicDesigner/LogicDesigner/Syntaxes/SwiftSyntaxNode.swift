@@ -23,7 +23,15 @@ protocol SyntaxNodeProtocol {
     func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]?
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
 
+    func documentation(for prefix: String) -> RichText
+
     //    static var suggestionCategories: [LogicSuggestionCategory] { get }
+}
+
+extension SyntaxNodeProtocol {
+    func documentation(for prefix: String) -> RichText {
+        return RichText(blocks: [])
+    }
 }
 
 extension SwiftIdentifier: SyntaxNodeProtocol {

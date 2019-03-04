@@ -97,8 +97,8 @@ private class FlippedView: NSView {
 }
 
 extension RichText {
-    static func makeContentView(from blockElements: [RichText.BlockElement]) -> NSView {
-        let blockViews = blockElements.map { $0.view }
+    func makeContentView() -> NSView {
+        let blockViews = blocks.map { $0.view }
 
         let contentView = FlippedView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +114,7 @@ extension RichText {
                 if offset == 0 {
                     view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24).isActive = true
                 } else {
-                    let margin = max(blockElements[offset].marginTop, 8)
+                    let margin = max(blocks[offset].marginTop, 8)
                     view.topAnchor.constraint(equalTo: blockViews[offset - 1].bottomAnchor, constant: margin).isActive = true
                 }
 
@@ -127,8 +127,8 @@ extension RichText {
         return contentView
     }
 
-    static func makeScrollView(from blockElements: [RichText.BlockElement]) -> NSScrollView {
-        let contentView = self.makeContentView(from: blockElements)
+    func makeScrollView() -> NSScrollView {
+        let contentView = self.makeContentView()
 
         let scrollView = NSScrollView()
 

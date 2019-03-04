@@ -38,6 +38,12 @@ class Document: NSDocument {
         }
     }
 
+    var selectedSuggestionIndex: Int? {
+        didSet {
+            childWindow?.selectedIndex = selectedSuggestionIndex
+        }
+    }
+
     func indexedSuggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
         var categories: [(name: String, list: [(offset: Int, item: LogicSuggestionItem)])] = []
 
@@ -112,8 +118,22 @@ class Document: NSDocument {
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
+        childWindow.detailView = logicSuggestions.first?.node.documentation(for: suggestionText).makeScrollView()
         childWindow.suggestionItems = indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
+
+        childWindow.onSelectIndex = { index in
+            self.selectedSuggestionIndex = index
+
+            if let index = index {
+                let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
+                let suggestedNode = logicSuggestions[indexedSuggestions[index].offset].node
+
+                childWindow.detailView = suggestedNode.documentation(for: self.suggestionText).makeScrollView()
+            } else {
+                childWindow.detailView = nil
+            }
+        }
 
         childWindow.onPressEscapeKey = {
             self.hideSuggestionWindow()

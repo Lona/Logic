@@ -45,6 +45,7 @@
 		6B558A44222C805E000C22FE /* SuggestionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B558A43222C805E000C22FE /* SuggestionDetailView.swift */; };
 		6B558A47222C82E5000C22FE /* RichText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B558A46222C82E5000C22FE /* RichText.swift */; };
 		6B558A49222C8604000C22FE /* RichText+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B558A48222C8604000C22FE /* RichText+AppKit.swift */; };
+		6B558A4D222CA401000C22FE /* SwiftSyntax+Documentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B558A4C222CA401000C22FE /* SwiftSyntax+Documentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +90,7 @@
 		6B558A43222C805E000C22FE /* SuggestionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionDetailView.swift; sourceTree = "<group>"; };
 		6B558A46222C82E5000C22FE /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
 		6B558A48222C8604000C22FE /* RichText+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichText+AppKit.swift"; sourceTree = "<group>"; };
+		6B558A4C222CA401000C22FE /* SwiftSyntax+Documentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Documentation.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -176,6 +178,7 @@
 			children = (
 				6B12C639221E3F95005A808C /* SwiftList+Sequence.swift */,
 				6B12C625221B5FB1005A808C /* SwiftSyntax.swift */,
+				6B558A4C222CA401000C22FE /* SwiftSyntax+Documentation.swift */,
 				6B12C62F221CB8D8005A808C /* SwiftSyntax+Formatter.swift */,
 				6B12C62D221CB867005A808C /* SwiftSyntax+NativeTypes.swift */,
 				6B12C62B221CB66A005A808C /* SwiftSyntax+Suggestions.swift */,
@@ -319,6 +322,7 @@
 				6B12C62A221B9854005A808C /* NSBezierPath+Polygon.swift in Sources */,
 				6B558A49222C8604000C22FE /* RichText+AppKit.swift in Sources */,
 				6B12C6152219EAA6005A808C /* LNAImageView.swift in Sources */,
+				6B558A4D222CA401000C22FE /* SwiftSyntax+Documentation.swift in Sources */,
 				6B558A3C221F431D000C22FE /* ControlledDropdown.swift in Sources */,
 				6B12C630221CB8D8005A808C /* SwiftSyntax+Formatter.swift in Sources */,
 				6B12C638221CFAA3005A808C /* LogicEditorElement+Formatter.swift in Sources */,

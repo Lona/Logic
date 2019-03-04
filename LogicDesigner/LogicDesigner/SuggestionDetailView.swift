@@ -42,6 +42,10 @@ public class SuggestionDetailView: NSBox {
     public var detailView: CustomDetailView {
         get { return parameters.detailView }
         set {
+            if detailView == newValue { return }
+
+            detailView?.removeFromSuperview()
+
             if parameters.detailView != newValue {
                 parameters.detailView = newValue
             }
@@ -69,8 +73,6 @@ public class SuggestionDetailView: NSBox {
     }
 
     private func update() {
-        detailView?.removeFromSuperview()
-
         if let detailView = detailView {
             addSubview(detailView)
 

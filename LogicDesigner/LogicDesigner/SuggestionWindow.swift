@@ -67,7 +67,7 @@ class SuggestionWindow: NSWindow {
         }
 
         suggestionView.onSelectIndex = { selectedIndex in
-            self.selectedIndex = selectedIndex
+            self.onSelectIndex?(selectedIndex)
         }
 
         suggestionView.onPressDownKey = {
@@ -78,11 +78,12 @@ class SuggestionWindow: NSWindow {
             }) {
                 let nextFilteredIndex = min(filteredIndex + 1, selectablePairs.count - 1)
                 let nextIndex = selectablePairs[nextFilteredIndex].offset
-                self.selectedIndex = nextIndex
+
+                self.onSelectIndex?(nextIndex)
             } else if let first = selectablePairs.first {
-                self.selectedIndex = first.offset
+                self.onSelectIndex?(first.offset)
             } else {
-                self.selectedIndex = nil
+                self.onSelectIndex?(nil)
             }
         }
 
@@ -94,11 +95,11 @@ class SuggestionWindow: NSWindow {
             }) {
                 let nextFilteredIndex = max(filteredIndex - 1, 0)
                 let nextIndex = selectablePairs[nextFilteredIndex].offset
-                self.selectedIndex = nextIndex
+                self.onSelectIndex?(nextIndex)
             } else if let last = selectablePairs.last {
-                self.selectedIndex = last.offset
+                self.onSelectIndex?(last.offset)
             } else {
-                self.selectedIndex = nil
+                self.onSelectIndex?(nil)
             }
         }
 
@@ -116,6 +117,8 @@ class SuggestionWindow: NSWindow {
     // MARK: Public
 
     public var onSubmit: ((Int) -> Void)?
+
+    public var onSelectIndex: ((Int?) -> Void)?
 
     public var selectedIndex: Int? {
         get { return suggestionView.selectedIndex }
@@ -177,6 +180,13 @@ class SuggestionWindow: NSWindow {
     public var onHighlightDropdownIndex: ((Int?) -> Void)? {
         get { return suggestionView.onHighlightDropdownIndex }
         set { suggestionView.onHighlightDropdownIndex = newValue }
+    }
+
+    // MARK: Detail view
+
+    public var detailView: CustomDetailView {
+        get { return suggestionView.detailView }
+        set { suggestionView.detailView = newValue }
     }
 
     // MARK: Focus
