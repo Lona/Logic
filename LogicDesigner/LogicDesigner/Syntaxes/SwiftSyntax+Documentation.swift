@@ -8,6 +8,39 @@
 
 import AppKit
 
+extension SwiftExpression {
+    func documentation(for prefix: String) -> RichText {
+        switch self {
+        case .binaryExpression(let value):
+            if value.op == "=" {
+                let blocks: [RichText.BlockElement] = [
+                    .heading(.title) { "Assignment" },
+                    .paragraph(
+                        [
+                            .text(.none) { "Use an assignment expression to update the value of an existing variable." }
+                        ]
+                    )
+                ]
+
+                return RichText(blocks: blocks)
+            }
+
+            let blocks: [RichText.BlockElement] = [
+                .heading(.title) { "Comparison" },
+                .paragraph(
+                    [
+                        .text(.none) { "Compare two variables." }
+                    ]
+                )
+            ]
+
+            return RichText(blocks: blocks)
+        default:
+            return RichText(blocks: [])
+        }
+    }
+}
+
 extension SwiftStatement {
     func documentation(for prefix: String) -> RichText {
         switch self {
@@ -60,12 +93,22 @@ extension SwiftStatement {
             ]
 
             return RichText(blocks: blocks)
+        case .loop:
+            let blocks: [RichText.BlockElement] = [
+                .heading(.title) { "For loop" },
+                .paragraph(
+                    [
+                        .text(.none) { "Loops let you run the same code multiple times, once for each item in a sequence of items." }
+                    ]
+                )
+            ]
+
+            return RichText(blocks: blocks)
         default:
             return RichText(blocks: [])
         }
     }
 }
-
 
 extension SwiftSyntaxNode {
     func documentation(for prefix: String) -> RichText {
