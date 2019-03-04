@@ -87,8 +87,28 @@ extension SwiftStatement {
                                     )
                                 ),
                                 block: SwiftList<SwiftStatement>.next(
-                                    SwiftStatement.placeholderStatement(
-                                        SwiftPlaceholderStatement(id: NSUUID().uuidString)
+                                    SwiftStatement.expressionStatement(
+                                        SwiftExpressionStatement(
+                                            id: NSUUID().uuidString,
+                                            expression: SwiftExpression.binaryExpression(
+                                                SwiftBinaryExpression(
+                                                    left: SwiftExpression.identifierExpression(
+                                                        SwiftIdentifierExpression(
+                                                            id: NSUUID().uuidString,
+                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
+                                                        )
+                                                    ),
+                                                    right: SwiftExpression.identifierExpression(
+                                                        SwiftIdentifierExpression(
+                                                            id: NSUUID().uuidString,
+                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrat's, you're an adult!\"")
+                                                        )
+                                                    ),
+                                                    op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
+                                                    id: NSUUID().uuidString
+                                                )
+                                            )
+                                        )
                                     ),
                                     .empty
                                 )
