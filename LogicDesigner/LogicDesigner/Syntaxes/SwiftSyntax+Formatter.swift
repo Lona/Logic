@@ -128,15 +128,26 @@ extension SwiftSyntaxNode {
     }
 
     func topNodeWithEqualElement(as targetID: SwiftUUID) -> SwiftSyntaxNode {
-        guard let pathToTarget = pathTo(id: targetID) else {
+        let elementPath = uniqueElementPathTo(id: targetID)
+
+        return elementPath[elementPath.count - 1]
+    }
+
+    func uniqueElementPathTo(id targetID: SwiftUUID) -> [SwiftSyntaxNode] {
+        guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }
 
-        let allFormattedElements = pathToTarget.map({ $0.formatted.elements })
-        guard let minimumElementCount = allFormattedElements.map({ $0.count }).min(),
-            let topIndex = allFormattedElements.firstIndex(where: { $0.count == minimumElementCount })
-            else { fatalError("Bad index logic") }
+        let (_, uniquePath): (min: Int, path: [SwiftSyntaxNode]) = pathToTarget
+            .reduce((min: Int.max, path: []), { result, next in
+                let formattedElements = next.formatted.elements
+                if formattedElements.count < result.min {
+                    return (formattedElements.count, result.path + [next])
+                } else {
+                    return result
+                }
+            })
 
-        return pathToTarget[topIndex]
+        return uniquePath
     }
 }

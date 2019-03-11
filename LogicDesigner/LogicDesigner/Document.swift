@@ -113,7 +113,7 @@ class Document: NSDocument {
     func showSuggestionWindow(for nodeIndex: Int, syntaxNode: SwiftSyntaxNode) {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
-        let syntaxNodePath = self.rootNode.pathTo(id: syntaxNode.uuid) ?? []
+        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid)
         let dropdownNodes = Array(syntaxNodePath)
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
