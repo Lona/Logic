@@ -280,7 +280,13 @@ public class LogicEditor: NSView {
         }
     }
 
+    private var _cachedMeasuredElements: [LogicEditorMeasuredElement]? = nil
+
     private var measuredElements: [LogicEditorMeasuredElement] {
+        if let cached = _cachedMeasuredElements {
+            return cached
+        }
+
         let yOffset = LogicEditor.textMargin.height
 
         var measuredLine: [LogicEditorMeasuredElement] = []
@@ -305,6 +311,8 @@ public class LogicEditor: NSView {
                 formattedElementIndex += 1
             }
         }
+
+        _cachedMeasuredElements = measuredLine
 
         return measuredLine
     }
@@ -334,11 +342,14 @@ public class LogicEditor: NSView {
     }
 
     private func update() {
+        _cachedMeasuredElements = nil
         needsDisplay = true
     }
 
     public override func layout() {
         super.layout()
+
+        _cachedMeasuredElements = nil
 
         let minHeight = self.minHeight
         if minHeight != previousHeight {

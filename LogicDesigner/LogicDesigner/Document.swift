@@ -223,7 +223,6 @@ class Document: NSDocument {
     private let logicEditor = LogicEditor()
 
     func setUpViews() -> NSView {
-
         logicEditor.formattedContent = rootNode.formatted
         logicEditor.onActivate = { activatedIndex in
             if let activatedIndex = activatedIndex {
