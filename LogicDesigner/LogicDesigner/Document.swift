@@ -111,8 +111,10 @@ class Document: NSDocument {
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
+        let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
         childWindow.detailView = logicSuggestions.first?.node.documentation(for: suggestionText).makeScrollView()
-        childWindow.suggestionItems = indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
+        childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
+        childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
         childWindow.dropdownIndex = dropdownNodes.count - 1
 
@@ -178,7 +180,9 @@ class Document: NSDocument {
             // Update logicSuggestions
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
 
-            childWindow.suggestionItems = self.indexedSuggestionListItems(for: logicSuggestions).map { $0.item }
+            let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
+            childWindow.suggestionItems = indexedSuggestions.map { $0.item }
+            childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
         }
 
         window.addChildWindow(childWindow, ordered: .above)

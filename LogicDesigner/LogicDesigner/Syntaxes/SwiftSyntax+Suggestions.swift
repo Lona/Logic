@@ -12,6 +12,18 @@ struct LogicSuggestionItem {
     var title: String
     var category: String
     var node: SwiftSyntaxNode
+
+    func titleContains(prefix: String) -> Bool {
+        if prefix.isEmpty { return true }
+
+        return title.lowercased().contains(prefix.lowercased())
+    }
+}
+
+extension Array where Element == LogicSuggestionItem {
+    func titleContains(prefix: String) -> [Element] {
+        return self.filter { item in item.titleContains(prefix: prefix) }
+    }
 }
 
 struct LogicSuggestionCategory {
@@ -51,7 +63,7 @@ extension SwiftIdentifier {
             )
         ]
 
-        return items
+        return items.titleContains(prefix: prefix)
     }
 }
 
@@ -105,7 +117,7 @@ extension SwiftBinaryOperator {
                 category: "Operators".uppercased(),
                 node: SwiftSyntaxNode.binaryOperator(node)
             )
-        }
+        }.titleContains(prefix: prefix)
     }
 }
 
@@ -146,7 +158,7 @@ extension SwiftExpression {
             assignmentSuggestionItem
         ]
 
-        return items + SwiftIdentifier.suggestions(for: prefix)
+        return items.titleContains(prefix: prefix) + SwiftIdentifier.suggestions(for: prefix)
     }
 }
 
@@ -189,7 +201,7 @@ extension SwiftStatement {
             SwiftExpression.assignmentSuggestionItem
         ]
 
-        return items
+        return items.titleContains(prefix: prefix)
     }
 }
 
