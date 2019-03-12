@@ -9,9 +9,17 @@
 import AppKit
 
 struct LogicSuggestionItem {
+    init(title: String, category: String, node: SwiftSyntaxNode, disabled: Bool = false) {
+        self.title = title
+        self.category = category
+        self.node = node
+        self.disabled = disabled
+    }
+
     var title: String
     var category: String
     var node: SwiftSyntaxNode
+    var disabled: Bool
 
     func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
@@ -32,7 +40,7 @@ struct LogicSuggestionCategory {
 
     var suggestionListItems: [SuggestionListItem] {
         let sectionHeader = SuggestionListItem.sectionHeader(title)
-        let rows = items.map { SuggestionListItem.row($0.title) }
+        let rows = items.map { SuggestionListItem.row($0.title, $0.disabled) }
         return Array([[sectionHeader], rows].joined())
     }
 }
@@ -73,7 +81,8 @@ extension SwiftPattern {
             LogicSuggestionItem(
                 title: "Variable name: \(prefix)",
                 category: "Pattern".uppercased(),
-                node: SwiftSyntaxNode.pattern(SwiftPattern(id: NSUUID().uuidString, name: prefix))
+                node: SwiftSyntaxNode.pattern(SwiftPattern(id: NSUUID().uuidString, name: prefix)),
+                disabled: prefix.isEmpty
             )
         ]
 

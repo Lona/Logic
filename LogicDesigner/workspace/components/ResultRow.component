@@ -16,6 +16,20 @@
       "params" : {
 
       }
+    },
+    {
+      "id" : "Selected",
+      "name" : "Selected",
+      "params" : {
+        "selected" : true
+      }
+    },
+    {
+      "id" : "Disabled",
+      "name" : "Disabled",
+      "params" : {
+        "disabled" : true
+      }
     }
   ],
   "logic" : [
@@ -65,6 +79,41 @@
         "type" : "BinExpr"
       },
       "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Text",
+            "textStyle"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "rowDisabled",
+              "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "parameters",
+          "disabled"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
     }
   ],
   "params" : [
@@ -74,6 +123,10 @@
     },
     {
       "name" : "selected",
+      "type" : "Boolean"
+    },
+    {
+      "name" : "disabled",
       "type" : "Boolean"
     }
   ],

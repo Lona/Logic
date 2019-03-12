@@ -55,7 +55,7 @@ class Document: NSDocument {
             suggestionListItems.append((0, .sectionHeader(category.name)))
 
             category.list.forEach { logicItem in
-                suggestionListItems.append((logicItem.offset, .row(logicItem.item.title)))
+                suggestionListItems.append((logicItem.offset, .row(logicItem.item.title, logicItem.item.disabled)))
             }
         }
 
@@ -157,7 +157,11 @@ class Document: NSDocument {
 
         childWindow.onSubmit = { index in
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
-            let suggestedNode = logicSuggestions[indexedSuggestions[index].offset].node
+            let logicSuggestionItem = logicSuggestions[indexedSuggestions[index].offset]
+
+            if logicSuggestionItem.disabled { return }
+
+            let suggestedNode = logicSuggestionItem.node
 
             Swift.print("Chose suggestion", suggestedNode)
 

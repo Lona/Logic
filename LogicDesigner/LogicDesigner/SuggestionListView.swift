@@ -3,7 +3,7 @@ import Foundation
 
 public enum SuggestionListItem {
     case sectionHeader(String)
-    case row(String)
+    case row(String, Bool)
 
     public var isSelectable: Bool {
         switch self {
@@ -190,9 +190,13 @@ extension SuggestionListView: NSTableViewDelegate {
         let item = items[row]
 
         switch item {
-        case .row(let value):
-            let rowView = ResultRow(titleText: value, selected: row == selectedIndex)
-            rowView.fillColor = row == selectedIndex ? NSColor.selectedMenuItemColor : NSColor.clear
+        case .row(let value, let disabled):
+            let rowView = ResultRow(titleText: value, selected: row == selectedIndex, disabled: disabled)
+            rowView.fillColor = row != selectedIndex
+                ? NSColor.clear
+                : disabled
+                ? NSColor.unemphasizedSelectedContentBackgroundColor
+                : NSColor.selectedMenuItemColor
             return rowView
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)

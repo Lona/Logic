@@ -18,8 +18,8 @@ public class ResultRow: NSBox {
     update()
   }
 
-  public convenience init(titleText: String, selected: Bool) {
-    self.init(Parameters(titleText: titleText, selected: selected))
+  public convenience init(titleText: String, selected: Bool, disabled: Bool) {
+    self.init(Parameters(titleText: titleText, selected: selected, disabled: disabled))
   }
 
   public convenience init() {
@@ -53,6 +53,15 @@ public class ResultRow: NSBox {
     set {
       if parameters.selected != newValue {
         parameters.selected = newValue
+      }
+    }
+  }
+
+  public var disabled: Bool {
+    get { return parameters.disabled }
+    set {
+      if parameters.disabled != newValue {
+        parameters.disabled = newValue
       }
     }
   }
@@ -107,6 +116,10 @@ public class ResultRow: NSBox {
       textViewTextStyle = TextStyles.rowInverse
       textView.attributedStringValue = textViewTextStyle.apply(to: textView.attributedStringValue)
     }
+    if disabled {
+      textViewTextStyle = TextStyles.rowDisabled
+      textView.attributedStringValue = textViewTextStyle.apply(to: textView.attributedStringValue)
+    }
   }
 }
 
@@ -116,18 +129,20 @@ extension ResultRow {
   public struct Parameters: Equatable {
     public var titleText: String
     public var selected: Bool
+    public var disabled: Bool
 
-    public init(titleText: String, selected: Bool) {
+    public init(titleText: String, selected: Bool, disabled: Bool) {
       self.titleText = titleText
       self.selected = selected
+      self.disabled = disabled
     }
 
     public init() {
-      self.init(titleText: "", selected: false)
+      self.init(titleText: "", selected: false, disabled: false)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.titleText == rhs.titleText && lhs.selected == rhs.selected
+      return lhs.titleText == rhs.titleText && lhs.selected == rhs.selected && lhs.disabled == rhs.disabled
     }
   }
 }
@@ -151,12 +166,12 @@ extension ResultRow {
       self.parameters = parameters
     }
 
-    public init(titleText: String, selected: Bool) {
-      self.init(Parameters(titleText: titleText, selected: selected))
+    public init(titleText: String, selected: Bool, disabled: Bool) {
+      self.init(Parameters(titleText: titleText, selected: selected, disabled: disabled))
     }
 
     public init() {
-      self.init(titleText: "", selected: false)
+      self.init(titleText: "", selected: false, disabled: false)
     }
   }
 }
