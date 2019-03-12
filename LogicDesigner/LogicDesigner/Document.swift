@@ -78,7 +78,7 @@ class Document: NSDocument {
             self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: id)
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
             self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
         } else {
             Swift.print("No next node to activate")
@@ -94,7 +94,7 @@ class Document: NSDocument {
             self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElement(as: id)
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
             self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
         } else {
             Swift.print("No previous node to activate")
@@ -201,7 +201,7 @@ class Document: NSDocument {
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
-            let topNode = self.rootNode.topNodeWithEqualElement(as: syntaxNodeId)
+            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId)
 
             if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
                 self.logicEditor.selectedRange = selectedRange

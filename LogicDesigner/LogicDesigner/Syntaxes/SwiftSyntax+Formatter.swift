@@ -112,7 +112,7 @@ extension SwiftSyntaxNode {
     }
 
     func elementRange(for targetID: SwiftUUID) -> Range<Int>? {
-        let topNode = topNodeWithEqualElement(as: targetID)
+        let topNode = topNodeWithEqualElements(as: targetID)
         let topNodeFormattedElements = topNode.formatted.elements
 
         guard let topFirstFocusableIndex = topNodeFormattedElements.firstIndex(where: { $0.syntaxNodeID != nil }) else { return nil }
@@ -127,7 +127,7 @@ extension SwiftSyntaxNode {
         return firstIndex..<lastIndex
     }
 
-    func topNodeWithEqualElement(as targetID: SwiftUUID) -> SwiftSyntaxNode {
+    func topNodeWithEqualElements(as targetID: SwiftUUID) -> SwiftSyntaxNode {
         let elementPath = uniqueElementPathTo(id: targetID)
 
         return elementPath[elementPath.count - 1]
