@@ -20,15 +20,8 @@ class Document: NSDocument {
     }
 
     var rootNode: SwiftSyntaxNode = SwiftSyntaxNode.statement(
-        SwiftStatement.loop(
-            SwiftLoop(
-                pattern: SwiftPattern(id: NSUUID().uuidString, name: "item"),
-                expression: SwiftExpression.identifierExpression(
-                    SwiftIdentifierExpression(
-                        id: NSUUID().uuidString,
-                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "array"))),
-                block: SwiftList<SwiftStatement>.empty,
-                id: NSUUID().uuidString)
+        SwiftStatement.placeholderStatement(
+            SwiftPlaceholderStatement(id: NSUUID().uuidString)
         )
     )
 

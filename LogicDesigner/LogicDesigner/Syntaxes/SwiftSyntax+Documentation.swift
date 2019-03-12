@@ -101,7 +101,7 @@ extension SwiftStatement {
                                                     right: SwiftExpression.identifierExpression(
                                                         SwiftIdentifierExpression(
                                                             id: NSUUID().uuidString,
-                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrat's, you're an adult!\"")
+                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
                                                         )
                                                     ),
                                                     op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
@@ -116,13 +116,13 @@ extension SwiftStatement {
                         )
                     )
                 ),
-                .paragraph(
-                    [
-                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
-                        .text(.link) { "if else statement" },
-                        .text(.none) { "." }
-                    ]
-                )
+//                .paragraph(
+//                    [
+//                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
+//                        .text(.link) { "if else statement" },
+//                        .text(.none) { "." }
+//                    ]
+//                )
             ]
 
             return RichText(blocks: blocks)
