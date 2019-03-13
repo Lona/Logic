@@ -37,7 +37,13 @@ public class LogicEditor: NSView {
             update()
         }
     }
+    public var selectedLine: Int? {
+        didSet {
+            update()
+        }
+    }
     public var onActivate: ((Int?) -> Void)?
+    public var onActivateLine: ((Int) -> Void)?
 
     // MARK: Styles
 
@@ -138,9 +144,17 @@ public class LogicEditor: NSView {
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) })
-
-        onActivate?(index)
+        if let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) }) {
+            onActivate?(index)
+        // If we didn't select an element, try to select a line.
+        // Find the first element lower than the mouse.
+        } else if let lineElementIndex = measuredElements.firstIndex(where: {
+            point.y < $0.backgroundRect.maxY
+        }) {
+            onActivateLine?(formattedContent.lineIndex(for: lineElementIndex))
+        } else {
+            onActivate?(nil)
+        }
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -148,7 +162,14 @@ public class LogicEditor: NSView {
 
         switch Int(event.keyCode) {
         case 36: // Enter
-            onActivate?(selectedIndex)
+            if let selectedIndex = selectedIndex {
+                onActivate?(selectedIndex)
+            } else if let selectedLine = selectedLine {
+                let range = formattedContent.elementIndexRange(for: selectedLine)
+                onActivate?(range.lowerBound)
+            } else {
+                onActivate?(nil)
+            }
         case 48: // Tab
             let shiftKey = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
 
@@ -168,9 +189,13 @@ public class LogicEditor: NSView {
         case 124: // Right
             Swift.print("Right arrow")
         case 125: // Down
-            Swift.print("Down arrow")
+            if let selectedLine = selectedLine, selectedLine + 1 < formattedContent.logicalRows.count {
+                onActivateLine?(selectedLine + 1)
+            }
         case 126: // Up
-            Swift.print("Up arrow")
+            if let selectedLine = selectedLine, selectedLine - 1 >= 0 {
+                onActivateLine?(selectedLine - 1)
+            }
         default:
             break
         }
@@ -191,7 +216,20 @@ public class LogicEditor: NSView {
 
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
-        let measuredLines = self.measuredElements
+        if let selectedLine = selectedLine {
+            let range = formattedContent.elementIndexRange(for: selectedLine)
+            let elements = measuredElements[range]
+            if let first = elements.first, let last = elements.last {
+                NSColor.selectedMenuItemColor.highlight(withLevel: 0.9)?.set()
+                let rect = NSRect(
+                    x: 0,
+                    y: first.backgroundRect.minY,
+                    width: bounds.width,
+                    height: last.backgroundRect.maxY - first.backgroundRect.minY)
+                let path = NSBezierPath(rect: rect)
+                path.fill()
+            }
+        }
 
         if let range = outlinedRange {
             var rect = measuredElements[range.startIndex].backgroundRect
@@ -219,7 +257,7 @@ public class LogicEditor: NSView {
             }
         }
 
-        measuredLines.enumerated().forEach { textIndex, measuredText in
+        measuredElements.enumerated().forEach { textIndex, measuredText in
             let selected = textIndex == self.selectedIndex
             let text = measuredText.element
             let rect = measuredText.attributedStringRect
@@ -287,15 +325,13 @@ public class LogicEditor: NSView {
             return cached
         }
 
-        let yOffset = LogicEditor.textMargin.height
-
-        var measuredLine: [LogicEditorMeasuredElement] = []
-
         let formattedElementLines = formattedContent.print(
             width: bounds.width - LogicEditor.textMargin.width * 2,
             spaceWidth: LogicEditor.textSpacing,
             indentWidth: 20)
 
+        let yOffset = LogicEditor.textMargin.height
+        var measuredLine: [LogicEditorMeasuredElement] = []
         var formattedElementIndex = 0
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in

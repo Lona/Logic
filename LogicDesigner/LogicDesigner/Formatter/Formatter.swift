@@ -40,16 +40,29 @@ public enum Formatter<Element: FormattableElement> {
         }
 
         var elements: [Element] {
-            var allElements: [Element] = []
+            return Array(logicalRows.joined())
+        }
+
+        var logicalRows: [[Element]] {
+            var rows: [[Element]] = []
+
+            var currentRow: [Element] = []
+
+            func moveToNextRow() {
+                rows.append(currentRow)
+                currentRow = []
+            }
 
             func process(command: Command) {
                 switch command {
                 case .indent(let child):
                     process(command: child())
-                case .line, .hardLine:
+                case .line:
                     break
+                case .hardLine:
+                    moveToNextRow()
                 case .element(let element):
-                    allElements.append(element)
+                    currentRow.append(element)
                 case .concat(let commands):
                     commands().forEach(process)
                 case .join(with: let separator, let commands):
@@ -59,8 +72,41 @@ public enum Formatter<Element: FormattableElement> {
 
             process(command: self)
 
-            return allElements
+            if !currentRow.isEmpty {
+                rows.append(currentRow)
+            }
+
+            return rows
         }
+
+        func lineIndex(for elementIndex: Int) -> Int {
+            var elementCount = 0
+            for (offset, formattedLine) in logicalRows.enumerated() {
+                elementCount += formattedLine.count
+
+                if elementIndex < elementCount {
+                    return offset
+                }
+            }
+
+            fatalError("Could not find line number for element index \(elementIndex)")
+        }
+
+        func elementIndexRange(for lineIndex: Int) -> Range<Int> {
+            var elementCount = 0
+            for (offset, formattedLine) in logicalRows.enumerated() {
+                let endElementCount = elementCount + formattedLine.count
+
+                if offset == lineIndex {
+                    return elementCount..<endElementCount
+                }
+
+                elementCount = endElementCount
+            }
+
+            fatalError("Could not find element range for line index \(lineIndex)")
+        }
+
     }
 
     static func print(

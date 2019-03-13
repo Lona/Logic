@@ -174,7 +174,7 @@ class Document: NSDocument {
             if suggestedNode.movementAfterInsertion == .next {
                 self.nextNode()
             } else {
-                self.logicEditor.reactivate()
+                self.handleActivateElement(self.logicEditor.selectedRange?.lowerBound)
             }
         }
 
@@ -206,6 +206,7 @@ class Document: NSDocument {
     }
 
     func select(nodeByID syntaxNodeId: SwiftUUID?) {
+        self.logicEditor.selectedLine = nil
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
@@ -226,16 +227,27 @@ class Document: NSDocument {
 
     private let logicEditor = LogicEditor()
 
+    func handleActivateElement(_ activatedIndex: Int?) {
+        if let activatedIndex = activatedIndex {
+            let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
+            self.select(nodeByID: id)
+        } else {
+            self.select(nodeByID: nil)
+        }
+    }
+
+    func handleActivateLine(_ activatedLineIndex: Int) {
+        handleActivateElement(nil)
+
+        Swift.print("Activate line \(activatedLineIndex)")
+
+        logicEditor.selectedLine = activatedLineIndex
+    }
+
     func setUpViews() -> NSView {
         logicEditor.formattedContent = rootNode.formatted
-        logicEditor.onActivate = { activatedIndex in
-            if let activatedIndex = activatedIndex {
-                let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
-                self.select(nodeByID: id)
-            } else {
-                self.select(nodeByID: nil)
-            }
-        }
+        logicEditor.onActivate = handleActivateElement
+        logicEditor.onActivateLine = handleActivateLine
 
         return logicEditor
     }
