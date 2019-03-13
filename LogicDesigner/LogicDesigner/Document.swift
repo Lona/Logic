@@ -19,9 +19,15 @@ class Document: NSDocument {
         return false
     }
 
-    var rootNode: SwiftSyntaxNode = SwiftSyntaxNode.statement(
-        SwiftStatement.placeholderStatement(
-            SwiftPlaceholderStatement(id: NSUUID().uuidString)
+    var rootNode: SwiftSyntaxNode = SwiftSyntaxNode.program(
+        SwiftProgram(
+            id: NSUUID().uuidString,
+            block: SwiftList<SwiftStatement>.next(
+                SwiftStatement.placeholderStatement(
+                    SwiftPlaceholderStatement(id: NSUUID().uuidString)
+                ),
+                .empty
+            )
         )
     )
 

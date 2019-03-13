@@ -373,6 +373,21 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "normal",
+            "name" : "program",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Program",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "SyntaxNode"
@@ -616,6 +631,43 @@
           }
         ],
         "name" : "BinaryOperator"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "program",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "block",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "Statement"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Program"
       }
     }
   ]

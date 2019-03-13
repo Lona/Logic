@@ -85,6 +85,11 @@ public struct SwiftSetEqualTo: Codable & Equatable {
   public var id: SwiftUUID
 }
 
+public struct SwiftProgram: Codable & Equatable {
+  public var id: SwiftUUID
+  public var block: SwiftList<SwiftStatement>
+}
+
 public indirect enum SwiftStatement: Codable & Equatable {
   case loop(SwiftLoop)
   case branch(SwiftBranch)
@@ -217,6 +222,7 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
   case expression(SwiftExpression)
   case pattern(SwiftPattern)
   case binaryOperator(SwiftBinaryOperator)
+  case program(SwiftProgram)
 
   // MARK: Codable
 
@@ -242,6 +248,8 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         self = .pattern(try container.decode(SwiftPattern.self, forKey: .data))
       case "binaryOperator":
         self = .binaryOperator(try container.decode(SwiftBinaryOperator.self, forKey: .data))
+      case "program":
+        self = .program(try container.decode(SwiftProgram.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -268,6 +276,9 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .binaryOperator(let value):
         try container.encode("binaryOperator", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .program(let value):
+        try container.encode("program", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

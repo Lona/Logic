@@ -214,6 +214,12 @@ extension SwiftStatement {
     }
 }
 
+extension SwiftProgram {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        return SwiftStatement.suggestions(for: prefix)
+    }
+}
+
 extension SwiftSyntaxNode {
     func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         switch self {
@@ -229,6 +235,8 @@ extension SwiftSyntaxNode {
             return SwiftExpression.suggestions(for: prefix)
         case .binaryOperator:
             return SwiftBinaryOperator.suggestions(for: prefix)
+        case .program:
+            return SwiftProgram.suggestions(for: prefix)
         }
     }
 }

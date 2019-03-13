@@ -414,6 +414,54 @@ extension SwiftStatement: SyntaxNodeProtocol {
     }
 }
 
+extension SwiftProgram: SyntaxNodeProtocol {
+    var nodeTypeDescription: String {
+        return "Program"
+    }
+
+    var node: SwiftSyntaxNode {
+        return .program(self)
+    }
+
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftProgram {
+        return SwiftProgram(
+            id: NSUUID().uuidString,
+            block: block.replace(id: id, with: syntaxNode)
+        )
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        if id == uuid { return node }
+
+        return block.find(id: id)
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [SwiftSyntaxNode]? = block.reduce(nil, { result, node in
+            if result != nil { return result }
+            return node.pathTo(id: id)
+        })
+
+        // We don't include the Program node in the path, since we never want
+        // to directly select it or show it in any menus
+        return found
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        return block.map { $0 }.last?.lastNode ?? node
+    }
+
+    var uuid: SwiftUUID {
+        return id
+    }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension SwiftSyntaxNode {
     var contents: SyntaxNodeProtocol {
         switch self {
@@ -428,6 +476,8 @@ extension SwiftSyntaxNode {
         case .pattern(let value):
             return value
         case .binaryOperator(let value):
+            return value
+        case .program(let value):
             return value
         }
     }

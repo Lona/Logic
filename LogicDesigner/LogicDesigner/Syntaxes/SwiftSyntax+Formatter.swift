@@ -93,6 +93,16 @@ extension SwiftStatement {
     }
 }
 
+
+extension SwiftProgram {
+    var formatted: LogicEditorFormatCommand {
+        return .join(with: .hardLine) {
+            self.block.map { $0.formatted }
+        }
+    }
+}
+
+
 extension SwiftSyntaxNode {
     var formatted: LogicEditorFormatCommand {
         switch self {
@@ -107,6 +117,8 @@ extension SwiftSyntaxNode {
         case .binaryOperator(let value):
             return value.formatted
         case .expression(let value):
+            return value.formatted
+        case .program(let value):
             return value.formatted
         }
     }
