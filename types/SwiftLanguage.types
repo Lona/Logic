@@ -474,6 +474,45 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "record",
+            "name" : "functionCallExpression",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "arguments",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "FunctionCallArgument"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "Expression"
@@ -668,6 +707,50 @@
           }
         ],
         "name" : "Program"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "functionCallArgument",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "label",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "FunctionCallArgument"
       }
     }
   ]

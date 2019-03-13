@@ -205,6 +205,14 @@ extension SwiftExpression: SyntaxNodeProtocol {
             return .identifierExpression(SwiftIdentifierExpression(
                 id: NSUUID().uuidString,
                 identifier: value.identifier.replace(id: id, with: syntaxNode)))
+        case (_, .functionCallExpression(let value)):
+            return .functionCallExpression(
+                SwiftFunctionCallExpression(
+                    id: NSUUID().uuidString,
+                    expression: value.expression.replace(id: id, with: syntaxNode),
+                    arguments: value.arguments.replace(id: id, with: syntaxNode)
+                )
+            )
         }
     }
 
@@ -218,6 +226,8 @@ extension SwiftExpression: SyntaxNodeProtocol {
             return value.left.find(id: id) ?? value.op.find(id: id) ?? value.right.find(id: id)
         case .identifierExpression(let value):
             return value.identifier.find(id: id)
+        case .functionCallExpression(let value):
+            return value.expression.find(id: id) ?? value.arguments.find(id: id)
         }
     }
 
@@ -233,6 +243,12 @@ extension SwiftExpression: SyntaxNodeProtocol {
             found = value.left.pathTo(id: id) ?? value.op.pathTo(id: id) ?? value.right.pathTo(id: id)
         case .identifierExpression(let value):
             found = value.identifier.pathTo(id: id)
+        case .functionCallExpression(let value):
+            let foundInArguments: [SwiftSyntaxNode]? = value.arguments.reduce(nil, { result, node in
+                if result != nil { return result }
+                return node.pathTo(id: id)
+            })
+            found = value.expression.pathTo(id: id) ?? foundInArguments
         }
 
         if let found = found {
@@ -248,6 +264,8 @@ extension SwiftExpression: SyntaxNodeProtocol {
             return value.right.lastNode
         case .identifierExpression(let value):
             return value.identifier.lastNode
+        case .functionCallExpression(let value):
+            return value.arguments.isEmpty ? value.expression.lastNode : value.arguments[value.arguments.count - 1].lastNode
         }
     }
 
@@ -257,6 +275,8 @@ extension SwiftExpression: SyntaxNodeProtocol {
             return value.id
         case .identifierExpression(let value):
             return value.id
+        case .functionCallExpression(let value):
+            return value.id
         }
     }
 
@@ -265,6 +285,8 @@ extension SwiftExpression: SyntaxNodeProtocol {
         case .binaryExpression:
             return .none
         case .identifierExpression:
+            return .next
+        case .functionCallExpression:
             return .next
         }
     }
@@ -462,6 +484,37 @@ extension SwiftProgram: SyntaxNodeProtocol {
     }
 }
 
+
+extension SwiftFunctionCallArgument {
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftFunctionCallArgument {
+        return SwiftFunctionCallArgument(
+            id: NSUUID().uuidString,
+            label: label,
+            expression: expression.replace(id: id, with: syntaxNode)
+        )
+    }
+
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return expression.find(id: id)
+    }
+
+    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+        return expression.pathTo(id: id)
+    }
+
+    var lastNode: SwiftSyntaxNode {
+        return expression.lastNode
+    }
+
+    var uuid: SwiftUUID {
+        return id
+    }
+
+    var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension SwiftSyntaxNode {
     var contents: SyntaxNodeProtocol {
         switch self {
@@ -519,6 +572,7 @@ extension SwiftList where T == SwiftStatement {
     }
 
     func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftList {
+        // Reverse list so we can easily prepend to the front
         let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
 
         var resultIterator = result.makeIterator()
@@ -529,6 +583,28 @@ extension SwiftList where T == SwiftStatement {
         } else {
             output = .next(.placeholderStatement(SwiftPlaceholderStatement(id: NSUUID().uuidString)), output)
         }
+
+        while let current = resultIterator.next() {
+            output = .next(current, output)
+        }
+
+        return output
+    }
+}
+
+extension SwiftList where T == SwiftFunctionCallArgument {
+    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+        return self.reduce(nil, { result, item in
+            return result ?? item.find(id: id)
+        })
+    }
+
+    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftList {
+        // Reverse list so we can easily prepend to the front
+        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
+
+        var resultIterator = result.makeIterator()
+        var output = SwiftList<T>.empty
 
         while let current = resultIterator.next() {
             output = .next(current, output)

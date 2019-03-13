@@ -26,6 +26,17 @@ extension SwiftBinaryOperator {
     }
 }
 
+extension SwiftFunctionCallArgument {
+    var formatted: LogicEditorFormatCommand {
+        return .concat {
+            [
+                .element(.text(self.label + " :")),
+                self.expression.formatted
+            ]
+        }
+    }
+}
+
 extension SwiftExpression {
     var formatted: LogicEditorFormatCommand {
         switch self {
@@ -49,6 +60,24 @@ extension SwiftExpression {
                         value.right.formatted
                     ]
                 }
+            }
+        case .functionCallExpression(let value):
+            return .concat {
+                [
+                    value.expression.formatted,
+                    .element(.text("(")),
+                    .indent {
+                        .concat {
+                            [
+                                .line,
+                                .join(with: .concat {[.element(.text(",")), .line]}) {
+                                    value.arguments.map { $0.formatted }
+                                }
+                            ]
+                        }
+                    },
+                    .element(.text(")"))
+                ]
             }
         }
     }

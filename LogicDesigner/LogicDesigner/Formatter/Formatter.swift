@@ -145,7 +145,7 @@ public enum Formatter<Element: FormattableElement> {
             case .element(let element):
                 let elementWidth = element.width
 
-                if currentOffset + elementWidth >= maxLineWidth {
+                if currentOffset + elementWidth >= maxLineWidth && !currentRow.isEmpty {
                     moveToNextRow()
                 }
 

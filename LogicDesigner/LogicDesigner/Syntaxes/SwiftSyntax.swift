@@ -52,6 +52,12 @@ public struct SwiftIdentifierExpression: Codable & Equatable {
   public var identifier: SwiftIdentifier
 }
 
+public struct SwiftFunctionCallExpression: Codable & Equatable {
+  public var id: SwiftUUID
+  public var expression: SwiftExpression
+  public var arguments: SwiftList<SwiftFunctionCallArgument>
+}
+
 public struct SwiftPattern: Codable & Equatable {
   public var id: SwiftUUID
   public var name: SwiftString
@@ -88,6 +94,12 @@ public struct SwiftSetEqualTo: Codable & Equatable {
 public struct SwiftProgram: Codable & Equatable {
   public var id: SwiftUUID
   public var block: SwiftList<SwiftStatement>
+}
+
+public struct SwiftFunctionCallArgument: Codable & Equatable {
+  public var id: SwiftUUID
+  public var label: SwiftString
+  public var expression: SwiftExpression
 }
 
 public indirect enum SwiftStatement: Codable & Equatable {
@@ -287,6 +299,7 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
 public indirect enum SwiftExpression: Codable & Equatable {
   case binaryExpression(SwiftBinaryExpression)
   case identifierExpression(SwiftIdentifierExpression)
+  case functionCallExpression(SwiftFunctionCallExpression)
 
   // MARK: Codable
 
@@ -304,6 +317,8 @@ public indirect enum SwiftExpression: Codable & Equatable {
         self = .binaryExpression(try container.decode(SwiftBinaryExpression.self, forKey: .data))
       case "identifierExpression":
         self = .identifierExpression(try container.decode(SwiftIdentifierExpression.self, forKey: .data))
+      case "functionCallExpression":
+        self = .functionCallExpression(try container.decode(SwiftFunctionCallExpression.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -318,6 +333,9 @@ public indirect enum SwiftExpression: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .identifierExpression(let value):
         try container.encode("identifierExpression", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .functionCallExpression(let value):
+        try container.encode("functionCallExpression", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
