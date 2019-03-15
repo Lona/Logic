@@ -108,7 +108,7 @@ extension RichText {
         return contentView
     }
 
-    func makeScrollView() -> NSScrollView {
+    public func makeScrollView() -> NSScrollView {
         let contentView = self.makeContentView()
 
         let scrollView = NSScrollView()

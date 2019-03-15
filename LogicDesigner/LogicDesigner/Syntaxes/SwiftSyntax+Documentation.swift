@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Logic
 
 private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
     let container = NSBox()

@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Logic
 
 struct LogicSuggestionItem {
     init(title: String, category: String, node: SwiftSyntaxNode, disabled: Bool = false) {

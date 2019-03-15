@@ -7,8 +7,9 @@
 //
 
 import AppKit
+import Logic
 
-class SuggestionWindow: NSWindow {
+public class SuggestionWindow: NSWindow {
     convenience init() {
         self.init(
             contentRect: NSRect(x: 0, y: 0, width: 610, height: 380),
@@ -219,11 +220,11 @@ class SuggestionWindow: NSWindow {
 
     // MARK: Overrides
 
-    override var canBecomeKey: Bool {
+    public override var canBecomeKey: Bool {
         return true
     }
 
-    override func setFrameOrigin(_ point: NSPoint) {
+    public override func setFrameOrigin(_ point: NSPoint) {
         super.setFrameOrigin(NSPoint(x: point.x - 12, y: point.y - 12))
     }
 }

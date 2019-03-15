@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Logic
 
 extension SwiftIdentifier {
     var formatted: LogicEditorFormatCommand {

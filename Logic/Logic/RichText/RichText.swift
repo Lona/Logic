@@ -8,27 +8,31 @@
 
 import AppKit
 
-struct RichText {
-    enum TextStyle {
+public struct RichText {
+    public enum TextStyle {
         case none
         case bold
         case link
     }
 
-    enum HeadingSize {
+    public enum HeadingSize {
         case title
         case section
     }
 
-    enum InlineElement {
+    public enum InlineElement {
         case text(TextStyle, () -> String)
     }
 
-    enum BlockElement {
+    public enum BlockElement {
         case custom(NSView)
         case heading(HeadingSize, () -> String)
         case paragraph([InlineElement])
     }
 
-    var blocks: [BlockElement]
+    public var blocks: [BlockElement]
+
+    public init(blocks: [BlockElement]) {
+        self.blocks = blocks
+    }
 }

@@ -6,7 +6,8 @@
 //  Copyright © 2019 BitDisco, Inc. All rights reserved.
 //
 
-import Cocoa
+import AppKit
+import Logic
 
 class Document: NSDocument {
 

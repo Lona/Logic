@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Logic
 
 enum Movement {
     case none, next
