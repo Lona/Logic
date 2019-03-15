@@ -46,9 +46,9 @@ extension LGCIdentifier: SyntaxNodeProtocol {
     public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCIdentifier {
         switch syntaxNode {
         case .identifier(let newNode) where id == uuid:
-            return LGCIdentifier(id: NSUUID().uuidString, string: newNode.string)
+            return LGCIdentifier(id: UUID(), string: newNode.string)
         default:
-            return LGCIdentifier(id: NSUUID().uuidString, string: string)
+            return LGCIdentifier(id: UUID(), string: string)
         }
     }
 
@@ -83,9 +83,9 @@ extension LGCPattern: SyntaxNodeProtocol {
     public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCPattern {
         switch syntaxNode {
         case .pattern(let newNode) where id == uuid:
-            return LGCPattern(id: NSUUID().uuidString, name: newNode.name)
+            return LGCPattern(id: UUID(), name: newNode.name)
         default:
-            return LGCPattern(id: NSUUID().uuidString, name: name)
+            return LGCPattern(id: UUID(), name: name)
         }
     }
 
@@ -124,19 +124,19 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
         default:
             switch self {
             case .isEqualTo:
-                return LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: UUID()))
             case .isNotEqualTo:
-                return LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: UUID()))
             case .isLessThan:
-                return LGCBinaryOperator.isLessThan(LGCIsLessThan(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isLessThan(LGCIsLessThan(id: UUID()))
             case .isGreaterThan:
-                return LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: UUID()))
             case .isLessThanOrEqualTo:
-                return LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: UUID()))
             case .isGreaterThanOrEqualTo:
-                return LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: UUID()))
             case .setEqualTo:
-                return LGCBinaryOperator.setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.setEqualTo(LGCSetEqualTo(id: UUID()))
             }
         }
     }
@@ -193,22 +193,22 @@ extension LGCExpression: SyntaxNodeProtocol {
         // Identifier can become an IdentifierExpression and replace an expression
         case (.identifier(let newNode), _) where id == uuid:
             return .identifierExpression(LGCIdentifierExpression(
-                id: NSUUID().uuidString,
+                id: UUID(),
                 identifier: newNode))
         case (_, .binaryExpression(let value)):
             return .binaryExpression(LGCBinaryExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
                 op: value.op.replace(id: id, with: syntaxNode),
-                id: NSUUID().uuidString))
+                id: UUID()))
         case (_, .identifierExpression(let value)):
             return .identifierExpression(LGCIdentifierExpression(
-                id: NSUUID().uuidString,
+                id: UUID(),
                 identifier: value.identifier.replace(id: id, with: syntaxNode)))
         case (_, .functionCallExpression(let value)):
             return .functionCallExpression(
                 LGCFunctionCallExpression(
-                    id: NSUUID().uuidString,
+                    id: UUID(),
                     expression: value.expression.replace(id: id, with: syntaxNode),
                     arguments: value.arguments.replace(id: id, with: syntaxNode)
                 )
@@ -308,7 +308,7 @@ extension LGCStatement: SyntaxNodeProtocol {
         case .expression(let newNode) where id == uuid:
             return .expressionStatement(
                 LGCExpressionStatement(
-                    id: NSUUID().uuidString,
+                    id: UUID(),
                     expression: newNode
                 )
             )
@@ -316,7 +316,7 @@ extension LGCStatement: SyntaxNodeProtocol {
             return .decl(
                 LGCDecl(
                     content: newNode,
-                    id: NSUUID().uuidString
+                    id: UUID()
                 )
             )
         default:
@@ -324,7 +324,7 @@ extension LGCStatement: SyntaxNodeProtocol {
             case .branch(let value):
                 return .branch(
                     LGCBranch(
-                        id: NSUUID().uuidString,
+                        id: UUID(),
                         condition: value.condition.replace(id: id, with: syntaxNode),
                         block: value.block.replace(id: id, with: syntaxNode)
                     )
@@ -337,11 +337,11 @@ extension LGCStatement: SyntaxNodeProtocol {
                         pattern: value.pattern.replace(id: id, with: syntaxNode),
                         expression: value.expression.replace(id: id, with: syntaxNode),
                         block: LGCList<LGCStatement>.empty,
-                        id: NSUUID().uuidString))
+                        id: UUID()))
             case .expressionStatement(let value):
                 return LGCStatement.expressionStatement(
                     LGCExpressionStatement(
-                        id: NSUUID().uuidString,
+                        id: UUID(),
                         expression: value.expression.replace(id: id, with: syntaxNode)
                     )
                 )
@@ -447,7 +447,7 @@ extension LGCProgram: SyntaxNodeProtocol {
 
     public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCProgram {
         return LGCProgram(
-            id: NSUUID().uuidString,
+            id: UUID(),
             block: block.replace(id: id, with: syntaxNode)
         )
     }
@@ -488,7 +488,7 @@ extension LGCProgram: SyntaxNodeProtocol {
 extension LGCFunctionCallArgument {
     func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
         return LGCFunctionCallArgument(
-            id: NSUUID().uuidString,
+            id: UUID(),
             label: label,
             expression: expression.replace(id: id, with: syntaxNode)
         )
@@ -581,7 +581,7 @@ extension LGCList where T == LGCStatement {
         if let first = result.first, case .placeholderStatement = first {
 
         } else {
-            output = .next(.placeholderStatement(LGCPlaceholderStatement(id: NSUUID().uuidString)), output)
+            output = .next(.placeholderStatement(LGCPlaceholderStatement(id: UUID())), output)
         }
 
         while let current = resultIterator.next() {

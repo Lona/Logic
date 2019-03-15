@@ -8,14 +8,12 @@
 
 import AppKit
 
-public typealias LogicTextID = String
-
 public enum LogicElement {
     case text(String)
     case coloredText(String, NSColor)
-    case dropdown(LogicTextID, String, NSColor)
+    case dropdown(UUID, String, NSColor)
 
-    public var syntaxNodeID: String? {
+    public var syntaxNodeID: UUID? {
         switch self {
         case .text:
             return nil

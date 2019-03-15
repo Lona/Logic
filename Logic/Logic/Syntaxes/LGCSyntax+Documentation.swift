@@ -72,45 +72,45 @@ public extension LGCStatement {
             let example = LGCSyntaxNode.statement(
                 LGCStatement.branch(
                     LGCBranch(
-                        id: NSUUID().uuidString,
+                        id: UUID(),
                         condition: LGCExpression.binaryExpression(
                             LGCBinaryExpression(
                                 left: LGCExpression.identifierExpression(
                                     LGCIdentifierExpression(
-                                        id: NSUUID().uuidString,
-                                        identifier: LGCIdentifier(id: NSUUID().uuidString, string: "age")
+                                        id: UUID(),
+                                        identifier: LGCIdentifier(id: UUID(), string: "age")
                                     )
                                 ),
                                 right: LGCExpression.identifierExpression(
                                     LGCIdentifierExpression(
-                                        id: NSUUID().uuidString,
-                                        identifier: LGCIdentifier(id: NSUUID().uuidString, string: "17")
+                                        id: UUID(),
+                                        identifier: LGCIdentifier(id: UUID(), string: "17")
                                     )
                                 ),
-                                op: .isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString)),
-                                id: NSUUID().uuidString
+                                op: .isGreaterThan(LGCIsGreaterThan(id: UUID())),
+                                id: UUID()
                             )
                         ),
                         block: LGCList<LGCStatement>.next(
                             LGCStatement.expressionStatement(
                                 LGCExpressionStatement(
-                                    id: NSUUID().uuidString,
+                                    id: UUID(),
                                     expression: LGCExpression.binaryExpression(
                                         LGCBinaryExpression(
                                             left: LGCExpression.identifierExpression(
                                                 LGCIdentifierExpression(
-                                                    id: NSUUID().uuidString,
-                                                    identifier: LGCIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
+                                                    id: UUID(),
+                                                    identifier: LGCIdentifier(id: UUID(), string: "layers.Text.text")
                                                 )
                                             ),
                                             right: LGCExpression.identifierExpression(
                                                 LGCIdentifierExpression(
-                                                    id: NSUUID().uuidString,
-                                                    identifier: LGCIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
+                                                    id: UUID(),
+                                                    identifier: LGCIdentifier(id: UUID(), string: "\"Congrats, you're an adult!\"")
                                                 )
                                             ),
-                                            op: .setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString)),
-                                            id: NSUUID().uuidString
+                                            op: .setEqualTo(LGCSetEqualTo(id: UUID())),
+                                            id: UUID()
                                         )
                                     )
                                 )

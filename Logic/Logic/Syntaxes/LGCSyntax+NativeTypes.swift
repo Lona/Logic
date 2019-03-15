@@ -9,4 +9,4 @@
 import AppKit
 
 public typealias LGCString = String
-public typealias LGCUUID = String
+public typealias LGCUUID = UUID

@@ -1,17 +1,17 @@
 import AppKit
 
 public struct LGCIdentifier: Codable & Equatable {
-  public init(id: LGCUUID, string: LGCString) {
+  public init(id: UUID, string: String) {
     self.id = id
     self.string = string
   }
 
-  public var id: LGCUUID
-  public var string: LGCString
+  public var id: UUID
+  public var string: String
 }
 
 public struct LGCLoop: Codable & Equatable {
-  public init(pattern: LGCPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: LGCUUID) {
+  public init(pattern: LGCPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: UUID) {
     self.pattern = pattern
     self.expression = expression
     self.block = block
@@ -21,67 +21,67 @@ public struct LGCLoop: Codable & Equatable {
   public var pattern: LGCPattern
   public var expression: LGCExpression
   public var block: LGCList<LGCStatement>
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCBranch: Codable & Equatable {
-  public init(id: LGCUUID, condition: LGCExpression, block: LGCList<LGCStatement>) {
+  public init(id: UUID, condition: LGCExpression, block: LGCList<LGCStatement>) {
     self.id = id
     self.condition = condition
     self.block = block
   }
 
-  public var id: LGCUUID
+  public var id: UUID
   public var condition: LGCExpression
   public var block: LGCList<LGCStatement>
 }
 
 public struct LGCDecl: Codable & Equatable {
-  public init(content: LGCDeclaration, id: LGCUUID) {
+  public init(content: LGCDeclaration, id: UUID) {
     self.content = content
     self.id = id
   }
 
   public var content: LGCDeclaration
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCExpressionStatement: Codable & Equatable {
-  public init(id: LGCUUID, expression: LGCExpression) {
+  public init(id: UUID, expression: LGCExpression) {
     self.id = id
     self.expression = expression
   }
 
-  public var id: LGCUUID
+  public var id: UUID
   public var expression: LGCExpression
 }
 
 public struct LGCPlaceholderStatement: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCVariable: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCFunction: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCBinaryExpression: Codable & Equatable {
-  public init(left: LGCExpression, right: LGCExpression, op: LGCBinaryOperator, id: LGCUUID) {
+  public init(left: LGCExpression, right: LGCExpression, op: LGCBinaryOperator, id: UUID) {
     self.left = left
     self.right = right
     self.op = op
@@ -91,116 +91,116 @@ public struct LGCBinaryExpression: Codable & Equatable {
   public var left: LGCExpression
   public var right: LGCExpression
   public var op: LGCBinaryOperator
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIdentifierExpression: Codable & Equatable {
-  public init(id: LGCUUID, identifier: LGCIdentifier) {
+  public init(id: UUID, identifier: LGCIdentifier) {
     self.id = id
     self.identifier = identifier
   }
 
-  public var id: LGCUUID
+  public var id: UUID
   public var identifier: LGCIdentifier
 }
 
 public struct LGCFunctionCallExpression: Codable & Equatable {
-  public init(id: LGCUUID, expression: LGCExpression, arguments: LGCList<LGCFunctionCallArgument>) {
+  public init(id: UUID, expression: LGCExpression, arguments: LGCList<LGCFunctionCallArgument>) {
     self.id = id
     self.expression = expression
     self.arguments = arguments
   }
 
-  public var id: LGCUUID
+  public var id: UUID
   public var expression: LGCExpression
   public var arguments: LGCList<LGCFunctionCallArgument>
 }
 
 public struct LGCPattern: Codable & Equatable {
-  public init(id: LGCUUID, name: LGCString) {
+  public init(id: UUID, name: String) {
     self.id = id
     self.name = name
   }
 
-  public var id: LGCUUID
-  public var name: LGCString
+  public var id: UUID
+  public var name: String
 }
 
 public struct LGCIsEqualTo: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIsNotEqualTo: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIsLessThan: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIsGreaterThan: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIsLessThanOrEqualTo: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCIsGreaterThanOrEqualTo: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCSetEqualTo: Codable & Equatable {
-  public init(id: LGCUUID) {
+  public init(id: UUID) {
     self.id = id
   }
 
-  public var id: LGCUUID
+  public var id: UUID
 }
 
 public struct LGCProgram: Codable & Equatable {
-  public init(id: LGCUUID, block: LGCList<LGCStatement>) {
+  public init(id: UUID, block: LGCList<LGCStatement>) {
     self.id = id
     self.block = block
   }
 
-  public var id: LGCUUID
+  public var id: UUID
   public var block: LGCList<LGCStatement>
 }
 
 public struct LGCFunctionCallArgument: Codable & Equatable {
-  public init(id: LGCUUID, label: LGCString, expression: LGCExpression) {
+  public init(id: UUID, label: String, expression: LGCExpression) {
     self.id = id
     self.label = label
     self.expression = expression
   }
 
-  public var id: LGCUUID
-  public var label: LGCString
+  public var id: UUID
+  public var label: String
   public var expression: LGCExpression
 }
 

@@ -46,14 +46,14 @@ public struct LogicSuggestionCategory {
 }
 
 private func id(_ string: String) -> LGCIdentifier {
-    return LGCIdentifier(id: NSUUID().uuidString, string: string)
+    return LGCIdentifier(id: UUID(), string: string)
 }
 
 private func idExpression(_ string: String) -> LGCExpression {
     return LGCExpression.identifierExpression(
         LGCIdentifierExpression(
-            id: NSUUID().uuidString,
-            identifier: LGCIdentifier(id: NSUUID().uuidString, string: string)))
+            id: UUID(),
+            identifier: LGCIdentifier(id: UUID(), string: string)))
 }
 
 public extension LGCIdentifier {
@@ -62,12 +62,12 @@ public extension LGCIdentifier {
             LogicSuggestionItem(
                 title: "bar",
                 category: "Variables".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: NSUUID().uuidString, string: "bar"))
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "bar"))
             ),
             LogicSuggestionItem(
                 title: "foo",
                 category: "Variables".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: NSUUID().uuidString, string: "foo"))
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "foo"))
             )
         ]
 
@@ -81,7 +81,7 @@ public extension LGCPattern {
             LogicSuggestionItem(
                 title: "Variable name: \(prefix)",
                 category: "Pattern".uppercased(),
-                node: LGCSyntaxNode.pattern(LGCPattern(id: NSUUID().uuidString, name: prefix)),
+                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: prefix)),
                 disabled: prefix.isEmpty
             )
         ]
@@ -112,12 +112,12 @@ public extension LGCBinaryOperator {
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let operatorNodes = [
-            LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString)),
-            LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: NSUUID().uuidString)),
-            LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString)),
-            LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: NSUUID().uuidString)),
-            LGCBinaryOperator.isLessThan(LGCIsLessThan(id: NSUUID().uuidString)),
-            LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: UUID())),
+            LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: UUID())),
+            LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: UUID())),
+            LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: UUID())),
+            LGCBinaryOperator.isLessThan(LGCIsLessThan(id: UUID())),
+            LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: UUID())),
         ]
 
         return operatorNodes.map { node in
@@ -139,11 +139,11 @@ public extension LGCExpression {
                 LGCExpression.binaryExpression(
                     LGCBinaryExpression(
                         left: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
+                            LGCIdentifierExpression(id: UUID(), identifier: id("variable"))),
                         right: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
-                        op: .setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString)),
-                        id: NSUUID().uuidString))))
+                            LGCIdentifierExpression(id: UUID(), identifier: id("value"))),
+                        op: .setEqualTo(LGCSetEqualTo(id: UUID())),
+                        id: UUID()))))
     }
 
     static var comparisonSuggestionItem: LogicSuggestionItem {
@@ -154,11 +154,11 @@ public extension LGCExpression {
                 LGCExpression.binaryExpression(
                     LGCBinaryExpression(
                         left: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
+                            LGCIdentifierExpression(id: UUID(), identifier: id("left"))),
                         right: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
-                        op: .isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString)),
-                        id: NSUUID().uuidString))))
+                            LGCIdentifierExpression(id: UUID(), identifier: id("right"))),
+                        op: .isEqualTo(LGCIsEqualTo(id: UUID())),
+                        id: UUID()))))
     }
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
@@ -176,11 +176,11 @@ public extension LGCStatement {
         let ifCondition = LGCSyntaxNode.statement(
             LGCStatement.branch(
                 LGCBranch(
-                    id: NSUUID().uuidString,
+                    id: UUID(),
                     condition: idExpression("condition"),
                     block: LGCList<LGCStatement>.next(
                         LGCStatement.placeholderStatement(
-                            LGCPlaceholderStatement(id: NSUUID().uuidString)
+                            LGCPlaceholderStatement(id: UUID())
                         ),
                         .empty
                     )
@@ -191,10 +191,10 @@ public extension LGCStatement {
         let forLoop = LGCSyntaxNode.statement(
             LGCStatement.loop(
                 LGCLoop(
-                    pattern: LGCPattern(id: NSUUID().uuidString, name: "item"),
+                    pattern: LGCPattern(id: UUID(), name: "item"),
                     expression: idExpression("array"),
                     block: LGCList<LGCStatement>.empty,
-                    id: NSUUID().uuidString)))
+                    id: UUID())))
 
         let items = [
             LogicSuggestionItem(

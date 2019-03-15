@@ -2,10 +2,10 @@ import AppKit
 
 public let defaultRootNode = LGCSyntaxNode.program(
     LGCProgram(
-        id: NSUUID().uuidString,
+        id: UUID(),
         block: LGCList<LGCStatement>.next(
             LGCStatement.placeholderStatement(
-                LGCPlaceholderStatement(id: NSUUID().uuidString)
+                LGCPlaceholderStatement(id: UUID())
             ),
             .empty
         )
