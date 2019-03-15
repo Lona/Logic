@@ -15,7 +15,7 @@ public enum LogicEditorElement {
     case coloredText(String, NSColor)
     case dropdown(LogicTextID, String, NSColor)
 
-    var syntaxNodeID: String? {
+    public var syntaxNodeID: String? {
         switch self {
         case .text:
             return nil
@@ -26,7 +26,7 @@ public enum LogicEditorElement {
         }
     }
 
-    var value: String {
+    public var value: String {
         switch self {
         case .text(let value):
             return value
@@ -37,7 +37,7 @@ public enum LogicEditorElement {
         }
     }
 
-    var color: NSColor {
+    public var color: NSColor {
         switch self {
         case .text:
             return NSColor.black

@@ -7,7 +7,6 @@
 //
 
 import AppKit
-import Logic
 
 public class SuggestionWindow: NSWindow {
     convenience init() {

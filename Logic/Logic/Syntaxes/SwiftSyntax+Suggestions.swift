@@ -7,20 +7,19 @@
 //
 
 import AppKit
-import Logic
 
-struct LogicSuggestionItem {
-    init(title: String, category: String, node: SwiftSyntaxNode, disabled: Bool = false) {
+public struct LogicSuggestionItem {
+    public init(title: String, category: String, node: SwiftSyntaxNode, disabled: Bool = false) {
         self.title = title
         self.category = category
         self.node = node
         self.disabled = disabled
     }
 
-    var title: String
-    var category: String
-    var node: SwiftSyntaxNode
-    var disabled: Bool
+    public var title: String
+    public var category: String
+    public var node: SwiftSyntaxNode
+    public var disabled: Bool
 
     func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
@@ -35,11 +34,11 @@ extension Array where Element == LogicSuggestionItem {
     }
 }
 
-struct LogicSuggestionCategory {
-    var title: String
-    var items: [LogicSuggestionItem]
+public struct LogicSuggestionCategory {
+    public var title: String
+    public var items: [LogicSuggestionItem]
 
-    var suggestionListItems: [SuggestionListItem] {
+    public var suggestionListItems: [SuggestionListItem] {
         let sectionHeader = SuggestionListItem.sectionHeader(title)
         let rows = items.map { SuggestionListItem.row($0.title, $0.disabled) }
         return Array([[sectionHeader], rows].joined())
@@ -57,8 +56,8 @@ private func idExpression(_ string: String) -> SwiftExpression {
             identifier: SwiftIdentifier(id: NSUUID().uuidString, string: string)))
 }
 
-extension SwiftIdentifier {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+public extension SwiftIdentifier {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "bar",
@@ -76,8 +75,8 @@ extension SwiftIdentifier {
     }
 }
 
-extension SwiftPattern {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+public extension SwiftPattern {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "Variable name: \(prefix)",
@@ -91,8 +90,8 @@ extension SwiftPattern {
     }
 }
 
-extension SwiftBinaryOperator {
-    var displayText: String {
+public extension SwiftBinaryOperator {
+    public var displayText: String {
         switch self {
         case .isEqualTo:
             return "is equal to"
@@ -111,7 +110,7 @@ extension SwiftBinaryOperator {
         }
     }
 
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let operatorNodes = [
             SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString)),
             SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString)),
@@ -131,7 +130,7 @@ extension SwiftBinaryOperator {
     }
 }
 
-extension SwiftExpression {
+public extension SwiftExpression {
     static var assignmentSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Assignment",
@@ -162,7 +161,7 @@ extension SwiftExpression {
                         id: NSUUID().uuidString))))
     }
 
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             comparisonSuggestionItem,
             assignmentSuggestionItem
@@ -172,8 +171,8 @@ extension SwiftExpression {
     }
 }
 
-extension SwiftStatement {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+public extension SwiftStatement {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = SwiftSyntaxNode.statement(
             SwiftStatement.branch(
                 SwiftBranch(
@@ -215,14 +214,14 @@ extension SwiftStatement {
     }
 }
 
-extension SwiftProgram {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+public extension SwiftProgram {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         return SwiftStatement.suggestions(for: prefix)
     }
 }
 
-extension SwiftSyntaxNode {
-    func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+public extension SwiftSyntaxNode {
+    public func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         switch self {
         case .statement:
             return SwiftStatement.suggestions(for: prefix)

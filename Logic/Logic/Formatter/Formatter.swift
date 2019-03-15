@@ -26,7 +26,7 @@ public enum Formatter<Element: FormattableElement> {
         case join(with: Command, () -> [Command])
         case concat(() -> [Command])
 
-        func print(
+        public func print(
             width maxLineWidth: CGFloat,
             spaceWidth: CGFloat,
             indentWidth: CGFloat
@@ -39,11 +39,11 @@ public enum Formatter<Element: FormattableElement> {
                 indentWidth: indentWidth)
         }
 
-        var elements: [Element] {
+        public var elements: [Element] {
             return Array(logicalRows.joined())
         }
 
-        var logicalRows: [[Element]] {
+        public var logicalRows: [[Element]] {
             var rows: [[Element]] = []
 
             var currentRow: [Element] = []

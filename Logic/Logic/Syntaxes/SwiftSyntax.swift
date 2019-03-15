@@ -1,11 +1,23 @@
 import AppKit
 
 public struct SwiftIdentifier: Codable & Equatable {
+  public init(id: SwiftUUID, string: SwiftString) {
+    self.id = id
+    self.string = string
+  }
+
   public var id: SwiftUUID
   public var string: SwiftString
 }
 
 public struct SwiftLoop: Codable & Equatable {
+  public init(pattern: SwiftPattern, expression: SwiftExpression, block: SwiftList<SwiftStatement>, id: SwiftUUID) {
+    self.pattern = pattern
+    self.expression = expression
+    self.block = block
+    self.id = id
+  }
+
   public var pattern: SwiftPattern
   public var expression: SwiftExpression
   public var block: SwiftList<SwiftStatement>
@@ -13,34 +25,69 @@ public struct SwiftLoop: Codable & Equatable {
 }
 
 public struct SwiftBranch: Codable & Equatable {
+  public init(id: SwiftUUID, condition: SwiftExpression, block: SwiftList<SwiftStatement>) {
+    self.id = id
+    self.condition = condition
+    self.block = block
+  }
+
   public var id: SwiftUUID
   public var condition: SwiftExpression
   public var block: SwiftList<SwiftStatement>
 }
 
 public struct SwiftDecl: Codable & Equatable {
+  public init(content: SwiftDeclaration, id: SwiftUUID) {
+    self.content = content
+    self.id = id
+  }
+
   public var content: SwiftDeclaration
   public var id: SwiftUUID
 }
 
 public struct SwiftExpressionStatement: Codable & Equatable {
+  public init(id: SwiftUUID, expression: SwiftExpression) {
+    self.id = id
+    self.expression = expression
+  }
+
   public var id: SwiftUUID
   public var expression: SwiftExpression
 }
 
 public struct SwiftPlaceholderStatement: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftVariable: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftFunction: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftBinaryExpression: Codable & Equatable {
+  public init(left: SwiftExpression, right: SwiftExpression, op: SwiftBinaryOperator, id: SwiftUUID) {
+    self.left = left
+    self.right = right
+    self.op = op
+    self.id = id
+  }
+
   public var left: SwiftExpression
   public var right: SwiftExpression
   public var op: SwiftBinaryOperator
@@ -48,55 +95,110 @@ public struct SwiftBinaryExpression: Codable & Equatable {
 }
 
 public struct SwiftIdentifierExpression: Codable & Equatable {
+  public init(id: SwiftUUID, identifier: SwiftIdentifier) {
+    self.id = id
+    self.identifier = identifier
+  }
+
   public var id: SwiftUUID
   public var identifier: SwiftIdentifier
 }
 
 public struct SwiftFunctionCallExpression: Codable & Equatable {
+  public init(id: SwiftUUID, expression: SwiftExpression, arguments: SwiftList<SwiftFunctionCallArgument>) {
+    self.id = id
+    self.expression = expression
+    self.arguments = arguments
+  }
+
   public var id: SwiftUUID
   public var expression: SwiftExpression
   public var arguments: SwiftList<SwiftFunctionCallArgument>
 }
 
 public struct SwiftPattern: Codable & Equatable {
+  public init(id: SwiftUUID, name: SwiftString) {
+    self.id = id
+    self.name = name
+  }
+
   public var id: SwiftUUID
   public var name: SwiftString
 }
 
 public struct SwiftIsEqualTo: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftIsNotEqualTo: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftIsLessThan: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftIsGreaterThan: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftIsLessThanOrEqualTo: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftIsGreaterThanOrEqualTo: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftSetEqualTo: Codable & Equatable {
+  public init(id: SwiftUUID) {
+    self.id = id
+  }
+
   public var id: SwiftUUID
 }
 
 public struct SwiftProgram: Codable & Equatable {
+  public init(id: SwiftUUID, block: SwiftList<SwiftStatement>) {
+    self.id = id
+    self.block = block
+  }
+
   public var id: SwiftUUID
   public var block: SwiftList<SwiftStatement>
 }
 
 public struct SwiftFunctionCallArgument: Codable & Equatable {
+  public init(id: SwiftUUID, label: SwiftString, expression: SwiftExpression) {
+    self.id = id
+    self.label = label
+    self.expression = expression
+  }
+
   public var id: SwiftUUID
   public var label: SwiftString
   public var expression: SwiftExpression

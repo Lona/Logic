@@ -26,6 +26,20 @@
 		6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E162223B3E2C00740318 /* ControlledDropdown.swift */; };
 		6B44E16B223B3E9E00740318 /* SuggestionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E168223B3E9E00740318 /* SuggestionListView.swift */; };
 		6B44E16D223B3E9E00740318 /* SuggestionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E16A223B3E9E00740318 /* SuggestionDetailView.swift */; };
+		6B44E177223B40BA00740318 /* LogicEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E172223B40AF00740318 /* LogicEditor.swift */; };
+		6B44E178223B40BA00740318 /* LogicEditorElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E173223B40AF00740318 /* LogicEditorElement.swift */; };
+		6B44E179223B40BA00740318 /* LogicEditorElement+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E174223B40AF00740318 /* LogicEditorElement+Formatter.swift */; };
+		6B44E17A223B40BA00740318 /* LogicEditorMeasuredElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E175223B40AF00740318 /* LogicEditorMeasuredElement.swift */; };
+		6B44E17B223B40BD00740318 /* Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E170223B406800740318 /* Formatter.swift */; };
+		6B44E184223B40CF00740318 /* SwiftList+Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E17C223B40C900740318 /* SwiftList+Sequence.swift */; };
+		6B44E185223B40CF00740318 /* SwiftSyntax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E17D223B40C900740318 /* SwiftSyntax.swift */; };
+		6B44E186223B40CF00740318 /* SwiftSyntax+Documentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E17E223B40C900740318 /* SwiftSyntax+Documentation.swift */; };
+		6B44E187223B40CF00740318 /* SwiftSyntax+Formatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E17F223B40C900740318 /* SwiftSyntax+Formatter.swift */; };
+		6B44E188223B40CF00740318 /* SwiftSyntax+NativeTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E180223B40C900740318 /* SwiftSyntax+NativeTypes.swift */; };
+		6B44E189223B40CF00740318 /* SwiftSyntax+Suggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E181223B40C900740318 /* SwiftSyntax+Suggestions.swift */; };
+		6B44E18A223B40CF00740318 /* SwiftSyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E182223B40C900740318 /* SwiftSyntaxNode.swift */; };
+		6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E18B223B40F100740318 /* SuggestionWindow.swift */; };
+		6B44E18E223B411C00740318 /* NSBezierPath+Polygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */; };
 		6B5B7522215B198400CDC9C6 /* Logic.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B5B7520215B198400CDC9C6 /* Logic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6B5B755E215B1ABE00CDC9C6 /* TypeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7554215B1ABE00CDC9C6 /* TypeListRowView.swift */; };
 		6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7555215B1ABE00CDC9C6 /* TypeListHeaderView.swift */; };
@@ -62,6 +76,20 @@
 		6B44E162223B3E2C00740318 /* ControlledDropdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlledDropdown.swift; sourceTree = "<group>"; };
 		6B44E168223B3E9E00740318 /* SuggestionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListView.swift; sourceTree = "<group>"; };
 		6B44E16A223B3E9E00740318 /* SuggestionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionDetailView.swift; sourceTree = "<group>"; };
+		6B44E170223B406800740318 /* Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatter.swift; sourceTree = "<group>"; };
+		6B44E172223B40AF00740318 /* LogicEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicEditor.swift; sourceTree = "<group>"; };
+		6B44E173223B40AF00740318 /* LogicEditorElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicEditorElement.swift; sourceTree = "<group>"; };
+		6B44E174223B40AF00740318 /* LogicEditorElement+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicEditorElement+Formatter.swift"; sourceTree = "<group>"; };
+		6B44E175223B40AF00740318 /* LogicEditorMeasuredElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicEditorMeasuredElement.swift; sourceTree = "<group>"; };
+		6B44E17C223B40C900740318 /* SwiftList+Sequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftList+Sequence.swift"; sourceTree = "<group>"; };
+		6B44E17D223B40C900740318 /* SwiftSyntax.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSyntax.swift; sourceTree = "<group>"; };
+		6B44E17E223B40C900740318 /* SwiftSyntax+Documentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Documentation.swift"; sourceTree = "<group>"; };
+		6B44E17F223B40C900740318 /* SwiftSyntax+Formatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Formatter.swift"; sourceTree = "<group>"; };
+		6B44E180223B40C900740318 /* SwiftSyntax+NativeTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+NativeTypes.swift"; sourceTree = "<group>"; };
+		6B44E181223B40C900740318 /* SwiftSyntax+Suggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSyntax+Suggestions.swift"; sourceTree = "<group>"; };
+		6B44E182223B40C900740318 /* SwiftSyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftSyntaxNode.swift; sourceTree = "<group>"; };
+		6B44E18B223B40F100740318 /* SuggestionWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionWindow.swift; sourceTree = "<group>"; };
+		6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSBezierPath+Polygon.swift"; sourceTree = "<group>"; };
 		6B5B751D215B198400CDC9C6 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B5B7520215B198400CDC9C6 /* Logic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logic.h; sourceTree = "<group>"; };
 		6B5B7521215B198400CDC9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -148,6 +176,7 @@
 		6B44E166223B3E6000740318 /* Language */ = {
 			isa = PBXGroup;
 			children = (
+				6B44E18B223B40F100740318 /* SuggestionWindow.swift */,
 				6B44E167223B3E7800740318 /* Views */,
 			);
 			path = Language;
@@ -160,6 +189,39 @@
 				6B44E168223B3E9E00740318 /* SuggestionListView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		6B44E171223B406800740318 /* Formatter */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E170223B406800740318 /* Formatter.swift */,
+			);
+			path = Formatter;
+			sourceTree = "<group>";
+		};
+		6B44E176223B40AF00740318 /* LogicEditor */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E172223B40AF00740318 /* LogicEditor.swift */,
+				6B44E173223B40AF00740318 /* LogicEditorElement.swift */,
+				6B44E174223B40AF00740318 /* LogicEditorElement+Formatter.swift */,
+				6B44E175223B40AF00740318 /* LogicEditorMeasuredElement.swift */,
+			);
+			path = LogicEditor;
+			sourceTree = "<group>";
+		};
+		6B44E183223B40C900740318 /* Syntaxes */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E17C223B40C900740318 /* SwiftList+Sequence.swift */,
+				6B44E17D223B40C900740318 /* SwiftSyntax.swift */,
+				6B44E17E223B40C900740318 /* SwiftSyntax+Documentation.swift */,
+				6B44E17F223B40C900740318 /* SwiftSyntax+Formatter.swift */,
+				6B44E180223B40C900740318 /* SwiftSyntax+NativeTypes.swift */,
+				6B44E181223B40C900740318 /* SwiftSyntax+Suggestions.swift */,
+				6B44E182223B40C900740318 /* SwiftSyntaxNode.swift */,
+			);
+			path = Syntaxes;
 			sourceTree = "<group>";
 		};
 		6B5B7513215B198400CDC9C6 = {
@@ -181,14 +243,18 @@
 		6B5B751F215B198400CDC9C6 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				6B44E166223B3E6000740318 /* Language */,
 				6B5B7520215B198400CDC9C6 /* Logic.h */,
 				6B5B7521215B198400CDC9C6 /* Info.plist */,
 				6B44E15F223B3DFF00740318 /* ForeignTypes.swift */,
 				6B44E15D223B3DF300740318 /* TextStyle.swift */,
+				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
 				6B44E163223B3E2C00740318 /* Controlled */,
+				6B44E171223B406800740318 /* Formatter */,
 				6B44E151223B3DB700740318 /* Generated */,
+				6B44E166223B3E6000740318 /* Language */,
+				6B44E176223B40AF00740318 /* LogicEditor */,
 				6B44E142223B3D2200740318 /* RichText */,
+				6B44E183223B40C900740318 /* Syntaxes */,
 				6B44E13B223B3C9000740318 /* Types */,
 			);
 			path = Logic;
@@ -306,20 +372,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B44E17A223B40BA00740318 /* LogicEditorMeasuredElement.swift in Sources */,
 				6B44E160223B3DFF00740318 /* ForeignTypes.swift in Sources */,
 				6B44E15E223B3DF300740318 /* TextStyle.swift in Sources */,
+				6B44E188223B40CF00740318 /* SwiftSyntax+NativeTypes.swift in Sources */,
+				6B44E178223B40BA00740318 /* LogicEditorElement.swift in Sources */,
+				6B44E179223B40BA00740318 /* LogicEditorElement+Formatter.swift in Sources */,
 				6B44E156223B3DD000740318 /* LonaViewModel.swift in Sources */,
 				6B44E158223B3DD000740318 /* Shadows.swift in Sources */,
 				6B44E144223B3D9000740318 /* RichText+AppKit.swift in Sources */,
 				6B5B7574215C387E00CDC9C6 /* TypeCaseParameterEntity.swift in Sources */,
 				6B44E154223B3DD000740318 /* LNAImageView.swift in Sources */,
+				6B44E187223B40CF00740318 /* SwiftSyntax+Formatter.swift in Sources */,
 				6B44E15C223B3DDA00740318 /* ResultSectionHeader.swift in Sources */,
 				6B44E15B223B3DDA00740318 /* ResultRow.swift in Sources */,
+				6B44E185223B40CF00740318 /* SwiftSyntax.swift in Sources */,
+				6B44E18E223B411C00740318 /* NSBezierPath+Polygon.swift in Sources */,
+				6B44E189223B40CF00740318 /* SwiftSyntax+Suggestions.swift in Sources */,
+				6B44E184223B40CF00740318 /* SwiftList+Sequence.swift in Sources */,
 				6B5B755E215B1ABE00CDC9C6 /* TypeListRowView.swift in Sources */,
+				6B44E18A223B40CF00740318 /* SwiftSyntaxNode.swift in Sources */,
 				6B44E153223B3DD000740318 /* Colors.swift in Sources */,
 				6B5B7562215B1ABE00CDC9C6 /* TypeCase.swift in Sources */,
 				6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */,
 				6B44E16B223B3E9E00740318 /* SuggestionListView.swift in Sources */,
+				6B44E186223B40CF00740318 /* SwiftSyntax+Documentation.swift in Sources */,
 				6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */,
 				6B44E15A223B3DDA00740318 /* SuggestionView.swift in Sources */,
 				6B5B756D215B1C5200CDC9C6 /* Array+Operations.swift in Sources */,
@@ -329,6 +406,7 @@
 				6B5B7566215B1ABE00CDC9C6 /* TypeListEditor.swift in Sources */,
 				6B44E16D223B3E9E00740318 /* SuggestionDetailView.swift in Sources */,
 				6B44E155223B3DD000740318 /* LNATextField.swift in Sources */,
+				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
 				6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */,
 				6B44E159223B3DD000740318 /* TextStyles.swift in Sources */,
@@ -336,8 +414,10 @@
 				6B44E164223B3E3C00740318 /* ControlledSearchInput.swift in Sources */,
 				6B44E143223B3D8E00740318 /* RichText.swift in Sources */,
 				6B5B7561215B1ABE00CDC9C6 /* TypeListItem.swift in Sources */,
+				6B44E177223B40BA00740318 /* LogicEditor.swift in Sources */,
 				6B5B7560215B1ABE00CDC9C6 /* Entity.swift in Sources */,
 				6B5B7565215B1ABE00CDC9C6 /* EntityCellView.swift in Sources */,
+				6B44E17B223B40BD00740318 /* Formatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

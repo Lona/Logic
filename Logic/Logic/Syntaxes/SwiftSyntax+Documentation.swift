@@ -7,7 +7,6 @@
 //
 
 import AppKit
-import Logic
 
 private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
     let container = NSBox()
@@ -32,8 +31,8 @@ private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
     return container
 }
 
-extension SwiftExpression {
-    func documentation(for prefix: String) -> RichText {
+public extension SwiftExpression {
+    public func documentation(for prefix: String) -> RichText {
         switch self {
         case .binaryExpression(let value):
             switch value.op {
@@ -66,8 +65,8 @@ extension SwiftExpression {
     }
 }
 
-extension SwiftStatement {
-    func documentation(for prefix: String) -> RichText {
+public extension SwiftStatement {
+    public func documentation(for prefix: String) -> RichText {
         switch self {
         case .branch:
             let example = SwiftSyntaxNode.statement(
@@ -167,7 +166,7 @@ extension SwiftStatement {
     }
 }
 
-extension SwiftSyntaxNode {
+public extension SwiftSyntaxNode {
     func documentation(for prefix: String) -> RichText {
         return contents.documentation(for: prefix)
     }

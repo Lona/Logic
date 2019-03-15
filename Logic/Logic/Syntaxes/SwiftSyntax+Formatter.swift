@@ -7,28 +7,27 @@
 //
 
 import AppKit
-import Logic
 
-extension SwiftIdentifier {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftIdentifier {
+    public var formatted: LogicEditorFormatCommand {
         return .element(LogicEditorElement.dropdown(id, string, Colors.editableText))
     }
 }
 
-extension SwiftPattern {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftPattern {
+    public var formatted: LogicEditorFormatCommand {
         return .element(LogicEditorElement.dropdown(id, name, Colors.editableText))
     }
 }
 
-extension SwiftBinaryOperator {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftBinaryOperator {
+    public var formatted: LogicEditorFormatCommand {
         return .element(LogicEditorElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
-extension SwiftFunctionCallArgument {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftFunctionCallArgument {
+    public var formatted: LogicEditorFormatCommand {
         return .concat {
             [
                 .element(.text(self.label + " :")),
@@ -38,8 +37,8 @@ extension SwiftFunctionCallArgument {
     }
 }
 
-extension SwiftExpression {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftExpression {
+    public var formatted: LogicEditorFormatCommand {
         switch self {
         case .identifierExpression(let value):
             return value.identifier.formatted
@@ -84,8 +83,8 @@ extension SwiftExpression {
     }
 }
 
-extension SwiftStatement {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftStatement {
+    public var formatted: LogicEditorFormatCommand {
         switch self {
         case .loop(let loop):
             return .concat {
@@ -124,8 +123,8 @@ extension SwiftStatement {
 }
 
 
-extension SwiftProgram {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftProgram {
+    public var formatted: LogicEditorFormatCommand {
         return .join(with: .hardLine) {
             self.block.map { $0.formatted }
         }
@@ -133,8 +132,8 @@ extension SwiftProgram {
 }
 
 
-extension SwiftSyntaxNode {
-    var formatted: LogicEditorFormatCommand {
+public extension SwiftSyntaxNode {
+    public var formatted: LogicEditorFormatCommand {
         switch self {
         case .statement(let value):
             return value.formatted
@@ -153,7 +152,7 @@ extension SwiftSyntaxNode {
         }
     }
 
-    func elementRange(for targetID: SwiftUUID) -> Range<Int>? {
+    public func elementRange(for targetID: SwiftUUID) -> Range<Int>? {
         let topNode = topNodeWithEqualElements(as: targetID)
         let topNodeFormattedElements = topNode.formatted.elements
 
@@ -169,13 +168,13 @@ extension SwiftSyntaxNode {
         return firstIndex..<lastIndex
     }
 
-    func topNodeWithEqualElements(as targetID: SwiftUUID) -> SwiftSyntaxNode {
+    public func topNodeWithEqualElements(as targetID: SwiftUUID) -> SwiftSyntaxNode {
         let elementPath = uniqueElementPathTo(id: targetID)
 
         return elementPath[elementPath.count - 1]
     }
 
-    func uniqueElementPathTo(id targetID: SwiftUUID) -> [SwiftSyntaxNode] {
+    public func uniqueElementPathTo(id targetID: SwiftUUID) -> [SwiftSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }
