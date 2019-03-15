@@ -49,27 +49,8 @@ extension RichText.BlockElement {
             }
 
             return NSTextField(labelWithAttributedString: paragraphString)
-        case .code(let node):
-            let container = NSBox()
-            container.boxType = .custom
-            container.borderType = .lineBorder
-            container.borderWidth = 1
-            container.borderColor = NSColor(red: 0.59, green: 0.59, blue: 0.59, alpha: 0.26)
-            container.fillColor = .white
-            container.cornerRadius = 4
-
-            let editor = LogicEditor()
-            editor.formattedContent = node.formatted
-
-            container.addSubview(editor)
-
-            editor.translatesAutoresizingMaskIntoConstraints = false
-            editor.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
-            editor.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
-            editor.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
-            editor.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
-
-            return container
+        case .custom(let view):
+            return view
         }
     }
 
@@ -84,7 +65,7 @@ extension RichText.BlockElement {
             }
         case .paragraph:
             return 8
-        case .code:
+        case .custom:
             return 12
         }
     }

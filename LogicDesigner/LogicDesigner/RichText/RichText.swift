@@ -25,7 +25,7 @@ struct RichText {
     }
 
     enum BlockElement {
-        case code(SwiftSyntaxNode)
+        case custom(NSView)
         case heading(HeadingSize, () -> String)
         case paragraph([InlineElement])
     }

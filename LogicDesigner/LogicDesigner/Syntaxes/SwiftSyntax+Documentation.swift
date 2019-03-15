@@ -8,6 +8,29 @@
 
 import AppKit
 
+private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
+    let container = NSBox()
+    container.boxType = .custom
+    container.borderType = .lineBorder
+    container.borderWidth = 1
+    container.borderColor = NSColor(red: 0.59, green: 0.59, blue: 0.59, alpha: 0.26)
+    container.fillColor = .white
+    container.cornerRadius = 4
+
+    let editor = LogicEditor()
+    editor.formattedContent = syntaxNode.formatted
+
+    container.addSubview(editor)
+
+    editor.translatesAutoresizingMaskIntoConstraints = false
+    editor.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
+    editor.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
+    editor.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
+    editor.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
+
+    return container
+}
+
 extension SwiftExpression {
     func documentation(for prefix: String) -> RichText {
         switch self {
@@ -46,6 +69,58 @@ extension SwiftStatement {
     func documentation(for prefix: String) -> RichText {
         switch self {
         case .branch:
+            let example = SwiftSyntaxNode.statement(
+                SwiftStatement.branch(
+                    SwiftBranch(
+                        id: NSUUID().uuidString,
+                        condition: SwiftExpression.binaryExpression(
+                            SwiftBinaryExpression(
+                                left: SwiftExpression.identifierExpression(
+                                    SwiftIdentifierExpression(
+                                        id: NSUUID().uuidString,
+                                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "age")
+                                    )
+                                ),
+                                right: SwiftExpression.identifierExpression(
+                                    SwiftIdentifierExpression(
+                                        id: NSUUID().uuidString,
+                                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "17")
+                                    )
+                                ),
+                                op: .isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
+                                id: NSUUID().uuidString
+                            )
+                        ),
+                        block: SwiftList<SwiftStatement>.next(
+                            SwiftStatement.expressionStatement(
+                                SwiftExpressionStatement(
+                                    id: NSUUID().uuidString,
+                                    expression: SwiftExpression.binaryExpression(
+                                        SwiftBinaryExpression(
+                                            left: SwiftExpression.identifierExpression(
+                                                SwiftIdentifierExpression(
+                                                    id: NSUUID().uuidString,
+                                                    identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
+                                                )
+                                            ),
+                                            right: SwiftExpression.identifierExpression(
+                                                SwiftIdentifierExpression(
+                                                    id: NSUUID().uuidString,
+                                                    identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
+                                                )
+                                            ),
+                                            op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
+                                            id: NSUUID().uuidString
+                                        )
+                                    )
+                                )
+                            ),
+                            .empty
+                        )
+                    )
+                )
+            )
+
             let blocks: [RichText.BlockElement] = [
                 .heading(.title) { "If condition" },
                 .paragraph(
@@ -63,59 +138,7 @@ extension SwiftStatement {
                         .text(.none) { "to accomplish this:" }
                     ]
                 ),
-                .code(
-                    SwiftSyntaxNode.statement(
-                        SwiftStatement.branch(
-                            SwiftBranch(
-                                id: NSUUID().uuidString,
-                                condition: SwiftExpression.binaryExpression(
-                                    SwiftBinaryExpression(
-                                        left: SwiftExpression.identifierExpression(
-                                            SwiftIdentifierExpression(
-                                                id: NSUUID().uuidString,
-                                                identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "age")
-                                            )
-                                        ),
-                                        right: SwiftExpression.identifierExpression(
-                                            SwiftIdentifierExpression(
-                                                id: NSUUID().uuidString,
-                                                identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "17")
-                                            )
-                                        ),
-                                        op: .isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
-                                        id: NSUUID().uuidString
-                                    )
-                                ),
-                                block: SwiftList<SwiftStatement>.next(
-                                    SwiftStatement.expressionStatement(
-                                        SwiftExpressionStatement(
-                                            id: NSUUID().uuidString,
-                                            expression: SwiftExpression.binaryExpression(
-                                                SwiftBinaryExpression(
-                                                    left: SwiftExpression.identifierExpression(
-                                                        SwiftIdentifierExpression(
-                                                            id: NSUUID().uuidString,
-                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
-                                                        )
-                                                    ),
-                                                    right: SwiftExpression.identifierExpression(
-                                                        SwiftIdentifierExpression(
-                                                            id: NSUUID().uuidString,
-                                                            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
-                                                        )
-                                                    ),
-                                                    op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
-                                                    id: NSUUID().uuidString
-                                                )
-                                            )
-                                        )
-                                    ),
-                                    .empty
-                                )
-                            )
-                        )
-                    )
-                ),
+                .custom(codeView(for: example)),
 //                .paragraph(
 //                    [
 //                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
