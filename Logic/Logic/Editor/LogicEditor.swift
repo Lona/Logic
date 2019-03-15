@@ -41,21 +41,128 @@ public class LogicEditor: NSBox {
         }
     }
 
-    var childWindow: SuggestionWindow? = SuggestionWindow()
+    // MARK: Private
 
-    var suggestionText: String = "" {
+    private var suggestionText: String = "" {
         didSet {
             childWindow?.suggestionText = suggestionText
         }
     }
 
-    var selectedSuggestionIndex: Int? {
+    private var selectedSuggestionIndex: Int? {
         didSet {
             childWindow?.selectedIndex = selectedSuggestionIndex
         }
     }
 
-    func indexedSuggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
+    private lazy var childWindow: SuggestionWindow? = SuggestionWindow()
+
+    private let canvas = LogicCanvas()
+
+    private func setUpViews() {
+        boxType = .custom
+        borderType = .noBorder
+        contentViewMargins = .zero
+
+        addSubview(canvas)
+
+        canvas.formattedContent = rootNode.formatted
+        canvas.onActivate = handleActivateElement
+        canvas.onActivateLine = handleActivateLine
+        canvas.onPressTabKey = nextNode
+        canvas.onPressShiftTabKey = previousNode
+    }
+
+    private func setUpConstraints() {
+        translatesAutoresizingMaskIntoConstraints = false
+        canvas.translatesAutoresizingMaskIntoConstraints = false
+        
+        canvas.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        canvas.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        canvas.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        canvas.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+    }
+
+    private func update() {}
+}
+
+// MARK: - Selection
+
+extension LogicEditor {
+
+    private func nextNode() {
+        if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvas.selectedRange?.lowerBound),
+            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
+
+            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
+            self.suggestionText = ""
+
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
+            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
+        } else {
+            Swift.print("No next node to activate")
+
+            self.hideSuggestionWindow()
+        }
+    }
+
+    private func previousNode() {
+        if let index = rootNode.formatted.previousActivatableElementIndex(before: self.canvas.selectedRange?.lowerBound),
+            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
+
+            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
+            self.suggestionText = ""
+
+            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
+            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
+        } else {
+            Swift.print("No previous node to activate")
+
+            self.hideSuggestionWindow()
+        }
+    }
+
+    private func select(nodeByID syntaxNodeId: UUID?) {
+        self.canvas.selectedLine = nil
+        self.suggestionText = ""
+
+        if let syntaxNodeId = syntaxNodeId {
+            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId)
+
+            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
+                self.canvas.selectedRange = selectedRange
+                self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
+            } else {
+                self.canvas.selectedRange = nil
+                self.hideSuggestionWindow()
+            }
+        } else {
+            self.canvas.selectedRange = nil
+            self.hideSuggestionWindow()
+        }
+    }
+
+    private func handleActivateElement(_ activatedIndex: Int?) {
+        if let activatedIndex = activatedIndex {
+            let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
+            self.select(nodeByID: id)
+        } else {
+            self.select(nodeByID: nil)
+        }
+    }
+
+    private func handleActivateLine(_ activatedLineIndex: Int) {
+        handleActivateElement(nil)
+
+        canvas.selectedLine = activatedLineIndex
+    }
+}
+
+// MARK: - Suggestions
+
+extension LogicEditor {
+
+    private func indexedSuggestionListItems(for logicSuggestionItems: [LogicSuggestionItem]) -> [(offset: Int, item: SuggestionListItem)] {
         var categories: [(name: String, list: [(offset: Int, item: LogicSuggestionItem)])] = []
 
         logicSuggestionItems.enumerated().forEach { offset, item in
@@ -80,7 +187,7 @@ public class LogicEditor: NSBox {
         return suggestionListItems
     }
 
-    func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
+    private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
         guard let range = rootNode.elementRange(for: syntaxNode.uuid),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
@@ -88,40 +195,13 @@ public class LogicEditor: NSBox {
 
         return highestMatch.suggestions(for: prefix)
     }
+}
 
-    func nextNode() {
-        if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvas.selectedRange?.lowerBound),
-            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
+// MARK: - Suggestion Window
 
-            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
-            self.suggestionText = ""
+extension LogicEditor {
 
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
-            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
-        } else {
-            Swift.print("No next node to activate")
-
-            self.hideSuggestionWindow()
-        }
-    }
-
-    func previousNode() {
-        if let index = rootNode.formatted.previousActivatableElementIndex(before: self.canvas.selectedRange?.lowerBound),
-            let id = self.rootNode.formatted.elements[index].syntaxNodeID {
-
-            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
-            self.suggestionText = ""
-
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
-            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
-        } else {
-            Swift.print("No previous node to activate")
-
-            self.hideSuggestionWindow()
-        }
-    }
-
-    func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
+    private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
         let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid)
@@ -187,8 +267,6 @@ public class LogicEditor: NSBox {
 
             self.rootNode = replacement
 
-            self.canvas.formattedContent = self.rootNode.formatted
-
             if suggestedNode.movementAfterInsertion == .next {
                 self.nextNode()
             } else {
@@ -216,77 +294,10 @@ public class LogicEditor: NSBox {
         }
     }
 
-    func hideSuggestionWindow() {
+    private func hideSuggestionWindow() {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
         window.removeChildWindow(childWindow)
         childWindow.setIsVisible(false)
     }
-
-    func select(nodeByID syntaxNodeId: UUID?) {
-        self.canvas.selectedLine = nil
-        self.suggestionText = ""
-
-        if let syntaxNodeId = syntaxNodeId {
-            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId)
-
-            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
-                self.canvas.selectedRange = selectedRange
-                self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
-            } else {
-                self.canvas.selectedRange = nil
-                self.hideSuggestionWindow()
-            }
-        } else {
-            self.canvas.selectedRange = nil
-            self.hideSuggestionWindow()
-        }
-    }
-
-    // MARK: Private
-
-    private let canvas = LogicCanvas()
-
-    func handleActivateElement(_ activatedIndex: Int?) {
-        if let activatedIndex = activatedIndex {
-            let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
-            self.select(nodeByID: id)
-        } else {
-            self.select(nodeByID: nil)
-        }
-    }
-
-    func handleActivateLine(_ activatedLineIndex: Int) {
-        handleActivateElement(nil)
-
-        Swift.print("Activate line \(activatedLineIndex)")
-
-        canvas.selectedLine = activatedLineIndex
-    }
-
-    private func setUpViews() {
-        boxType = .custom
-        borderType = .noBorder
-        contentViewMargins = .zero
-
-        addSubview(canvas)
-
-        canvas.formattedContent = rootNode.formatted
-        canvas.onActivate = handleActivateElement
-        canvas.onActivateLine = handleActivateLine
-        canvas.onPressTabKey = nextNode
-        canvas.onPressShiftTabKey = previousNode
-    }
-
-    private func setUpConstraints() {
-        translatesAutoresizingMaskIntoConstraints = false
-        canvas.translatesAutoresizingMaskIntoConstraints = false
-        
-        canvas.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        canvas.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        canvas.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        canvas.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-    }
-
-    private func update() {}
 }
