@@ -1,5 +1,5 @@
 //
-//  LogicEditorMeasuredElement.swift
+//  LogicMeasuredElement.swift
 //  LogicDesigner
 //
 //  Created by Devin Abbott on 2/21/19.
@@ -8,8 +8,8 @@
 
 import AppKit
 
-struct LogicEditorMeasuredElement {
-    var element: LogicEditorElement
+struct LogicMeasuredElement {
+    var element: LogicElement
     var attributedString: NSAttributedString
     var attributedStringRect: CGRect
     var backgroundRect: CGRect

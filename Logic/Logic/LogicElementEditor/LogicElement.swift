@@ -1,5 +1,5 @@
 //
-//  LogicEditorElement.swift
+//  LogicElement.swift
 //  LogicDesigner
 //
 //  Created by Devin Abbott on 2/19/19.
@@ -10,7 +10,7 @@ import AppKit
 
 public typealias LogicTextID = String
 
-public enum LogicEditorElement {
+public enum LogicElement {
     case text(String)
     case coloredText(String, NSColor)
     case dropdown(LogicTextID, String, NSColor)
@@ -49,8 +49,8 @@ public enum LogicEditorElement {
     }
 }
 
-extension LogicEditorElement {
-    func measured(selected: Bool, offset: CGPoint) -> LogicEditorMeasuredElement {
+extension LogicElement {
+    func measured(selected: Bool, offset: CGPoint) -> LogicMeasuredElement {
         let attributedString = NSMutableAttributedString(string: self.value)
         let range = NSRange(location: 0, length: attributedString.length)
 
@@ -58,15 +58,15 @@ extension LogicEditorElement {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: NSColor.systemGray,
-                NSAttributedString.Key.font: LogicEditor.font
+                NSAttributedString.Key.font: LogicElementEditor.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
 
-            return LogicEditorMeasuredElement(
+            return LogicMeasuredElement(
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
@@ -76,15 +76,15 @@ extension LogicEditorElement {
 
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicEditor.font
+                NSAttributedString.Key.font: LogicElementEditor.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
 
-            return LogicEditorMeasuredElement(
+            return LogicMeasuredElement(
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
@@ -92,19 +92,19 @@ extension LogicEditorElement {
         case .dropdown(_, _, let color):
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicEditor.font
+                NSAttributedString.Key.font: LogicElementEditor.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            var backgroundRect = rect.insetBy(dx: -LogicEditor.textPadding.width, dy: -LogicEditor.textPadding.height)
+            var backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
 
-            if LogicEditor.dropdownCarets || value.isEmpty {
+            if LogicElementEditor.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 
-            return LogicEditorMeasuredElement(
+            return LogicMeasuredElement(
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,

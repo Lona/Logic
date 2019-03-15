@@ -1,5 +1,5 @@
 //
-//  LogicEditor+Formatter.swift
+//  LogicElementEditor+Formatter.swift
 //  LogicDesigner
 //
 //  Created by Devin Abbott on 2/19/19.
@@ -8,16 +8,16 @@
 
 import AppKit
 
-extension LogicEditorElement: FormattableElement {
+extension LogicElement: FormattableElement {
     public var width: CGFloat {
         return measured(selected: false, offset: .zero).backgroundRect.width
     }
 }
 
-extension Formatter.Command where Element == LogicEditorElement {
-    var focusableElements: [LogicEditorElement] {
+extension Formatter.Command where Element == LogicElement {
+    var focusableElements: [LogicElement] {
         return elements.filter { $0.syntaxNodeID != nil }
     }
 }
 
-public typealias LogicEditorFormatCommand = Formatter<LogicEditorElement>.Command
+public typealias LogicEditorFormatCommand = Formatter<LogicElement>.Command

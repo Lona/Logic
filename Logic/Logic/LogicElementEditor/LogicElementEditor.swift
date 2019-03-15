@@ -1,8 +1,8 @@
 import AppKit
 
-// MARK: - LogicEditor
+// MARK: - LogicElementEditor
 
-public class LogicEditor: NSView {
+public class LogicElementEditor: NSView {
 
     // MARK: Lifecycle
 
@@ -21,7 +21,7 @@ public class LogicEditor: NSView {
 
     // MARK: Public
 
-    public var formattedContent: Formatter<LogicEditorElement>.Command = .hardLine {
+    public var formattedContent: Formatter<LogicElement>.Command = .hardLine {
         didSet {
 //            invalidateIntrinsicContentSize()
             update()
@@ -68,11 +68,11 @@ public class LogicEditor: NSView {
 
     public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
 
-    var selectedElement: LogicEditorElement? {
+    var selectedElement: LogicElement? {
         return selectedMeasuredElement?.element
     }
 
-    var selectedMeasuredElement: LogicEditorMeasuredElement? {
+    var selectedMeasuredElement: LogicMeasuredElement? {
         guard let index = selectedIndex else { return nil }
         return measuredElements[index]
     }
@@ -158,7 +158,7 @@ public class LogicEditor: NSView {
     }
 
     public override func keyDown(with event: NSEvent) {
-        Swift.print("LogicEditor kd", event.keyCode)
+        Swift.print("LogicElementEditor kd", event.keyCode)
 
         switch Int(event.keyCode) {
         case 36: // Enter
@@ -238,10 +238,10 @@ public class LogicEditor: NSView {
             }
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
-                roundedRect: rect.insetBy(dx: LogicEditor.outlineWidth / 2, dy: LogicEditor.outlineWidth / 2),
-                xRadius: LogicEditor.textBackgroundRadius.width,
-                yRadius: LogicEditor.textBackgroundRadius.height)
-            path.lineWidth = LogicEditor.outlineWidth
+                roundedRect: rect.insetBy(dx: LogicElementEditor.outlineWidth / 2, dy: LogicElementEditor.outlineWidth / 2),
+                xRadius: LogicElementEditor.textBackgroundRadius.width,
+                yRadius: LogicElementEditor.textBackgroundRadius.height)
+            path.lineWidth = LogicElementEditor.outlineWidth
             path.stroke()
         } else {
             if let start = selectedIndex, let end = selectionEndIndex, start < end, end < measuredElements.count {
@@ -252,8 +252,8 @@ public class LogicEditor: NSView {
                 NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
                 NSBezierPath(
                     roundedRect: rect,
-                    xRadius: LogicEditor.textBackgroundRadius.width,
-                    yRadius: LogicEditor.textBackgroundRadius.height).fill()
+                    xRadius: LogicElementEditor.textBackgroundRadius.width,
+                    yRadius: LogicElementEditor.textBackgroundRadius.height).fill()
             }
         }
 
@@ -285,13 +285,13 @@ public class LogicEditor: NSView {
 
                 let backgroundPath = NSBezierPath(
                     roundedRect: backgroundRect,
-                    xRadius: LogicEditor.textBackgroundRadius.width,
-                    yRadius: LogicEditor.textBackgroundRadius.height)
+                    xRadius: LogicElementEditor.textBackgroundRadius.width,
+                    yRadius: LogicElementEditor.textBackgroundRadius.height)
                 backgroundPath.fill()
 
                 NSShadow().set()
 
-                if LogicEditor.dropdownCarets || value.isEmpty {
+                if LogicElementEditor.dropdownCarets || value.isEmpty {
                     if drawSelection {
                         NSColor.white.setStroke()
                     } else {
@@ -318,20 +318,20 @@ public class LogicEditor: NSView {
         }
     }
 
-    private var _cachedMeasuredElements: [LogicEditorMeasuredElement]? = nil
+    private var _cachedMeasuredElements: [LogicMeasuredElement]? = nil
 
-    private var measuredElements: [LogicEditorMeasuredElement] {
+    private var measuredElements: [LogicMeasuredElement] {
         if let cached = _cachedMeasuredElements {
             return cached
         }
 
         let formattedElementLines = formattedContent.print(
-            width: bounds.width - LogicEditor.textMargin.width * 2,
-            spaceWidth: LogicEditor.textSpacing,
+            width: bounds.width - LogicElementEditor.textMargin.width * 2,
+            spaceWidth: LogicElementEditor.textSpacing,
             indentWidth: 20)
 
-        let yOffset = LogicEditor.textMargin.height
-        var measuredLine: [LogicEditorMeasuredElement] = []
+        let yOffset = LogicElementEditor.textMargin.height
+        var measuredLine: [LogicMeasuredElement] = []
         var formattedElementIndex = 0
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
@@ -339,8 +339,8 @@ public class LogicEditor: NSView {
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
-                        x: LogicEditor.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * LogicEditor.minimumLineHeight))
+                        x: LogicElementEditor.textMargin.width + formattedElement.position,
+                        y: yOffset + CGFloat(rowIndex) * LogicElementEditor.minimumLineHeight))
 
                 measuredLine.append(measured)
 
@@ -354,8 +354,8 @@ public class LogicEditor: NSView {
     }
 
     private var minHeight: CGFloat {
-        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicEditor.textMargin.height
-        let minHeight = contentHeight + LogicEditor.textMargin.height
+        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicElementEditor.textMargin.height
+        let minHeight = contentHeight + LogicElementEditor.textMargin.height
         return minHeight
     }
 

@@ -241,7 +241,7 @@ public class LogicDocumentEditor: NSBox {
 
     // MARK: Private
 
-    private let logicEditor = LogicEditor()
+    private let logicEditor = LogicElementEditor()
 
     func handleActivateElement(_ activatedIndex: Int?) {
         if let activatedIndex = activatedIndex {

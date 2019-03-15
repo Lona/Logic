@@ -17,7 +17,7 @@ private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
     container.fillColor = .white
     container.cornerRadius = 4
 
-    let editor = LogicEditor()
+    let editor = LogicElementEditor()
     editor.formattedContent = syntaxNode.formatted
 
     container.addSubview(editor)

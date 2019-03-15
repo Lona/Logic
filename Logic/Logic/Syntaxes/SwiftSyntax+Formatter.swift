@@ -10,19 +10,19 @@ import AppKit
 
 public extension SwiftIdentifier {
     public var formatted: LogicEditorFormatCommand {
-        return .element(LogicEditorElement.dropdown(id, string, Colors.editableText))
+        return .element(LogicElement.dropdown(id, string, Colors.editableText))
     }
 }
 
 public extension SwiftPattern {
     public var formatted: LogicEditorFormatCommand {
-        return .element(LogicEditorElement.dropdown(id, name, Colors.editableText))
+        return .element(LogicElement.dropdown(id, name, Colors.editableText))
     }
 }
 
 public extension SwiftBinaryOperator {
     public var formatted: LogicEditorFormatCommand {
-        return .element(LogicEditorElement.dropdown(uuid, displayText, Colors.text))
+        return .element(LogicElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
@@ -89,16 +89,16 @@ public extension SwiftStatement {
         case .loop(let loop):
             return .concat {
                 [
-                    .element(LogicEditorElement.dropdown(loop.id, "For", NSColor.black)),
+                    .element(LogicElement.dropdown(loop.id, "For", NSColor.black)),
                     loop.pattern.formatted,
-                    .element(LogicEditorElement.text("in")),
+                    .element(LogicElement.text("in")),
                     loop.expression.formatted,
                 ]
             }
         case .branch(let branch):
             return .concat {
                 [
-                    .element(LogicEditorElement.dropdown(branch.id, "If", NSColor.black)),
+                    .element(LogicElement.dropdown(branch.id, "If", NSColor.black)),
                     branch.condition.formatted,
                     .indent {
                         .concat {
@@ -113,7 +113,7 @@ public extension SwiftStatement {
                 ]
             }
         case .placeholderStatement(let value):
-            return .element(LogicEditorElement.dropdown(value.id, "", Colors.editableText))
+            return .element(LogicElement.dropdown(value.id, "", Colors.editableText))
         case .expressionStatement(let value):
             return value.expression.formatted
         default:
