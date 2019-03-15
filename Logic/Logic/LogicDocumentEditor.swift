@@ -35,7 +35,11 @@ public class LogicDocumentEditor: NSBox {
 
     // MARK: Public
 
-    public var rootNode: SwiftSyntaxNode
+    public var rootNode: SwiftSyntaxNode {
+        didSet {
+            logicEditor.formattedContent = rootNode.formatted
+        }
+    }
 
     var childWindow: SuggestionWindow? = SuggestionWindow()
 
