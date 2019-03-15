@@ -211,7 +211,7 @@
 			path = LogicElementEditor;
 			sourceTree = "<group>";
 		};
-		6B44E183223B40C900740318 /* Syntaxes */ = {
+		6B44E183223B40C900740318 /* Syntax */ = {
 			isa = PBXGroup;
 			children = (
 				6B44E17C223B40C900740318 /* LGCList+Sequence.swift */,
@@ -221,7 +221,7 @@
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
 				6B44E182223B40C900740318 /* LGCSyntaxNode.swift */,
 			);
-			path = Syntaxes;
+			path = Syntax;
 			sourceTree = "<group>";
 		};
 		6B44E195223C19B100740318 /* Editor */ = {
@@ -232,6 +232,7 @@
 				6B44E176223B40AF00740318 /* LogicElementEditor */,
 				6B44E142223B3D2200740318 /* RichText */,
 				6B44E166223B3E6000740318 /* Suggestions */,
+				6B44E183223B40C900740318 /* Syntax */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -278,7 +279,6 @@
 				6B44E163223B3E2C00740318 /* Controlled */,
 				6B44E195223C19B100740318 /* Editor */,
 				6B44E197223C1A0000740318 /* Lona */,
-				6B44E183223B40C900740318 /* Syntaxes */,
 				6B44E13B223B3C9000740318 /* Types */,
 				6B44E196223C19EF00740318 /* Utils */,
 			);
