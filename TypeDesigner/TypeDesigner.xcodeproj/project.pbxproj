@@ -74,13 +74,13 @@
 		6B5B7533215B19ED00CDC9C6 /* TypeDesigner */ = {
 			isa = PBXGroup;
 			children = (
+				6B5B7541215B19EF00CDC9C6 /* TypeDesigner.entitlements */,
+				6B5B7540215B19EF00CDC9C6 /* Info.plist */,
 				6B5B7534215B19EE00CDC9C6 /* AppDelegate.swift */,
 				6B5B7536215B19EE00CDC9C6 /* Document.swift */,
-				6B5B7538215B19EE00CDC9C6 /* Document.xib */,
 				6B5B753B215B19EF00CDC9C6 /* Assets.xcassets */,
+				6B5B7538215B19EE00CDC9C6 /* Document.xib */,
 				6B5B753D215B19EF00CDC9C6 /* MainMenu.xib */,
-				6B5B7540215B19EF00CDC9C6 /* Info.plist */,
-				6B5B7541215B19EF00CDC9C6 /* TypeDesigner.entitlements */,
 			);
 			path = TypeDesigner;
 			sourceTree = "<group>";
