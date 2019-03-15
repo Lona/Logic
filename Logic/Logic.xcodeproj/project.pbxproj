@@ -177,7 +177,7 @@
 			path = Controlled;
 			sourceTree = "<group>";
 		};
-		6B44E166223B3E6000740318 /* Language */ = {
+		6B44E166223B3E6000740318 /* Suggestions */ = {
 			isa = PBXGroup;
 			children = (
 				6B44E18B223B40F100740318 /* SuggestionWindow.swift */,
@@ -185,7 +185,7 @@
 				6B44E168223B3E9E00740318 /* SuggestionListView.swift */,
 				6B44E191223C0F6000740318 /* SuggestionListItem.swift */,
 			);
-			path = Language;
+			path = Suggestions;
 			sourceTree = "<group>";
 		};
 		6B44E171223B406800740318 /* Formatter */ = {
@@ -249,9 +249,9 @@
 				6B44E163223B3E2C00740318 /* Controlled */,
 				6B44E171223B406800740318 /* Formatter */,
 				6B44E151223B3DB700740318 /* Generated */,
-				6B44E166223B3E6000740318 /* Language */,
 				6B44E176223B40AF00740318 /* LogicElementEditor */,
 				6B44E142223B3D2200740318 /* RichText */,
+				6B44E166223B3E6000740318 /* Suggestions */,
 				6B44E183223B40C900740318 /* Syntaxes */,
 				6B44E13B223B3C9000740318 /* Types */,
 			);
