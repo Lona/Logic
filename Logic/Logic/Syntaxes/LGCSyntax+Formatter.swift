@@ -152,7 +152,7 @@ public extension LGCSyntaxNode {
         }
     }
 
-    public func elementRange(for targetID: LGCUUID) -> Range<Int>? {
+    public func elementRange(for targetID: UUID) -> Range<Int>? {
         let topNode = topNodeWithEqualElements(as: targetID)
         let topNodeFormattedElements = topNode.formatted.elements
 
@@ -168,13 +168,13 @@ public extension LGCSyntaxNode {
         return firstIndex..<lastIndex
     }
 
-    public func topNodeWithEqualElements(as targetID: LGCUUID) -> LGCSyntaxNode {
+    public func topNodeWithEqualElements(as targetID: UUID) -> LGCSyntaxNode {
         let elementPath = uniqueElementPathTo(id: targetID)
 
         return elementPath[elementPath.count - 1]
     }
 
-    public func uniqueElementPathTo(id targetID: LGCUUID) -> [LGCSyntaxNode] {
+    public func uniqueElementPathTo(id targetID: UUID) -> [LGCSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }

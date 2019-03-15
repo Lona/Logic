@@ -223,7 +223,7 @@ public class LogicEditor: NSBox {
         childWindow.setIsVisible(false)
     }
 
-    func select(nodeByID syntaxNodeId: LGCUUID?) {
+    func select(nodeByID syntaxNodeId: UUID?) {
         self.canvas.selectedLine = nil
         self.suggestionText = ""
 
