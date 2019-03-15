@@ -168,10 +168,13 @@ public indirect enum SwiftList<T: Equatable & Codable>: Codable & Equatable {
   public init(from decoder: Decoder) throws {
     var unkeyedContainer = try decoder.unkeyedContainer()
 
-    self = .empty
-
+    var items: [T] = []
     while !unkeyedContainer.isAtEnd {
-      let item = try unkeyedContainer.decode(T.self)
+      items.append(try unkeyedContainer.decode(T.self))
+    }
+
+    self = .empty
+    while let item = items.popLast() {
       self = .next(item, self)
     }
   }
