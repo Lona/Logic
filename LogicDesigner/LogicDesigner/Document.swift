@@ -21,7 +21,7 @@ class Document: NSDocument {
 
     var window: NSWindow?
 
-    var logicDocumentEditor = LogicDocumentEditor()
+    var logicEditor = LogicEditor()
 
     override func makeWindowControllers() {
         let window = NSWindow(
@@ -32,7 +32,7 @@ class Document: NSDocument {
 
         window.backgroundColor = NSColor.white
         window.center()
-        window.contentView = logicDocumentEditor
+        window.contentView = logicEditor
 
         self.window = window
 
@@ -45,11 +45,11 @@ class Document: NSDocument {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
-        return try encoder.encode(logicDocumentEditor.rootNode)
+        return try encoder.encode(logicEditor.rootNode)
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        logicDocumentEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
+        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
     }
 }
 

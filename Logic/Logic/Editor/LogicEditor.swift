@@ -12,9 +12,9 @@ public let defaultRootNode = LGCSyntaxNode.program(
     )
 )
 
-// MARK: - LogicDocumentEditor
+// MARK: - LogicEditor
 
-public class LogicDocumentEditor: NSBox {
+public class LogicEditor: NSBox {
 
     // MARK: Lifecycle
 
@@ -37,7 +37,7 @@ public class LogicDocumentEditor: NSBox {
 
     public var rootNode: LGCSyntaxNode {
         didSet {
-            logicEditor.formattedContent = rootNode.formatted
+            canvas.formattedContent = rootNode.formatted
         }
     }
 
@@ -90,10 +90,10 @@ public class LogicDocumentEditor: NSBox {
     }
 
     func nextNode() {
-        if let index = self.nextActivatableElementIndex(after: self.logicEditor.selectedRange?.lowerBound),
+        if let index = self.nextActivatableElementIndex(after: self.canvas.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
+            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
@@ -106,10 +106,10 @@ public class LogicDocumentEditor: NSBox {
     }
 
     func previousNode() {
-        if let index = self.previousActivatableElementIndex(before: self.logicEditor.selectedRange?.lowerBound),
+        if let index = self.previousActivatableElementIndex(before: self.canvas.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.logicEditor.selectedRange = self.rootNode.elementRange(for: id)
+            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
@@ -162,14 +162,14 @@ public class LogicDocumentEditor: NSBox {
                 let selected = dropdownNodes[highlightedIndex]
                 let range = self.rootNode.elementRange(for: selected.uuid)
 
-                self.logicEditor.outlinedRange = range
+                self.canvas.outlinedRange = range
             } else {
-                self.logicEditor.outlinedRange = nil
+                self.canvas.outlinedRange = nil
             }
         }
 
         childWindow.onSelectDropdownIndex = { selectedIndex in
-            self.logicEditor.outlinedRange = nil
+            self.canvas.outlinedRange = nil
             self.select(nodeByID: dropdownNodes[selectedIndex].uuid)
         }
 
@@ -187,12 +187,12 @@ public class LogicDocumentEditor: NSBox {
 
             self.rootNode = replacement
 
-            self.logicEditor.formattedContent = self.rootNode.formatted
+            self.canvas.formattedContent = self.rootNode.formatted
 
             if suggestedNode.movementAfterInsertion == .next {
                 self.nextNode()
             } else {
-                self.handleActivateElement(self.logicEditor.selectedRange?.lowerBound)
+                self.handleActivateElement(self.canvas.selectedRange?.lowerBound)
             }
         }
 
@@ -209,7 +209,7 @@ public class LogicDocumentEditor: NSBox {
 
         window.addChildWindow(childWindow, ordered: .above)
 
-        if let rect = self.logicEditor.getBoundingRect(for: nodeIndex) {
+        if let rect = self.canvas.getBoundingRect(for: nodeIndex) {
             let screenRect = window.convertToScreen(rect)
             childWindow.anchorTo(rect: screenRect)
             childWindow.focusSearchField()
@@ -224,28 +224,28 @@ public class LogicDocumentEditor: NSBox {
     }
 
     func select(nodeByID syntaxNodeId: LGCUUID?) {
-        self.logicEditor.selectedLine = nil
+        self.canvas.selectedLine = nil
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
             let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId)
 
             if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
-                self.logicEditor.selectedRange = selectedRange
+                self.canvas.selectedRange = selectedRange
                 self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
             } else {
-                self.logicEditor.selectedRange = nil
+                self.canvas.selectedRange = nil
                 self.hideSuggestionWindow()
             }
         } else {
-            self.logicEditor.selectedRange = nil
+            self.canvas.selectedRange = nil
             self.hideSuggestionWindow()
         }
     }
 
     // MARK: Private
 
-    private let logicEditor = LogicElementEditor()
+    private let canvas = LogicCanvas()
 
     func handleActivateElement(_ activatedIndex: Int?) {
         if let activatedIndex = activatedIndex {
@@ -261,7 +261,7 @@ public class LogicDocumentEditor: NSBox {
 
         Swift.print("Activate line \(activatedLineIndex)")
 
-        logicEditor.selectedLine = activatedLineIndex
+        canvas.selectedLine = activatedLineIndex
     }
 
     private func setUpViews() {
@@ -269,29 +269,29 @@ public class LogicDocumentEditor: NSBox {
         borderType = .noBorder
         contentViewMargins = .zero
 
-        addSubview(logicEditor)
+        addSubview(canvas)
 
-        logicEditor.formattedContent = rootNode.formatted
-        logicEditor.onActivate = handleActivateElement
-        logicEditor.onActivateLine = handleActivateLine
-        logicEditor.onPressTabKey = nextNode
-        logicEditor.onPressShiftTabKey = previousNode
+        canvas.formattedContent = rootNode.formatted
+        canvas.onActivate = handleActivateElement
+        canvas.onActivateLine = handleActivateLine
+        canvas.onPressTabKey = nextNode
+        canvas.onPressShiftTabKey = previousNode
     }
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
-        logicEditor.translatesAutoresizingMaskIntoConstraints = false
+        canvas.translatesAutoresizingMaskIntoConstraints = false
         
-        logicEditor.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        logicEditor.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        logicEditor.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        logicEditor.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        canvas.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        canvas.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        canvas.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        canvas.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 
     private func update() {}
 }
 
-extension LogicDocumentEditor {
+extension LogicEditor {
     public func nextActivatableElementIndex(after currentIndex: Int?) -> Int? {
         let elements = rootNode.formatted.elements
 

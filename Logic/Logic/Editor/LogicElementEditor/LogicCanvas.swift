@@ -1,8 +1,8 @@
 import AppKit
 
-// MARK: - LogicElementEditor
+// MARK: - LogicCanvas
 
-public class LogicElementEditor: NSView {
+public class LogicCanvas: NSView {
 
     // MARK: Lifecycle
 
@@ -77,10 +77,6 @@ public class LogicElementEditor: NSView {
     var selectedMeasuredElement: LogicMeasuredElement? {
         guard let index = selectedIndex else { return nil }
         return measuredElements[index]
-    }
-
-    func reactivate() {
-        onActivate?(selectedIndex)
     }
 
     // MARK: Overrides
@@ -192,10 +188,10 @@ public class LogicElementEditor: NSView {
             }
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
-                roundedRect: rect.insetBy(dx: LogicElementEditor.outlineWidth / 2, dy: LogicElementEditor.outlineWidth / 2),
-                xRadius: LogicElementEditor.textBackgroundRadius.width,
-                yRadius: LogicElementEditor.textBackgroundRadius.height)
-            path.lineWidth = LogicElementEditor.outlineWidth
+                roundedRect: rect.insetBy(dx: LogicCanvas.outlineWidth / 2, dy: LogicCanvas.outlineWidth / 2),
+                xRadius: LogicCanvas.textBackgroundRadius.width,
+                yRadius: LogicCanvas.textBackgroundRadius.height)
+            path.lineWidth = LogicCanvas.outlineWidth
             path.stroke()
         } else {
             if let start = selectedIndex, let end = selectionEndIndex, start < end, end < measuredElements.count {
@@ -206,8 +202,8 @@ public class LogicElementEditor: NSView {
                 NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
                 NSBezierPath(
                     roundedRect: rect,
-                    xRadius: LogicElementEditor.textBackgroundRadius.width,
-                    yRadius: LogicElementEditor.textBackgroundRadius.height).fill()
+                    xRadius: LogicCanvas.textBackgroundRadius.width,
+                    yRadius: LogicCanvas.textBackgroundRadius.height).fill()
             }
         }
 
@@ -239,13 +235,13 @@ public class LogicElementEditor: NSView {
 
                 let backgroundPath = NSBezierPath(
                     roundedRect: backgroundRect,
-                    xRadius: LogicElementEditor.textBackgroundRadius.width,
-                    yRadius: LogicElementEditor.textBackgroundRadius.height)
+                    xRadius: LogicCanvas.textBackgroundRadius.width,
+                    yRadius: LogicCanvas.textBackgroundRadius.height)
                 backgroundPath.fill()
 
                 NSShadow().set()
 
-                if LogicElementEditor.dropdownCarets || value.isEmpty {
+                if LogicCanvas.dropdownCarets || value.isEmpty {
                     if drawSelection {
                         NSColor.white.setStroke()
                     } else {
@@ -280,11 +276,11 @@ public class LogicElementEditor: NSView {
         }
 
         let formattedElementLines = formattedContent.print(
-            width: bounds.width - LogicElementEditor.textMargin.width * 2,
-            spaceWidth: LogicElementEditor.textSpacing,
+            width: bounds.width - LogicCanvas.textMargin.width * 2,
+            spaceWidth: LogicCanvas.textSpacing,
             indentWidth: 20)
 
-        let yOffset = LogicElementEditor.textMargin.height
+        let yOffset = LogicCanvas.textMargin.height
         var measuredLine: [LogicMeasuredElement] = []
         var formattedElementIndex = 0
 
@@ -293,8 +289,8 @@ public class LogicElementEditor: NSView {
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
-                        x: LogicElementEditor.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * LogicElementEditor.minimumLineHeight))
+                        x: LogicCanvas.textMargin.width + formattedElement.position,
+                        y: yOffset + CGFloat(rowIndex) * LogicCanvas.minimumLineHeight))
 
                 measuredLine.append(measured)
 
@@ -308,8 +304,8 @@ public class LogicElementEditor: NSView {
     }
 
     private var minHeight: CGFloat {
-        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicElementEditor.textMargin.height
-        let minHeight = contentHeight + LogicElementEditor.textMargin.height
+        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicCanvas.textMargin.height
+        let minHeight = contentHeight + LogicCanvas.textMargin.height
         return minHeight
     }
 

@@ -13,11 +13,3 @@ extension LogicElement: FormattableElement {
         return measured(selected: false, offset: .zero).backgroundRect.width
     }
 }
-
-extension FormatterCommand where Element == LogicElement {
-    var focusableElements: [LogicElement] {
-        return elements.filter { $0.syntaxNodeID != nil }
-    }
-}
-
-public typealias LogicEditorFormatCommand = FormatterCommand<LogicElement>

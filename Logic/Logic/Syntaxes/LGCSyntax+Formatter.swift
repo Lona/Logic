@@ -9,25 +9,25 @@
 import AppKit
 
 public extension LGCIdentifier {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, string, Colors.editableText))
     }
 }
 
 public extension LGCPattern {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, name, Colors.editableText))
     }
 }
 
 public extension LGCBinaryOperator {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
 public extension LGCFunctionCallArgument {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         return .concat {
             [
                 .element(.text(self.label + " :")),
@@ -38,7 +38,7 @@ public extension LGCFunctionCallArgument {
 }
 
 public extension LGCExpression {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .identifierExpression(let value):
             return value.identifier.formatted
@@ -84,7 +84,7 @@ public extension LGCExpression {
 }
 
 public extension LGCStatement {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .loop(let loop):
             return .concat {
@@ -124,7 +124,7 @@ public extension LGCStatement {
 
 
 public extension LGCProgram {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
             self.block.map { $0.formatted }
         }
@@ -133,7 +133,7 @@ public extension LGCProgram {
 
 
 public extension LGCSyntaxNode {
-    public var formatted: LogicEditorFormatCommand {
+    public var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .statement(let value):
             return value.formatted

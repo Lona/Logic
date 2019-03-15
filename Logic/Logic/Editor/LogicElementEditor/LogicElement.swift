@@ -65,13 +65,13 @@ extension LogicElement {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: NSColor.systemGray,
-                NSAttributedString.Key.font: LogicElementEditor.font
+                NSAttributedString.Key.font: LogicCanvas.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
 
             return LogicMeasuredElement(
                 element: self,
@@ -83,13 +83,13 @@ extension LogicElement {
 
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicElementEditor.font
+                NSAttributedString.Key.font: LogicCanvas.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
 
             return LogicMeasuredElement(
                 element: self,
@@ -99,15 +99,15 @@ extension LogicElement {
         case .dropdown(_, _, let color):
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicElementEditor.font
+                NSAttributedString.Key.font: LogicCanvas.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            var backgroundRect = rect.insetBy(dx: -LogicElementEditor.textPadding.width, dy: -LogicElementEditor.textPadding.height)
+            var backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
 
-            if LogicElementEditor.dropdownCarets || value.isEmpty {
+            if LogicCanvas.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 
