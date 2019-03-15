@@ -124,19 +124,19 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
         default:
             switch self {
             case .isEqualTo:
-                return LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: UUID()))
+                return LGCBinaryOperator.isEqualTo(id: UUID())
             case .isNotEqualTo:
-                return LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: UUID()))
+                return LGCBinaryOperator.isNotEqualTo(id: UUID())
             case .isLessThan:
-                return LGCBinaryOperator.isLessThan(LGCIsLessThan(id: UUID()))
+                return LGCBinaryOperator.isLessThan(id: UUID())
             case .isGreaterThan:
-                return LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: UUID()))
+                return LGCBinaryOperator.isGreaterThan(id: UUID())
             case .isLessThanOrEqualTo:
-                return LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: UUID()))
+                return LGCBinaryOperator.isLessThanOrEqualTo(id: UUID())
             case .isGreaterThanOrEqualTo:
-                return LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: UUID()))
+                return LGCBinaryOperator.isGreaterThanOrEqualTo(id: UUID())
             case .setEqualTo:
-                return LGCBinaryOperator.setEqualTo(LGCSetEqualTo(id: UUID()))
+                return LGCBinaryOperator.setEqualTo(id: UUID())
             }
         }
     }
@@ -156,19 +156,19 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
     public var uuid: UUID {
         switch self {
         case .isEqualTo(let value):
-            return value.id
+            return value
         case .isNotEqualTo(let value):
-            return value.id
+            return value
         case .isLessThan(let value):
-            return value.id
+            return value
         case .isGreaterThan(let value):
-            return value.id
+            return value
         case .isLessThanOrEqualTo(let value):
-            return value.id
+            return value
         case .isGreaterThanOrEqualTo(let value):
-            return value.id
+            return value
         case .setEqualTo(let value):
-            return value.id
+            return value
         }
     }
 
@@ -192,26 +192,24 @@ extension LGCExpression: SyntaxNodeProtocol {
             return newNode
         // Identifier can become an IdentifierExpression and replace an expression
         case (.identifier(let newNode), _) where id == uuid:
-            return .identifierExpression(LGCIdentifierExpression(
-                id: UUID(),
-                identifier: newNode))
+            return .identifierExpression(id: UUID(), identifier: newNode)
         case (_, .binaryExpression(let value)):
-            return .binaryExpression(LGCBinaryExpression(
+            return .binaryExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
                 op: value.op.replace(id: id, with: syntaxNode),
-                id: UUID()))
+                id: UUID()
+            )
         case (_, .identifierExpression(let value)):
-            return .identifierExpression(LGCIdentifierExpression(
+            return .identifierExpression(
                 id: UUID(),
-                identifier: value.identifier.replace(id: id, with: syntaxNode)))
+                identifier: value.identifier.replace(id: id, with: syntaxNode)
+            )
         case (_, .functionCallExpression(let value)):
             return .functionCallExpression(
-                LGCFunctionCallExpression(
-                    id: UUID(),
-                    expression: value.expression.replace(id: id, with: syntaxNode),
-                    arguments: value.arguments.replace(id: id, with: syntaxNode)
-                )
+                id: UUID(),
+                expression: value.expression.replace(id: id, with: syntaxNode),
+                arguments: value.arguments.replace(id: id, with: syntaxNode)
             )
         }
     }
@@ -307,43 +305,35 @@ extension LGCStatement: SyntaxNodeProtocol {
             return newNode
         case .expression(let newNode) where id == uuid:
             return .expressionStatement(
-                LGCExpressionStatement(
-                    id: UUID(),
-                    expression: newNode
-                )
+                id: UUID(),
+                expression: newNode
             )
         case .declaration(let newNode) where id == uuid:
             return .decl(
-                LGCDecl(
-                    content: newNode,
-                    id: UUID()
-                )
+                content: newNode,
+                id: UUID()
             )
         default:
             switch self {
             case .branch(let value):
                 return .branch(
-                    LGCBranch(
-                        id: UUID(),
-                        condition: value.condition.replace(id: id, with: syntaxNode),
-                        block: value.block.replace(id: id, with: syntaxNode)
-                    )
+                    id: UUID(),
+                    condition: value.condition.replace(id: id, with: syntaxNode),
+                    block: value.block.replace(id: id, with: syntaxNode)
                 )
             case .decl:
                 return self
             case .loop(let value):
                 return LGCStatement.loop(
-                    LGCLoop(
-                        pattern: value.pattern.replace(id: id, with: syntaxNode),
-                        expression: value.expression.replace(id: id, with: syntaxNode),
-                        block: LGCList<LGCStatement>.empty,
-                        id: UUID()))
+                    pattern: value.pattern.replace(id: id, with: syntaxNode),
+                    expression: value.expression.replace(id: id, with: syntaxNode),
+                    block: LGCList<LGCStatement>.empty,
+                    id: UUID()
+                )
             case .expressionStatement(let value):
                 return LGCStatement.expressionStatement(
-                    LGCExpressionStatement(
-                        id: UUID(),
-                        expression: value.expression.replace(id: id, with: syntaxNode)
-                    )
+                    id: UUID(),
+                    expression: value.expression.replace(id: id, with: syntaxNode)
                 )
             case .placeholderStatement(_):
                 return self
@@ -427,7 +417,7 @@ extension LGCStatement: SyntaxNodeProtocol {
         case .expressionStatement(let value):
             return value.id
         case .placeholderStatement(let value):
-            return value.id
+            return value
         }
     }
 
@@ -581,7 +571,7 @@ extension LGCList where T == LGCStatement {
         if let first = result.first, case .placeholderStatement = first {
 
         } else {
-            output = .next(.placeholderStatement(LGCPlaceholderStatement(id: UUID())), output)
+            output = .next(.placeholderStatement(id: UUID()), output)
         }
 
         while let current = resultIterator.next() {

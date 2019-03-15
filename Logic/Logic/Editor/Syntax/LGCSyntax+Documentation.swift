@@ -71,52 +71,36 @@ public extension LGCStatement {
         case .branch:
             let example = LGCSyntaxNode.statement(
                 LGCStatement.branch(
-                    LGCBranch(
-                        id: UUID(),
-                        condition: LGCExpression.binaryExpression(
-                            LGCBinaryExpression(
+                    id: UUID(),
+                    condition: LGCExpression.binaryExpression(
+                        left: LGCExpression.identifierExpression(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "age")
+                        ),
+                        right: LGCExpression.identifierExpression(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "17")
+                        ),
+                        op: .isGreaterThan(id: UUID()),
+                        id: UUID()
+                    ),
+                    block: LGCList<LGCStatement>.next(
+                        LGCStatement.expressionStatement(
+                            id: UUID(),
+                            expression: LGCExpression.binaryExpression(
                                 left: LGCExpression.identifierExpression(
-                                    LGCIdentifierExpression(
-                                        id: UUID(),
-                                        identifier: LGCIdentifier(id: UUID(), string: "age")
-                                    )
+                                    id: UUID(),
+                                    identifier: LGCIdentifier(id: UUID(), string: "layers.Text.text")
                                 ),
                                 right: LGCExpression.identifierExpression(
-                                    LGCIdentifierExpression(
-                                        id: UUID(),
-                                        identifier: LGCIdentifier(id: UUID(), string: "17")
-                                    )
+                                    id: UUID(),
+                                    identifier: LGCIdentifier(id: UUID(), string: "\"Congrats, you're an adult!\"")
                                 ),
-                                op: .isGreaterThan(LGCIsGreaterThan(id: UUID())),
+                                op: .setEqualTo(id: UUID()),
                                 id: UUID()
                             )
                         ),
-                        block: LGCList<LGCStatement>.next(
-                            LGCStatement.expressionStatement(
-                                LGCExpressionStatement(
-                                    id: UUID(),
-                                    expression: LGCExpression.binaryExpression(
-                                        LGCBinaryExpression(
-                                            left: LGCExpression.identifierExpression(
-                                                LGCIdentifierExpression(
-                                                    id: UUID(),
-                                                    identifier: LGCIdentifier(id: UUID(), string: "layers.Text.text")
-                                                )
-                                            ),
-                                            right: LGCExpression.identifierExpression(
-                                                LGCIdentifierExpression(
-                                                    id: UUID(),
-                                                    identifier: LGCIdentifier(id: UUID(), string: "\"Congrats, you're an adult!\"")
-                                                )
-                                            ),
-                                            op: .setEqualTo(LGCSetEqualTo(id: UUID())),
-                                            id: UUID()
-                                        )
-                                    )
-                                )
-                            ),
-                            .empty
-                        )
+                        .empty
                     )
                 )
             )

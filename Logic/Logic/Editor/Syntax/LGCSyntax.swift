@@ -205,11 +205,11 @@ public struct LGCFunctionCallArgument: Codable & Equatable {
 }
 
 public indirect enum LGCStatement: Codable & Equatable {
-  case loop(LGCLoop)
-  case branch(LGCBranch)
-  case decl(LGCDecl)
-  case expressionStatement(LGCExpressionStatement)
-  case placeholderStatement(LGCPlaceholderStatement)
+  case loop(pattern: LGCPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: UUID)
+  case branch(id: UUID, condition: LGCExpression, block: LGCList<LGCStatement>)
+  case decl(content: LGCDeclaration, id: UUID)
+  case expressionStatement(id: UUID, expression: LGCExpression)
+  case placeholderStatement(id: UUID)
 
   // MARK: Codable
 
@@ -218,21 +218,46 @@ public indirect enum LGCStatement: Codable & Equatable {
     case data
   }
 
+  public enum DataCodingKeys: CodingKey {
+    case pattern
+    case expression
+    case block
+    case id
+    case condition
+    case content
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
       case "loop":
-        self = .loop(try container.decode(LGCLoop.self, forKey: .data))
+        self =
+          .loop(
+            pattern: try data.decode(LGCPattern.self, forKey: .pattern),
+            expression: try data.decode(LGCExpression.self, forKey: .expression),
+            block: try data.decode(LGCList.self, forKey: .block),
+            id: try data.decode(UUID.self, forKey: .id))
       case "branch":
-        self = .branch(try container.decode(LGCBranch.self, forKey: .data))
+        self =
+          .branch(
+            id: try data.decode(UUID.self, forKey: .id),
+            condition: try data.decode(LGCExpression.self, forKey: .condition),
+            block: try data.decode(LGCList.self, forKey: .block))
       case "decl":
-        self = .decl(try container.decode(LGCDecl.self, forKey: .data))
+        self =
+          .decl(
+            content: try data.decode(LGCDeclaration.self, forKey: .content),
+            id: try data.decode(UUID.self, forKey: .id))
       case "expressionStatement":
-        self = .expressionStatement(try container.decode(LGCExpressionStatement.self, forKey: .data))
+        self =
+          .expressionStatement(
+            id: try data.decode(UUID.self, forKey: .id),
+            expression: try data.decode(LGCExpression.self, forKey: .expression))
       case "placeholderStatement":
-        self = .placeholderStatement(try container.decode(LGCPlaceholderStatement.self, forKey: .data))
+        self = .placeholderStatement(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -240,23 +265,31 @@ public indirect enum LGCStatement: Codable & Equatable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
 
     switch self {
       case .loop(let value):
         try container.encode("loop", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.pattern, forKey: .pattern)
+        try data.encode(value.expression, forKey: .expression)
+        try data.encode(value.block, forKey: .block)
+        try data.encode(value.id, forKey: .id)
       case .branch(let value):
         try container.encode("branch", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.condition, forKey: .condition)
+        try data.encode(value.block, forKey: .block)
       case .decl(let value):
         try container.encode("decl", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.content, forKey: .content)
+        try data.encode(value.id, forKey: .id)
       case .expressionStatement(let value):
         try container.encode("expressionStatement", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.expression, forKey: .expression)
       case .placeholderStatement(let value):
         try container.encode("placeholderStatement", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
     }
   }
 }
@@ -294,8 +327,8 @@ public indirect enum LGCList<T: Equatable & Codable>: Codable & Equatable {
 }
 
 public indirect enum LGCDeclaration: Codable & Equatable {
-  case variable(LGCVariable)
-  case function(LGCFunction)
+  case variable(id: UUID)
+  case function(id: UUID)
 
   // MARK: Codable
 
@@ -304,15 +337,20 @@ public indirect enum LGCDeclaration: Codable & Equatable {
     case data
   }
 
+  public enum DataCodingKeys: CodingKey {
+    case id
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
       case "variable":
-        self = .variable(try container.decode(LGCVariable.self, forKey: .data))
+        self = .variable(id: try data.decode(UUID.self, forKey: .id))
       case "function":
-        self = .function(try container.decode(LGCFunction.self, forKey: .data))
+        self = .function(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -320,14 +358,15 @@ public indirect enum LGCDeclaration: Codable & Equatable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
 
     switch self {
       case .variable(let value):
         try container.encode("variable", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .function(let value):
         try container.encode("function", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
     }
   }
 }
@@ -402,9 +441,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
 }
 
 public indirect enum LGCExpression: Codable & Equatable {
-  case binaryExpression(LGCBinaryExpression)
-  case identifierExpression(LGCIdentifierExpression)
-  case functionCallExpression(LGCFunctionCallExpression)
+  case binaryExpression(left: LGCExpression, right: LGCExpression, op: LGCBinaryOperator, id: UUID)
+  case identifierExpression(id: UUID, identifier: LGCIdentifier)
+  case functionCallExpression(id: UUID, expression: LGCExpression, arguments: LGCList<LGCFunctionCallArgument>)
 
   // MARK: Codable
 
@@ -413,17 +452,40 @@ public indirect enum LGCExpression: Codable & Equatable {
     case data
   }
 
+  public enum DataCodingKeys: CodingKey {
+    case left
+    case right
+    case op
+    case id
+    case identifier
+    case expression
+    case arguments
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
       case "binaryExpression":
-        self = .binaryExpression(try container.decode(LGCBinaryExpression.self, forKey: .data))
+        self =
+          .binaryExpression(
+            left: try data.decode(LGCExpression.self, forKey: .left),
+            right: try data.decode(LGCExpression.self, forKey: .right),
+            op: try data.decode(LGCBinaryOperator.self, forKey: .op),
+            id: try data.decode(UUID.self, forKey: .id))
       case "identifierExpression":
-        self = .identifierExpression(try container.decode(LGCIdentifierExpression.self, forKey: .data))
+        self =
+          .identifierExpression(
+            id: try data.decode(UUID.self, forKey: .id),
+            identifier: try data.decode(LGCIdentifier.self, forKey: .identifier))
       case "functionCallExpression":
-        self = .functionCallExpression(try container.decode(LGCFunctionCallExpression.self, forKey: .data))
+        self =
+          .functionCallExpression(
+            id: try data.decode(UUID.self, forKey: .id),
+            expression: try data.decode(LGCExpression.self, forKey: .expression),
+            arguments: try data.decode(LGCList.self, forKey: .arguments))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -431,29 +493,36 @@ public indirect enum LGCExpression: Codable & Equatable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
 
     switch self {
       case .binaryExpression(let value):
         try container.encode("binaryExpression", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.left, forKey: .left)
+        try data.encode(value.right, forKey: .right)
+        try data.encode(value.op, forKey: .op)
+        try data.encode(value.id, forKey: .id)
       case .identifierExpression(let value):
         try container.encode("identifierExpression", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.identifier, forKey: .identifier)
       case .functionCallExpression(let value):
         try container.encode("functionCallExpression", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.expression, forKey: .expression)
+        try data.encode(value.arguments, forKey: .arguments)
     }
   }
 }
 
 public indirect enum LGCBinaryOperator: Codable & Equatable {
-  case isEqualTo(LGCIsEqualTo)
-  case isNotEqualTo(LGCIsNotEqualTo)
-  case isLessThan(LGCIsLessThan)
-  case isGreaterThan(LGCIsGreaterThan)
-  case isLessThanOrEqualTo(LGCIsLessThanOrEqualTo)
-  case isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo)
-  case setEqualTo(LGCSetEqualTo)
+  case isEqualTo(id: UUID)
+  case isNotEqualTo(id: UUID)
+  case isLessThan(id: UUID)
+  case isGreaterThan(id: UUID)
+  case isLessThanOrEqualTo(id: UUID)
+  case isGreaterThanOrEqualTo(id: UUID)
+  case setEqualTo(id: UUID)
 
   // MARK: Codable
 
@@ -462,25 +531,30 @@ public indirect enum LGCBinaryOperator: Codable & Equatable {
     case data
   }
 
+  public enum DataCodingKeys: CodingKey {
+    case id
+  }
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
       case "isEqualTo":
-        self = .isEqualTo(try container.decode(LGCIsEqualTo.self, forKey: .data))
+        self = .isEqualTo(id: try data.decode(UUID.self, forKey: .id))
       case "isNotEqualTo":
-        self = .isNotEqualTo(try container.decode(LGCIsNotEqualTo.self, forKey: .data))
+        self = .isNotEqualTo(id: try data.decode(UUID.self, forKey: .id))
       case "isLessThan":
-        self = .isLessThan(try container.decode(LGCIsLessThan.self, forKey: .data))
+        self = .isLessThan(id: try data.decode(UUID.self, forKey: .id))
       case "isGreaterThan":
-        self = .isGreaterThan(try container.decode(LGCIsGreaterThan.self, forKey: .data))
+        self = .isGreaterThan(id: try data.decode(UUID.self, forKey: .id))
       case "isLessThanOrEqualTo":
-        self = .isLessThanOrEqualTo(try container.decode(LGCIsLessThanOrEqualTo.self, forKey: .data))
+        self = .isLessThanOrEqualTo(id: try data.decode(UUID.self, forKey: .id))
       case "isGreaterThanOrEqualTo":
-        self = .isGreaterThanOrEqualTo(try container.decode(LGCIsGreaterThanOrEqualTo.self, forKey: .data))
+        self = .isGreaterThanOrEqualTo(id: try data.decode(UUID.self, forKey: .id))
       case "setEqualTo":
-        self = .setEqualTo(try container.decode(LGCSetEqualTo.self, forKey: .data))
+        self = .setEqualTo(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -488,29 +562,30 @@ public indirect enum LGCBinaryOperator: Codable & Equatable {
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
 
     switch self {
       case .isEqualTo(let value):
         try container.encode("isEqualTo", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .isNotEqualTo(let value):
         try container.encode("isNotEqualTo", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .isLessThan(let value):
         try container.encode("isLessThan", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .isGreaterThan(let value):
         try container.encode("isGreaterThan", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .isLessThanOrEqualTo(let value):
         try container.encode("isLessThanOrEqualTo", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .isGreaterThanOrEqualTo(let value):
         try container.encode("isGreaterThanOrEqualTo", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
       case .setEqualTo(let value):
         try container.encode("setEqualTo", forKey: .type)
-        try container.encode(value, forKey: .data)
+        try data.encode(value, forKey: .id)
     }
   }
 }

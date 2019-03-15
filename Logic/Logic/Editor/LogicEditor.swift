@@ -4,9 +4,7 @@ public let defaultRootNode = LGCSyntaxNode.program(
     LGCProgram(
         id: UUID(),
         block: LGCList<LGCStatement>.next(
-            LGCStatement.placeholderStatement(
-                LGCPlaceholderStatement(id: UUID())
-            ),
+            LGCStatement.placeholderStatement(id: UUID()),
             .empty
         )
     )

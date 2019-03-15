@@ -113,7 +113,7 @@ public extension LGCStatement {
                 ]
             }
         case .placeholderStatement(let value):
-            return .element(LogicElement.dropdown(value.id, "", Colors.editableText))
+            return .element(LogicElement.dropdown(value, "", Colors.editableText))
         case .expressionStatement(let value):
             return value.expression.formatted
         default:

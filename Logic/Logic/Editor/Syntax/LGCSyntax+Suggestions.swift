@@ -51,9 +51,9 @@ private func id(_ string: String) -> LGCIdentifier {
 
 private func idExpression(_ string: String) -> LGCExpression {
     return LGCExpression.identifierExpression(
-        LGCIdentifierExpression(
-            id: UUID(),
-            identifier: LGCIdentifier(id: UUID(), string: string)))
+        id: UUID(),
+        identifier: LGCIdentifier(id: UUID(), string: string)
+    )
 }
 
 public extension LGCIdentifier {
@@ -112,12 +112,12 @@ public extension LGCBinaryOperator {
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let operatorNodes = [
-            LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: UUID())),
-            LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: UUID())),
-            LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: UUID())),
-            LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: UUID())),
-            LGCBinaryOperator.isLessThan(LGCIsLessThan(id: UUID())),
-            LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: UUID())),
+            LGCBinaryOperator.isEqualTo(id: UUID()),
+            LGCBinaryOperator.isNotEqualTo(id: UUID()),
+            LGCBinaryOperator.isGreaterThan(id: UUID()),
+            LGCBinaryOperator.isGreaterThanOrEqualTo(id: UUID()),
+            LGCBinaryOperator.isLessThan(id: UUID()),
+            LGCBinaryOperator.isLessThanOrEqualTo(id: UUID())
         ]
 
         return operatorNodes.map { node in
@@ -137,13 +137,13 @@ public extension LGCExpression {
             category: "Expressions".uppercased(),
             node: LGCSyntaxNode.expression(
                 LGCExpression.binaryExpression(
-                    LGCBinaryExpression(
-                        left: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: UUID(), identifier: id("variable"))),
-                        right: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: UUID(), identifier: id("value"))),
-                        op: .setEqualTo(LGCSetEqualTo(id: UUID())),
-                        id: UUID()))))
+                    left: LGCExpression.identifierExpression(id: UUID(), identifier: id("variable")),
+                    right: LGCExpression.identifierExpression(id: UUID(), identifier: id("value")),
+                    op: .setEqualTo(id: UUID()),
+                    id: UUID()
+                )
+            )
+        )
     }
 
     static var comparisonSuggestionItem: LogicSuggestionItem {
@@ -152,13 +152,13 @@ public extension LGCExpression {
             category: "Expressions".uppercased(),
             node: LGCSyntaxNode.expression(
                 LGCExpression.binaryExpression(
-                    LGCBinaryExpression(
-                        left: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: UUID(), identifier: id("left"))),
-                        right: LGCExpression.identifierExpression(
-                            LGCIdentifierExpression(id: UUID(), identifier: id("right"))),
-                        op: .isEqualTo(LGCIsEqualTo(id: UUID())),
-                        id: UUID()))))
+                    left: LGCExpression.identifierExpression(id: UUID(), identifier: id("left")),
+                    right: LGCExpression.identifierExpression(id: UUID(), identifier: id("right")),
+                    op: .isEqualTo(id: UUID()),
+                    id: UUID()
+                )
+            )
+        )
     }
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
@@ -175,26 +175,23 @@ public extension LGCStatement {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = LGCSyntaxNode.statement(
             LGCStatement.branch(
-                LGCBranch(
-                    id: UUID(),
-                    condition: idExpression("condition"),
-                    block: LGCList<LGCStatement>.next(
-                        LGCStatement.placeholderStatement(
-                            LGCPlaceholderStatement(id: UUID())
-                        ),
-                        .empty
-                    )
+                id: UUID(),
+                condition: idExpression("condition"),
+                block: LGCList<LGCStatement>.next(
+                    LGCStatement.placeholderStatement(id: UUID()),
+                    .empty
                 )
             )
         )
 
         let forLoop = LGCSyntaxNode.statement(
             LGCStatement.loop(
-                LGCLoop(
-                    pattern: LGCPattern(id: UUID(), name: "item"),
-                    expression: idExpression("array"),
-                    block: LGCList<LGCStatement>.empty,
-                    id: UUID())))
+                pattern: LGCPattern(id: UUID(), name: "item"),
+                expression: idExpression("array"),
+                block: LGCList<LGCStatement>.empty,
+                id: UUID()
+            )
+        )
 
         let items = [
             LogicSuggestionItem(
