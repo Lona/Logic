@@ -224,6 +224,36 @@
 			path = Syntaxes;
 			sourceTree = "<group>";
 		};
+		6B44E195223C19B100740318 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E18F223B494600740318 /* LogicDocumentEditor.swift */,
+				6B44E171223B406800740318 /* Formatter */,
+				6B44E176223B40AF00740318 /* LogicElementEditor */,
+				6B44E142223B3D2200740318 /* RichText */,
+				6B44E166223B3E6000740318 /* Suggestions */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		6B44E196223C19EF00740318 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		6B44E197223C1A0000740318 /* Lona */ = {
+			isa = PBXGroup;
+			children = (
+				6B44E15F223B3DFF00740318 /* ForeignTypes.swift */,
+				6B44E15D223B3DF300740318 /* TextStyle.swift */,
+				6B44E151223B3DB700740318 /* Generated */,
+			);
+			path = Lona;
+			sourceTree = "<group>";
+		};
 		6B5B7513215B198400CDC9C6 = {
 			isa = PBXGroup;
 			children = (
@@ -245,18 +275,12 @@
 			children = (
 				6B5B7520215B198400CDC9C6 /* Logic.h */,
 				6B5B7521215B198400CDC9C6 /* Info.plist */,
-				6B44E15F223B3DFF00740318 /* ForeignTypes.swift */,
-				6B44E18F223B494600740318 /* LogicDocumentEditor.swift */,
-				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
-				6B44E15D223B3DF300740318 /* TextStyle.swift */,
 				6B44E163223B3E2C00740318 /* Controlled */,
-				6B44E171223B406800740318 /* Formatter */,
-				6B44E151223B3DB700740318 /* Generated */,
-				6B44E176223B40AF00740318 /* LogicElementEditor */,
-				6B44E142223B3D2200740318 /* RichText */,
-				6B44E166223B3E6000740318 /* Suggestions */,
+				6B44E195223C19B100740318 /* Editor */,
+				6B44E197223C1A0000740318 /* Lona */,
 				6B44E183223B40C900740318 /* Syntaxes */,
 				6B44E13B223B3C9000740318 /* Types */,
+				6B44E196223C19EF00740318 /* Utils */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
