@@ -199,9 +199,9 @@
 		6B44E176223B40AF00740318 /* LogicElementEditor */ = {
 			isa = PBXGroup;
 			children = (
-				6B44E172223B40AF00740318 /* LogicElementEditor.swift */,
 				6B44E173223B40AF00740318 /* LogicElement.swift */,
 				6B44E174223B40AF00740318 /* LogicElement+Formatter.swift */,
+				6B44E172223B40AF00740318 /* LogicElementEditor.swift */,
 				6B44E175223B40AF00740318 /* LogicMeasuredElement.swift */,
 			);
 			path = LogicElementEditor;
