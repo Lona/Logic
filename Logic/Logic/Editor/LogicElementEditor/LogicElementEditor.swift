@@ -44,6 +44,8 @@ public class LogicElementEditor: NSView {
     }
     public var onActivate: ((Int?) -> Void)?
     public var onActivateLine: ((Int) -> Void)?
+    public var onPressTabKey: (() -> Void)?
+    public var onPressShiftTabKey: (() -> Void)?
 
     // MARK: Styles
 
@@ -91,50 +93,6 @@ public class LogicElementEditor: NSView {
         return true
     }
 
-    public func nextActivatableIndex(after currentIndex: Int?) -> Int? {
-        let measuredElements = self.measuredElements
-
-        let activatableElements = measuredElements.enumerated()
-            .filter { $0.element.element.syntaxNodeID != nil }
-
-        if activatableElements.isEmpty { return nil }
-
-        // If there is no selection, focus the first element
-        guard let currentIndex = currentIndex else { return activatableElements.first?.offset }
-
-        guard currentIndex < measuredElements.count,
-            let currentID = measuredElements[currentIndex].element.syntaxNodeID else { return nil }
-
-        if let index = activatableElements.firstIndex(where: { $0.element.element.syntaxNodeID == currentID }),
-            index + 1 < activatableElements.count {
-            return activatableElements[index + 1].offset
-        } else {
-            return nil
-        }
-    }
-
-    public func previousActivatableIndex(before currentIndex: Int?) -> Int? {
-        let measuredElements = self.measuredElements
-
-        let activatableElements = measuredElements.enumerated()
-            .filter { $0.element.element.syntaxNodeID != nil }
-
-        if activatableElements.isEmpty { return nil }
-
-        // If there is no selection, focus the last element
-        guard let currentIndex = currentIndex else { return activatableElements.last?.offset }
-
-        guard currentIndex < measuredElements.count,
-            let currentID = measuredElements[currentIndex].element.syntaxNodeID else { return nil }
-
-        if let index = activatableElements.firstIndex(where: { $0.element.element.syntaxNodeID == currentID }),
-            index - 1 >= 0 {
-            return activatableElements[index - 1].offset
-        } else {
-            return nil
-        }
-    }
-
     public func getBoundingRect(for index: Int) -> CGRect? {
         if index >= measuredElements.count { return nil }
 
@@ -176,13 +134,9 @@ public class LogicElementEditor: NSView {
             Swift.print("Tab \(shiftKey ? "shift" : "no shift")")
 
             if shiftKey {
-                if let previousIndex = previousActivatableIndex(before: selectedIndex) {
-                    onActivate?(previousIndex)
-                }
+                onPressShiftTabKey?()
             } else {
-                if let nextIndex = nextActivatableIndex(after: selectedIndex) {
-                    onActivate?(nextIndex)
-                }
+                onPressTabKey?()
             }
         case 123: // Left
             Swift.print("Left arrow")

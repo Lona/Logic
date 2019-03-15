@@ -13,6 +13,15 @@ public enum LogicElement {
     case coloredText(String, NSColor)
     case dropdown(UUID, String, NSColor)
 
+    public var isActivatable: Bool {
+        switch self {
+        case .text, .coloredText:
+            return false
+        case .dropdown:
+            return true
+        }
+    }
+
     public var syntaxNodeID: UUID? {
         switch self {
         case .text:
