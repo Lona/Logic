@@ -21,7 +21,7 @@ public class LogicElementEditor: NSView {
 
     // MARK: Public
 
-    public var formattedContent: Formatter<LogicElement>.Command = .hardLine {
+    public var formattedContent: FormatterCommand<LogicElement> = .hardLine {
         didSet {
 //            invalidateIntrinsicContentSize()
             update()

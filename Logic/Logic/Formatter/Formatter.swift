@@ -12,113 +12,96 @@ public protocol FormattableElement {
     var width: CGFloat { get }
 }
 
-public enum Formatter<Element: FormattableElement> {
+public indirect enum FormatterCommand<Element: FormattableElement> {
+    case element(Element)
+    case line
+    case indent(() -> FormatterCommand)
+    case hardLine
+    case join(with: FormatterCommand, () -> [FormatterCommand])
+    case concat(() -> [FormatterCommand])
+
     public struct FormattedElement {
         var element: Element
         var position: CGFloat
     }
 
-    public indirect enum Command {
-        case element(Element)
-        case line
-        case indent(() -> Command)
-        case hardLine
-        case join(with: Command, () -> [Command])
-        case concat(() -> [Command])
-
-        public func print(
-            width maxLineWidth: CGFloat,
-            spaceWidth: CGFloat,
-            indentWidth: CGFloat
-            ) -> [[Formatter<Element>.FormattedElement]] {
-
-            return Formatter<Element>.print(
-                command: self,
-                width: maxLineWidth,
-                spaceWidth: spaceWidth,
-                indentWidth: indentWidth)
-        }
-
-        public var elements: [Element] {
-            return Array(logicalRows.joined())
-        }
-
-        public var logicalRows: [[Element]] {
-            var rows: [[Element]] = []
-
-            var currentRow: [Element] = []
-
-            func moveToNextRow() {
-                rows.append(currentRow)
-                currentRow = []
-            }
-
-            func process(command: Command) {
-                switch command {
-                case .indent(let child):
-                    process(command: child())
-                case .line:
-                    break
-                case .hardLine:
-                    moveToNextRow()
-                case .element(let element):
-                    currentRow.append(element)
-                case .concat(let commands):
-                    commands().forEach(process)
-                case .join(with: let separator, let commands):
-                    process(command: Formatter.performJoin(with: separator, commands))
-                }
-            }
-
-            process(command: self)
-
-            if !currentRow.isEmpty {
-                rows.append(currentRow)
-            }
-
-            return rows
-        }
-
-        func lineIndex(for elementIndex: Int) -> Int {
-            var elementCount = 0
-            for (offset, formattedLine) in logicalRows.enumerated() {
-                elementCount += formattedLine.count
-
-                if elementIndex < elementCount {
-                    return offset
-                }
-            }
-
-            fatalError("Could not find line number for element index \(elementIndex)")
-        }
-
-        func elementIndexRange(for lineIndex: Int) -> Range<Int> {
-            var elementCount = 0
-            for (offset, formattedLine) in logicalRows.enumerated() {
-                let endElementCount = elementCount + formattedLine.count
-
-                if offset == lineIndex {
-                    return elementCount..<endElementCount
-                }
-
-                elementCount = endElementCount
-            }
-
-            fatalError("Could not find element range for line index \(lineIndex)")
-        }
-
+    public var elements: [Element] {
+        return Array(logicalRows.joined())
     }
 
-    static func print(
-        command: Command,
+    public var logicalRows: [[Element]] {
+        var rows: [[Element]] = []
+
+        var currentRow: [Element] = []
+
+        func moveToNextRow() {
+            rows.append(currentRow)
+            currentRow = []
+        }
+
+        func process(command: FormatterCommand) {
+            switch command {
+            case .indent(let child):
+                process(command: child())
+            case .line:
+                break
+            case .hardLine:
+                moveToNextRow()
+            case .element(let element):
+                currentRow.append(element)
+            case .concat(let commands):
+                commands().forEach(process)
+            case .join(with: let separator, let commands):
+                process(command: FormatterCommand.performJoin(with: separator, commands))
+            }
+        }
+
+        process(command: self)
+
+        if !currentRow.isEmpty {
+            rows.append(currentRow)
+        }
+
+        return rows
+    }
+
+    func lineIndex(for elementIndex: Int) -> Int {
+        var elementCount = 0
+        for (offset, formattedLine) in logicalRows.enumerated() {
+            elementCount += formattedLine.count
+
+            if elementIndex < elementCount {
+                return offset
+            }
+        }
+
+        fatalError("Could not find line number for element index \(elementIndex)")
+    }
+
+    func elementIndexRange(for lineIndex: Int) -> Range<Int> {
+        var elementCount = 0
+        for (offset, formattedLine) in logicalRows.enumerated() {
+            let endElementCount = elementCount + formattedLine.count
+
+            if offset == lineIndex {
+                return elementCount..<endElementCount
+            }
+
+            elementCount = endElementCount
+        }
+
+        fatalError("Could not find element range for line index \(lineIndex)")
+    }
+
+    func print(
         width maxLineWidth: CGFloat,
         spaceWidth: CGFloat,
         indentWidth: CGFloat
-        ) -> [[Formatter<Element>.FormattedElement]] {
+        ) -> [[FormattedElement]] {
 
-        var rows: [[Formatter<Element>.FormattedElement]] = []
+        var rows: [[FormattedElement]] = []
 
-        var currentRow: [Formatter<Element>.FormattedElement] = []
+        var currentRow: [FormattedElement] = []
         var currentOffset: CGFloat = 0
         var currentIndentLevel: Int = 0
 
@@ -128,7 +111,7 @@ public enum Formatter<Element: FormattableElement> {
             currentOffset = CGFloat(currentIndentLevel) * indentWidth
         }
 
-        func process(command: Command) {
+        func process(command: FormatterCommand) {
             switch command {
             case .indent(let child):
                 currentIndentLevel += 1
@@ -149,18 +132,18 @@ public enum Formatter<Element: FormattableElement> {
                     moveToNextRow()
                 }
 
-                let formattedElement = Formatter<Element>.FormattedElement(element: element, position: currentOffset)
+                let formattedElement = FormatterCommand<Element>.FormattedElement(element: element, position: currentOffset)
                 currentRow.append(formattedElement)
 
                 currentOffset += elementWidth
             case .concat(let commands):
                 commands().forEach(process)
             case .join(with: let separator, let commands):
-                process(command: Formatter.performJoin(with: separator, commands))
+                process(command: FormatterCommand.performJoin(with: separator, commands))
             }
         }
 
-        process(command: command)
+        process(command: self)
 
         if !currentRow.isEmpty {
             rows.append(currentRow)
@@ -169,8 +152,8 @@ public enum Formatter<Element: FormattableElement> {
         return rows
     }
 
-    private static func performJoin(with separator: Command, _ commands: () -> [Command]) -> Command {
-        var joinedCommands: [Command] = []
+    private static func performJoin(with separator: FormatterCommand, _ commands: () -> [FormatterCommand]) -> FormatterCommand {
+        var joinedCommands: [FormatterCommand] = []
         let commands = commands()
 
         commands.enumerated().forEach { offset, command in
@@ -192,7 +175,7 @@ extension String: FormattableElement {
 }
 
 func testFormatter() {
-    let command: Formatter<String>.Command = .concat {
+    let command: FormatterCommand<String> = .concat {
         [
             .element("Hello"),
             .line,
@@ -211,7 +194,7 @@ func testFormatter() {
         ]
     }
 
-    let lines = Formatter.print(command: command, width: 20, spaceWidth: 1, indentWidth: 4)
+    let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4)
 
     Swift.print(lines)
 }
