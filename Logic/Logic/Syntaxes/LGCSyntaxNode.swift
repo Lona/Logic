@@ -13,15 +13,15 @@ public enum Movement {
 }
 
 public protocol SyntaxNodeProtocol {
-    var uuid: SwiftUUID { get }
-    var lastNode: SwiftSyntaxNode { get }
+    var uuid: LGCUUID { get }
+    var lastNode: LGCSyntaxNode { get }
     var movementAfterInsertion: Movement { get }
-    var node: SwiftSyntaxNode { get }
+    var node: LGCSyntaxNode { get }
     var nodeTypeDescription: String { get }
 
-    func find(id: SwiftUUID) -> SwiftSyntaxNode?
-    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]?
-    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> Self
+    func find(id: LGCUUID) -> LGCSyntaxNode?
+    func pathTo(id: LGCUUID) -> [LGCSyntaxNode]?
+    func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> Self
 
     func documentation(for prefix: String) -> RichText
 
@@ -34,126 +34,126 @@ extension SyntaxNodeProtocol {
     }
 }
 
-extension SwiftIdentifier: SyntaxNodeProtocol {
+extension LGCIdentifier: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Identifier"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .identifier(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftIdentifier {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCIdentifier {
         switch syntaxNode {
         case .identifier(let newNode) where id == uuid:
-            return SwiftIdentifier(id: NSUUID().uuidString, string: newNode.string)
+            return LGCIdentifier(id: NSUUID().uuidString, string: newNode.string)
         default:
-            return SwiftIdentifier(id: NSUUID().uuidString, string: string)
+            return LGCIdentifier(id: NSUUID().uuidString, string: string)
         }
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         return id == uuid ? node : nil
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         return id == uuid ? [node] : nil
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         return node
     }
 
-    public var uuid: SwiftUUID { return id }
+    public var uuid: LGCUUID { return id }
 
     public var movementAfterInsertion: Movement {
         return .next
     }
 }
 
-extension SwiftPattern: SyntaxNodeProtocol {
+extension LGCPattern: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Pattern"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .pattern(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftPattern {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCPattern {
         switch syntaxNode {
         case .pattern(let newNode) where id == uuid:
-            return SwiftPattern(id: NSUUID().uuidString, name: newNode.name)
+            return LGCPattern(id: NSUUID().uuidString, name: newNode.name)
         default:
-            return SwiftPattern(id: NSUUID().uuidString, name: name)
+            return LGCPattern(id: NSUUID().uuidString, name: name)
         }
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         return id == uuid ? node : nil
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         return id == uuid ? [node] : nil
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         return node
     }
 
-    public var uuid: SwiftUUID { return id }
+    public var uuid: LGCUUID { return id }
 
     public var movementAfterInsertion: Movement {
         return .next
     }
 }
 
-extension SwiftBinaryOperator: SyntaxNodeProtocol {
+extension LGCBinaryOperator: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Binary Operator"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .binaryOperator(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftBinaryOperator {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCBinaryOperator {
         switch syntaxNode {
         case .binaryOperator(let newNode) where id == uuid:
             return newNode
         default:
             switch self {
             case .isEqualTo:
-                return SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString))
             case .isNotEqualTo:
-                return SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: NSUUID().uuidString))
             case .isLessThan:
-                return SwiftBinaryOperator.isLessThan(SwiftIsLessThan(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isLessThan(LGCIsLessThan(id: NSUUID().uuidString))
             case .isGreaterThan:
-                return SwiftBinaryOperator.isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString))
             case .isLessThanOrEqualTo:
-                return SwiftBinaryOperator.isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: NSUUID().uuidString))
             case .isGreaterThanOrEqualTo:
-                return SwiftBinaryOperator.isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: NSUUID().uuidString))
             case .setEqualTo:
-                return SwiftBinaryOperator.setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString))
+                return LGCBinaryOperator.setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString))
             }
         }
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         return id == uuid ? node : nil
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         return id == uuid ? [node] : nil
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         return node
     }
 
-    public var uuid: SwiftUUID {
+    public var uuid: LGCUUID {
         switch self {
         case .isEqualTo(let value):
             return value.id
@@ -177,37 +177,37 @@ extension SwiftBinaryOperator: SyntaxNodeProtocol {
     }
 }
 
-extension SwiftExpression: SyntaxNodeProtocol {
+extension LGCExpression: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Expression"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .expression(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftExpression {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCExpression {
         switch (syntaxNode, self) {
         case (.expression(let newNode), _) where id == uuid:
             return newNode
         // Identifier can become an IdentifierExpression and replace an expression
         case (.identifier(let newNode), _) where id == uuid:
-            return .identifierExpression(SwiftIdentifierExpression(
+            return .identifierExpression(LGCIdentifierExpression(
                 id: NSUUID().uuidString,
                 identifier: newNode))
         case (_, .binaryExpression(let value)):
-            return .binaryExpression(SwiftBinaryExpression(
+            return .binaryExpression(LGCBinaryExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
                 op: value.op.replace(id: id, with: syntaxNode),
                 id: NSUUID().uuidString))
         case (_, .identifierExpression(let value)):
-            return .identifierExpression(SwiftIdentifierExpression(
+            return .identifierExpression(LGCIdentifierExpression(
                 id: NSUUID().uuidString,
                 identifier: value.identifier.replace(id: id, with: syntaxNode)))
         case (_, .functionCallExpression(let value)):
             return .functionCallExpression(
-                SwiftFunctionCallExpression(
+                LGCFunctionCallExpression(
                     id: NSUUID().uuidString,
                     expression: value.expression.replace(id: id, with: syntaxNode),
                     arguments: value.arguments.replace(id: id, with: syntaxNode)
@@ -216,9 +216,9 @@ extension SwiftExpression: SyntaxNodeProtocol {
         }
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         if id == uuid {
-            return SwiftSyntaxNode.expression(self)
+            return LGCSyntaxNode.expression(self)
         }
 
         switch self {
@@ -231,12 +231,12 @@ extension SwiftExpression: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         if id == uuid {
             return [.expression(self)]
         }
 
-        var found: [SwiftSyntaxNode]?
+        var found: [LGCSyntaxNode]?
 
         switch self {
         case .binaryExpression(let value):
@@ -244,7 +244,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
         case .identifierExpression(let value):
             found = value.identifier.pathTo(id: id)
         case .functionCallExpression(let value):
-            let foundInArguments: [SwiftSyntaxNode]? = value.arguments.reduce(nil, { result, node in
+            let foundInArguments: [LGCSyntaxNode]? = value.arguments.reduce(nil, { result, node in
                 if result != nil { return result }
                 return node.pathTo(id: id)
             })
@@ -258,7 +258,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         switch self {
         case .binaryExpression(let value):
             return value.right.lastNode
@@ -269,7 +269,7 @@ extension SwiftExpression: SyntaxNodeProtocol {
         }
     }
 
-    public var uuid: SwiftUUID {
+    public var uuid: LGCUUID {
         switch self {
         case .binaryExpression(let value):
             return value.id
@@ -292,29 +292,29 @@ extension SwiftExpression: SyntaxNodeProtocol {
     }
 }
 
-extension SwiftStatement: SyntaxNodeProtocol {
+extension LGCStatement: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Statement"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .statement(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftStatement {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCStatement {
         switch syntaxNode {
         case .statement(let newNode) where id == uuid:
             return newNode
         case .expression(let newNode) where id == uuid:
             return .expressionStatement(
-                SwiftExpressionStatement(
+                LGCExpressionStatement(
                     id: NSUUID().uuidString,
                     expression: newNode
                 )
             )
         case .declaration(let newNode) where id == uuid:
             return .decl(
-                SwiftDecl(
+                LGCDecl(
                     content: newNode,
                     id: NSUUID().uuidString
                 )
@@ -323,7 +323,7 @@ extension SwiftStatement: SyntaxNodeProtocol {
             switch self {
             case .branch(let value):
                 return .branch(
-                    SwiftBranch(
+                    LGCBranch(
                         id: NSUUID().uuidString,
                         condition: value.condition.replace(id: id, with: syntaxNode),
                         block: value.block.replace(id: id, with: syntaxNode)
@@ -332,15 +332,15 @@ extension SwiftStatement: SyntaxNodeProtocol {
             case .decl:
                 return self
             case .loop(let value):
-                return SwiftStatement.loop(
-                    SwiftLoop(
+                return LGCStatement.loop(
+                    LGCLoop(
                         pattern: value.pattern.replace(id: id, with: syntaxNode),
                         expression: value.expression.replace(id: id, with: syntaxNode),
-                        block: SwiftList<SwiftStatement>.empty,
+                        block: LGCList<LGCStatement>.empty,
                         id: NSUUID().uuidString))
             case .expressionStatement(let value):
-                return SwiftStatement.expressionStatement(
-                    SwiftExpressionStatement(
+                return LGCStatement.expressionStatement(
+                    LGCExpressionStatement(
                         id: NSUUID().uuidString,
                         expression: value.expression.replace(id: id, with: syntaxNode)
                     )
@@ -351,9 +351,9 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         if id == uuid {
-            return SwiftSyntaxNode.statement(self)
+            return LGCSyntaxNode.statement(self)
         }
 
         switch self {
@@ -370,16 +370,16 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         if id == uuid {
             return [.statement(self)]
         }
 
-        var found: [SwiftSyntaxNode]?
+        var found: [LGCSyntaxNode]?
 
         switch self {
         case .branch(let value):
-            let foundInBlock: [SwiftSyntaxNode]? = value.block.reduce(nil, { result, node in
+            let foundInBlock: [LGCSyntaxNode]? = value.block.reduce(nil, { result, node in
                 if result != nil { return result }
                 return node.pathTo(id: id)
             })
@@ -401,7 +401,7 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         switch self {
         case .branch(let value):
             return value.block.map { $0 }.last?.lastNode ?? value.condition.lastNode
@@ -416,7 +416,7 @@ extension SwiftStatement: SyntaxNodeProtocol {
         }
     }
 
-    public var uuid: SwiftUUID {
+    public var uuid: LGCUUID {
         switch self {
         case .branch(let value):
             return value.id
@@ -436,32 +436,32 @@ extension SwiftStatement: SyntaxNodeProtocol {
     }
 }
 
-extension SwiftProgram: SyntaxNodeProtocol {
+extension LGCProgram: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Program"
     }
 
-    public var node: SwiftSyntaxNode {
+    public var node: LGCSyntaxNode {
         return .program(self)
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftProgram {
-        return SwiftProgram(
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCProgram {
+        return LGCProgram(
             id: NSUUID().uuidString,
             block: block.replace(id: id, with: syntaxNode)
         )
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         if id == uuid { return node }
 
         return block.find(id: id)
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         if id == uuid { return [node] }
 
-        let found: [SwiftSyntaxNode]? = block.reduce(nil, { result, node in
+        let found: [LGCSyntaxNode]? = block.reduce(nil, { result, node in
             if result != nil { return result }
             return node.pathTo(id: id)
         })
@@ -471,11 +471,11 @@ extension SwiftProgram: SyntaxNodeProtocol {
         return found
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         return block.map { $0 }.last?.lastNode ?? node
     }
 
-    public var uuid: SwiftUUID {
+    public var uuid: LGCUUID {
         return id
     }
 
@@ -485,28 +485,28 @@ extension SwiftProgram: SyntaxNodeProtocol {
 }
 
 
-extension SwiftFunctionCallArgument {
-    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftFunctionCallArgument {
-        return SwiftFunctionCallArgument(
+extension LGCFunctionCallArgument {
+    func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
+        return LGCFunctionCallArgument(
             id: NSUUID().uuidString,
             label: label,
             expression: expression.replace(id: id, with: syntaxNode)
         )
     }
 
-    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    func find(id: LGCUUID) -> LGCSyntaxNode? {
         return expression.find(id: id)
     }
 
-    func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         return expression.pathTo(id: id)
     }
 
-    var lastNode: SwiftSyntaxNode {
+    var lastNode: LGCSyntaxNode {
         return expression.lastNode
     }
 
-    var uuid: SwiftUUID {
+    var uuid: LGCUUID {
         return id
     }
 
@@ -515,7 +515,7 @@ extension SwiftFunctionCallArgument {
     }
 }
 
-extension SwiftSyntaxNode {
+extension LGCSyntaxNode {
     public var contents: SyntaxNodeProtocol {
         switch self {
         case .statement(let value):
@@ -535,23 +535,23 @@ extension SwiftSyntaxNode {
         }
     }
 
-    public func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftSyntaxNode {
+    public func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
         return contents.replace(id: id, with: syntaxNode).node
     }
 
-    public func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+    public func find(id: LGCUUID) -> LGCSyntaxNode? {
         return contents.find(id: id)
     }
 
-    public func pathTo(id: SwiftUUID) -> [SwiftSyntaxNode]? {
+    public func pathTo(id: LGCUUID) -> [LGCSyntaxNode]? {
         return contents.pathTo(id: id)
     }
 
-    public var lastNode: SwiftSyntaxNode {
+    public var lastNode: LGCSyntaxNode {
         return contents.lastNode
     }
 
-    public var uuid: SwiftUUID {
+    public var uuid: LGCUUID {
         return contents.uuid
     }
 
@@ -564,24 +564,24 @@ extension SwiftSyntaxNode {
     }
 }
 
-extension SwiftList where T == SwiftStatement {
-    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+extension LGCList where T == LGCStatement {
+    func find(id: LGCUUID) -> LGCSyntaxNode? {
         return self.reduce(nil, { result, item in
             return result ?? item.find(id: id)
         })
     }
 
-    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftList {
+    func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
         // Reverse list so we can easily prepend to the front
         let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
 
         var resultIterator = result.makeIterator()
-        var output = SwiftList<T>.empty
+        var output = LGCList<T>.empty
 
         if let first = result.first, case .placeholderStatement = first {
 
         } else {
-            output = .next(.placeholderStatement(SwiftPlaceholderStatement(id: NSUUID().uuidString)), output)
+            output = .next(.placeholderStatement(LGCPlaceholderStatement(id: NSUUID().uuidString)), output)
         }
 
         while let current = resultIterator.next() {
@@ -592,19 +592,19 @@ extension SwiftList where T == SwiftStatement {
     }
 }
 
-extension SwiftList where T == SwiftFunctionCallArgument {
-    func find(id: SwiftUUID) -> SwiftSyntaxNode? {
+extension LGCList where T == LGCFunctionCallArgument {
+    func find(id: LGCUUID) -> LGCSyntaxNode? {
         return self.reduce(nil, { result, item in
             return result ?? item.find(id: id)
         })
     }
 
-    func replace(id: SwiftUUID, with syntaxNode: SwiftSyntaxNode) -> SwiftList {
+    func replace(id: LGCUUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
         // Reverse list so we can easily prepend to the front
         let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
 
         var resultIterator = result.makeIterator()
-        var output = SwiftList<T>.empty
+        var output = LGCList<T>.empty
 
         while let current = resultIterator.next() {
             output = .next(current, output)

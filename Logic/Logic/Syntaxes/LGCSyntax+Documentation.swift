@@ -8,7 +8,7 @@
 
 import AppKit
 
-private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
+private func codeView(for syntaxNode: LGCSyntaxNode) -> NSView {
     let container = NSBox()
     container.boxType = .custom
     container.borderType = .lineBorder
@@ -31,7 +31,7 @@ private func codeView(for syntaxNode: SwiftSyntaxNode) -> NSView {
     return container
 }
 
-public extension SwiftExpression {
+public extension LGCExpression {
     public func documentation(for prefix: String) -> RichText {
         switch self {
         case .binaryExpression(let value):
@@ -65,51 +65,51 @@ public extension SwiftExpression {
     }
 }
 
-public extension SwiftStatement {
+public extension LGCStatement {
     public func documentation(for prefix: String) -> RichText {
         switch self {
         case .branch:
-            let example = SwiftSyntaxNode.statement(
-                SwiftStatement.branch(
-                    SwiftBranch(
+            let example = LGCSyntaxNode.statement(
+                LGCStatement.branch(
+                    LGCBranch(
                         id: NSUUID().uuidString,
-                        condition: SwiftExpression.binaryExpression(
-                            SwiftBinaryExpression(
-                                left: SwiftExpression.identifierExpression(
-                                    SwiftIdentifierExpression(
+                        condition: LGCExpression.binaryExpression(
+                            LGCBinaryExpression(
+                                left: LGCExpression.identifierExpression(
+                                    LGCIdentifierExpression(
                                         id: NSUUID().uuidString,
-                                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "age")
+                                        identifier: LGCIdentifier(id: NSUUID().uuidString, string: "age")
                                     )
                                 ),
-                                right: SwiftExpression.identifierExpression(
-                                    SwiftIdentifierExpression(
+                                right: LGCExpression.identifierExpression(
+                                    LGCIdentifierExpression(
                                         id: NSUUID().uuidString,
-                                        identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "17")
+                                        identifier: LGCIdentifier(id: NSUUID().uuidString, string: "17")
                                     )
                                 ),
-                                op: .isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
+                                op: .isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString)),
                                 id: NSUUID().uuidString
                             )
                         ),
-                        block: SwiftList<SwiftStatement>.next(
-                            SwiftStatement.expressionStatement(
-                                SwiftExpressionStatement(
+                        block: LGCList<LGCStatement>.next(
+                            LGCStatement.expressionStatement(
+                                LGCExpressionStatement(
                                     id: NSUUID().uuidString,
-                                    expression: SwiftExpression.binaryExpression(
-                                        SwiftBinaryExpression(
-                                            left: SwiftExpression.identifierExpression(
-                                                SwiftIdentifierExpression(
+                                    expression: LGCExpression.binaryExpression(
+                                        LGCBinaryExpression(
+                                            left: LGCExpression.identifierExpression(
+                                                LGCIdentifierExpression(
                                                     id: NSUUID().uuidString,
-                                                    identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
+                                                    identifier: LGCIdentifier(id: NSUUID().uuidString, string: "layers.Text.text")
                                                 )
                                             ),
-                                            right: SwiftExpression.identifierExpression(
-                                                SwiftIdentifierExpression(
+                                            right: LGCExpression.identifierExpression(
+                                                LGCIdentifierExpression(
                                                     id: NSUUID().uuidString,
-                                                    identifier: SwiftIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
+                                                    identifier: LGCIdentifier(id: NSUUID().uuidString, string: "\"Congrats, you're an adult!\"")
                                                 )
                                             ),
-                                            op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
+                                            op: .setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString)),
                                             id: NSUUID().uuidString
                                         )
                                     )
@@ -166,7 +166,7 @@ public extension SwiftStatement {
     }
 }
 
-public extension SwiftSyntaxNode {
+public extension LGCSyntaxNode {
     func documentation(for prefix: String) -> RichText {
         return contents.documentation(for: prefix)
     }

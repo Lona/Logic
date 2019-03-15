@@ -1,11 +1,11 @@
 import AppKit
 
-public let defaultRootNode = SwiftSyntaxNode.program(
-    SwiftProgram(
+public let defaultRootNode = LGCSyntaxNode.program(
+    LGCProgram(
         id: NSUUID().uuidString,
-        block: SwiftList<SwiftStatement>.next(
-            SwiftStatement.placeholderStatement(
-                SwiftPlaceholderStatement(id: NSUUID().uuidString)
+        block: LGCList<LGCStatement>.next(
+            LGCStatement.placeholderStatement(
+                LGCPlaceholderStatement(id: NSUUID().uuidString)
             ),
             .empty
         )
@@ -18,7 +18,7 @@ public class LogicDocumentEditor: NSBox {
 
     // MARK: Lifecycle
 
-    public init(rootNode: SwiftSyntaxNode = defaultRootNode) {
+    public init(rootNode: LGCSyntaxNode = defaultRootNode) {
         self.rootNode = rootNode
 
         super.init(frame: .zero)
@@ -35,7 +35,7 @@ public class LogicDocumentEditor: NSBox {
 
     // MARK: Public
 
-    public var rootNode: SwiftSyntaxNode {
+    public var rootNode: LGCSyntaxNode {
         didSet {
             logicEditor.formattedContent = rootNode.formatted
         }
@@ -80,7 +80,7 @@ public class LogicDocumentEditor: NSBox {
         return suggestionListItems
     }
 
-    func logicSuggestionItems(for syntaxNode: SwiftSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
+    func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
         guard let range = rootNode.elementRange(for: syntaxNode.uuid),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
@@ -121,7 +121,7 @@ public class LogicDocumentEditor: NSBox {
         }
     }
 
-    func showSuggestionWindow(for nodeIndex: Int, syntaxNode: SwiftSyntaxNode) {
+    func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window, let childWindow = self.childWindow else { return }
 
         let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid)
@@ -223,7 +223,7 @@ public class LogicDocumentEditor: NSBox {
         childWindow.setIsVisible(false)
     }
 
-    func select(nodeByID syntaxNodeId: SwiftUUID?) {
+    func select(nodeByID syntaxNodeId: LGCUUID?) {
         self.logicEditor.selectedLine = nil
         self.suggestionText = ""
 

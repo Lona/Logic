@@ -1,215 +1,215 @@
 import AppKit
 
-public struct SwiftIdentifier: Codable & Equatable {
-  public init(id: SwiftUUID, string: SwiftString) {
+public struct LGCIdentifier: Codable & Equatable {
+  public init(id: LGCUUID, string: LGCString) {
     self.id = id
     self.string = string
   }
 
-  public var id: SwiftUUID
-  public var string: SwiftString
+  public var id: LGCUUID
+  public var string: LGCString
 }
 
-public struct SwiftLoop: Codable & Equatable {
-  public init(pattern: SwiftPattern, expression: SwiftExpression, block: SwiftList<SwiftStatement>, id: SwiftUUID) {
+public struct LGCLoop: Codable & Equatable {
+  public init(pattern: LGCPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: LGCUUID) {
     self.pattern = pattern
     self.expression = expression
     self.block = block
     self.id = id
   }
 
-  public var pattern: SwiftPattern
-  public var expression: SwiftExpression
-  public var block: SwiftList<SwiftStatement>
-  public var id: SwiftUUID
+  public var pattern: LGCPattern
+  public var expression: LGCExpression
+  public var block: LGCList<LGCStatement>
+  public var id: LGCUUID
 }
 
-public struct SwiftBranch: Codable & Equatable {
-  public init(id: SwiftUUID, condition: SwiftExpression, block: SwiftList<SwiftStatement>) {
+public struct LGCBranch: Codable & Equatable {
+  public init(id: LGCUUID, condition: LGCExpression, block: LGCList<LGCStatement>) {
     self.id = id
     self.condition = condition
     self.block = block
   }
 
-  public var id: SwiftUUID
-  public var condition: SwiftExpression
-  public var block: SwiftList<SwiftStatement>
+  public var id: LGCUUID
+  public var condition: LGCExpression
+  public var block: LGCList<LGCStatement>
 }
 
-public struct SwiftDecl: Codable & Equatable {
-  public init(content: SwiftDeclaration, id: SwiftUUID) {
+public struct LGCDecl: Codable & Equatable {
+  public init(content: LGCDeclaration, id: LGCUUID) {
     self.content = content
     self.id = id
   }
 
-  public var content: SwiftDeclaration
-  public var id: SwiftUUID
+  public var content: LGCDeclaration
+  public var id: LGCUUID
 }
 
-public struct SwiftExpressionStatement: Codable & Equatable {
-  public init(id: SwiftUUID, expression: SwiftExpression) {
+public struct LGCExpressionStatement: Codable & Equatable {
+  public init(id: LGCUUID, expression: LGCExpression) {
     self.id = id
     self.expression = expression
   }
 
-  public var id: SwiftUUID
-  public var expression: SwiftExpression
+  public var id: LGCUUID
+  public var expression: LGCExpression
 }
 
-public struct SwiftPlaceholderStatement: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCPlaceholderStatement: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftVariable: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCVariable: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftFunction: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCFunction: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftBinaryExpression: Codable & Equatable {
-  public init(left: SwiftExpression, right: SwiftExpression, op: SwiftBinaryOperator, id: SwiftUUID) {
+public struct LGCBinaryExpression: Codable & Equatable {
+  public init(left: LGCExpression, right: LGCExpression, op: LGCBinaryOperator, id: LGCUUID) {
     self.left = left
     self.right = right
     self.op = op
     self.id = id
   }
 
-  public var left: SwiftExpression
-  public var right: SwiftExpression
-  public var op: SwiftBinaryOperator
-  public var id: SwiftUUID
+  public var left: LGCExpression
+  public var right: LGCExpression
+  public var op: LGCBinaryOperator
+  public var id: LGCUUID
 }
 
-public struct SwiftIdentifierExpression: Codable & Equatable {
-  public init(id: SwiftUUID, identifier: SwiftIdentifier) {
+public struct LGCIdentifierExpression: Codable & Equatable {
+  public init(id: LGCUUID, identifier: LGCIdentifier) {
     self.id = id
     self.identifier = identifier
   }
 
-  public var id: SwiftUUID
-  public var identifier: SwiftIdentifier
+  public var id: LGCUUID
+  public var identifier: LGCIdentifier
 }
 
-public struct SwiftFunctionCallExpression: Codable & Equatable {
-  public init(id: SwiftUUID, expression: SwiftExpression, arguments: SwiftList<SwiftFunctionCallArgument>) {
+public struct LGCFunctionCallExpression: Codable & Equatable {
+  public init(id: LGCUUID, expression: LGCExpression, arguments: LGCList<LGCFunctionCallArgument>) {
     self.id = id
     self.expression = expression
     self.arguments = arguments
   }
 
-  public var id: SwiftUUID
-  public var expression: SwiftExpression
-  public var arguments: SwiftList<SwiftFunctionCallArgument>
+  public var id: LGCUUID
+  public var expression: LGCExpression
+  public var arguments: LGCList<LGCFunctionCallArgument>
 }
 
-public struct SwiftPattern: Codable & Equatable {
-  public init(id: SwiftUUID, name: SwiftString) {
+public struct LGCPattern: Codable & Equatable {
+  public init(id: LGCUUID, name: LGCString) {
     self.id = id
     self.name = name
   }
 
-  public var id: SwiftUUID
-  public var name: SwiftString
+  public var id: LGCUUID
+  public var name: LGCString
 }
 
-public struct SwiftIsEqualTo: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsEqualTo: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftIsNotEqualTo: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsNotEqualTo: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftIsLessThan: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsLessThan: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftIsGreaterThan: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsGreaterThan: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftIsLessThanOrEqualTo: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsLessThanOrEqualTo: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftIsGreaterThanOrEqualTo: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCIsGreaterThanOrEqualTo: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftSetEqualTo: Codable & Equatable {
-  public init(id: SwiftUUID) {
+public struct LGCSetEqualTo: Codable & Equatable {
+  public init(id: LGCUUID) {
     self.id = id
   }
 
-  public var id: SwiftUUID
+  public var id: LGCUUID
 }
 
-public struct SwiftProgram: Codable & Equatable {
-  public init(id: SwiftUUID, block: SwiftList<SwiftStatement>) {
+public struct LGCProgram: Codable & Equatable {
+  public init(id: LGCUUID, block: LGCList<LGCStatement>) {
     self.id = id
     self.block = block
   }
 
-  public var id: SwiftUUID
-  public var block: SwiftList<SwiftStatement>
+  public var id: LGCUUID
+  public var block: LGCList<LGCStatement>
 }
 
-public struct SwiftFunctionCallArgument: Codable & Equatable {
-  public init(id: SwiftUUID, label: SwiftString, expression: SwiftExpression) {
+public struct LGCFunctionCallArgument: Codable & Equatable {
+  public init(id: LGCUUID, label: LGCString, expression: LGCExpression) {
     self.id = id
     self.label = label
     self.expression = expression
   }
 
-  public var id: SwiftUUID
-  public var label: SwiftString
-  public var expression: SwiftExpression
+  public var id: LGCUUID
+  public var label: LGCString
+  public var expression: LGCExpression
 }
 
-public indirect enum SwiftStatement: Codable & Equatable {
-  case loop(SwiftLoop)
-  case branch(SwiftBranch)
-  case decl(SwiftDecl)
-  case expressionStatement(SwiftExpressionStatement)
-  case placeholderStatement(SwiftPlaceholderStatement)
+public indirect enum LGCStatement: Codable & Equatable {
+  case loop(LGCLoop)
+  case branch(LGCBranch)
+  case decl(LGCDecl)
+  case expressionStatement(LGCExpressionStatement)
+  case placeholderStatement(LGCPlaceholderStatement)
 
   // MARK: Codable
 
@@ -224,15 +224,15 @@ public indirect enum SwiftStatement: Codable & Equatable {
 
     switch type {
       case "loop":
-        self = .loop(try container.decode(SwiftLoop.self, forKey: .data))
+        self = .loop(try container.decode(LGCLoop.self, forKey: .data))
       case "branch":
-        self = .branch(try container.decode(SwiftBranch.self, forKey: .data))
+        self = .branch(try container.decode(LGCBranch.self, forKey: .data))
       case "decl":
-        self = .decl(try container.decode(SwiftDecl.self, forKey: .data))
+        self = .decl(try container.decode(LGCDecl.self, forKey: .data))
       case "expressionStatement":
-        self = .expressionStatement(try container.decode(SwiftExpressionStatement.self, forKey: .data))
+        self = .expressionStatement(try container.decode(LGCExpressionStatement.self, forKey: .data))
       case "placeholderStatement":
-        self = .placeholderStatement(try container.decode(SwiftPlaceholderStatement.self, forKey: .data))
+        self = .placeholderStatement(try container.decode(LGCPlaceholderStatement.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -261,8 +261,8 @@ public indirect enum SwiftStatement: Codable & Equatable {
   }
 }
 
-public indirect enum SwiftList<T: Equatable & Codable>: Codable & Equatable {
-  case next(T, SwiftList)
+public indirect enum LGCList<T: Equatable & Codable>: Codable & Equatable {
+  case next(T, LGCList)
   case empty
 
   // MARK: Codable
@@ -293,9 +293,9 @@ public indirect enum SwiftList<T: Equatable & Codable>: Codable & Equatable {
   }
 }
 
-public indirect enum SwiftDeclaration: Codable & Equatable {
-  case variable(SwiftVariable)
-  case function(SwiftFunction)
+public indirect enum LGCDeclaration: Codable & Equatable {
+  case variable(LGCVariable)
+  case function(LGCFunction)
 
   // MARK: Codable
 
@@ -310,9 +310,9 @@ public indirect enum SwiftDeclaration: Codable & Equatable {
 
     switch type {
       case "variable":
-        self = .variable(try container.decode(SwiftVariable.self, forKey: .data))
+        self = .variable(try container.decode(LGCVariable.self, forKey: .data))
       case "function":
-        self = .function(try container.decode(SwiftFunction.self, forKey: .data))
+        self = .function(try container.decode(LGCFunction.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -332,14 +332,14 @@ public indirect enum SwiftDeclaration: Codable & Equatable {
   }
 }
 
-public indirect enum SwiftSyntaxNode: Codable & Equatable {
-  case statement(SwiftStatement)
-  case declaration(SwiftDeclaration)
-  case identifier(SwiftIdentifier)
-  case expression(SwiftExpression)
-  case pattern(SwiftPattern)
-  case binaryOperator(SwiftBinaryOperator)
-  case program(SwiftProgram)
+public indirect enum LGCSyntaxNode: Codable & Equatable {
+  case statement(LGCStatement)
+  case declaration(LGCDeclaration)
+  case identifier(LGCIdentifier)
+  case expression(LGCExpression)
+  case pattern(LGCPattern)
+  case binaryOperator(LGCBinaryOperator)
+  case program(LGCProgram)
 
   // MARK: Codable
 
@@ -354,19 +354,19 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
 
     switch type {
       case "statement":
-        self = .statement(try container.decode(SwiftStatement.self, forKey: .data))
+        self = .statement(try container.decode(LGCStatement.self, forKey: .data))
       case "declaration":
-        self = .declaration(try container.decode(SwiftDeclaration.self, forKey: .data))
+        self = .declaration(try container.decode(LGCDeclaration.self, forKey: .data))
       case "identifier":
-        self = .identifier(try container.decode(SwiftIdentifier.self, forKey: .data))
+        self = .identifier(try container.decode(LGCIdentifier.self, forKey: .data))
       case "expression":
-        self = .expression(try container.decode(SwiftExpression.self, forKey: .data))
+        self = .expression(try container.decode(LGCExpression.self, forKey: .data))
       case "pattern":
-        self = .pattern(try container.decode(SwiftPattern.self, forKey: .data))
+        self = .pattern(try container.decode(LGCPattern.self, forKey: .data))
       case "binaryOperator":
-        self = .binaryOperator(try container.decode(SwiftBinaryOperator.self, forKey: .data))
+        self = .binaryOperator(try container.decode(LGCBinaryOperator.self, forKey: .data))
       case "program":
-        self = .program(try container.decode(SwiftProgram.self, forKey: .data))
+        self = .program(try container.decode(LGCProgram.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -401,10 +401,10 @@ public indirect enum SwiftSyntaxNode: Codable & Equatable {
   }
 }
 
-public indirect enum SwiftExpression: Codable & Equatable {
-  case binaryExpression(SwiftBinaryExpression)
-  case identifierExpression(SwiftIdentifierExpression)
-  case functionCallExpression(SwiftFunctionCallExpression)
+public indirect enum LGCExpression: Codable & Equatable {
+  case binaryExpression(LGCBinaryExpression)
+  case identifierExpression(LGCIdentifierExpression)
+  case functionCallExpression(LGCFunctionCallExpression)
 
   // MARK: Codable
 
@@ -419,11 +419,11 @@ public indirect enum SwiftExpression: Codable & Equatable {
 
     switch type {
       case "binaryExpression":
-        self = .binaryExpression(try container.decode(SwiftBinaryExpression.self, forKey: .data))
+        self = .binaryExpression(try container.decode(LGCBinaryExpression.self, forKey: .data))
       case "identifierExpression":
-        self = .identifierExpression(try container.decode(SwiftIdentifierExpression.self, forKey: .data))
+        self = .identifierExpression(try container.decode(LGCIdentifierExpression.self, forKey: .data))
       case "functionCallExpression":
-        self = .functionCallExpression(try container.decode(SwiftFunctionCallExpression.self, forKey: .data))
+        self = .functionCallExpression(try container.decode(LGCFunctionCallExpression.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -446,14 +446,14 @@ public indirect enum SwiftExpression: Codable & Equatable {
   }
 }
 
-public indirect enum SwiftBinaryOperator: Codable & Equatable {
-  case isEqualTo(SwiftIsEqualTo)
-  case isNotEqualTo(SwiftIsNotEqualTo)
-  case isLessThan(SwiftIsLessThan)
-  case isGreaterThan(SwiftIsGreaterThan)
-  case isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo)
-  case isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo)
-  case setEqualTo(SwiftSetEqualTo)
+public indirect enum LGCBinaryOperator: Codable & Equatable {
+  case isEqualTo(LGCIsEqualTo)
+  case isNotEqualTo(LGCIsNotEqualTo)
+  case isLessThan(LGCIsLessThan)
+  case isGreaterThan(LGCIsGreaterThan)
+  case isLessThanOrEqualTo(LGCIsLessThanOrEqualTo)
+  case isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo)
+  case setEqualTo(LGCSetEqualTo)
 
   // MARK: Codable
 
@@ -468,19 +468,19 @@ public indirect enum SwiftBinaryOperator: Codable & Equatable {
 
     switch type {
       case "isEqualTo":
-        self = .isEqualTo(try container.decode(SwiftIsEqualTo.self, forKey: .data))
+        self = .isEqualTo(try container.decode(LGCIsEqualTo.self, forKey: .data))
       case "isNotEqualTo":
-        self = .isNotEqualTo(try container.decode(SwiftIsNotEqualTo.self, forKey: .data))
+        self = .isNotEqualTo(try container.decode(LGCIsNotEqualTo.self, forKey: .data))
       case "isLessThan":
-        self = .isLessThan(try container.decode(SwiftIsLessThan.self, forKey: .data))
+        self = .isLessThan(try container.decode(LGCIsLessThan.self, forKey: .data))
       case "isGreaterThan":
-        self = .isGreaterThan(try container.decode(SwiftIsGreaterThan.self, forKey: .data))
+        self = .isGreaterThan(try container.decode(LGCIsGreaterThan.self, forKey: .data))
       case "isLessThanOrEqualTo":
-        self = .isLessThanOrEqualTo(try container.decode(SwiftIsLessThanOrEqualTo.self, forKey: .data))
+        self = .isLessThanOrEqualTo(try container.decode(LGCIsLessThanOrEqualTo.self, forKey: .data))
       case "isGreaterThanOrEqualTo":
-        self = .isGreaterThanOrEqualTo(try container.decode(SwiftIsGreaterThanOrEqualTo.self, forKey: .data))
+        self = .isGreaterThanOrEqualTo(try container.decode(LGCIsGreaterThanOrEqualTo.self, forKey: .data))
       case "setEqualTo":
-        self = .setEqualTo(try container.decode(SwiftSetEqualTo.self, forKey: .data))
+        self = .setEqualTo(try container.decode(LGCSetEqualTo.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }

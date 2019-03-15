@@ -8,5 +8,5 @@
 
 import AppKit
 
-public typealias SwiftString = String
-public typealias SwiftUUID = String
+public typealias LGCString = String
+public typealias LGCUUID = String

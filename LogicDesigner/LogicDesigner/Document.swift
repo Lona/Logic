@@ -49,7 +49,7 @@ class Document: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        logicDocumentEditor.rootNode = try JSONDecoder().decode(SwiftSyntaxNode.self, from: data)
+        logicDocumentEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
     }
 }
 

@@ -8,25 +8,25 @@
 
 import AppKit
 
-public extension SwiftIdentifier {
+public extension LGCIdentifier {
     public var formatted: LogicEditorFormatCommand {
         return .element(LogicElement.dropdown(id, string, Colors.editableText))
     }
 }
 
-public extension SwiftPattern {
+public extension LGCPattern {
     public var formatted: LogicEditorFormatCommand {
         return .element(LogicElement.dropdown(id, name, Colors.editableText))
     }
 }
 
-public extension SwiftBinaryOperator {
+public extension LGCBinaryOperator {
     public var formatted: LogicEditorFormatCommand {
         return .element(LogicElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
-public extension SwiftFunctionCallArgument {
+public extension LGCFunctionCallArgument {
     public var formatted: LogicEditorFormatCommand {
         return .concat {
             [
@@ -37,7 +37,7 @@ public extension SwiftFunctionCallArgument {
     }
 }
 
-public extension SwiftExpression {
+public extension LGCExpression {
     public var formatted: LogicEditorFormatCommand {
         switch self {
         case .identifierExpression(let value):
@@ -83,7 +83,7 @@ public extension SwiftExpression {
     }
 }
 
-public extension SwiftStatement {
+public extension LGCStatement {
     public var formatted: LogicEditorFormatCommand {
         switch self {
         case .loop(let loop):
@@ -123,7 +123,7 @@ public extension SwiftStatement {
 }
 
 
-public extension SwiftProgram {
+public extension LGCProgram {
     public var formatted: LogicEditorFormatCommand {
         return .join(with: .hardLine) {
             self.block.map { $0.formatted }
@@ -132,7 +132,7 @@ public extension SwiftProgram {
 }
 
 
-public extension SwiftSyntaxNode {
+public extension LGCSyntaxNode {
     public var formatted: LogicEditorFormatCommand {
         switch self {
         case .statement(let value):
@@ -152,7 +152,7 @@ public extension SwiftSyntaxNode {
         }
     }
 
-    public func elementRange(for targetID: SwiftUUID) -> Range<Int>? {
+    public func elementRange(for targetID: LGCUUID) -> Range<Int>? {
         let topNode = topNodeWithEqualElements(as: targetID)
         let topNodeFormattedElements = topNode.formatted.elements
 
@@ -168,18 +168,18 @@ public extension SwiftSyntaxNode {
         return firstIndex..<lastIndex
     }
 
-    public func topNodeWithEqualElements(as targetID: SwiftUUID) -> SwiftSyntaxNode {
+    public func topNodeWithEqualElements(as targetID: LGCUUID) -> LGCSyntaxNode {
         let elementPath = uniqueElementPathTo(id: targetID)
 
         return elementPath[elementPath.count - 1]
     }
 
-    public func uniqueElementPathTo(id targetID: SwiftUUID) -> [SwiftSyntaxNode] {
+    public func uniqueElementPathTo(id targetID: LGCUUID) -> [LGCSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }
 
-        let (_, uniquePath): (min: Int, path: [SwiftSyntaxNode]) = pathToTarget
+        let (_, uniquePath): (min: Int, path: [LGCSyntaxNode]) = pathToTarget
             .reduce((min: Int.max, path: []), { result, next in
                 let formattedElements = next.formatted.elements
                 if formattedElements.count < result.min {

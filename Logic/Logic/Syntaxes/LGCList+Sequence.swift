@@ -8,10 +8,10 @@
 
 import AppKit
 
-public struct SwiftListIterator<T: Equatable & Codable>: IteratorProtocol {
-    var list: SwiftList<T>
+public struct LGCListIterator<T: Equatable & Codable>: IteratorProtocol {
+    var list: LGCList<T>
 
-    init(_ list: SwiftList<T>) {
+    init(_ list: LGCList<T>) {
         self.list = list
     }
 
@@ -27,13 +27,13 @@ public struct SwiftListIterator<T: Equatable & Codable>: IteratorProtocol {
 }
 
 
-extension SwiftList: Sequence {
-    public func makeIterator() -> SwiftListIterator<T> {
-        return SwiftListIterator(self)
+extension LGCList: Sequence {
+    public func makeIterator() -> LGCListIterator<T> {
+        return LGCListIterator(self)
     }
 }
 
-extension SwiftList: Collection {
+extension LGCList: Collection {
     public typealias Index = Int
     public typealias Element = T
 
@@ -49,7 +49,7 @@ extension SwiftList: Collection {
         return count
     }
 
-    public subscript(index: Index) -> SwiftListIterator<T>.Element {
+    public subscript(index: Index) -> LGCListIterator<T>.Element {
         get {
             var count = 0
 

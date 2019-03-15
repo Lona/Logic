@@ -9,7 +9,7 @@
 import AppKit
 
 public struct LogicSuggestionItem {
-    public init(title: String, category: String, node: SwiftSyntaxNode, disabled: Bool = false) {
+    public init(title: String, category: String, node: LGCSyntaxNode, disabled: Bool = false) {
         self.title = title
         self.category = category
         self.node = node
@@ -18,7 +18,7 @@ public struct LogicSuggestionItem {
 
     public var title: String
     public var category: String
-    public var node: SwiftSyntaxNode
+    public var node: LGCSyntaxNode
     public var disabled: Bool
 
     func titleContains(prefix: String) -> Bool {
@@ -45,29 +45,29 @@ public struct LogicSuggestionCategory {
     }
 }
 
-private func id(_ string: String) -> SwiftIdentifier {
-    return SwiftIdentifier(id: NSUUID().uuidString, string: string)
+private func id(_ string: String) -> LGCIdentifier {
+    return LGCIdentifier(id: NSUUID().uuidString, string: string)
 }
 
-private func idExpression(_ string: String) -> SwiftExpression {
-    return SwiftExpression.identifierExpression(
-        SwiftIdentifierExpression(
+private func idExpression(_ string: String) -> LGCExpression {
+    return LGCExpression.identifierExpression(
+        LGCIdentifierExpression(
             id: NSUUID().uuidString,
-            identifier: SwiftIdentifier(id: NSUUID().uuidString, string: string)))
+            identifier: LGCIdentifier(id: NSUUID().uuidString, string: string)))
 }
 
-public extension SwiftIdentifier {
+public extension LGCIdentifier {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "bar",
                 category: "Variables".uppercased(),
-                node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "bar"))
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: NSUUID().uuidString, string: "bar"))
             ),
             LogicSuggestionItem(
                 title: "foo",
                 category: "Variables".uppercased(),
-                node: SwiftSyntaxNode.identifier(SwiftIdentifier(id: NSUUID().uuidString, string: "foo"))
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: NSUUID().uuidString, string: "foo"))
             )
         ]
 
@@ -75,13 +75,13 @@ public extension SwiftIdentifier {
     }
 }
 
-public extension SwiftPattern {
+public extension LGCPattern {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "Variable name: \(prefix)",
                 category: "Pattern".uppercased(),
-                node: SwiftSyntaxNode.pattern(SwiftPattern(id: NSUUID().uuidString, name: prefix)),
+                node: LGCSyntaxNode.pattern(LGCPattern(id: NSUUID().uuidString, name: prefix)),
                 disabled: prefix.isEmpty
             )
         ]
@@ -90,7 +90,7 @@ public extension SwiftPattern {
     }
 }
 
-public extension SwiftBinaryOperator {
+public extension LGCBinaryOperator {
     public var displayText: String {
         switch self {
         case .isEqualTo:
@@ -112,37 +112,37 @@ public extension SwiftBinaryOperator {
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let operatorNodes = [
-            SwiftBinaryOperator.isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString)),
-            SwiftBinaryOperator.isNotEqualTo(SwiftIsNotEqualTo(id: NSUUID().uuidString)),
-            SwiftBinaryOperator.isGreaterThan(SwiftIsGreaterThan(id: NSUUID().uuidString)),
-            SwiftBinaryOperator.isGreaterThanOrEqualTo(SwiftIsGreaterThanOrEqualTo(id: NSUUID().uuidString)),
-            SwiftBinaryOperator.isLessThan(SwiftIsLessThan(id: NSUUID().uuidString)),
-            SwiftBinaryOperator.isLessThanOrEqualTo(SwiftIsLessThanOrEqualTo(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isNotEqualTo(LGCIsNotEqualTo(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isGreaterThan(LGCIsGreaterThan(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isGreaterThanOrEqualTo(LGCIsGreaterThanOrEqualTo(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isLessThan(LGCIsLessThan(id: NSUUID().uuidString)),
+            LGCBinaryOperator.isLessThanOrEqualTo(LGCIsLessThanOrEqualTo(id: NSUUID().uuidString)),
         ]
 
         return operatorNodes.map { node in
             LogicSuggestionItem(
                 title: node.displayText,
                 category: "Operators".uppercased(),
-                node: SwiftSyntaxNode.binaryOperator(node)
+                node: LGCSyntaxNode.binaryOperator(node)
             )
         }.titleContains(prefix: prefix)
     }
 }
 
-public extension SwiftExpression {
+public extension LGCExpression {
     static var assignmentSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Assignment",
             category: "Expressions".uppercased(),
-            node: SwiftSyntaxNode.expression(
-                SwiftExpression.binaryExpression(
-                    SwiftBinaryExpression(
-                        left: SwiftExpression.identifierExpression(
-                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
-                        right: SwiftExpression.identifierExpression(
-                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
-                        op: .setEqualTo(SwiftSetEqualTo(id: NSUUID().uuidString)),
+            node: LGCSyntaxNode.expression(
+                LGCExpression.binaryExpression(
+                    LGCBinaryExpression(
+                        left: LGCExpression.identifierExpression(
+                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("variable"))),
+                        right: LGCExpression.identifierExpression(
+                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("value"))),
+                        op: .setEqualTo(LGCSetEqualTo(id: NSUUID().uuidString)),
                         id: NSUUID().uuidString))))
     }
 
@@ -150,14 +150,14 @@ public extension SwiftExpression {
         return LogicSuggestionItem(
             title: "Comparison",
             category: "Expressions".uppercased(),
-            node: SwiftSyntaxNode.expression(
-                SwiftExpression.binaryExpression(
-                    SwiftBinaryExpression(
-                        left: SwiftExpression.identifierExpression(
-                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
-                        right: SwiftExpression.identifierExpression(
-                            SwiftIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
-                        op: .isEqualTo(SwiftIsEqualTo(id: NSUUID().uuidString)),
+            node: LGCSyntaxNode.expression(
+                LGCExpression.binaryExpression(
+                    LGCBinaryExpression(
+                        left: LGCExpression.identifierExpression(
+                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("left"))),
+                        right: LGCExpression.identifierExpression(
+                            LGCIdentifierExpression(id: NSUUID().uuidString, identifier: id("right"))),
+                        op: .isEqualTo(LGCIsEqualTo(id: NSUUID().uuidString)),
                         id: NSUUID().uuidString))))
     }
 
@@ -167,20 +167,20 @@ public extension SwiftExpression {
             assignmentSuggestionItem
         ]
 
-        return items.titleContains(prefix: prefix) + SwiftIdentifier.suggestions(for: prefix)
+        return items.titleContains(prefix: prefix) + LGCIdentifier.suggestions(for: prefix)
     }
 }
 
-public extension SwiftStatement {
+public extension LGCStatement {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let ifCondition = SwiftSyntaxNode.statement(
-            SwiftStatement.branch(
-                SwiftBranch(
+        let ifCondition = LGCSyntaxNode.statement(
+            LGCStatement.branch(
+                LGCBranch(
                     id: NSUUID().uuidString,
                     condition: idExpression("condition"),
-                    block: SwiftList<SwiftStatement>.next(
-                        SwiftStatement.placeholderStatement(
-                            SwiftPlaceholderStatement(id: NSUUID().uuidString)
+                    block: LGCList<LGCStatement>.next(
+                        LGCStatement.placeholderStatement(
+                            LGCPlaceholderStatement(id: NSUUID().uuidString)
                         ),
                         .empty
                     )
@@ -188,12 +188,12 @@ public extension SwiftStatement {
             )
         )
 
-        let forLoop = SwiftSyntaxNode.statement(
-            SwiftStatement.loop(
-                SwiftLoop(
-                    pattern: SwiftPattern(id: NSUUID().uuidString, name: "item"),
+        let forLoop = LGCSyntaxNode.statement(
+            LGCStatement.loop(
+                LGCLoop(
+                    pattern: LGCPattern(id: NSUUID().uuidString, name: "item"),
                     expression: idExpression("array"),
-                    block: SwiftList<SwiftStatement>.empty,
+                    block: LGCList<LGCStatement>.empty,
                     id: NSUUID().uuidString)))
 
         let items = [
@@ -207,36 +207,36 @@ public extension SwiftStatement {
                 category: "Statements".uppercased(),
                 node: forLoop
             ),
-            SwiftExpression.assignmentSuggestionItem
+            LGCExpression.assignmentSuggestionItem
         ]
 
         return items.titleContains(prefix: prefix)
     }
 }
 
-public extension SwiftProgram {
+public extension LGCProgram {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        return SwiftStatement.suggestions(for: prefix)
+        return LGCStatement.suggestions(for: prefix)
     }
 }
 
-public extension SwiftSyntaxNode {
+public extension LGCSyntaxNode {
     public func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         switch self {
         case .statement:
-            return SwiftStatement.suggestions(for: prefix)
+            return LGCStatement.suggestions(for: prefix)
         case .declaration:
             return []
         case .identifier:
-            return SwiftIdentifier.suggestions(for: prefix)
+            return LGCIdentifier.suggestions(for: prefix)
         case .pattern:
-            return SwiftPattern.suggestions(for: prefix)
+            return LGCPattern.suggestions(for: prefix)
         case .expression:
-            return SwiftExpression.suggestions(for: prefix)
+            return LGCExpression.suggestions(for: prefix)
         case .binaryOperator:
-            return SwiftBinaryOperator.suggestions(for: prefix)
+            return LGCBinaryOperator.suggestions(for: prefix)
         case .program:
-            return SwiftProgram.suggestions(for: prefix)
+            return LGCProgram.suggestions(for: prefix)
         }
     }
 }
