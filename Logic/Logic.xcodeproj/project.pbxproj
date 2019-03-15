@@ -53,6 +53,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B44E13B223B3C9000740318 /* Types */ = {
+			isa = PBXGroup;
+			children = (
+				6B5B756B215B1C3C00CDC9C6 /* Extensions */,
+				6B5B7556215B1ABE00CDC9C6 /* Models */,
+				6B5B7553215B1ABE00CDC9C6 /* Views */,
+			);
+			path = Types;
+			sourceTree = "<group>";
+		};
 		6B5B7513215B198400CDC9C6 = {
 			isa = PBXGroup;
 			children = (
@@ -72,9 +82,7 @@
 		6B5B751F215B198400CDC9C6 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				6B5B756B215B1C3C00CDC9C6 /* Extensions */,
-				6B5B7556215B1ABE00CDC9C6 /* Models */,
-				6B5B7553215B1ABE00CDC9C6 /* Views */,
+				6B44E13B223B3C9000740318 /* Types */,
 				6B5B7520215B198400CDC9C6 /* Logic.h */,
 				6B5B7521215B198400CDC9C6 /* Info.plist */,
 			);
@@ -340,7 +348,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = K5VK634QMQ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -367,7 +375,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = K5VK634QMQ;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
