@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GenericType: Codable {
+public struct GenericType: Codable & Equatable {
     public var name: String
     public var cases: [TypeCase]
 
@@ -18,7 +18,7 @@ public struct GenericType: Codable {
     }
 }
 
-public struct NativeType: Codable {
+public struct NativeType: Codable & Equatable {
     public init(name: String) {
         self.name = name
     }
@@ -26,7 +26,7 @@ public struct NativeType: Codable {
     public var name: String
 }
 
-public enum Entity: Codable {
+public enum Entity: Codable & Equatable {
     case genericType(GenericType)
     //    case instanceType
     //    case aliasType

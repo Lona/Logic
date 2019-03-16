@@ -9,6 +9,15 @@
 import AppKit
 import Foundation
 
+// MARK: - NSPasteboard.PasteboardType
+
+public extension NSPasteboard.PasteboardType {
+    static let typeListIndex = NSPasteboard.PasteboardType(rawValue: "logic.typelist.index")
+    static let typeListItem = NSPasteboard.PasteboardType(rawValue: "logic.typelist.item")
+}
+
+// MARK: Protocols
+
 protocol Selectable {
     var isSelected: Bool { get set }
 }
@@ -57,6 +66,7 @@ public class TypeList: NSBox {
         setUpViews()
         setUpConstraints()
 
+        outlineView.registerForDraggedTypes([.typeListIndex])
         update()
     }
 
@@ -651,5 +661,78 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         guard let state = UserDefaults.standard
             .value(forKey: "Logic typeListExpandedItems") as? [Bool] else { return }
         setExpandedItems(state)
+    }
+
+    // MARK: - Drag and drop
+
+    typealias Element = TypeListItem
+
+    public func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
+        let pasteboardItem = NSPasteboardItem()
+        let index = outlineView.row(forItem: item)
+
+        pasteboardItem.setString(String(index), forType: .typeListIndex)
+
+        return pasteboardItem
+    }
+
+    public func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
+
+        let sourceIndexString = info.draggingPasteboard.string(forType: .typeListIndex)
+
+        if let sourceIndexString = sourceIndexString,
+            let sourceIndex = Int(sourceIndexString),
+            let sourceItem = outlineView.item(atRow: sourceIndex) as? Element,
+            let relativeItem = item as? Element? {
+
+            let acceptanceCategory = outlineView.shouldAccept(dropping: sourceItem, relativeTo: relativeItem, at: index)
+
+            switch acceptanceCategory {
+            case .intoContainer:
+                return NSDragOperation.move
+            default: break
+            }
+        }
+
+        return NSDragOperation()
+    }
+
+    public func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
+        let sourceIndexString = info.draggingPasteboard.string(forType: .typeListIndex)
+
+        if let sourceIndexString = sourceIndexString,
+            let sourceIndex = Int(sourceIndexString),
+            let sourceItem = outlineView.item(atRow: sourceIndex) as? Element,
+            let relativeItem = item as? Element? {
+
+            let acceptanceCategory = outlineView.shouldAccept(dropping: sourceItem, relativeTo: relativeItem, at: index)
+
+            switch acceptanceCategory {
+            case .intoContainer(let targetIndex):
+                guard let entity = sourceItem.entity else { return false }
+
+                var list = self.list
+
+                let (_, relativeIndex) = self.relativePosition(for: sourceItem)
+
+                list.remove(at: relativeIndex)
+
+                if let targetIndex = targetIndex {
+                    if relativeIndex < targetIndex {
+                        list.insert(entity, at: targetIndex - 1)
+                    } else {
+                        list.insert(entity, at: targetIndex)
+                    }
+                } else {
+                    list.append(entity)
+                }
+
+                onChange(list)
+            default:
+                break
+            }
+        }
+
+        return false
     }
 }

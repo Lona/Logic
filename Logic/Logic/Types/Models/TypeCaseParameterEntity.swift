@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum TypeCaseParameterEntity: Codable {
+public enum TypeCaseParameterEntity: Codable & Equatable {
     case type(String, [GenericTypeParameterSubstitution])
     case generic(String)
 

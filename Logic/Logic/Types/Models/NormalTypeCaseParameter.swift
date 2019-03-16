@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct NormalTypeCaseParameter: Codable {
+public struct NormalTypeCaseParameter: Codable & Equatable {
     public init(value: TypeCaseParameterEntity) {
         self.value = value
     }

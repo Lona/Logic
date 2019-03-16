@@ -1,6 +1,54 @@
 {
   "types" : [
     {
+      "case" : "native",
+      "data" : {
+        "name" : "UUID"
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "String"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "normal",
+            "name" : "next",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "generic",
+                  "name" : "T"
+                }
+              },
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "empty",
+            "params" : [
+
+            ]
+          }
+        ],
+        "name" : "List"
+      }
+    },
+    {
       "case" : "type",
       "data" : {
         "cases" : [
@@ -32,6 +80,363 @@
           }
         ],
         "name" : "Identifier"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "variable",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "function",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Declaration"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "pattern",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "name",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Pattern"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "isEqualTo",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "isNotEqualTo",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "isLessThan",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "isGreaterThan",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "isLessThanOrEqualTo",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "isGreaterThanOrEqualTo",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "setEqualTo",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "BinaryOperator"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "functionCallArgument",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "label",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "FunctionCallArgument"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "binaryExpression",
+            "params" : [
+              {
+                "key" : "left",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "right",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "op",
+                "value" : {
+                  "case" : "type",
+                  "name" : "BinaryOperator",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "identifierExpression",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "identifier",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "functionCallExpression",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "arguments",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "FunctionCallArgument"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Expression"
       }
     },
     {
@@ -203,81 +608,36 @@
       "data" : {
         "cases" : [
           {
-            "case" : "normal",
-            "name" : "next",
+            "case" : "record",
+            "name" : "program",
             "params" : [
               {
+                "key" : "id",
                 "value" : {
-                  "case" : "generic",
-                  "name" : "T"
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
                 }
               },
               {
+                "key" : "block",
                 "value" : {
                   "case" : "type",
                   "name" : "List",
                   "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "empty",
-            "params" : [
-
-            ]
-          }
-        ],
-        "name" : "List"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "variable",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "function",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
+                    {
+                      "generic" : "T",
+                      "instance" : "Statement"
+                    }
                   ]
                 }
               }
             ]
           }
         ],
-        "name" : "Declaration"
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "UUID"
+        "name" : "Program"
       }
     },
     {
@@ -391,366 +751,6 @@
           }
         ],
         "name" : "SyntaxNode"
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "String"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "binaryExpression",
-            "params" : [
-              {
-                "key" : "left",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "right",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "op",
-                "value" : {
-                  "case" : "type",
-                  "name" : "BinaryOperator",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "identifierExpression",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "identifier",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Identifier",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "functionCallExpression",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "arguments",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "FunctionCallArgument"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Expression"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "pattern",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "name",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Pattern"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "isEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isNotEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isLessThan",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isGreaterThan",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isLessThanOrEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isGreaterThanOrEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "setEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "BinaryOperator"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "program",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "block",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "Statement"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Program"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "functionCallArgument",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "label",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "FunctionCallArgument"
       }
     }
   ]

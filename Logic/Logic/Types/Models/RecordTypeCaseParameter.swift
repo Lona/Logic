@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct RecordTypeCaseParameter: Codable {
+public struct RecordTypeCaseParameter: Codable & Equatable {
     public init(key: String, value: TypeCaseParameterEntity) {
         self.key = key
         self.value = value

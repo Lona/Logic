@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GenericTypeParameterSubstitution: Codable {
+public struct GenericTypeParameterSubstitution: Codable & Equatable {
     public init(generic: String, instance: String) {
         self.generic = generic
         self.instance = instance

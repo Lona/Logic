@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum TypeCase: Codable {
+public enum TypeCase: Codable & Equatable {
     case normal(String, [NormalTypeCaseParameter])
     case record(String, [RecordTypeCaseParameter])
 
