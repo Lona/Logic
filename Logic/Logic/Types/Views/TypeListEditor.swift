@@ -67,6 +67,7 @@ public class TypeList: NSBox {
         setUpConstraints()
 
         outlineView.registerForDraggedTypes([.typeListIndex])
+
         update()
     }
 
@@ -688,9 +689,22 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             let acceptanceCategory = outlineView.shouldAccept(dropping: sourceItem, relativeTo: relativeItem, at: index)
 
             switch acceptanceCategory {
+            case .into(parent: let parent, at: _):
+                switch (sourceItem, parent) {
+                case (.typeCase, .entity(.genericType)):
+                    return NSDragOperation.move
+                default:
+                    break
+                }
             case .intoContainer:
-                return NSDragOperation.move
-            default: break
+                switch sourceItem {
+                case .entity:
+                    return NSDragOperation.move
+                default:
+                    break
+                }
+            case .intoDescendant:
+                break
             }
         }
 
@@ -706,28 +720,68 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             let relativeItem = item as? Element? {
 
             let acceptanceCategory = outlineView.shouldAccept(dropping: sourceItem, relativeTo: relativeItem, at: index)
+            let (sourceParent, relativeIndex) = relativePosition(for: sourceItem)
 
             switch acceptanceCategory {
+            case .into(parent: let targetParent, at: let targetIndex):
+                switch (sourceItem, targetParent) {
+                case (.typeCase, .entity):
+                    guard let typeCase = sourceItem.typeCase else { return false }
+
+                    let sourceItemPath = self.path(forItem: sourceItem)
+                    let targetParentPath = self.path(forItem: targetParent)
+
+                    var copy = self.list
+
+                    // Remove the TypeCase from the source Entity
+                    switch copy[sourceItemPath[0]] {
+                    case .genericType(var sourceGenericType):
+                        sourceGenericType.cases.remove(at: relativeIndex)
+                        copy[sourceItemPath[0]] = .genericType(sourceGenericType)
+                    default:
+                        return false
+                    }
+
+                    // Insert the TypeCase in the target Entity
+                    switch copy[targetParentPath[0]] {
+                    case .genericType(var targetGenericType):
+                        if let targetIndex = targetIndex {
+                            if relativeIndex < targetIndex && sourceParent == targetParent {
+                                targetGenericType.cases.insert(typeCase, at: targetIndex - 1)
+                            } else {
+                                targetGenericType.cases.insert(typeCase, at: targetIndex)
+                            }
+                        } else {
+                            targetGenericType.cases.append(typeCase)
+                        }
+
+                        copy[targetParentPath[0]] = .genericType(targetGenericType)
+                    default:
+                        return false
+                    }
+
+                    self.onChange(copy)
+                default:
+                    break
+                }
             case .intoContainer(let targetIndex):
                 guard let entity = sourceItem.entity else { return false }
 
-                var list = self.list
+                var copy = self.list
 
-                let (_, relativeIndex) = self.relativePosition(for: sourceItem)
-
-                list.remove(at: relativeIndex)
+                copy.remove(at: relativeIndex)
 
                 if let targetIndex = targetIndex {
                     if relativeIndex < targetIndex {
-                        list.insert(entity, at: targetIndex - 1)
+                        copy.insert(entity, at: targetIndex - 1)
                     } else {
-                        list.insert(entity, at: targetIndex)
+                        copy.insert(entity, at: targetIndex)
                     }
                 } else {
-                    list.append(entity)
+                    copy.append(entity)
                 }
 
-                onChange(list)
+                onChange(copy)
             default:
                 break
             }
