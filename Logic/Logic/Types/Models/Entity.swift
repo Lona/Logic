@@ -96,6 +96,40 @@ public enum Entity: Codable & Equatable {
         }
     }
 
+    func appending(item: TypeListItem, atPath path: [Int]) -> Entity {
+        switch self {
+        case .genericType(var genericType):
+            if path.count > 1 {
+                genericType.cases = genericType.cases.replacing(
+                    itemAt: path[0],
+                    with: genericType.cases[path[0]].appending(item: item, atPath: Array(path.dropFirst()))
+                )
+            } else {
+                genericType.cases.append(item.typeCase!)
+            }
+            return .genericType(genericType)
+        case .nativeType:
+            return self
+        }
+    }
+
+    func inserting(item: TypeListItem, atPath path: [Int]) -> Entity {
+        switch self {
+        case .genericType(var genericType):
+            if path.count > 1 {
+                genericType.cases = genericType.cases.replacing(
+                    itemAt: path[0],
+                    with: genericType.cases[path[0]].inserting(item: item, atPath: Array(path.dropFirst()))
+                )
+            } else {
+                genericType.cases.insert(item.typeCase!, at: path[0])
+            }
+            return .genericType(genericType)
+        case .nativeType:
+            return self
+        }
+    }
+
     func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
         switch self {
         case .genericType(var genericType):

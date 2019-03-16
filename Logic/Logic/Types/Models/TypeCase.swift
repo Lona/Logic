@@ -81,6 +81,44 @@ public enum TypeCase: Codable & Equatable {
         }
     }
 
+    func appending(item: TypeListItem, atPath path: [Int]) -> TypeCase {
+        switch self {
+        case .normal(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.append(item.normalTypeCaseParameter!)
+                return TypeCase.normal(name, parameters)
+            }
+        case .record(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.append(item.recordTypeCaseParameter!)
+                return TypeCase.record(name, parameters)
+            }
+        }
+    }
+
+    func inserting(item: TypeListItem, atPath path: [Int]) -> TypeCase {
+        switch self {
+        case .normal(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.insert(item.normalTypeCaseParameter!, at: path[0])
+                return TypeCase.normal(name, parameters)
+            }
+        case .record(let name, var parameters):
+            if path.count > 1 {
+                return self // TODO
+            } else {
+                parameters.insert(item.recordTypeCaseParameter!, at: path[0])
+                return TypeCase.record(name, parameters)
+            }
+        }
+    }
+
     func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
         switch self {
         case .normal(let name, var parameters):

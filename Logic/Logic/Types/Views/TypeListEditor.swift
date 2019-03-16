@@ -726,38 +726,24 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             case .into(parent: let targetParent, at: let targetIndex):
                 switch (sourceItem, targetParent) {
                 case (.typeCase, .entity):
-                    guard let typeCase = sourceItem.typeCase else { return false }
-
                     let sourceItemPath = self.path(forItem: sourceItem)
                     let targetParentPath = self.path(forItem: targetParent)
 
                     var copy = self.list
 
-                    // Remove the TypeCase from the source Entity
-                    switch copy[sourceItemPath[0]] {
-                    case .genericType(var sourceGenericType):
-                        sourceGenericType.cases.remove(at: relativeIndex)
-                        copy[sourceItemPath[0]] = .genericType(sourceGenericType)
-                    default:
-                        return false
-                    }
+                    copy[sourceItemPath[0]] = copy[sourceItemPath[0]]
+                        .removing(itemAtPath: Array(sourceItemPath.dropFirst()))
 
-                    // Insert the TypeCase in the target Entity
-                    switch copy[targetParentPath[0]] {
-                    case .genericType(var targetGenericType):
-                        if let targetIndex = targetIndex {
-                            if relativeIndex < targetIndex && sourceParent == targetParent {
-                                targetGenericType.cases.insert(typeCase, at: targetIndex - 1)
-                            } else {
-                                targetGenericType.cases.insert(typeCase, at: targetIndex)
-                            }
-                        } else {
-                            targetGenericType.cases.append(typeCase)
-                        }
+                    if let targetIndex = targetIndex {
+                        let adjustedIndex = relativeIndex < targetIndex && sourceParent == targetParent
+                            ? targetIndex - 1
+                            : targetIndex
 
-                        copy[targetParentPath[0]] = .genericType(targetGenericType)
-                    default:
-                        return false
+                        copy[targetParentPath[0]] = copy[targetParentPath[0]]
+                            .inserting(item: sourceItem, atPath: Array(targetParentPath.dropFirst()) + [adjustedIndex])
+                    } else {
+                        copy[targetParentPath[0]] = copy[targetParentPath[0]]
+                            .appending(item: sourceItem, atPath: Array(targetParentPath.dropFirst()))
                     }
 
                     self.onChange(copy)
