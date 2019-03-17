@@ -37,6 +37,34 @@ public extension LGCFunctionCallArgument {
     }
 }
 
+public extension LGCFunctionParameter {
+    public var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", Colors.editableText))
+        case .parameter(let value):
+            return .concat {
+                [
+                    value.localName.formatted,
+                    .element(.text("of type")),
+                    value.annotation.formatted
+                ]
+            }
+        }
+    }
+}
+
+public extension LGCTypeAnnotation {
+    public var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .typeIdentifier(let value):
+            return value.identifier.formatted
+        case .genericType:
+            fatalError("Not supported")
+        }
+    }
+}
+
 public extension LGCExpression {
     public var formatted: FormatterCommand<LogicElement> {
         switch self {
@@ -116,12 +144,85 @@ public extension LGCStatement {
             return .element(LogicElement.dropdown(value, "", Colors.editableText))
         case .expressionStatement(let value):
             return value.expression.formatted
-        default:
-            return .hardLine
+        case .declaration(let value):
+            return value.content.formatted
         }
     }
 }
 
+public extension LGCDeclaration {
+    public var formatted: FormatterCommand<LogicElement> {
+        func parameters() -> FormatterCommand<LogicElement> {
+            switch self {
+            case .function(let value):
+                switch value.parameters {
+                case .next(.placeholder(let inner), _):
+                    return .concat {
+                        [
+                            .element(.text("Parameters:")),
+                            .element(LogicElement.dropdown(inner, "", Colors.editableText)),
+                        ]
+                    }
+                default:
+                    return .concat {
+                        [
+                            .element(.text("Parameters:")),
+                            .indent {
+                                .concat {
+                                    [
+                                        .hardLine,
+                                        .join(with: .concat {[.hardLine]}) {
+                                            value.parameters.map { param in param.formatted }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+
+            case .variable:
+                fatalError("TODO")
+            }
+        }
+
+        switch self {
+        case .variable:
+            return .element(.text("VARIABLE"))
+        case .function(let value):
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Function", Colors.text)),
+                    value.name.formatted,
+                    .indent {
+                        .concat {
+                            [
+                                .hardLine,
+                                parameters(),
+                                .hardLine,
+                                .element(.text("Returning")),
+                                .line,
+                                value.returnType.formatted,
+                                .hardLine,
+                                .element(.text("Body:")),
+                                .indent {
+                                    .concat {
+                                        [
+                                            .hardLine,
+                                            .join(with: .hardLine) {
+                                                value.block.map { $0.formatted }
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
 
 public extension LGCProgram {
     public var formatted: FormatterCommand<LogicElement> {
@@ -137,8 +238,8 @@ public extension LGCSyntaxNode {
         switch self {
         case .statement(let value):
             return value.formatted
-        case .declaration:
-            fatalError("Handle declarations")
+        case .declaration(let value):
+            return value.formatted
         case .identifier(let value):
             return value.formatted
         case .pattern(let value):
@@ -148,6 +249,10 @@ public extension LGCSyntaxNode {
         case .expression(let value):
             return value.formatted
         case .program(let value):
+            return value.formatted
+        case .functionParameter(let value):
+            return value.formatted
+        case .typeAnnotation(let value):
             return value.formatted
         }
     }

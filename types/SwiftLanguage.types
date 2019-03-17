@@ -21,7 +21,7 @@
     {
       "case" : "native",
       "data" : {
-        "name" : "Option",
+        "name" : "Optional",
         "parameters" : [
           {
             "name" : "Value"
@@ -130,6 +130,52 @@
                   "name" : "UUID",
                   "substitutions" : [
 
+                  ]
+                }
+              },
+              {
+                "key" : "name",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Pattern",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "returnType",
+                "value" : {
+                  "case" : "type",
+                  "name" : "TypeAnnotation",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "parameters",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "FunctionParameter"
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "block",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "Statement"
+                    }
                   ]
                 }
               }
@@ -550,23 +596,23 @@
           },
           {
             "case" : "record",
-            "name" : "decl",
+            "name" : "declaration",
             "params" : [
               {
-                "key" : "content",
+                "key" : "id",
                 "value" : {
                   "case" : "type",
-                  "name" : "Declaration",
+                  "name" : "UUID",
                   "substitutions" : [
 
                   ]
                 }
               },
               {
-                "key" : "id",
+                "key" : "content",
                 "value" : {
                   "case" : "type",
-                  "name" : "UUID",
+                  "name" : "Declaration",
                   "substitutions" : [
 
                   ]
@@ -765,9 +811,198 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "normal",
+            "name" : "functionParameter",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "FunctionParameter",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "typeAnnotation",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "TypeAnnotation",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "SyntaxNode"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "parameter",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "externalName",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Optional",
+                  "substitutions" : [
+                    {
+                      "generic" : "Value",
+                      "instance" : "String"
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "localName",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Pattern",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "annotation",
+                "value" : {
+                  "case" : "type",
+                  "name" : "TypeAnnotation",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "defaultValue",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Optional",
+                  "substitutions" : [
+                    {
+                      "generic" : "Value",
+                      "instance" : "String"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "placeholder",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "FunctionParameter"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "typeIdentifier",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "identifier",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "genericType",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "identifier",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Identifier",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "genericArguments",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "Identifier"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "TypeAnnotation"
       }
     }
   ]

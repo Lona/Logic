@@ -108,6 +108,165 @@ extension LGCPattern: SyntaxNodeProtocol {
     }
 }
 
+extension LGCTypeAnnotation: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Type Annotation"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .typeAnnotation(self)
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTypeAnnotation {
+        switch syntaxNode {
+        case .typeAnnotation(let newNode) where id == uuid:
+            return newNode
+        case .identifier(let newNode) where id == uuid:
+            return LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: newNode)
+        default:
+            switch self {
+            case .typeIdentifier(let value):
+                return LGCTypeAnnotation.typeIdentifier(
+                    id: UUID(),
+                    identifier: value.identifier.replace(id: id, with: syntaxNode)
+                )
+            case .genericType(let value):
+                return LGCTypeAnnotation.genericType(
+                    id: UUID(),
+                    identifier: value.identifier.replace(id: id, with: syntaxNode),
+                    genericArguments: value.genericArguments.replace(id: id, with: syntaxNode)
+                )
+            }
+        }
+    }
+
+    public func find(id: UUID) -> LGCSyntaxNode? {
+        if id == uuid { return node }
+
+        switch self {
+        case .genericType:
+            fatalError("Not supported")
+        case .typeIdentifier(let value):
+            return value.identifier.find(id: id)
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]?
+
+        switch self {
+        case .genericType:
+            fatalError("Not supported")
+        case .typeIdentifier(let value):
+            found = value.identifier.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        return node
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .typeIdentifier(let value):
+            return value.id
+        case .genericType(let value):
+            return value.id
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
+extension LGCFunctionParameter: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Function Parameter"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .functionParameter(self)
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionParameter {
+        switch syntaxNode {
+        case .functionParameter(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .placeholder:
+                return LGCFunctionParameter.placeholder(id: UUID())
+            case .parameter(let value):
+                return LGCFunctionParameter.parameter(
+                    id: UUID(),
+                    externalName: value.externalName,
+                    localName: value.localName.replace(id: id, with: syntaxNode),
+                    annotation: value.annotation.replace(id: id, with: syntaxNode),
+                    defaultValue: value.defaultValue
+                )
+            }
+        }
+    }
+
+    public func find(id: UUID) -> LGCSyntaxNode? {
+        if id == uuid { return node }
+
+        switch self {
+        case .placeholder:
+            return nil
+        case .parameter(let value):
+            return value.localName.find(id: id)
+                ?? value.annotation.find(id: id)
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]?
+
+        switch self {
+        case .placeholder:
+            found = nil
+        case .parameter(let value):
+            found = value.localName.pathTo(id: id)
+                ?? value.annotation.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        return node
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .parameter(let value):
+            return value.id
+        case .placeholder(let value):
+            return value
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension LGCBinaryOperator: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Binary Operator"
@@ -309,9 +468,9 @@ extension LGCStatement: SyntaxNodeProtocol {
                 expression: newNode
             )
         case .declaration(let newNode) where id == uuid:
-            return .decl(
-                content: newNode,
-                id: UUID()
+            return .declaration(
+                id: UUID(),
+                content: newNode
             )
         default:
             switch self {
@@ -321,8 +480,11 @@ extension LGCStatement: SyntaxNodeProtocol {
                     condition: value.condition.replace(id: id, with: syntaxNode),
                     block: value.block.replace(id: id, with: syntaxNode)
                 )
-            case .decl:
-                return self
+            case .declaration(let value):
+                return LGCStatement.declaration(
+                    id: UUID(),
+                    content: value.content.replace(id: id, with: syntaxNode)
+                )
             case .loop(let value):
                 return LGCStatement.loop(
                     pattern: value.pattern.replace(id: id, with: syntaxNode),
@@ -349,7 +511,8 @@ extension LGCStatement: SyntaxNodeProtocol {
         switch self {
         case .branch(let value):
             return value.condition.find(id: id) ?? value.block.find(id: id)
-        case .decl:
+        case .declaration:
+            fatalError("Not implemented")
             return nil
         case .loop(let value):
             return value.expression.find(id: id) ?? value.pattern.find(id: id)
@@ -374,8 +537,8 @@ extension LGCStatement: SyntaxNodeProtocol {
                 return node.pathTo(id: id)
             })
             found = value.condition.pathTo(id: id) ?? foundInBlock
-        case .decl:
-            return nil
+        case .declaration(let value):
+            found = value.content.pathTo(id: id)
         case .loop(let value):
             found = value.expression.pathTo(id: id) ?? value.pattern.pathTo(id: id)
         case .expressionStatement(let value):
@@ -395,7 +558,8 @@ extension LGCStatement: SyntaxNodeProtocol {
         switch self {
         case .branch(let value):
             return value.block.map { $0 }.last?.lastNode ?? value.condition.lastNode
-        case .decl:
+        case .declaration:
+            fatalError("Not implemented")
             return .statement(self)
         case .loop(let value):
             return value.expression.lastNode
@@ -410,7 +574,7 @@ extension LGCStatement: SyntaxNodeProtocol {
         switch self {
         case .branch(let value):
             return value.id
-        case .decl(let value):
+        case .declaration(let value):
             return value.id
         case .loop(let value):
             return value.id
@@ -418,6 +582,93 @@ extension LGCStatement: SyntaxNodeProtocol {
             return value.id
         case .placeholderStatement(let value):
             return value
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
+extension LGCDeclaration: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Declaration"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .declaration(self)
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCDeclaration {
+        switch syntaxNode {
+        case .declaration(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .variable:
+                return LGCDeclaration.variable(id: UUID())
+            case .function(let value):
+                return LGCDeclaration.function(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    returnType: value.returnType.replace(id: id, with: syntaxNode),
+                    parameters: value.parameters.replace(id: id, with: syntaxNode),
+                    block: value.block.replace(id: id, with: syntaxNode))
+            }
+        }
+    }
+
+    public func find(id: UUID) -> LGCSyntaxNode? {
+        if id == uuid { return node }
+
+        switch self {
+        case .variable:
+            return nil
+        case .function(let value):
+            return value.name.find(id: id)
+                ?? value.returnType.find(id: id)
+                ?? value.parameters.find(id: id)
+                ?? value.block.find(id: id)
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]?
+
+        switch self {
+        case .variable:
+            found = nil
+        case .function(let value):
+            found = value.name.pathTo(id: id)
+                ?? value.returnType.pathTo(id: id)
+                ?? value.parameters.pathTo(id: id)
+                ?? value.block.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        switch self {
+        case .variable:
+            return node
+        case .function(let value):
+            return value.block.map { $0 }.last?.lastNode ?? node
+        }
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .variable(let value):
+            return value
+        case .function(let value):
+            return value.id
         }
     }
 
@@ -474,7 +725,6 @@ extension LGCProgram: SyntaxNodeProtocol {
     }
 }
 
-
 extension LGCFunctionCallArgument {
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
         return LGCFunctionCallArgument(
@@ -510,8 +760,8 @@ extension LGCSyntaxNode {
         switch self {
         case .statement(let value):
             return value
-        case .declaration:
-            fatalError("Declarations not implemented")
+        case .declaration(let value):
+            return value
         case .expression(let value):
             return value
         case .identifier(let value):
@@ -521,6 +771,10 @@ extension LGCSyntaxNode {
         case .binaryOperator(let value):
             return value
         case .program(let value):
+            return value
+        case .functionParameter(let value):
+            return value
+        case .typeAnnotation(let value):
             return value
         }
     }
@@ -551,55 +805,5 @@ extension LGCSyntaxNode {
 
     public var nodeTypeDescription: String {
         return contents.nodeTypeDescription
-    }
-}
-
-extension LGCList where T == LGCStatement {
-    func find(id: UUID) -> LGCSyntaxNode? {
-        return self.reduce(nil, { result, item in
-            return result ?? item.find(id: id)
-        })
-    }
-
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
-        // Reverse list so we can easily prepend to the front
-        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
-
-        var resultIterator = result.makeIterator()
-        var output = LGCList<T>.empty
-
-        if let first = result.first, case .placeholderStatement = first {
-
-        } else {
-            output = .next(.placeholderStatement(id: UUID()), output)
-        }
-
-        while let current = resultIterator.next() {
-            output = .next(current, output)
-        }
-
-        return output
-    }
-}
-
-extension LGCList where T == LGCFunctionCallArgument {
-    func find(id: UUID) -> LGCSyntaxNode? {
-        return self.reduce(nil, { result, item in
-            return result ?? item.find(id: id)
-        })
-    }
-
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
-        // Reverse list so we can easily prepend to the front
-        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
-
-        var resultIterator = result.makeIterator()
-        var output = LGCList<T>.empty
-
-        while let current = resultIterator.next() {
-            output = .next(current, output)
-        }
-
-        return output
     }
 }

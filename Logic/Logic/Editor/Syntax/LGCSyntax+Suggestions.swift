@@ -75,6 +75,25 @@ public extension LGCIdentifier {
     }
 }
 
+public extension LGCTypeAnnotation {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "Boolean",
+                category: "Types".uppercased(),
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "Boolean"))
+            ),
+            LogicSuggestionItem(
+                title: "Number",
+                category: "Types".uppercased(),
+                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "Number"))
+            )
+        ]
+
+        return items.titleContains(prefix: prefix)
+    }
+}
+
 public extension LGCPattern {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
@@ -82,6 +101,32 @@ public extension LGCPattern {
                 title: "Variable name: \(prefix)",
                 category: "Pattern".uppercased(),
                 node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: prefix)),
+                disabled: prefix.isEmpty
+            )
+        ]
+
+        return items
+    }
+}
+
+public extension LGCFunctionParameter {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "Parameter name: \(prefix)",
+                category: "Function Parameter".uppercased(),
+                node: LGCSyntaxNode.functionParameter(
+                    LGCFunctionParameter.parameter(
+                        id: UUID(),
+                        externalName: nil,
+                        localName: LGCPattern(id: UUID(), name: prefix),
+                        annotation: LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "type")
+                        ),
+                        defaultValue: nil
+                    )
+                ),
                 disabled: prefix.isEmpty
             )
         ]
@@ -171,6 +216,32 @@ public extension LGCExpression {
     }
 }
 
+public extension LGCDeclaration {
+    static var functionSuggestionItem: LogicSuggestionItem {
+        return LogicSuggestionItem(
+            title: "Function",
+            category: "Declarations".uppercased(),
+            node: LGCSyntaxNode.declaration(
+                LGCDeclaration.function(
+                    id: UUID(),
+                    name: LGCPattern(id: UUID(), name: "name"),
+                    returnType: LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: LGCIdentifier(id: UUID(), string: "Void")),
+                    parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
+                    block: .empty
+                )
+            )
+        )
+    }
+
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            functionSuggestionItem
+        ]
+
+        return items.titleContains(prefix: prefix)
+    }
+}
+
 public extension LGCStatement {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = LGCSyntaxNode.statement(
@@ -204,7 +275,8 @@ public extension LGCStatement {
                 category: "Statements".uppercased(),
                 node: forLoop
             ),
-            LGCExpression.assignmentSuggestionItem
+            LGCExpression.assignmentSuggestionItem,
+            LGCDeclaration.functionSuggestionItem
         ]
 
         return items.titleContains(prefix: prefix)
@@ -223,7 +295,7 @@ public extension LGCSyntaxNode {
         case .statement:
             return LGCStatement.suggestions(for: prefix)
         case .declaration:
-            return []
+            return LGCDeclaration.suggestions(for: prefix)
         case .identifier:
             return LGCIdentifier.suggestions(for: prefix)
         case .pattern:
@@ -234,6 +306,10 @@ public extension LGCSyntaxNode {
             return LGCBinaryOperator.suggestions(for: prefix)
         case .program:
             return LGCProgram.suggestions(for: prefix)
+        case .functionParameter:
+            return LGCFunctionParameter.suggestions(for: prefix)
+        case .typeAnnotation:
+            return LGCTypeAnnotation.suggestions(for: prefix)
         }
     }
 }
