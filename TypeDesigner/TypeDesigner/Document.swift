@@ -71,8 +71,8 @@ class Document: NSDocument {
                     }
                 })
                 return Array(all.joined())
-            default:
-                return []
+            case .nativeType(let nativeType):
+                return nativeType.parameters.map { $0.name }
             }
         }
 

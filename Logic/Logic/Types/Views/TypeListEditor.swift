@@ -334,8 +334,11 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         genericType.cases.append(TypeCase.normal("", []))
                         self.replace(item: item, with: TypeListItem.entity(Entity.genericType(genericType)))
                     }
-                case .nativeType(_):
-                    break
+                case .nativeType(var nativeType):
+                    view.onPressPlus = {
+                        nativeType.parameters.append(NativeTypeParameter(name: ""))
+                        self.replace(item: item, with: TypeListItem.entity(Entity.nativeType(nativeType)))
+                    }
                 }
                 view.onPressMinus = {
                     self.remove(item: item)
@@ -400,6 +403,12 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
                 view.textValue = substitution.generic
                 cell = view
+            case .nativeTypeParameter:
+                let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
+                view.textValue = "(Parameter \(childIndex(forItem: item)))"
+                cell = view
+
+                view.onPressMinus = { self.remove(item: item) }
             }
         case "Entity":
             switch typeListItem {
@@ -424,7 +433,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.entity(
                                 Entity.nativeType(
-                                    NativeType(name: entity.name))))
+                                    NativeType(name: entity.name, parameters: []))))
                     default:
                         break
                     }
@@ -517,7 +526,13 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     break
                 }
             case .genericTypeParameterSubstitution:
-                break
+                let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
+                view.textValue = "(Generic Substitution)"
+                cell = view
+            case .nativeTypeParameter:
+                let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
+                view.textValue = "(Generic Parameter)"
+                cell = view
             }
         case "Value":
             switch typeListItem {
@@ -608,6 +623,15 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     self.replace(item: item, with:
                         TypeListItem.genericTypeParameterSubstitution(
                             GenericTypeParameterSubstitution(generic: substitution.generic, instance: selectedItem)))
+                }
+                cell = view
+            case .nativeTypeParameter(let parameter):
+                let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
+                view.textValue = parameter.name
+                view.placeholderTextValue = "Generic name"
+                view.onChangeText = { name in
+                    self.replace(item: item, with:
+                        TypeListItem.nativeTypeParameter(NativeTypeParameter(name: name)))
                 }
                 cell = view
             }

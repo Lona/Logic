@@ -14,7 +14,8 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
     case normalTypeCaseParameter(NormalTypeCaseParameter)
     case recordTypeCaseParameter(RecordTypeCaseParameter)
     case genericTypeParameterSubstitution(GenericTypeParameterSubstitution)
-
+    case nativeTypeParameter(NativeTypeParameter)
+    
     // MARK: Codable
 
     public enum CodingKeys: CodingKey {
@@ -37,6 +38,8 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
             self = .recordTypeCaseParameter(try container.decode(RecordTypeCaseParameter.self, forKey: .data))
         case "genericTypeParameterSubstitution":
             self = .genericTypeParameterSubstitution(try container.decode(GenericTypeParameterSubstitution.self, forKey: .data))
+        case "nativeTypeParameter":
+            self = .nativeTypeParameter(try container.decode(NativeTypeParameter.self, forKey: .data))
         default:
             fatalError("Failed to decode enum due to invalid case type.")
         }
@@ -61,6 +64,9 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
         case .genericTypeParameterSubstitution(let value):
             try container.encode("genericTypeParameterSubstitution", forKey: .type)
             try container.encode(value, forKey: .data)
+        case .nativeTypeParameter(let value):
+            try container.encode("nativeTypeParameter", forKey: .type)
+            try container.encode(value, forKey: .data)
         }
     }
 
@@ -77,6 +83,8 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
         case .recordTypeCaseParameter(let value):
             return value.children
         case .genericTypeParameterSubstitution:
+            return []
+        case .nativeTypeParameter:
             return []
         }
     }
@@ -120,6 +128,15 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
     var genericTypeParameterSubstitution: GenericTypeParameterSubstitution? {
         switch self {
         case .genericTypeParameterSubstitution(let value):
+            return value
+        default:
+            return nil
+        }
+    }
+
+    var nativeTypeParameter: NativeTypeParameter? {
+        switch self {
+        case .nativeTypeParameter(let value):
             return value
         default:
             return nil

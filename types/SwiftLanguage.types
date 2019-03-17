@@ -3,13 +3,30 @@
     {
       "case" : "native",
       "data" : {
-        "name" : "UUID"
+        "name" : "UUID",
+        "parameters" : [
+
+        ]
       }
     },
     {
       "case" : "native",
       "data" : {
-        "name" : "String"
+        "name" : "String",
+        "parameters" : [
+
+        ]
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "Option",
+        "parameters" : [
+          {
+            "name" : "Value"
+          }
+        ]
       }
     },
     {

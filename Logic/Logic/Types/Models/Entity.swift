@@ -18,12 +18,30 @@ public struct GenericType: Codable & Equatable {
     }
 }
 
-public struct NativeType: Codable & Equatable {
+public struct NativeTypeParameter: Codable & Equatable {
+    public var name: String
+
     public init(name: String) {
         self.name = name
     }
 
+    func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
+        if path.count > 0 {
+            fatalError("Nothing to replace")
+        } else {
+            return TypeListItem.nativeTypeParameter(item.nativeTypeParameter!)
+        }
+    }
+}
+
+public struct NativeType: Codable & Equatable {
     public var name: String
+    public var parameters: [NativeTypeParameter]
+
+    public init(name: String, parameters: [NativeTypeParameter]) {
+        self.name = name
+        self.parameters = parameters
+    }
 }
 
 public enum Entity: Codable & Equatable {
@@ -67,8 +85,8 @@ public enum Entity: Codable & Equatable {
         switch self {
         case .genericType(let genericType):
             return genericType.cases.map { TypeListItem.typeCase($0) }
-        case .nativeType:
-            return []
+        case .nativeType(let nativeType):
+            return nativeType.parameters.map { TypeListItem.nativeTypeParameter($0) }
         }
     }
 
@@ -91,8 +109,13 @@ public enum Entity: Codable & Equatable {
                 genericType.cases.remove(at: path[0])
             }
             return .genericType(genericType)
-        case .nativeType:
-            return self
+        case .nativeType(var nativeType):
+            if path.count > 1 {
+                fatalError("Nothing to remove")
+            } else {
+                nativeType.parameters.remove(at: path[0])
+            }
+            return .nativeType(nativeType)
         }
     }
 
@@ -143,9 +166,14 @@ public enum Entity: Codable & Equatable {
             } else {
                 return item
             }
-        case .nativeType:
+        case .nativeType(var nativeType):
             if path.count > 0 {
-                return TypeListItem.entity(self)
+                nativeType.parameters = nativeType.parameters.enumerated().map { index, x in
+                    return index == path[0]
+                        ? x.replacing(itemAtPath: Array(path.dropFirst()), with: item).nativeTypeParameter!
+                        : x
+                }
+                return TypeListItem.entity(.nativeType(nativeType))
             } else {
                 return item
             }
