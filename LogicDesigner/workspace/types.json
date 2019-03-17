@@ -1,0 +1,9 @@
+{
+  "types": [
+    {
+      "name": "Named",
+      "alias": "CustomDetailView",
+      "of": "NSView"
+    }
+  ]
+}

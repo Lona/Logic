@@ -8,6 +8,7 @@
 
 import AppKit
 import Logic
+import XMLCoder
 
 struct Content: Codable {
     var types: [Entity]
@@ -70,8 +71,8 @@ class Document: NSDocument {
                     }
                 })
                 return Array(all.joined())
-            default:
-                return []
+            case .nativeType(let nativeType):
+                return nativeType.parameters.map { $0.name }
             }
         }
 
@@ -97,27 +98,27 @@ class Document: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        do {
-            let encoder = JSONEncoder()
-            if #available(OSX 10.13, *) {
-                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            } else {
-                encoder.outputFormatting = [.prettyPrinted]
-            }
-            return try encoder.encode(content)
-        } catch let error {
-            Swift.print(error)
-            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        let encoder = JSONEncoder()
+        if #available(OSX 10.13, *) {
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        } else {
+            encoder.outputFormatting = [.prettyPrinted]
         }
+        return try encoder.encode(content)
+
+//        let encoder = XMLEncoder()
+//        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+//        let header = XMLHeader(version: 1.0, encoding: "UTF-8", standalone: "yes")
+//        return try encoder.encode(content, withRootKey: "logic", header: header)
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
         do {
             content = try JSONDecoder().decode(Content.self, from: data)
             typeListEditor.list = content.types
-        } catch let error {
-            Swift.print(error)
-            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        } catch _ {
+            content = try XMLDecoder().decode(Content.self, from: data)
+            typeListEditor.list = content.types
         }
     }
 }

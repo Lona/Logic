@@ -1,0 +1,39 @@
+{
+  "colors" : [
+    {
+      "id" : "greyBackground",
+      "name" : "Grey Background",
+      "value" : "rgba(0,0,0,0.03)"
+    },
+    {
+      "id" : "divider",
+      "name" : "divider",
+      "value" : "rgba(237,237,237,1.0)"
+    },
+    {
+      "id" : "dividerBackground",
+      "name" : "dividerBackground",
+      "value" : "rgba(212,212,212,1.0)"
+    },
+    {
+      "id" : "textMuted",
+      "name" : "textMuted",
+      "value" : "rgba(144,144,144,1.0)"
+    },
+    {
+      "id" : "text",
+      "name" : "Text",
+      "value" : "black"
+    },
+    {
+      "id" : "editableText",
+      "name" : "editableText",
+      "value" : "#4a90e2"
+    },
+    {
+      "id" : "white",
+      "name" : "white",
+      "value" : "white"
+    }
+  ]
+}

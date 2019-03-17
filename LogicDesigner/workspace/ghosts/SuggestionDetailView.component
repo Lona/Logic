@@ -1,0 +1,38 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+
+      }
+    }
+  ],
+  "logic" : [
+
+  ],
+  "params" : [
+    {
+      "name" : "detailView",
+      "type" : "CustomDetailView"
+    }
+  ],
+  "root" : {
+    "id" : "View",
+    "params" : {
+      "alignSelf" : "stretch",
+      "flex" : 1
+    },
+    "type" : "Lona:View"
+  }
+}
