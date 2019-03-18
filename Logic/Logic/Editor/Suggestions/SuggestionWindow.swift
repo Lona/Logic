@@ -211,7 +211,7 @@ public class SuggestionWindow: NSWindow {
         let textInset: CGFloat = 12.0
         if let contentBox = contentBox {
             let origin = NSPoint(
-                x: rect.minX - textInset + LogicCanvas.textPadding.width,
+                x: rect.minX - textInset + LogicCanvasView.textPadding.width,
                 y: rect.minY - contentBox.frame.height - margin)
             setFrameOrigin(origin)
         }

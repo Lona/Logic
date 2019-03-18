@@ -1,8 +1,8 @@
 import AppKit
 
-// MARK: - LogicCanvas
+// MARK: - LogicCanvasView
 
-public class LogicCanvas: NSView {
+public class LogicCanvasView: NSView {
 
     // MARK: Lifecycle
 
@@ -23,8 +23,8 @@ public class LogicCanvas: NSView {
 
     public var formattedContent: FormatterCommand<LogicElement> = .hardLine {
         didSet {
-//            invalidateIntrinsicContentSize()
             update()
+            invalidateIntrinsicContentSize()
         }
     }
     public var selectedRange: Range<Int>? {
@@ -188,10 +188,10 @@ public class LogicCanvas: NSView {
             }
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
-                roundedRect: rect.insetBy(dx: LogicCanvas.outlineWidth / 2, dy: LogicCanvas.outlineWidth / 2),
-                xRadius: LogicCanvas.textBackgroundRadius.width,
-                yRadius: LogicCanvas.textBackgroundRadius.height)
-            path.lineWidth = LogicCanvas.outlineWidth
+                roundedRect: rect.insetBy(dx: LogicCanvasView.outlineWidth / 2, dy: LogicCanvasView.outlineWidth / 2),
+                xRadius: LogicCanvasView.textBackgroundRadius.width,
+                yRadius: LogicCanvasView.textBackgroundRadius.height)
+            path.lineWidth = LogicCanvasView.outlineWidth
             path.stroke()
         } else {
             if let start = selectedIndex, let end = selectionEndIndex, start < end, end < measuredElements.count {
@@ -202,8 +202,8 @@ public class LogicCanvas: NSView {
                 NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
                 NSBezierPath(
                     roundedRect: rect,
-                    xRadius: LogicCanvas.textBackgroundRadius.width,
-                    yRadius: LogicCanvas.textBackgroundRadius.height).fill()
+                    xRadius: LogicCanvasView.textBackgroundRadius.width,
+                    yRadius: LogicCanvasView.textBackgroundRadius.height).fill()
             }
         }
 
@@ -235,13 +235,13 @@ public class LogicCanvas: NSView {
 
                 let backgroundPath = NSBezierPath(
                     roundedRect: backgroundRect,
-                    xRadius: LogicCanvas.textBackgroundRadius.width,
-                    yRadius: LogicCanvas.textBackgroundRadius.height)
+                    xRadius: LogicCanvasView.textBackgroundRadius.width,
+                    yRadius: LogicCanvasView.textBackgroundRadius.height)
                 backgroundPath.fill()
 
                 NSShadow().set()
 
-                if LogicCanvas.dropdownCarets || value.isEmpty {
+                if LogicCanvasView.dropdownCarets || value.isEmpty {
                     if drawSelection {
                         NSColor.white.setStroke()
                     } else {
@@ -276,11 +276,11 @@ public class LogicCanvas: NSView {
         }
 
         let formattedElementLines = formattedContent.print(
-            width: bounds.width - LogicCanvas.textMargin.width * 2,
-            spaceWidth: LogicCanvas.textSpacing,
+            width: bounds.width - LogicCanvasView.textMargin.width * 2,
+            spaceWidth: LogicCanvasView.textSpacing,
             indentWidth: 20)
 
-        let yOffset = LogicCanvas.textMargin.height
+        let yOffset = LogicCanvasView.textMargin.height
         var measuredLine: [LogicMeasuredElement] = []
         var formattedElementIndex = 0
 
@@ -289,8 +289,8 @@ public class LogicCanvas: NSView {
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
-                        x: LogicCanvas.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * LogicCanvas.minimumLineHeight))
+                        x: LogicCanvasView.textMargin.width + formattedElement.position,
+                        y: yOffset + CGFloat(rowIndex) * LogicCanvasView.minimumLineHeight))
 
                 measuredLine.append(measured)
 
@@ -304,8 +304,8 @@ public class LogicCanvas: NSView {
     }
 
     private var minHeight: CGFloat {
-        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicCanvas.textMargin.height
-        let minHeight = contentHeight + LogicCanvas.textMargin.height
+        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicCanvasView.textMargin.height
+        let minHeight = contentHeight + LogicCanvasView.textMargin.height
         return minHeight
     }
 

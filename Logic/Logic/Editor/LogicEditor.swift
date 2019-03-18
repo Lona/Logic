@@ -35,7 +35,7 @@ public class LogicEditor: NSBox {
 
     public var rootNode: LGCSyntaxNode {
         didSet {
-            canvas.formattedContent = rootNode.formatted
+            canvasView.formattedContent = rootNode.formatted
         }
     }
 
@@ -55,30 +55,40 @@ public class LogicEditor: NSBox {
 
     private lazy var childWindow: SuggestionWindow? = SuggestionWindow()
 
-    private let canvas = LogicCanvas()
+    private let canvasView = LogicCanvasView()
+    private let scrollView = NSScrollView()
 
     private func setUpViews() {
         boxType = .custom
         borderType = .noBorder
         contentViewMargins = .zero
 
-        addSubview(canvas)
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
+        scrollView.drawsBackground = false
+        scrollView.documentView = canvasView
 
-        canvas.formattedContent = rootNode.formatted
-        canvas.onActivate = handleActivateElement
-        canvas.onActivateLine = handleActivateLine
-        canvas.onPressTabKey = nextNode
-        canvas.onPressShiftTabKey = previousNode
+        addSubview(scrollView)
+
+        canvasView.formattedContent = rootNode.formatted
+        canvasView.onActivate = handleActivateElement
+        canvasView.onActivateLine = handleActivateLine
+        canvasView.onPressTabKey = nextNode
+        canvasView.onPressShiftTabKey = previousNode
     }
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
-        canvas.translatesAutoresizingMaskIntoConstraints = false
-        
-        canvas.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        canvas.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        canvas.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        canvas.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        canvasView.translatesAutoresizingMaskIntoConstraints = false
+
+        canvasView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        canvasView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+
+        scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 
     private func update() {}
@@ -89,10 +99,10 @@ public class LogicEditor: NSBox {
 extension LogicEditor {
 
     private func nextNode() {
-        if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvas.selectedRange?.lowerBound),
+        if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvasView.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
+            self.canvasView.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
@@ -105,10 +115,10 @@ extension LogicEditor {
     }
 
     private func previousNode() {
-        if let index = rootNode.formatted.previousActivatableElementIndex(before: self.canvas.selectedRange?.lowerBound),
+        if let index = rootNode.formatted.previousActivatableElementIndex(before: self.canvasView.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.canvas.selectedRange = self.rootNode.elementRange(for: id)
+            self.canvasView.selectedRange = self.rootNode.elementRange(for: id)
             self.suggestionText = ""
 
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
@@ -121,21 +131,21 @@ extension LogicEditor {
     }
 
     private func select(nodeByID syntaxNodeId: UUID?) {
-        self.canvas.selectedLine = nil
+        self.canvasView.selectedLine = nil
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
             let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId)
 
             if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
-                self.canvas.selectedRange = selectedRange
+                self.canvasView.selectedRange = selectedRange
                 self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
             } else {
-                self.canvas.selectedRange = nil
+                self.canvasView.selectedRange = nil
                 self.hideSuggestionWindow()
             }
         } else {
-            self.canvas.selectedRange = nil
+            self.canvasView.selectedRange = nil
             self.hideSuggestionWindow()
         }
     }
@@ -152,7 +162,7 @@ extension LogicEditor {
     private func handleActivateLine(_ activatedLineIndex: Int) {
         handleActivateElement(nil)
 
-        canvas.selectedLine = activatedLineIndex
+        canvasView.selectedLine = activatedLineIndex
     }
 }
 
@@ -240,14 +250,14 @@ extension LogicEditor {
                 let selected = dropdownNodes[highlightedIndex]
                 let range = self.rootNode.elementRange(for: selected.uuid)
 
-                self.canvas.outlinedRange = range
+                self.canvasView.outlinedRange = range
             } else {
-                self.canvas.outlinedRange = nil
+                self.canvasView.outlinedRange = nil
             }
         }
 
         childWindow.onSelectDropdownIndex = { selectedIndex in
-            self.canvas.outlinedRange = nil
+            self.canvasView.outlinedRange = nil
             self.select(nodeByID: dropdownNodes[selectedIndex].uuid)
         }
 
@@ -268,7 +278,7 @@ extension LogicEditor {
             if suggestedNode.movementAfterInsertion == .next {
                 self.nextNode()
             } else {
-                self.handleActivateElement(self.canvas.selectedRange?.lowerBound)
+                self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
             }
         }
 
@@ -285,8 +295,15 @@ extension LogicEditor {
 
         window.addChildWindow(childWindow, ordered: .above)
 
-        if let rect = self.canvas.getBoundingRect(for: nodeIndex) {
-            let screenRect = window.convertToScreen(rect)
+        if let rect = self.canvasView.getBoundingRect(for: nodeIndex) {
+            let scrollOffset = rect.origin.y +
+                scrollView.frame.height -
+                (scrollView.documentView?.frame.height ?? 0) +
+                scrollView.documentVisibleRect.minY
+
+            let offsetRect = NSRect(origin: NSPoint(x: rect.origin.x, y: scrollOffset), size: rect.size)
+
+            let screenRect = window.convertToScreen(offsetRect)
             childWindow.anchorTo(rect: screenRect)
             childWindow.focusSearchField()
         }

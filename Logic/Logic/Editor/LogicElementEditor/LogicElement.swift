@@ -65,13 +65,13 @@ extension LogicElement {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: NSColor.systemGray,
-                NSAttributedString.Key.font: LogicCanvas.font
+                NSAttributedString.Key.font: LogicCanvasView.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicCanvasView.textPadding.width, dy: -LogicCanvasView.textPadding.height)
 
             return LogicMeasuredElement(
                 element: self,
@@ -83,13 +83,13 @@ extension LogicElement {
 
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicCanvas.font
+                NSAttributedString.Key.font: LogicCanvasView.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
+            let backgroundRect = rect.insetBy(dx: -LogicCanvasView.textPadding.width, dy: -LogicCanvasView.textPadding.height)
 
             return LogicMeasuredElement(
                 element: self,
@@ -99,15 +99,15 @@ extension LogicElement {
         case .dropdown(_, _, let color):
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicCanvas.font
+                NSAttributedString.Key.font: LogicCanvasView.font
             ]
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
             let rect = CGRect(origin: offset, size: attributedStringSize)
-            var backgroundRect = rect.insetBy(dx: -LogicCanvas.textPadding.width, dy: -LogicCanvas.textPadding.height)
+            var backgroundRect = rect.insetBy(dx: -LogicCanvasView.textPadding.width, dy: -LogicCanvasView.textPadding.height)
 
-            if LogicCanvas.dropdownCarets || value.isEmpty {
+            if LogicCanvasView.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 
