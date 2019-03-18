@@ -178,11 +178,19 @@ extension SuggestionListView: NSTableViewDelegate {
         switch item {
         case .row(let value, let disabled):
             let rowView = ResultRow(titleText: value, selected: row == selectedIndex, disabled: disabled)
+
+            var disabledBackgroundColor = Colors.greyBackground
+
+            if #available(OSX 10.14, *) {
+                disabledBackgroundColor = NSColor.unemphasizedSelectedContentBackgroundColor
+            }
+
             rowView.fillColor = row != selectedIndex
                 ? NSColor.clear
                 : disabled
-                ? NSColor.unemphasizedSelectedContentBackgroundColor
+                ? disabledBackgroundColor
                 : NSColor.selectedMenuItemColor
+
             return rowView
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)
