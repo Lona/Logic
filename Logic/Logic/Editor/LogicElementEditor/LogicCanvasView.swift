@@ -89,10 +89,10 @@ public class LogicCanvasView: NSView {
         return true
     }
 
-    public func getBoundingRect(for index: Int) -> CGRect? {
+    public func getElementRect(for index: Int) -> CGRect? {
         if index >= measuredElements.count { return nil }
 
-        return flip(rect: measuredElements[index].backgroundRect)
+        return measuredElements[index].backgroundRect
     }
 
     public override func mouseDown(with event: NSEvent) {
@@ -312,14 +312,6 @@ public class LogicCanvasView: NSView {
     private var previousHeight: CGFloat = -1
 
     // MARK: Private
-
-    private func flip(rect: CGRect) -> CGRect {
-        return CGRect(
-            x: rect.origin.x,
-            y: bounds.height - rect.height - rect.origin.y,
-            width: rect.width,
-            height: rect.height)
-    }
 
     private func setUpViews() {}
 

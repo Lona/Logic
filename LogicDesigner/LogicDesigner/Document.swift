@@ -21,7 +21,8 @@ class Document: NSDocument {
 
     var window: NSWindow?
 
-    var logicEditor = LogicEditor()
+    let logicEditor = LogicEditor()
+    let containerView = NSBox()
 
     override func makeWindowControllers() {
         let window = NSWindow(
@@ -30,9 +31,23 @@ class Document: NSDocument {
             backing: .buffered,
             defer: false)
 
+        containerView.boxType = .custom
+        containerView.borderType = .noBorder
+        containerView.contentViewMargins = .zero
+
+        containerView.addSubview(logicEditor)
+
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        logicEditor.translatesAutoresizingMaskIntoConstraints = false
+
+        logicEditor.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        logicEditor.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+
         window.backgroundColor = NSColor.white
         window.center()
-        window.contentView = logicEditor
+        window.contentView = containerView
 
         self.window = window
 

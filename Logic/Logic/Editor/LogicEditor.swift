@@ -295,15 +295,10 @@ extension LogicEditor {
 
         window.addChildWindow(childWindow, ordered: .above)
 
-        if let rect = self.canvasView.getBoundingRect(for: nodeIndex) {
-            let scrollOffset = rect.origin.y +
-                scrollView.frame.height -
-                (scrollView.documentView?.frame.height ?? 0) +
-                scrollView.documentVisibleRect.minY
+        if let elementRect = canvasView.getElementRect(for: nodeIndex) {
+            let windowRect = canvasView.convert(elementRect, to: nil)
+            let screenRect = window.convertToScreen(windowRect)
 
-            let offsetRect = NSRect(origin: NSPoint(x: rect.origin.x, y: scrollOffset), size: rect.size)
-
-            let screenRect = window.convertToScreen(offsetRect)
             childWindow.anchorTo(rect: screenRect)
             childWindow.focusSearchField()
         }
