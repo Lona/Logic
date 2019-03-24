@@ -829,6 +829,21 @@
           },
           {
             "case" : "normal",
+            "name" : "functionParameterDefaultValue",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "FunctionParameterDefaultValue",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
             "name" : "typeAnnotation",
             "params" : [
               {
@@ -901,12 +916,9 @@
                 "key" : "defaultValue",
                 "value" : {
                   "case" : "type",
-                  "name" : "Optional",
+                  "name" : "FunctionParameterDefaultValue",
                   "substitutions" : [
-                    {
-                      "generic" : "Value",
-                      "instance" : "String"
-                    }
+
                   ]
                 }
               }
@@ -930,6 +942,56 @@
           }
         ],
         "name" : "FunctionParameter"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "none",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "value",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "expression",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Expression",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "FunctionParameterDefaultValue"
       }
     },
     {

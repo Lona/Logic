@@ -194,6 +194,80 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
     }
 }
 
+extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Default Value"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .functionParameterDefaultValue(self)
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionParameterDefaultValue {
+        switch syntaxNode {
+        case .functionParameterDefaultValue(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .none:
+                return LGCFunctionParameterDefaultValue.none(id: UUID())
+            case .value(let value):
+                return LGCFunctionParameterDefaultValue.value(
+                    id: UUID(),
+                    expression: value.expression.replace(id: id, with: syntaxNode)
+                )
+            }
+        }
+    }
+
+    public func find(id: UUID) -> LGCSyntaxNode? {
+        if id == uuid { return node }
+
+        switch self {
+        case .none:
+            return nil
+        case .value(let value):
+            return value.expression.find(id: id)
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        var found: [LGCSyntaxNode]?
+
+        switch self {
+        case .none:
+            return nil
+        case .value(let value):
+            found = value.expression.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        return node
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .none(let value):
+            return value
+        case .value(let value):
+            return value.id
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension LGCFunctionParameter: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Function Parameter"
@@ -217,7 +291,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
                     externalName: value.externalName,
                     localName: value.localName.replace(id: id, with: syntaxNode),
                     annotation: value.annotation.replace(id: id, with: syntaxNode),
-                    defaultValue: value.defaultValue
+                    defaultValue: value.defaultValue.replace(id: id, with: syntaxNode)
                 )
             }
         }
@@ -232,6 +306,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         case .parameter(let value):
             return value.localName.find(id: id)
                 ?? value.annotation.find(id: id)
+                ?? value.defaultValue.find(id: id)
         }
     }
 
@@ -246,6 +321,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         case .parameter(let value):
             found = value.localName.pathTo(id: id)
                 ?? value.annotation.pathTo(id: id)
+                ?? value.defaultValue.pathTo(id: id)
         }
 
         if let found = found {
@@ -781,6 +857,8 @@ extension LGCSyntaxNode {
         case .functionParameter(let value):
             return value
         case .typeAnnotation(let value):
+            return value
+        case .functionParameterDefaultValue(let value):
             return value
         }
     }

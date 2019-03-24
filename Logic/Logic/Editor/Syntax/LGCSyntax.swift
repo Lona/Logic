@@ -382,6 +382,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
   case binaryOperator(LGCBinaryOperator)
   case program(LGCProgram)
   case functionParameter(LGCFunctionParameter)
+  case functionParameterDefaultValue(LGCFunctionParameterDefaultValue)
   case typeAnnotation(LGCTypeAnnotation)
 
   // MARK: Codable
@@ -412,6 +413,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         self = .program(try container.decode(LGCProgram.self, forKey: .data))
       case "functionParameter":
         self = .functionParameter(try container.decode(LGCFunctionParameter.self, forKey: .data))
+      case "functionParameterDefaultValue":
+        self =
+          .functionParameterDefaultValue(try container.decode(LGCFunctionParameterDefaultValue.self, forKey: .data))
       case "typeAnnotation":
         self = .typeAnnotation(try container.decode(LGCTypeAnnotation.self, forKey: .data))
       default:
@@ -447,6 +451,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
       case .functionParameter(let value):
         try container.encode("functionParameter", forKey: .type)
         try container.encode(value, forKey: .data)
+      case .functionParameterDefaultValue(let value):
+        try container.encode("functionParameterDefaultValue", forKey: .type)
+        try container.encode(value, forKey: .data)
       case .typeAnnotation(let value):
         try container.encode("typeAnnotation", forKey: .type)
         try container.encode(value, forKey: .data)
@@ -455,7 +462,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
 }
 
 public indirect enum LGCFunctionParameter: Codable & Equatable {
-  case parameter(id: UUID, externalName: Optional<String>, localName: LGCPattern, annotation: LGCTypeAnnotation, defaultValue: Optional<String>)
+  case parameter(id: UUID, externalName: Optional<String>, localName: LGCPattern, annotation: LGCTypeAnnotation, defaultValue: LGCFunctionParameterDefaultValue)
   case placeholder(id: UUID)
 
   // MARK: Codable
@@ -486,7 +493,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
             externalName: try data.decode(Optional.self, forKey: .externalName),
             localName: try data.decode(LGCPattern.self, forKey: .localName),
             annotation: try data.decode(LGCTypeAnnotation.self, forKey: .annotation),
-            defaultValue: try data.decode(Optional.self, forKey: .defaultValue))
+            defaultValue: try data.decode(LGCFunctionParameterDefaultValue.self, forKey: .defaultValue))
       case "placeholder":
         self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
@@ -509,6 +516,56 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
       case .placeholder(let value):
         try container.encode("placeholder", forKey: .type)
         try data.encode(value, forKey: .id)
+    }
+  }
+}
+
+public indirect enum LGCFunctionParameterDefaultValue: Codable & Equatable {
+  case none(id: UUID)
+  case value(id: UUID, expression: LGCExpression)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public enum DataCodingKeys: CodingKey {
+    case id
+    case expression
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "none":
+        self = .none(id: try data.decode(UUID.self, forKey: .id))
+      case "value":
+        self =
+          .value(
+            id: try data.decode(UUID.self, forKey: .id),
+            expression: try data.decode(LGCExpression.self, forKey: .expression))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+
+    switch self {
+      case .none(let value):
+        try container.encode("none", forKey: .type)
+        try data.encode(value, forKey: .id)
+      case .value(let value):
+        try container.encode("value", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.expression, forKey: .expression)
     }
   }
 }

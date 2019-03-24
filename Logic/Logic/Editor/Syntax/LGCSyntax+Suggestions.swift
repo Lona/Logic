@@ -75,6 +75,20 @@ public extension LGCIdentifier {
     }
 }
 
+public extension LGCFunctionParameterDefaultValue {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "No default",
+                category: "Default Value".uppercased(),
+                node: LGCSyntaxNode.functionParameterDefaultValue(.none(id: UUID()))
+            )
+        ]
+
+        return items.titleContains(prefix: prefix) + LGCExpression.suggestions(for: prefix)
+    }
+}
+
 public extension LGCTypeAnnotation {
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
@@ -173,7 +187,7 @@ public extension LGCFunctionParameter {
                             identifier: LGCIdentifier(id: UUID(), string: "type"),
                             genericArguments: .empty
                         ),
-                        defaultValue: nil
+                        defaultValue: .none(id: UUID())
                     )
                 ),
                 disabled: prefix.isEmpty
@@ -363,6 +377,8 @@ public extension LGCSyntaxNode {
             return LGCFunctionParameter.suggestions(for: prefix)
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)
+        case .functionParameterDefaultValue:
+            return LGCFunctionParameterDefaultValue.suggestions(for: prefix)
         }
     }
 }

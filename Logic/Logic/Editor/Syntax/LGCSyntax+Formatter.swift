@@ -37,6 +37,22 @@ public extension LGCFunctionCallArgument {
     }
 }
 
+public extension LGCFunctionParameterDefaultValue {
+    public var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .value(let value):
+            return .concat {
+                [
+                    .element(.text("default value")),
+                    value.expression.formatted
+                ]
+            }
+        case .none(let value):
+            return .element(LogicElement.dropdown(value, "no default", Colors.text))
+        }
+    }
+}
+
 public extension LGCFunctionParameter {
     public var formatted: FormatterCommand<LogicElement> {
         switch self {
@@ -47,7 +63,9 @@ public extension LGCFunctionParameter {
                 [
                     value.localName.formatted,
                     .element(.text("of type")),
-                    value.annotation.formatted
+                    value.annotation.formatted,
+                    .element(.text("with")),
+                    value.defaultValue.formatted
                 ]
             }
         }
@@ -266,6 +284,8 @@ public extension LGCSyntaxNode {
         case .functionParameter(let value):
             return value.formatted
         case .typeAnnotation(let value):
+            return value.formatted
+        case .functionParameterDefaultValue(let value):
             return value.formatted
         }
     }
