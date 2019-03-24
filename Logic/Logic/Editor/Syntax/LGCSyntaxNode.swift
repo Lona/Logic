@@ -153,13 +153,20 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         if id == uuid { return [node] }
 
-        let found: [LGCSyntaxNode]?
+        var found: [LGCSyntaxNode]?
 
         switch self {
         case .functionType:
             fatalError("Not supported")
         case .typeIdentifier(let value):
-            found = value.identifier.pathTo(id: id) ?? value.genericArguments.pathTo(id: id)
+            found = value.identifier.pathTo(id: id)
+
+            // If we match the identifier, we still want to show the picker for the whole annotation
+            if let _ = found {
+                return [self.node]
+            }
+
+            found = value.genericArguments.pathTo(id: id)
         }
 
         if let found = found {

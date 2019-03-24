@@ -101,6 +101,24 @@ public extension LGCTypeAnnotation {
                 )
             ),
             LogicSuggestionItem(
+                title: "Optional",
+                category: "Generic Types".uppercased(),
+                node: LGCSyntaxNode.typeAnnotation(
+                    LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "Optional"),
+                        genericArguments: .next(
+                            LGCTypeAnnotation.typeIdentifier(
+                                id: UUID(),
+                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                                genericArguments: .empty
+                            ),
+                            .empty
+                        )
+                    )
+                )
+            ),
+            LogicSuggestionItem(
                 title: "Array",
                 category: "Generic Types".uppercased(),
                 node: LGCSyntaxNode.typeAnnotation(
