@@ -33,7 +33,7 @@ class TypeListHeaderCellView: NSBox {
     var titleText: String { didSet { update() } }
 
     var titleTextFont: NSFont = NSFont.systemFont(ofSize: 12, weight: NSFont.Weight.bold)
-    var titleTextColor: NSColor = NSColor.init(calibratedRed: 0, green: 0, blue: 0, alpha: 0.4)
+    var titleTextColor: NSColor = Colors.textMuted
 
     var onPressPlus: (() -> Void)? { didSet { update() } }
 
@@ -121,7 +121,7 @@ class TypeListHeaderView: NSTableHeaderView {
         bottomDividerView.borderType = .lineBorder
         bottomDividerView.contentViewMargins = .zero
         bottomDividerView.borderWidth = 0
-        bottomDividerView.fillColor = NSColor.init(calibratedRed: 0, green: 0, blue: 0, alpha: 0.15)
+        bottomDividerView.fillColor = Colors.divider
 
         addSubview(bottomDividerView)
     }
@@ -144,7 +144,7 @@ class TypeListHeaderView: NSTableHeaderView {
             tableView.tableColumns.enumerated().forEach { index, column in
                 let rect = headerRect(ofColumn: index)
                 let view = TypeListHeaderCellView(frame: rect)
-                view.fillColor = .white
+                view.fillColor = Colors.divider
                 view.titleText = column.title
 
                 if index == 0 {

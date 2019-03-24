@@ -29,7 +29,7 @@ class Document: NSDocument {
     var typeListEditor = TypeList()
 
     func setUpViews() -> NSView {
-        typeListEditor.fillColor = .white
+        typeListEditor.fillColor = Colors.suggestionWindowBackground
 
         typeListEditor.onChange = { list in
             self.content.types = list
