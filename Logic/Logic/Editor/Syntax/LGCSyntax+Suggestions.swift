@@ -84,7 +84,8 @@ public extension LGCTypeAnnotation {
                 node: LGCSyntaxNode.typeAnnotation(
                     LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "Boolean")
+                        identifier: LGCIdentifier(id: UUID(), string: "Boolean"),
+                        genericArguments: .empty
                     )
                 )
             ),
@@ -94,7 +95,26 @@ public extension LGCTypeAnnotation {
                 node: LGCSyntaxNode.typeAnnotation(
                     LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "Number")
+                        identifier: LGCIdentifier(id: UUID(), string: "Number"),
+                        genericArguments: .empty
+                    )
+                )
+            ),
+            LogicSuggestionItem(
+                title: "Array",
+                category: "Generic Types".uppercased(),
+                node: LGCSyntaxNode.typeAnnotation(
+                    LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "Array"),
+                        genericArguments: .next(
+                            LGCTypeAnnotation.typeIdentifier(
+                                id: UUID(),
+                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                                genericArguments: .empty
+                            ),
+                            .empty
+                        )
                     )
                 )
             ),
@@ -132,7 +152,8 @@ public extension LGCFunctionParameter {
                         localName: LGCPattern(id: UUID(), name: prefix),
                         annotation: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "type")
+                            identifier: LGCIdentifier(id: UUID(), string: "type"),
+                            genericArguments: .empty
                         ),
                         defaultValue: nil
                     )
@@ -235,7 +256,11 @@ public extension LGCDeclaration {
                 LGCDeclaration.function(
                     id: UUID(),
                     name: LGCPattern(id: UUID(), name: "name"),
-                    returnType: LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: LGCIdentifier(id: UUID(), string: "Void")),
+                    returnType: LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                        genericArguments: .empty
+                    ),
                     parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
                     block: .empty
                 )

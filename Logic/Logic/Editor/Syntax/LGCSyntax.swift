@@ -514,8 +514,8 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
 }
 
 public indirect enum LGCTypeAnnotation: Codable & Equatable {
-  case typeIdentifier(id: UUID, identifier: LGCIdentifier)
-  case genericType(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeAnnotation>)
+  case typeIdentifier(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeAnnotation>)
+  case functionType(id: UUID, returnType: LGCTypeAnnotation, argumentTypes: LGCList<LGCTypeAnnotation>)
 
   // MARK: Codable
 
@@ -528,6 +528,8 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
     case id
     case identifier
     case genericArguments
+    case returnType
+    case argumentTypes
   }
 
   public init(from decoder: Decoder) throws {
@@ -540,13 +542,14 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
         self =
           .typeIdentifier(
             id: try data.decode(UUID.self, forKey: .id),
-            identifier: try data.decode(LGCIdentifier.self, forKey: .identifier))
-      case "genericType":
-        self =
-          .genericType(
-            id: try data.decode(UUID.self, forKey: .id),
             identifier: try data.decode(LGCIdentifier.self, forKey: .identifier),
             genericArguments: try data.decode(LGCList.self, forKey: .genericArguments))
+      case "functionType":
+        self =
+          .functionType(
+            id: try data.decode(UUID.self, forKey: .id),
+            returnType: try data.decode(LGCTypeAnnotation.self, forKey: .returnType),
+            argumentTypes: try data.decode(LGCList.self, forKey: .argumentTypes))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -561,11 +564,12 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
         try container.encode("typeIdentifier", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.identifier, forKey: .identifier)
-      case .genericType(let value):
-        try container.encode("genericType", forKey: .type)
-        try data.encode(value.id, forKey: .id)
-        try data.encode(value.identifier, forKey: .identifier)
         try data.encode(value.genericArguments, forKey: .genericArguments)
+      case .functionType(let value):
+        try container.encode("functionType", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.returnType, forKey: .returnType)
+        try data.encode(value.argumentTypes, forKey: .argumentTypes)
     }
   }
 }

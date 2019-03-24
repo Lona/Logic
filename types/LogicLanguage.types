@@ -959,12 +959,25 @@
 
                   ]
                 }
+              },
+              {
+                "key" : "genericArguments",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "TypeAnnotation"
+                    }
+                  ]
+                }
               }
             ]
           },
           {
             "case" : "record",
-            "name" : "genericType",
+            "name" : "functionType",
             "params" : [
               {
                 "key" : "id",
@@ -977,17 +990,17 @@
                 }
               },
               {
-                "key" : "identifier",
+                "key" : "returnType",
                 "value" : {
                   "case" : "type",
-                  "name" : "Identifier",
+                  "name" : "TypeAnnotation",
                   "substitutions" : [
 
                   ]
                 }
               },
               {
-                "key" : "genericArguments",
+                "key" : "argumentTypes",
                 "value" : {
                   "case" : "type",
                   "name" : "List",

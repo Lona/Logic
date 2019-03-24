@@ -58,8 +58,21 @@ public extension LGCTypeAnnotation {
     public var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .typeIdentifier(let value):
-            return value.identifier.formatted
-        case .genericType:
+            switch value.genericArguments {
+            case .empty:
+                return value.identifier.formatted
+            case .next:
+                return .concat {
+                    [
+                        value.identifier.formatted,
+                        .element(.text("of")),
+                        .join(with: .concat {[.element(.text(",")), .line]}) {
+                            value.genericArguments.map { $0.formatted }
+                        }
+                    ]
+                }
+            }
+        case .functionType:
             fatalError("Not supported")
         }
     }

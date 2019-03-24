@@ -121,20 +121,19 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         switch syntaxNode {
         case .typeAnnotation(let newNode) where id == uuid:
             return newNode
-        case .identifier(let newNode) where id == uuid:
-            return LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: newNode)
         default:
             switch self {
             case .typeIdentifier(let value):
                 return LGCTypeAnnotation.typeIdentifier(
                     id: UUID(),
-                    identifier: value.identifier.replace(id: id, with: syntaxNode)
-                )
-            case .genericType(let value):
-                return LGCTypeAnnotation.genericType(
-                    id: UUID(),
                     identifier: value.identifier.replace(id: id, with: syntaxNode),
                     genericArguments: value.genericArguments.replace(id: id, with: syntaxNode)
+                )
+            case .functionType(let value):
+                return LGCTypeAnnotation.functionType(
+                    id: UUID(),
+                    returnType: value.returnType.replace(id: id, with: syntaxNode),
+                    argumentTypes: value.argumentTypes.replace(id: id, with: syntaxNode)
                 )
             }
         }
@@ -144,10 +143,10 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         if id == uuid { return node }
 
         switch self {
-        case .genericType:
+        case .functionType:
             fatalError("Not supported")
         case .typeIdentifier(let value):
-            return value.identifier.find(id: id)
+            return value.identifier.find(id: id) ?? value.genericArguments.find(id: id)
         }
     }
 
@@ -157,10 +156,10 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         let found: [LGCSyntaxNode]?
 
         switch self {
-        case .genericType:
+        case .functionType:
             fatalError("Not supported")
         case .typeIdentifier(let value):
-            found = value.identifier.pathTo(id: id)
+            found = value.identifier.pathTo(id: id) ?? value.genericArguments.pathTo(id: id)
         }
 
         if let found = found {
@@ -178,7 +177,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         switch self {
         case .typeIdentifier(let value):
             return value.id
-        case .genericType(let value):
+        case .functionType(let value):
             return value.id
         }
     }
