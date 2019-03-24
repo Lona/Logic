@@ -32,7 +32,7 @@ extension Colors {
             }
         }
 
-        return NSColor.black.withAlphaComponent(0.03)
+        return #colorLiteral(red: 0.9725490196, green: 0.9725490196, blue: 0.9725490196, alpha: 1)
     }()
 
     public static let text: NSColor = {
@@ -52,7 +52,7 @@ extension Colors {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
             case .some(.darkAqua):
-                return NSColor.white.blended(withFraction: 0.3, of: NSColor.black)!
+                return NSColor.white.blended(withFraction: 0.5, of: NSColor.black)!
             default:
                 break
             }
@@ -72,5 +72,57 @@ extension Colors {
         }
 
         return #colorLiteral(red: 0.9294117647, green: 0.9294117647, blue: 0.9294117647, alpha: 1)
+    }()
+
+    public static let highlightedCode: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return NSColor.selectedMenuItemColor.withAlphaComponent(0.3)
+            default:
+                break
+            }
+        }
+
+        return NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)!
+    }()
+
+    public static let highlightedLine: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return NSColor.selectedMenuItemColor.withAlphaComponent(0.3)
+            default:
+                break
+            }
+        }
+
+        return NSColor.selectedMenuItemColor.highlight(withLevel: 0.9)!
+    }()
+
+    public static let suggestionListBackground: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return Colors.raisedBackground
+            default:
+                break
+            }
+        }
+
+        return NSColor.controlBackgroundColor
+    }()
+
+    public static let suggestionWindowBackground: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return Colors.raisedBackground
+            default:
+                break
+            }
+        }
+
+        return Colors.background
     }()
 }

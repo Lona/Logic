@@ -106,6 +106,7 @@ public class SuggestionListView: NSBox {
         boxType = .custom
         borderType = .noBorder
         contentViewMargins = .zero
+        fillColor = Colors.suggestionListBackground
 
         tableView.addTableColumn(tableColumn)
         tableView.intercellSpacing = NSSize.zero
@@ -114,6 +115,7 @@ public class SuggestionListView: NSBox {
         tableView.delegate = self
         tableView.target = self
         tableView.doubleAction = #selector(handleDoubleAction)
+        tableView.backgroundColor = .clear
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false

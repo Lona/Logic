@@ -170,7 +170,7 @@ public class LogicCanvasView: NSView {
             let range = formattedContent.elementIndexRange(for: selectedLine)
             let elements = measuredElements[range]
             if let first = elements.first, let last = elements.last {
-                NSColor.selectedMenuItemColor.highlight(withLevel: 0.9)?.set()
+                Colors.highlightedLine.set()
                 let rect = NSRect(
                     x: 0,
                     y: first.backgroundRect.minY,
@@ -199,7 +199,7 @@ public class LogicCanvasView: NSView {
                 for index in start...end {
                     rect = rect.union(measuredElements[index].backgroundRect)
                 }
-                NSColor.selectedMenuItemColor.highlight(withLevel: 0.8)?.set()
+                Colors.highlightedCode.set()
                 NSBezierPath(
                     roundedRect: rect,
                     xRadius: LogicCanvasView.textBackgroundRadius.width,
