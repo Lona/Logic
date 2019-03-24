@@ -994,7 +994,7 @@
                   "substitutions" : [
                     {
                       "generic" : "T",
-                      "instance" : "Identifier"
+                      "instance" : "TypeAnnotation"
                     }
                   ]
                 }

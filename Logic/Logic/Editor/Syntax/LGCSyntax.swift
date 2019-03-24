@@ -515,7 +515,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
 
 public indirect enum LGCTypeAnnotation: Codable & Equatable {
   case typeIdentifier(id: UUID, identifier: LGCIdentifier)
-  case genericType(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCIdentifier>)
+  case genericType(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeAnnotation>)
 
   // MARK: Codable
 

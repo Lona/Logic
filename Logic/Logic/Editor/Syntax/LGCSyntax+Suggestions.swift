@@ -81,13 +81,23 @@ public extension LGCTypeAnnotation {
             LogicSuggestionItem(
                 title: "Boolean",
                 category: "Types".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "Boolean"))
+                node: LGCSyntaxNode.typeAnnotation(
+                    LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "Boolean")
+                    )
+                )
             ),
             LogicSuggestionItem(
                 title: "Number",
                 category: "Types".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "Number"))
-            )
+                node: LGCSyntaxNode.typeAnnotation(
+                    LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "Number")
+                    )
+                )
+            ),
         ]
 
         return items.titleContains(prefix: prefix)
