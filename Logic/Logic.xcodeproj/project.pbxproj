@@ -59,6 +59,7 @@
 		6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */; };
 		6B5B7574215C387E00CDC9C6 /* TypeCaseParameterEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7573215C387E00CDC9C6 /* TypeCaseParameterEntity.swift */; };
 		6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */; };
+		6BC606342247DDFB003E616B /* Colors+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC606332247DDFB003E616B /* Colors+Appearance.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -116,6 +117,7 @@
 		6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalTypeCaseParameter.swift; sourceTree = "<group>"; };
 		6B5B7573215C387E00CDC9C6 /* TypeCaseParameterEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeCaseParameterEntity.swift; sourceTree = "<group>"; };
 		6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTypeParameterSubstitution.swift; sourceTree = "<group>"; };
+		6BC606332247DDFB003E616B /* Colors+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Appearance.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +255,7 @@
 		6B44E197223C1A0000740318 /* Lona */ = {
 			isa = PBXGroup;
 			children = (
+				6BC606332247DDFB003E616B /* Colors+Appearance.swift */,
 				6B44E15F223B3DFF00740318 /* ForeignTypes.swift */,
 				6B44E15D223B3DF300740318 /* TextStyle.swift */,
 				6B44E151223B3DB700740318 /* Generated */,
@@ -450,6 +453,7 @@
 				6B44E164223B3E3C00740318 /* ControlledSearchInput.swift in Sources */,
 				6B44E143223B3D8E00740318 /* RichText.swift in Sources */,
 				6B5B7561215B1ABE00CDC9C6 /* TypeListItem.swift in Sources */,
+				6BC606342247DDFB003E616B /* Colors+Appearance.swift in Sources */,
 				6B44E177223B40BA00740318 /* LogicCanvasView.swift in Sources */,
 				6B5B7560215B1ABE00CDC9C6 /* Entity.swift in Sources */,
 				6B5B7565215B1ABE00CDC9C6 /* EntityCellView.swift in Sources */,

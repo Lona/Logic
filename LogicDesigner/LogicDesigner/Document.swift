@@ -45,7 +45,7 @@ class Document: NSDocument {
         logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
-        window.backgroundColor = NSColor.white
+        window.backgroundColor = Colors.background
         window.center()
         window.contentView = containerView
 

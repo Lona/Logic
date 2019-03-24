@@ -29,7 +29,7 @@ public class SuggestionWindow: NSWindow {
         box.boxType = .custom
         box.borderType = .noBorder
         box.contentViewMargins = .zero
-        box.fillColor = .white
+        box.fillColor = Colors.background
         box.shadow = shadow
         box.cornerRadius = 4
 

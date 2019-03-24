@@ -14,7 +14,7 @@ private func codeView(for syntaxNode: LGCSyntaxNode) -> NSView {
     container.borderType = .lineBorder
     container.borderWidth = 1
     container.borderColor = NSColor(red: 0.59, green: 0.59, blue: 0.59, alpha: 0.26)
-    container.fillColor = .white
+    container.fillColor = Colors.background
     container.cornerRadius = 4
 
     let editor = LogicCanvasView()

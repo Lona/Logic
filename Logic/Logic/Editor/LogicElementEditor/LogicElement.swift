@@ -47,7 +47,7 @@ public enum LogicElement {
     public var color: NSColor {
         switch self {
         case .text:
-            return NSColor.black
+            return Colors.text
         case .coloredText(_, let color):
             return color
         case .dropdown(_, _, let color):
@@ -64,7 +64,7 @@ extension LogicElement {
         switch self {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: NSColor.systemGray,
+                NSAttributedString.Key.foregroundColor: Colors.textNoneditable,
                 NSAttributedString.Key.font: LogicCanvasView.font
             ]
             attributedString.setAttributes(attributes, range: range)

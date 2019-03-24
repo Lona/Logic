@@ -250,7 +250,7 @@ public class SuggestionView: NSBox {
 
     dividerView.fillColor = Colors.divider
     vDividerView.fillColor = Colors.divider
-    detailAreaView.fillColor = Colors.greyBackground
+    detailAreaView.fillColor = Colors.raisedBackground
   }
 
   private func setUpConstraints() {

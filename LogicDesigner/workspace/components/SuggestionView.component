@@ -526,7 +526,7 @@
             "id" : "Detail Area",
             "params" : {
               "alignSelf" : "stretch",
-              "backgroundColor" : "greyBackground",
+              "backgroundColor" : "raisedBackground",
               "flex" : 1
             },
             "type" : "Lona:View"

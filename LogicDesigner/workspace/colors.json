@@ -1,39 +1,69 @@
 {
-  "colors" : [
+  "colors": [
     {
-      "id" : "greyBackground",
-      "name" : "Grey Background",
-      "value" : "rgba(0,0,0,0.03)"
+      "id": "background",
+      "name": "Background",
+      "value": "white",
+      "metadata": {
+        "shouldGenerateCode": {
+          "macos": false
+        }
+      }
     },
     {
-      "id" : "divider",
-      "name" : "divider",
-      "value" : "rgba(237,237,237,1.0)"
+      "id": "raisedBackground",
+      "name": "Raised Background",
+      "value": "rgba(0,0,0,0.03)",
+      "metadata": {
+        "shouldGenerateCode": {
+          "macos": false
+        }
+      }
     },
     {
-      "id" : "dividerBackground",
-      "name" : "dividerBackground",
-      "value" : "rgba(212,212,212,1.0)"
+      "id": "greyBackground",
+      "name": "Grey Background",
+      "value": "rgba(0,0,0,0.03)"
     },
     {
-      "id" : "textMuted",
-      "name" : "textMuted",
-      "value" : "rgba(144,144,144,1.0)"
+      "id": "divider",
+      "name": "divider",
+      "value": "rgba(237,237,237,1.0)",
+      "metadata": {
+        "shouldGenerateCode": {
+          "macos": false
+        }
+      }
     },
     {
-      "id" : "text",
-      "name" : "Text",
-      "value" : "black"
+      "id": "dividerBackground",
+      "name": "dividerBackground",
+      "value": "rgba(212,212,212,1.0)"
     },
     {
-      "id" : "editableText",
-      "name" : "editableText",
-      "value" : "#4a90e2"
+      "id": "textMuted",
+      "name": "textMuted",
+      "value": "rgba(144,144,144,1.0)"
     },
     {
-      "id" : "white",
-      "name" : "white",
-      "value" : "white"
+      "id": "text",
+      "name": "Text",
+      "value": "black",
+      "metadata": {
+        "shouldGenerateCode": {
+          "macos": false
+        }
+      }
+    },
+    {
+      "id": "editableText",
+      "name": "editableText",
+      "value": "#4a90e2"
+    },
+    {
+      "id": "white",
+      "name": "white",
+      "value": "white"
     }
   ]
 }

@@ -117,7 +117,7 @@ public extension LGCStatement {
         case .loop(let loop):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(loop.id, "For", NSColor.black)),
+                    .element(LogicElement.dropdown(loop.id, "For", Colors.text)),
                     loop.pattern.formatted,
                     .element(LogicElement.text("in")),
                     loop.expression.formatted,
@@ -126,7 +126,7 @@ public extension LGCStatement {
         case .branch(let branch):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(branch.id, "If", NSColor.black)),
+                    .element(LogicElement.dropdown(branch.id, "If", Colors.text)),
                     branch.condition.formatted,
                     .indent {
                         .concat {
