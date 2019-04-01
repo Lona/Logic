@@ -168,6 +168,11 @@ public class SuggestionWindow: NSWindow {
 
     // MARK: Dropdown
 
+    public var showsDropdown: Bool {
+        get { return suggestionView.showsDropdown }
+        set { suggestionView.showsDropdown = newValue }
+    }
+
     public var dropdownIndex: Int {
         get { return suggestionView.dropdownIndex }
         set { suggestionView.dropdownIndex = newValue }

@@ -45,9 +45,11 @@ class Document: NSDocument {
         logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
-        logicEditor.rootNode = .topLevelParameters(
-            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
-        )
+        logicEditor.showsDropdown = true
+        logicEditor.rootNode = LogicEditor.defaultRootNode
+//        logicEditor.rootNode = .topLevelParameters(
+//            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
+//        )
 
         window.backgroundColor = Colors.background
         window.center()

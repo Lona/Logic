@@ -176,6 +176,18 @@
     {
       "assignee" : [
         "layers",
+        "ControlledDropdownContainer",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsDropdown"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "ControlledDropdown",
         "values"
       ],
@@ -417,6 +429,10 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "showsDropdown",
+      "type" : "Boolean"
     }
   ],
   "root" : {

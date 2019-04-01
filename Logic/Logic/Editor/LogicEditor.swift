@@ -15,6 +15,10 @@ public class LogicEditor: NSBox {
             return LogicEditor.defaultSuggestionsForNode(node, self.rootNode, query)
         }
 
+        self.documentationForNode = { [unowned self] node, query in
+            return LogicEditor.defaultDocumentationForNode(node, self.rootNode, query)
+        }
+
         setUpViews()
         setUpConstraints()
 
@@ -33,7 +37,18 @@ public class LogicEditor: NSBox {
         }
     }
 
-    public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _ in return [] }
+    public var showsDropdown: Bool {
+        get { return childWindow.showsDropdown }
+        set { childWindow.showsDropdown = newValue }
+    }
+
+    public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _
+        in return []
+    }
+
+    public var documentationForNode: ((LGCSyntaxNode, String) -> RichText) = { _, _ in
+        return RichText(blocks: [])
+    }
 
     public static let defaultRootNode = LGCSyntaxNode.program(
         LGCProgram(
@@ -52,21 +67,28 @@ public class LogicEditor: NSBox {
         return node.suggestions(within: rootNode, for: query)
     }
 
+    public static let defaultDocumentationForNode: (
+        LGCSyntaxNode,
+        LGCSyntaxNode,
+        String) -> RichText = { node, rootNode, query in
+            return node.documentation(within: rootNode, for: query)
+    }
+
     // MARK: Private
 
     private var suggestionText: String = "" {
         didSet {
-            childWindow?.suggestionText = suggestionText
+            childWindow.suggestionText = suggestionText
         }
     }
 
     private var selectedSuggestionIndex: Int? {
         didSet {
-            childWindow?.selectedIndex = selectedSuggestionIndex
+            childWindow.selectedIndex = selectedSuggestionIndex
         }
     }
 
-    private lazy var childWindow: SuggestionWindow? = SuggestionWindow()
+    private lazy var childWindow: SuggestionWindow = SuggestionWindow()
 
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
@@ -215,7 +237,6 @@ extension LogicEditor {
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-
         return suggestionsForNode(highestMatch, prefix)
     }
 }
@@ -224,8 +245,16 @@ extension LogicEditor {
 
 extension LogicEditor {
 
+    private func makeDetailView(for syntaxNode: LGCSyntaxNode?, query: String) -> NSView? {
+        if let syntaxNode = syntaxNode {
+            return syntaxNode.documentation(within: rootNode, for: query).makeScrollView()
+        } else {
+            return nil
+        }
+    }
+
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
-        guard let window = self.window, let childWindow = self.childWindow else { return }
+        guard let window = self.window else { return }
 
         let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid)
         let dropdownNodes = Array(syntaxNodePath)
@@ -233,7 +262,7 @@ extension LogicEditor {
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
-        childWindow.detailView = logicSuggestions.first?.node.documentation(for: suggestionText).makeScrollView()
+        childWindow.detailView = makeDetailView(for: logicSuggestions.first?.node, query: suggestionText)
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
         childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
@@ -246,9 +275,9 @@ extension LogicEditor {
                 let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
                 let suggestedNode = logicSuggestions[indexedSuggestions[index].offset].node
 
-                childWindow.detailView = suggestedNode.documentation(for: self.suggestionText).makeScrollView()
+                self.childWindow.detailView = self.makeDetailView(for: suggestedNode, query: self.suggestionText)
             } else {
-                childWindow.detailView = nil
+                self.childWindow.detailView = nil
             }
         }
 
@@ -304,8 +333,8 @@ extension LogicEditor {
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
 
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
-            childWindow.suggestionItems = indexedSuggestions.map { $0.item }
-            childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
+            self.childWindow.suggestionItems = indexedSuggestions.map { $0.item }
+            self.childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
         }
 
         window.addChildWindow(childWindow, ordered: .above)
@@ -320,7 +349,7 @@ extension LogicEditor {
     }
 
     private func hideSuggestionWindow() {
-        guard let window = self.window, let childWindow = self.childWindow else { return }
+        guard let window = self.window else { return }
 
         window.removeChildWindow(childWindow)
         childWindow.setIsVisible(false)

@@ -23,12 +23,12 @@ public protocol SyntaxNodeProtocol {
     func pathTo(id: UUID) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
 
-    func documentation(for prefix: String) -> RichText
+    func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
 }
 
 public extension SyntaxNodeProtocol {
-    func documentation(for prefix: String) -> RichText {
+    func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText {
         return RichText(blocks: [])
     }
 
