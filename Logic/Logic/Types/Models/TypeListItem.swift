@@ -147,8 +147,8 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
 // NSTableView/NSOutlineView items must be hashable to work correctly.
 // We could consider an obj-c compatible wrapper instead, which might be more future-proof.
 extension TypeListItem: Hashable {
-    public var hashValue: Int {
-        return try! JSONEncoder().encode(self).hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(try! JSONEncoder().encode(self).hashValue)
     }
 }
 

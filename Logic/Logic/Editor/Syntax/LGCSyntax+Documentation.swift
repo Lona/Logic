@@ -32,7 +32,7 @@ private func codeView(for syntaxNode: LGCSyntaxNode) -> NSView {
 }
 
 public extension LGCExpression {
-    public func documentation(for prefix: String) -> RichText {
+    func documentation(for prefix: String) -> RichText {
         switch self {
         case .binaryExpression(let value):
             switch value.op {
@@ -66,7 +66,7 @@ public extension LGCExpression {
 }
 
 public extension LGCStatement {
-    public func documentation(for prefix: String) -> RichText {
+    func documentation(for prefix: String) -> RichText {
         switch self {
         case .branch:
             let example = LGCSyntaxNode.statement(

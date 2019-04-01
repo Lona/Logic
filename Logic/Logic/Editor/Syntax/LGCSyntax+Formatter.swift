@@ -9,25 +9,25 @@
 import AppKit
 
 public extension LGCIdentifier {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, string, Colors.editableText))
     }
 }
 
 public extension LGCPattern {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, name, Colors.editableText))
     }
 }
 
 public extension LGCBinaryOperator {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(uuid, displayText, Colors.text))
     }
 }
 
 public extension LGCFunctionCallArgument {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         return .concat {
             [
                 .element(.text(self.label + " :")),
@@ -38,7 +38,7 @@ public extension LGCFunctionCallArgument {
 }
 
 public extension LGCFunctionParameterDefaultValue {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .value(let value):
             return .concat {
@@ -54,7 +54,7 @@ public extension LGCFunctionParameterDefaultValue {
 }
 
 public extension LGCFunctionParameter {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", Colors.editableText))
@@ -73,7 +73,7 @@ public extension LGCFunctionParameter {
 }
 
 public extension LGCTypeAnnotation {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .typeIdentifier(let value):
             switch value.genericArguments {
@@ -97,7 +97,7 @@ public extension LGCTypeAnnotation {
 }
 
 public extension LGCExpression {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .identifierExpression(let value):
             return value.identifier.formatted
@@ -143,7 +143,7 @@ public extension LGCExpression {
 }
 
 public extension LGCStatement {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .loop(let loop):
             return .concat {
@@ -182,7 +182,7 @@ public extension LGCStatement {
 }
 
 public extension LGCDeclaration {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         func parameters() -> FormatterCommand<LogicElement> {
             switch self {
             case .function(let value):
@@ -256,7 +256,7 @@ public extension LGCDeclaration {
 }
 
 public extension LGCProgram {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
             self.block.map { $0.formatted }
         }
@@ -265,7 +265,7 @@ public extension LGCProgram {
 
 
 public extension LGCSyntaxNode {
-    public var formatted: FormatterCommand<LogicElement> {
+    var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .statement(let value):
             return value.formatted
@@ -290,7 +290,7 @@ public extension LGCSyntaxNode {
         }
     }
 
-    public func elementRange(for targetID: UUID) -> Range<Int>? {
+    func elementRange(for targetID: UUID) -> Range<Int>? {
         let topNode = topNodeWithEqualElements(as: targetID)
         let topNodeFormattedElements = topNode.formatted.elements
 
@@ -306,13 +306,13 @@ public extension LGCSyntaxNode {
         return firstIndex..<lastIndex
     }
 
-    public func topNodeWithEqualElements(as targetID: UUID) -> LGCSyntaxNode {
+    func topNodeWithEqualElements(as targetID: UUID) -> LGCSyntaxNode {
         let elementPath = uniqueElementPathTo(id: targetID)
 
         return elementPath[elementPath.count - 1]
     }
 
-    public func uniqueElementPathTo(id targetID: UUID) -> [LGCSyntaxNode] {
+    func uniqueElementPathTo(id targetID: UUID) -> [LGCSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }

@@ -57,7 +57,7 @@ private func idExpression(_ string: String) -> LGCExpression {
 }
 
 public extension LGCIdentifier {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "bar",
@@ -76,7 +76,7 @@ public extension LGCIdentifier {
 }
 
 public extension LGCFunctionParameterDefaultValue {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "No default",
@@ -90,7 +90,7 @@ public extension LGCFunctionParameterDefaultValue {
 }
 
 public extension LGCTypeAnnotation {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "Boolean",
@@ -157,7 +157,7 @@ public extension LGCTypeAnnotation {
 }
 
 public extension LGCPattern {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "Variable name: \(prefix)",
@@ -172,7 +172,7 @@ public extension LGCPattern {
 }
 
 public extension LGCFunctionParameter {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
                 title: "Parameter name: \(prefix)",
@@ -199,7 +199,7 @@ public extension LGCFunctionParameter {
 }
 
 public extension LGCBinaryOperator {
-    public var displayText: String {
+    var displayText: String {
         switch self {
         case .isEqualTo:
             return "is equal to"
@@ -218,7 +218,7 @@ public extension LGCBinaryOperator {
         }
     }
 
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let operatorNodes = [
             LGCBinaryOperator.isEqualTo(id: UUID()),
             LGCBinaryOperator.isNotEqualTo(id: UUID()),
@@ -269,7 +269,7 @@ public extension LGCExpression {
         )
     }
 
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             comparisonSuggestionItem,
             assignmentSuggestionItem
@@ -300,7 +300,7 @@ public extension LGCDeclaration {
         )
     }
 
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             functionSuggestionItem
         ]
@@ -310,7 +310,7 @@ public extension LGCDeclaration {
 }
 
 public extension LGCStatement {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = LGCSyntaxNode.statement(
             LGCStatement.branch(
                 id: UUID(),
@@ -351,13 +351,13 @@ public extension LGCStatement {
 }
 
 public extension LGCProgram {
-    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         return LGCStatement.suggestions(for: prefix)
     }
 }
 
 public extension LGCSyntaxNode {
-    public func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         switch self {
         case .statement:
             return LGCStatement.suggestions(for: prefix)

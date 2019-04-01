@@ -88,7 +88,7 @@ public class SuggestionDetailView: NSBox {
 // MARK: - Parameters
 
 public extension SuggestionDetailView {
-    public struct Parameters: Equatable {
+    struct Parameters: Equatable {
         public var detailView: CustomDetailView
 
         public init(detailView: CustomDetailView) {
@@ -108,7 +108,7 @@ public extension SuggestionDetailView {
 // MARK: - Model
 
 public extension SuggestionDetailView {
-    public struct Model: LonaViewModel, Equatable {
+    struct Model: LonaViewModel, Equatable {
         public var id: String?
         public var parameters: Parameters
         public var type: String {
