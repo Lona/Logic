@@ -8,29 +8,6 @@
 
 import AppKit
 
-private func codeView(for syntaxNode: LGCSyntaxNode) -> NSView {
-    let container = NSBox()
-    container.boxType = .custom
-    container.borderType = .lineBorder
-    container.borderWidth = 1
-    container.borderColor = NSColor(red: 0.59, green: 0.59, blue: 0.59, alpha: 0.26)
-    container.fillColor = Colors.background
-    container.cornerRadius = 4
-
-    let editor = LogicCanvasView()
-    editor.formattedContent = syntaxNode.formatted
-
-    container.addSubview(editor)
-
-    editor.translatesAutoresizingMaskIntoConstraints = false
-    editor.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
-    editor.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
-    editor.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
-    editor.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
-
-    return container
-}
-
 public extension LGCExpression {
     func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
         switch self {
@@ -125,7 +102,7 @@ public extension LGCStatement {
                         .text(.none, "to accomplish this:")
                     ]
                 ),
-                .custom(codeView(for: example)),
+                .custom(example.makeCodeView()),
 //                .paragraph(
 //                    [
 //                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
@@ -156,6 +133,29 @@ public extension LGCStatement {
 public extension LGCSyntaxNode {
     func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
         return contents.documentation(within: rootNode, for: prefix)
+    }
+
+    func makeCodeView() -> NSView {
+        let container = NSBox()
+        container.boxType = .custom
+        container.borderType = .lineBorder
+        container.borderWidth = 1
+        container.borderColor = NSColor(red: 0.59, green: 0.59, blue: 0.59, alpha: 0.26)
+        container.fillColor = Colors.background
+        container.cornerRadius = 4
+
+        let editor = LogicCanvasView()
+        editor.formattedContent = formatted
+
+        container.addSubview(editor)
+
+        editor.translatesAutoresizingMaskIntoConstraints = false
+        editor.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
+        editor.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
+        editor.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
+        editor.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
+
+        return container
     }
 }
 
