@@ -21,12 +21,12 @@ public struct RichText {
     }
 
     public enum InlineElement {
-        case text(TextStyle, () -> String)
+        case text(TextStyle, String)
     }
 
     public enum BlockElement {
         case custom(NSView)
-        case heading(HeadingSize, () -> String)
+        case heading(HeadingSize, String)
         case paragraph([InlineElement])
     }
 

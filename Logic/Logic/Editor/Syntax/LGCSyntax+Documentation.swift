@@ -38,10 +38,13 @@ public extension LGCExpression {
             switch value.op {
             case .setEqualTo:
                 let blocks: [RichText.BlockElement] = [
-                    .heading(.title) { "Assignment" },
+                    .heading(.title, "Assignment"),
                     .paragraph(
                         [
-                            .text(.none) { "Use an assignment expression to update the value of an existing variable." }
+                            .text(
+                                .none,
+                                "Use an assignment expression to update the value of an existing variable."
+                            )
                         ]
                     )
                 ]
@@ -49,10 +52,10 @@ public extension LGCExpression {
                 return RichText(blocks: blocks)
             default:
                 let blocks: [RichText.BlockElement] = [
-                    .heading(.title) { "Comparison" },
+                    .heading(.title, "Comparison"),
                     .paragraph(
                         [
-                            .text(.none) { "Compare two variables." }
+                            .text(.none, "Compare two variables.")
                         ]
                     )
                 ]
@@ -106,20 +109,20 @@ public extension LGCStatement {
             )
 
             let blocks: [RichText.BlockElement] = [
-                .heading(.title) { "If condition" },
+                .heading(.title, "If condition"),
                 .paragraph(
                     [
-                        .text(.none) { "Conditions let you run different code depending on the current state of your app." }
+                        .text(.none, "Conditions let you run different code depending on the current state of your app.")
                     ]
                 ),
-                .heading(.section) { "Example" },
+                .heading(.section, "Example"),
                 .paragraph(
                     [
-                        .text(.none) { "Suppose our program has a variable " },
-                        .text(.bold) { "age" },
-                        .text(.none) { ", representing the current user's age. We might want to display a specific message depending on the value of age. We could use an " },
-                        .text(.bold) { "if condition " },
-                        .text(.none) { "to accomplish this:" }
+                        .text(.none, "Suppose our program has a variable "),
+                        .text(.bold, "age"),
+                        .text(.none, ", representing the current user's age. We might want to display a specific message depending on the value of age. We could use an "),
+                        .text(.bold, "if condition "),
+                        .text(.none, "to accomplish this:")
                     ]
                 ),
                 .custom(codeView(for: example)),
@@ -135,10 +138,10 @@ public extension LGCStatement {
             return RichText(blocks: blocks)
         case .loop:
             let blocks: [RichText.BlockElement] = [
-                .heading(.title) { "For loop" },
+                .heading(.title, "For loop"),
                 .paragraph(
                     [
-                        .text(.none) { "Loops let you run the same code multiple times, once for each item in a sequence of items." }
+                        .text(.none, "Loops let you run the same code multiple times, once for each item in a sequence of items.")
                     ]
                 )
             ]

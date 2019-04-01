@@ -36,7 +36,7 @@ extension RichText.BlockElement {
     var view: NSView {
         switch self {
         case .heading(let headingSize, let content):
-            let attributedString = headingSize.textStyle.apply(to: content())
+            let attributedString = headingSize.textStyle.apply(to: content)
             return NSTextField(labelWithAttributedString: attributedString)
         case .paragraph(let elements):
             let paragraphString = NSMutableAttributedString()
@@ -44,7 +44,7 @@ extension RichText.BlockElement {
             for element in elements {
                 guard case .text(let style, let content) = element else { continue }
 
-                let attributedString = style.textStyle.apply(to: content())
+                let attributedString = style.textStyle.apply(to: content)
                 paragraphString.append(attributedString)
             }
 
