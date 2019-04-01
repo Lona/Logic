@@ -55,6 +55,7 @@
         "params" : {
           "alignSelf" : "stretch",
           "backgroundColor" : "divider",
+          "flex" : 1,
           "paddingLeft" : 12,
           "paddingRight" : 12,
           "paddingTop" : 2
@@ -64,7 +65,8 @@
     ],
     "id" : "View",
     "params" : {
-      "alignSelf" : "stretch"
+      "alignSelf" : "stretch",
+      "flex" : 1
     },
     "type" : "Lona:View"
   }

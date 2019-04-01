@@ -68,6 +68,7 @@ public class SuggestionListView: NSBox {
 
   // MARK: Private
 
+  private var rowWrapperView = NSBox()
   private var resultSectionHeaderView = ResultSectionHeader()
   private var resultRowView = ResultRow()
   private var resultRow1View = ResultRow()
@@ -76,10 +77,14 @@ public class SuggestionListView: NSBox {
     boxType = .custom
     borderType = .noBorder
     contentViewMargins = .zero
+    rowWrapperView.boxType = .custom
+    rowWrapperView.borderType = .noBorder
+    rowWrapperView.contentViewMargins = .zero
 
-    addSubview(resultSectionHeaderView)
+    addSubview(rowWrapperView)
     addSubview(resultRowView)
     addSubview(resultRow1View)
+    rowWrapperView.addSubview(resultSectionHeaderView)
 
     resultSectionHeaderView.titleText = "STATEMENTS"
     resultRowView.titleText = "If condition"
@@ -88,36 +93,49 @@ public class SuggestionListView: NSBox {
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
-    resultSectionHeaderView.translatesAutoresizingMaskIntoConstraints = false
+    rowWrapperView.translatesAutoresizingMaskIntoConstraints = false
     resultRowView.translatesAutoresizingMaskIntoConstraints = false
     resultRow1View.translatesAutoresizingMaskIntoConstraints = false
+    resultSectionHeaderView.translatesAutoresizingMaskIntoConstraints = false
 
-    let resultSectionHeaderViewTopAnchorConstraint = resultSectionHeaderView.topAnchor.constraint(equalTo: topAnchor)
-    let resultSectionHeaderViewLeadingAnchorConstraint = resultSectionHeaderView
-      .leadingAnchor
-      .constraint(equalTo: leadingAnchor)
-    let resultSectionHeaderViewTrailingAnchorConstraint = resultSectionHeaderView
-      .trailingAnchor
-      .constraint(equalTo: trailingAnchor)
-    let resultRowViewTopAnchorConstraint = resultRowView
-      .topAnchor
-      .constraint(equalTo: resultSectionHeaderView.bottomAnchor)
+    let rowWrapperViewTopAnchorConstraint = rowWrapperView.topAnchor.constraint(equalTo: topAnchor)
+    let rowWrapperViewLeadingAnchorConstraint = rowWrapperView.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let rowWrapperViewTrailingAnchorConstraint = rowWrapperView.trailingAnchor.constraint(equalTo: trailingAnchor)
+    let resultRowViewTopAnchorConstraint = resultRowView.topAnchor.constraint(equalTo: rowWrapperView.bottomAnchor)
     let resultRowViewLeadingAnchorConstraint = resultRowView.leadingAnchor.constraint(equalTo: leadingAnchor)
     let resultRowViewTrailingAnchorConstraint = resultRowView.trailingAnchor.constraint(equalTo: trailingAnchor)
     let resultRow1ViewTopAnchorConstraint = resultRow1View.topAnchor.constraint(equalTo: resultRowView.bottomAnchor)
     let resultRow1ViewLeadingAnchorConstraint = resultRow1View.leadingAnchor.constraint(equalTo: leadingAnchor)
     let resultRow1ViewTrailingAnchorConstraint = resultRow1View.trailingAnchor.constraint(equalTo: trailingAnchor)
+    let rowWrapperViewHeightAnchorConstraint = rowWrapperView.heightAnchor.constraint(equalToConstant: 18)
+    let resultSectionHeaderViewTopAnchorConstraint = resultSectionHeaderView
+      .topAnchor
+      .constraint(equalTo: rowWrapperView.topAnchor)
+    let resultSectionHeaderViewBottomAnchorConstraint = resultSectionHeaderView
+      .bottomAnchor
+      .constraint(equalTo: rowWrapperView.bottomAnchor)
+    let resultSectionHeaderViewLeadingAnchorConstraint = resultSectionHeaderView
+      .leadingAnchor
+      .constraint(equalTo: rowWrapperView.leadingAnchor)
+    let resultSectionHeaderViewTrailingAnchorConstraint = resultSectionHeaderView
+      .trailingAnchor
+      .constraint(equalTo: rowWrapperView.trailingAnchor)
 
     NSLayoutConstraint.activate([
-      resultSectionHeaderViewTopAnchorConstraint,
-      resultSectionHeaderViewLeadingAnchorConstraint,
-      resultSectionHeaderViewTrailingAnchorConstraint,
+      rowWrapperViewTopAnchorConstraint,
+      rowWrapperViewLeadingAnchorConstraint,
+      rowWrapperViewTrailingAnchorConstraint,
       resultRowViewTopAnchorConstraint,
       resultRowViewLeadingAnchorConstraint,
       resultRowViewTrailingAnchorConstraint,
       resultRow1ViewTopAnchorConstraint,
       resultRow1ViewLeadingAnchorConstraint,
-      resultRow1ViewTrailingAnchorConstraint
+      resultRow1ViewTrailingAnchorConstraint,
+      rowWrapperViewHeightAnchorConstraint,
+      resultSectionHeaderViewTopAnchorConstraint,
+      resultSectionHeaderViewBottomAnchorConstraint,
+      resultSectionHeaderViewLeadingAnchorConstraint,
+      resultSectionHeaderViewTrailingAnchorConstraint
     ])
   }
 

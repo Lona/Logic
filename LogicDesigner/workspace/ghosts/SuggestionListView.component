@@ -54,11 +54,21 @@
   "root" : {
     "children" : [
       {
-        "id" : "ResultSectionHeader",
+        "children" : [
+          {
+            "id" : "ResultSectionHeader",
+            "params" : {
+              "titleText" : "STATEMENTS"
+            },
+            "type" : "ResultSectionHeader"
+          }
+        ],
+        "id" : "RowWrapper",
         "params" : {
-          "titleText" : "STATEMENTS"
+          "alignSelf" : "stretch",
+          "height" : 18
         },
-        "type" : "ResultSectionHeader"
+        "type" : "Lona:View"
       },
       {
         "id" : "ResultRow",
