@@ -247,7 +247,7 @@ extension LogicEditor {
 
     private func makeDetailView(for syntaxNode: LGCSyntaxNode?, query: String) -> NSView? {
         if let syntaxNode = syntaxNode {
-            return syntaxNode.documentation(within: rootNode, for: query).makeScrollView()
+            return documentationForNode(syntaxNode, query).makeScrollView()
         } else {
             return nil
         }
