@@ -21,14 +21,14 @@ public struct LogicSuggestionItem {
     public var node: LGCSyntaxNode
     public var disabled: Bool
 
-    func titleContains(prefix: String) -> Bool {
+    public func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
 
         return title.lowercased().contains(prefix.lowercased())
     }
 }
 
-extension Array where Element == LogicSuggestionItem {
+public extension Array where Element == LogicSuggestionItem {
     func titleContains(prefix: String) -> [Element] {
         return self.filter { item in item.titleContains(prefix: prefix) }
     }
