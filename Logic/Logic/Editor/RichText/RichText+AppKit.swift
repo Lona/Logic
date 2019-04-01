@@ -119,6 +119,7 @@ extension RichText {
         scrollView.documentView = contentView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
+        contentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
 

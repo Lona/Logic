@@ -82,6 +82,7 @@ public class LogicEditor: NSBox {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         canvasView.translatesAutoresizingMaskIntoConstraints = false
 
+        canvasView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
         canvasView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         canvasView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
 

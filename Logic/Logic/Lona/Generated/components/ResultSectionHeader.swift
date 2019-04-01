@@ -89,8 +89,8 @@ public class ResultSectionHeader: NSBox {
     let view1ViewBottomAnchorConstraint = view1View.bottomAnchor.constraint(equalTo: bottomAnchor)
     let view1ViewLeadingAnchorConstraint = view1View.leadingAnchor.constraint(equalTo: leadingAnchor)
     let view1ViewTrailingAnchorConstraint = view1View.trailingAnchor.constraint(equalTo: trailingAnchor)
-    let view1ViewHeightAnchorConstraint = view1View.heightAnchor.constraint(equalToConstant: 18)
     let textViewTopAnchorConstraint = textView.topAnchor.constraint(equalTo: view1View.topAnchor, constant: 2)
+    let textViewBottomAnchorConstraint = textView.bottomAnchor.constraint(equalTo: view1View.bottomAnchor)
     let textViewLeadingAnchorConstraint = textView
       .leadingAnchor
       .constraint(equalTo: view1View.leadingAnchor, constant: 12)
@@ -103,8 +103,8 @@ public class ResultSectionHeader: NSBox {
       view1ViewBottomAnchorConstraint,
       view1ViewLeadingAnchorConstraint,
       view1ViewTrailingAnchorConstraint,
-      view1ViewHeightAnchorConstraint,
       textViewTopAnchorConstraint,
+      textViewBottomAnchorConstraint,
       textViewLeadingAnchorConstraint,
       textViewTrailingAnchorConstraint
     ])

@@ -55,7 +55,6 @@
         "params" : {
           "alignSelf" : "stretch",
           "backgroundColor" : "divider",
-          "height" : 18,
           "paddingLeft" : 12,
           "paddingRight" : 12,
           "paddingTop" : 2
