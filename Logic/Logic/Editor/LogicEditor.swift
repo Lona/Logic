@@ -333,8 +333,12 @@ extension LogicEditor {
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
 
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
+
             self.childWindow.suggestionItems = indexedSuggestions.map { $0.item }
             self.childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
+            if let selectedItem = logicSuggestions.first {
+                self.childWindow.detailView = self.makeDetailView(for: selectedItem.node, query: self.suggestionText)
+            }
         }
 
         window.addChildWindow(childWindow, ordered: .above)
