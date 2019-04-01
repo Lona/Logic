@@ -26,6 +26,21 @@ public extension LGCBinaryOperator {
     }
 }
 
+public extension LGCLiteral {
+    var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .boolean(let value):
+            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+        case .number(let value):
+            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+        case .string(let value):
+            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+        case .none:
+            return .element(.text("none"))
+        }
+    }
+}
+
 public extension LGCFunctionCallArgument {
     var formatted: FormatterCommand<LogicElement> {
         return .concat {
@@ -43,7 +58,7 @@ public extension LGCFunctionParameterDefaultValue {
         case .value(let value):
             return .concat {
                 [
-                    .element(.text("default value")),
+                    .element(LogicElement.dropdown(value.id, "default value", Colors.text)),
                     value.expression.formatted
                 ]
             }
@@ -138,6 +153,8 @@ public extension LGCExpression {
                     .element(.text(")"))
                 ]
             }
+        case .literalExpression(let value):
+            return value.literal.formatted
         }
     }
 }
@@ -255,6 +272,15 @@ public extension LGCDeclaration {
     }
 }
 
+public extension LGCTopLevelParameters {
+    var formatted: FormatterCommand<LogicElement> {
+        return .join(with: .hardLine) {
+            self.parameters.map { $0.formatted }
+        }
+    }
+}
+
+
 public extension LGCProgram {
     var formatted: FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
@@ -262,7 +288,6 @@ public extension LGCProgram {
         }
     }
 }
-
 
 public extension LGCSyntaxNode {
     var formatted: FormatterCommand<LogicElement> {
@@ -286,6 +311,10 @@ public extension LGCSyntaxNode {
         case .typeAnnotation(let value):
             return value.formatted
         case .functionParameterDefaultValue(let value):
+            return value.formatted
+        case .literal(let value):
+            return value.formatted
+        case .topLevelParameters(let value):
             return value.formatted
         }
     }

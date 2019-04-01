@@ -75,6 +75,25 @@ public extension LGCIdentifier {
     }
 }
 
+public extension LGCLiteral {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "true (Boolean)",
+                category: "Literals".uppercased(),
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
+            ),
+            LogicSuggestionItem(
+                title: "false (Boolean)",
+                category: "Literals".uppercased(),
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
+            )
+        ]
+
+        return items.titleContains(prefix: prefix)
+    }
+}
+
 public extension LGCFunctionParameterDefaultValue {
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
@@ -85,7 +104,24 @@ public extension LGCFunctionParameterDefaultValue {
             )
         ]
 
-        return items.titleContains(prefix: prefix) + LGCExpression.suggestions(for: prefix)
+        let expressions: [LogicSuggestionItem] = LGCExpression
+            .suggestions(for: prefix)
+            .compactMap({ item in
+                switch item.node {
+                case .expression(let expression):
+                    return LogicSuggestionItem(
+                        title: item.title,
+                        category: item.category,
+                        node: .functionParameterDefaultValue(
+                            LGCFunctionParameterDefaultValue.value(id: UUID(), expression: expression)
+                        )
+                    )
+                default:
+                    return nil
+                }
+            })
+
+        return items.titleContains(prefix: prefix) + expressions
     }
 }
 
@@ -275,7 +311,24 @@ public extension LGCExpression {
             assignmentSuggestionItem
         ]
 
-        return items.titleContains(prefix: prefix) + LGCIdentifier.suggestions(for: prefix)
+        let literalExpressions: [LogicSuggestionItem] = LGCLiteral
+            .suggestions(for: prefix)
+            .compactMap({ item in
+                switch item.node {
+                case .literal(let literal):
+                    return LogicSuggestionItem(
+                        title: item.title,
+                        category: item.category,
+                        node: .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
+                    )
+                default:
+                    return nil
+                }
+            })
+
+        return items.titleContains(prefix: prefix) +
+            LGCIdentifier.suggestions(for: prefix) +
+            literalExpressions
     }
 }
 
@@ -350,14 +403,8 @@ public extension LGCStatement {
     }
 }
 
-public extension LGCProgram {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        return LGCStatement.suggestions(for: prefix)
-    }
-}
-
 public extension LGCSyntaxNode {
-    func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
         switch self {
         case .statement:
             return LGCStatement.suggestions(for: prefix)
@@ -372,13 +419,17 @@ public extension LGCSyntaxNode {
         case .binaryOperator:
             return LGCBinaryOperator.suggestions(for: prefix)
         case .program:
-            return LGCProgram.suggestions(for: prefix)
+            return []
         case .functionParameter:
             return LGCFunctionParameter.suggestions(for: prefix)
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)
         case .functionParameterDefaultValue:
             return LGCFunctionParameterDefaultValue.suggestions(for: prefix)
+        case .literal:
+            return LGCLiteral.suggestions(for: prefix)
+        case .topLevelParameters:
+            return []
         }
     }
 }

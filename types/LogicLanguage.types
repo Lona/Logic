@@ -12,6 +12,24 @@
     {
       "case" : "native",
       "data" : {
+        "name" : "Bool",
+        "parameters" : [
+
+        ]
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
+        "name" : "CGFloat",
+        "parameters" : [
+
+        ]
+      }
+    },
+    {
+      "case" : "native",
+      "data" : {
         "name" : "String",
         "parameters" : [
 
@@ -497,6 +515,32 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "record",
+            "name" : "literalExpression",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "literal",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Literal",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "Expression"
@@ -856,6 +900,36 @@
                 }
               }
             ]
+          },
+          {
+            "case" : "normal",
+            "name" : "literal",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "Literal",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "normal",
+            "name" : "topLevelParameters",
+            "params" : [
+              {
+                "value" : {
+                  "case" : "type",
+                  "name" : "TopLevelParameters",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
           }
         ],
         "name" : "SyntaxNode"
@@ -1078,6 +1152,145 @@
           }
         ],
         "name" : "TypeAnnotation"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "string",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "value",
+                "value" : {
+                  "case" : "type",
+                  "name" : "String",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "number",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "value",
+                "value" : {
+                  "case" : "type",
+                  "name" : "CGFloat",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "boolean",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "value",
+                "value" : {
+                  "case" : "type",
+                  "name" : "Bool",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "case" : "record",
+            "name" : "none",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "Literal"
+      }
+    },
+    {
+      "case" : "type",
+      "data" : {
+        "cases" : [
+          {
+            "case" : "record",
+            "name" : "topLevelParameters",
+            "params" : [
+              {
+                "key" : "id",
+                "value" : {
+                  "case" : "type",
+                  "name" : "UUID",
+                  "substitutions" : [
+
+                  ]
+                }
+              },
+              {
+                "key" : "parameters",
+                "value" : {
+                  "case" : "type",
+                  "name" : "List",
+                  "substitutions" : [
+                    {
+                      "generic" : "T",
+                      "instance" : "FunctionParameter"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "name" : "TopLevelParameters"
       }
     }
   ]

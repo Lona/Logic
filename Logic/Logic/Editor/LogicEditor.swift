@@ -1,15 +1,5 @@
 import AppKit
 
-public let defaultRootNode = LGCSyntaxNode.program(
-    LGCProgram(
-        id: UUID(),
-        block: LGCList<LGCStatement>.next(
-            LGCStatement.placeholderStatement(id: UUID()),
-            .empty
-        )
-    )
-)
-
 // MARK: - LogicEditor
 
 public class LogicEditor: NSBox {
@@ -20,6 +10,10 @@ public class LogicEditor: NSBox {
         self.rootNode = rootNode
 
         super.init(frame: .zero)
+
+        self.suggestionsForNode = { [unowned self] node, query in
+            return LogicEditor.defaultSuggestionsForNode(node, self.rootNode, query)
+        }
 
         setUpViews()
         setUpConstraints()
@@ -37,6 +31,25 @@ public class LogicEditor: NSBox {
         didSet {
             canvasView.formattedContent = rootNode.formatted
         }
+    }
+
+    public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _ in return [] }
+
+    public static let defaultRootNode = LGCSyntaxNode.program(
+        LGCProgram(
+            id: UUID(),
+            block: LGCList<LGCStatement>.next(
+                LGCStatement.placeholderStatement(id: UUID()),
+                .empty
+            )
+        )
+    )
+
+    public static let defaultSuggestionsForNode: (
+        LGCSyntaxNode,
+        LGCSyntaxNode,
+        String) -> [LogicSuggestionItem] = { node, rootNode, query in
+        return node.suggestions(within: rootNode, for: query)
     }
 
     // MARK: Private
@@ -202,7 +215,8 @@ extension LogicEditor {
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-        return highestMatch.suggestions(for: prefix)
+
+        return suggestionsForNode(highestMatch, prefix)
     }
 }
 
