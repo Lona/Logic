@@ -23,10 +23,35 @@ public class LogicEditor: NSBox {
         setUpConstraints()
 
         update()
+
+        let notificationTokens = [
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.didResignKeyNotification,
+                object: self.childWindow,
+                queue: nil,
+                using: { [weak self] notification in self?.hideSuggestionWindow() }
+            ),
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.didResignMainNotification,
+                object: self.childWindow,
+                queue: nil,
+                using: { [weak self] notification in self?.hideSuggestionWindow() }
+            )
+        ]
+
+        subscriptions.append({
+            notificationTokens.forEach {
+                NotificationCenter.default.removeObserver($0)
+            }
+        })
     }
 
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        subscriptions.forEach { subscription in subscription() }
     }
 
     // MARK: Public
@@ -75,6 +100,8 @@ public class LogicEditor: NSBox {
     }
 
     // MARK: Private
+
+    private var subscriptions: [() -> Void] = []
 
     private var suggestionText: String = "" {
         didSet {
