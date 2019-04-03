@@ -9,13 +9,6 @@
 import Foundation
 import JavaScriptCore
 
-private extension Data {
-    func utf8String() -> String? {
-        guard let string = NSString(data: self, encoding: String.Encoding.utf8.rawValue) else { return nil }
-        return string as String
-    }
-}
-
 public enum JavaScript {
     @objc private class BundleHelper: NSObject {
         @objc static func getBundle() -> Bundle {
@@ -28,7 +21,8 @@ public enum JavaScript {
 
         guard
             let libraryPath = bundle.path(forResource: "convert-encoding.umd.js", ofType: nil),
-            let libraryScript = FileManager.default.contents(atPath: libraryPath)?.utf8String(),
+            let libraryScriptData = FileManager.default.contents(atPath: libraryPath),
+            let libraryScript = String(data: libraryScriptData, encoding: .utf8),
             let context = JSContext()
             else { fatalError("Failed to initialize JSContext") }
 
@@ -53,12 +47,8 @@ function convert(contents, targetEncoding) {
         return context
     }()
 
-    public static func convert(contents: String, to targetEncoding: FileEncoding) -> String? {
+    static func convert(contents: String, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
         let script = "convert(`\(contents)`, '\(targetEncoding.rawValue)')"
         return context.evaluateScript(script)?.toString()
-    }
-
-    public enum FileEncoding: String {
-        case xml, json
     }
 }

@@ -99,19 +99,9 @@ class Document: NSDocument {
 
     override func data(ofType typeName: String) throws -> Data {
         let encoder = JSONEncoder()
-        if #available(OSX 10.13, *) {
-            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        } else {
-            encoder.outputFormatting = [.prettyPrinted]
-        }
+        let jsonData = try encoder.encode(content)
 
-        let data = try encoder.encode(content)
-
-        guard let string = String(data: data, encoding: .utf8) else {
-            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
-        }
-
-        guard let xmlData = JavaScript.convert(contents: string, to: .xml)?.data(using: .utf8) else {
+        guard let xmlData = LogicFile.convert(jsonData, to: .xml) else {
             throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
         }
 
@@ -119,15 +109,11 @@ class Document: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        guard let string = String(data: data, encoding: .utf8) else {
+        guard let jsonData = LogicFile.convert(data, to: .json) else {
             throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
         }
 
-        guard let convertedData = JavaScript.convert(contents: string, to: .json)?.data(using: .utf8) else {
-            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
-        }
-
-        content = try JSONDecoder().decode(Content.self, from: convertedData)
+        content = try JSONDecoder().decode(Content.self, from: jsonData)
         typeListEditor.list = content.types
     }
 }
