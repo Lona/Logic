@@ -11,22 +11,22 @@ import AppKit
 public extension LGCIdentifier {
     var formatted: FormatterCommand<LogicElement> {
         if isPlaceholder {
-            return .element(LogicElement.dropdown(id, string, NSColor.systemYellow))
+            return .element(LogicElement.dropdown(id, string, .placeholder))
         }
 
-        return .element(LogicElement.dropdown(id, string, Colors.editableText))
+        return .element(LogicElement.dropdown(id, string, .variable))
     }
 }
 
 public extension LGCPattern {
     var formatted: FormatterCommand<LogicElement> {
-        return .element(LogicElement.dropdown(id, name, Colors.editableText))
+        return .element(LogicElement.dropdown(id, name, .variable))
     }
 }
 
 public extension LGCBinaryOperator {
     var formatted: FormatterCommand<LogicElement> {
-        return .element(LogicElement.dropdown(uuid, displayText, Colors.text))
+        return .element(LogicElement.dropdown(uuid, displayText, .source))
     }
 }
 
@@ -34,11 +34,11 @@ public extension LGCLiteral {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .boolean(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .number(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .string(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, Colors.editableText))
+            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .none:
             return .element(.text("none"))
         }
@@ -62,12 +62,12 @@ public extension LGCFunctionParameterDefaultValue {
         case .value(let value):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(value.id, "default value", Colors.text)),
+                    .element(LogicElement.dropdown(value.id, "default value", .source)),
                     value.expression.formatted
                 ]
             }
         case .none(let value):
-            return .element(LogicElement.dropdown(value, "no default", Colors.text))
+            return .element(LogicElement.dropdown(value, "no default", .source))
         }
     }
 }
@@ -76,7 +76,7 @@ public extension LGCFunctionParameter {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
-            return .element(LogicElement.dropdown(value, "", Colors.editableText))
+            return .element(LogicElement.dropdown(value, "", .variable))
         case .parameter(let value):
             func defaultValue() -> FormatterCommand<LogicElement> {
                 switch value.annotation {
@@ -181,7 +181,7 @@ public extension LGCStatement {
         case .loop(let loop):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(loop.id, "For", Colors.text)),
+                    .element(LogicElement.dropdown(loop.id, "For", .source)),
                     loop.pattern.formatted,
                     .element(LogicElement.text("in")),
                     loop.expression.formatted,
@@ -190,7 +190,7 @@ public extension LGCStatement {
         case .branch(let branch):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(branch.id, "If", Colors.text)),
+                    .element(LogicElement.dropdown(branch.id, "If", .source)),
                     branch.condition.formatted,
                     .indent {
                         .concat {
@@ -205,7 +205,7 @@ public extension LGCStatement {
                 ]
             }
         case .placeholderStatement(let value):
-            return .element(LogicElement.dropdown(value, "", Colors.editableText))
+            return .element(LogicElement.dropdown(value, "", .variable))
         case .expressionStatement(let value):
             return value.expression.formatted
         case .declaration(let value):
@@ -224,7 +224,7 @@ public extension LGCDeclaration {
                     return .concat {
                         [
                             .element(.text("Parameters:")),
-                            .element(LogicElement.dropdown(inner, "", Colors.editableText)),
+                            .element(LogicElement.dropdown(inner, "", .variable)),
                         ]
                     }
                 default:
@@ -256,7 +256,7 @@ public extension LGCDeclaration {
         case .function(let value):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(value.id, "Function", Colors.text)),
+                    .element(LogicElement.dropdown(value.id, "Function", .source)),
                     value.name.formatted,
                     .indent {
                         .concat {

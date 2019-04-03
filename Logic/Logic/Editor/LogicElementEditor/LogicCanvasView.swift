@@ -217,9 +217,9 @@ public class LogicCanvasView: NSView {
             switch (text) {
             case .text, .coloredText:
                 attributedString.draw(at: rect.origin)
-            case .dropdown(_, let value, let color):
+            case .dropdown(_, let value, let dropdownStyle):
                 let drawSelection = selected && outlinedRange == nil
-                let color = drawSelection ? NSColor.selectedMenuItemColor : color
+                let color = drawSelection ? NSColor.selectedMenuItemColor : dropdownStyle.color
 
                 let shadow = NSShadow()
                 shadow.shadowBlurRadius = 1

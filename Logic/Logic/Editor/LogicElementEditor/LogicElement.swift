@@ -9,9 +9,25 @@
 import AppKit
 
 public enum LogicElement {
+
+    public enum DropdownStyle {
+        case source, variable, placeholder
+
+        var color: NSColor {
+            switch self {
+            case .source:
+                return Colors.text
+            case .variable:
+                return Colors.editableText
+            case .placeholder:
+                return NSColor.systemYellow
+            }
+        }
+    }
+
     case text(String)
     case coloredText(String, NSColor)
-    case dropdown(UUID, String, NSColor)
+    case dropdown(UUID, String, DropdownStyle)
 
     public var isActivatable: Bool {
         switch self {
@@ -50,8 +66,8 @@ public enum LogicElement {
             return Colors.text
         case .coloredText(_, let color):
             return color
-        case .dropdown(_, _, let color):
-            return color
+        case .dropdown(_, _, let dropdownStyle):
+            return dropdownStyle.color
         }
     }
 }
@@ -96,10 +112,10 @@ extension LogicElement {
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
-        case .dropdown(_, _, let color):
+        case .dropdown(_, _, let dropdownStyle):
             let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: LogicCanvasView.font
+                NSAttributedString.Key.foregroundColor: dropdownStyle.color,
+                NSAttributedString.Key.font: LogicCanvasView.font,
             ]
             attributedString.setAttributes(attributes, range: range)
 

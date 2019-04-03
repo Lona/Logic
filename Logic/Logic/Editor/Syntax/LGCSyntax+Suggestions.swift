@@ -45,10 +45,6 @@ public struct LogicSuggestionCategory {
     }
 }
 
-private func id(_ string: String) -> LGCIdentifier {
-    return LGCIdentifier(id: UUID(), string: string)
-}
-
 private func idExpression(_ string: String) -> LGCExpression {
     return LGCExpression.identifierExpression(
         id: UUID(),
@@ -281,8 +277,14 @@ public extension LGCExpression {
             category: "Expressions".uppercased(),
             node: LGCSyntaxNode.expression(
                 LGCExpression.binaryExpression(
-                    left: LGCExpression.identifierExpression(id: UUID(), identifier: id("variable")),
-                    right: LGCExpression.identifierExpression(id: UUID(), identifier: id("value")),
+                    left: LGCExpression.identifierExpression(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "variable", isPlaceholder: true)
+                    ),
+                    right: LGCExpression.identifierExpression(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                    ),
                     op: .setEqualTo(id: UUID()),
                     id: UUID()
                 )
@@ -296,8 +298,14 @@ public extension LGCExpression {
             category: "Expressions".uppercased(),
             node: LGCSyntaxNode.expression(
                 LGCExpression.binaryExpression(
-                    left: LGCExpression.identifierExpression(id: UUID(), identifier: id("left")),
-                    right: LGCExpression.identifierExpression(id: UUID(), identifier: id("right")),
+                    left: LGCExpression.identifierExpression(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "left", isPlaceholder: true)
+                    ),
+                    right: LGCExpression.identifierExpression(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "right", isPlaceholder: true)
+                    ),
                     op: .isEqualTo(id: UUID()),
                     id: UUID()
                 )
