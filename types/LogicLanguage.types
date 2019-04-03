@@ -1,1297 +1,236 @@
-{
-  "types" : [
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "UUID",
-        "parameters" : [
-
-        ]
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "Bool",
-        "parameters" : [
-
-        ]
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "CGFloat",
-        "parameters" : [
-
-        ]
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "String",
-        "parameters" : [
-
-        ]
-      }
-    },
-    {
-      "case" : "native",
-      "data" : {
-        "name" : "Optional",
-        "parameters" : [
-          {
-            "name" : "Value"
-          }
-        ]
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "normal",
-            "name" : "next",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "generic",
-                  "name" : "T"
-                }
-              },
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "empty",
-            "params" : [
-
-            ]
-          }
-        ],
-        "name" : "List"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "identifier",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "string",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Identifier"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "variable",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "function",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "name",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Pattern",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "returnType",
-                "value" : {
-                  "case" : "type",
-                  "name" : "TypeAnnotation",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "parameters",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "FunctionParameter"
-                    }
-                  ]
-                }
-              },
-              {
-                "key" : "block",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "Statement"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Declaration"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "pattern",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "name",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Pattern"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "isEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isNotEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isLessThan",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isGreaterThan",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isLessThanOrEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "isGreaterThanOrEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "setEqualTo",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "BinaryOperator"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "functionCallArgument",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "label",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "FunctionCallArgument"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "binaryExpression",
-            "params" : [
-              {
-                "key" : "left",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "right",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "op",
-                "value" : {
-                  "case" : "type",
-                  "name" : "BinaryOperator",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "identifierExpression",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "identifier",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Identifier",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "functionCallExpression",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "arguments",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "FunctionCallArgument"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "literalExpression",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "literal",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Literal",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Expression"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "loop",
-            "params" : [
-              {
-                "key" : "pattern",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Pattern",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "block",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "Statement"
-                    }
-                  ]
-                }
-              },
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "branch",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "condition",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "block",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "Statement"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "declaration",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "content",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Declaration",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "expressionStatement",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "placeholderStatement",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Statement"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "program",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "block",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "Statement"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Program"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "normal",
-            "name" : "statement",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Statement",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "declaration",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Declaration",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "identifier",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Identifier",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "expression",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "pattern",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Pattern",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "binaryOperator",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "BinaryOperator",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "program",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Program",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "functionParameter",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "FunctionParameter",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "functionParameterDefaultValue",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "FunctionParameterDefaultValue",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "typeAnnotation",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "TypeAnnotation",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "literal",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "Literal",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "normal",
-            "name" : "topLevelParameters",
-            "params" : [
-              {
-                "value" : {
-                  "case" : "type",
-                  "name" : "TopLevelParameters",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "SyntaxNode"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "parameter",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "externalName",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Optional",
-                  "substitutions" : [
-                    {
-                      "generic" : "Value",
-                      "instance" : "String"
-                    }
-                  ]
-                }
-              },
-              {
-                "key" : "localName",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Pattern",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "annotation",
-                "value" : {
-                  "case" : "type",
-                  "name" : "TypeAnnotation",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "defaultValue",
-                "value" : {
-                  "case" : "type",
-                  "name" : "FunctionParameterDefaultValue",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "placeholder",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "FunctionParameter"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "none",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "value",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "expression",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Expression",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "FunctionParameterDefaultValue"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "typeIdentifier",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "identifier",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Identifier",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "genericArguments",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "TypeAnnotation"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "functionType",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "returnType",
-                "value" : {
-                  "case" : "type",
-                  "name" : "TypeAnnotation",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "argumentTypes",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "TypeAnnotation"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "TypeAnnotation"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "string",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "value",
-                "value" : {
-                  "case" : "type",
-                  "name" : "String",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "number",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "value",
-                "value" : {
-                  "case" : "type",
-                  "name" : "CGFloat",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "boolean",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "value",
-                "value" : {
-                  "case" : "type",
-                  "name" : "Bool",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "case" : "record",
-            "name" : "none",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "Literal"
-      }
-    },
-    {
-      "case" : "type",
-      "data" : {
-        "cases" : [
-          {
-            "case" : "record",
-            "name" : "topLevelParameters",
-            "params" : [
-              {
-                "key" : "id",
-                "value" : {
-                  "case" : "type",
-                  "name" : "UUID",
-                  "substitutions" : [
-
-                  ]
-                }
-              },
-              {
-                "key" : "parameters",
-                "value" : {
-                  "case" : "type",
-                  "name" : "List",
-                  "substitutions" : [
-                    {
-                      "generic" : "T",
-                      "instance" : "FunctionParameter"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "name" : "TopLevelParameters"
-      }
-    }
-  ]
-}
+<?xml version="1.0"?>
+<root>
+  <NativeType name="UUID"/>
+  <NativeType name="Bool"/>
+  <NativeType name="CGFloat"/>
+  <NativeType name="String"/>
+  <NativeType name="Optional">
+    <NativeType.GenericParam type="Value"/>
+  </NativeType>
+  <Type name="List">
+    <Case name="next">
+      <Case.GenericParam type="T"/>
+      <Case.Param type="List"/>
+    </Case>
+    <Case name="empty"/>
+  </Type>
+  <Type name="Identifier">
+    <Record name="identifier">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="string" type="String"/>
+    </Record>
+  </Type>
+  <Type name="Declaration">
+    <Record name="variable">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="function">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="returnType" type="TypeAnnotation"/>
+      <Record.Param name="parameters" type="List">
+        <Record.Substitution generic="T" instance="FunctionParameter"/>
+      </Record.Param>
+      <Record.Param name="block" type="List">
+        <Record.Substitution generic="T" instance="Statement"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Pattern">
+    <Record name="pattern">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="String"/>
+    </Record>
+  </Type>
+  <Type name="BinaryOperator">
+    <Record name="isEqualTo">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="isNotEqualTo">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="isLessThan">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="isGreaterThan">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="isLessThanOrEqualTo">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="isGreaterThanOrEqualTo">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="setEqualTo">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+  </Type>
+  <Type name="FunctionCallArgument">
+    <Record name="functionCallArgument">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="label" type="String"/>
+      <Record.Param name="expression" type="Expression"/>
+    </Record>
+  </Type>
+  <Type name="Expression">
+    <Record name="binaryExpression">
+      <Record.Param name="left" type="Expression"/>
+      <Record.Param name="right" type="Expression"/>
+      <Record.Param name="op" type="BinaryOperator"/>
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="identifierExpression">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="identifier" type="Identifier"/>
+    </Record>
+    <Record name="functionCallExpression">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="expression" type="Expression"/>
+      <Record.Param name="arguments" type="List">
+        <Record.Substitution generic="T" instance="FunctionCallArgument"/>
+      </Record.Param>
+    </Record>
+    <Record name="literalExpression">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="literal" type="Literal"/>
+    </Record>
+  </Type>
+  <Type name="Statement">
+    <Record name="loop">
+      <Record.Param name="pattern" type="Pattern"/>
+      <Record.Param name="expression" type="Expression"/>
+      <Record.Param name="block" type="List">
+        <Record.Substitution generic="T" instance="Statement"/>
+      </Record.Param>
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="branch">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="condition" type="Expression"/>
+      <Record.Param name="block" type="List">
+        <Record.Substitution generic="T" instance="Statement"/>
+      </Record.Param>
+    </Record>
+    <Record name="declaration">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="content" type="Declaration"/>
+    </Record>
+    <Record name="expressionStatement">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="expression" type="Expression"/>
+    </Record>
+    <Record name="placeholderStatement">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+  </Type>
+  <Type name="Program">
+    <Record name="program">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="block" type="List">
+        <Record.Substitution generic="T" instance="Statement"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="SyntaxNode">
+    <Case name="statement">
+      <Case.Param type="Statement"/>
+    </Case>
+    <Case name="declaration">
+      <Case.Param type="Declaration"/>
+    </Case>
+    <Case name="identifier">
+      <Case.Param type="Identifier"/>
+    </Case>
+    <Case name="expression">
+      <Case.Param type="Expression"/>
+    </Case>
+    <Case name="pattern">
+      <Case.Param type="Pattern"/>
+    </Case>
+    <Case name="binaryOperator">
+      <Case.Param type="BinaryOperator"/>
+    </Case>
+    <Case name="program">
+      <Case.Param type="Program"/>
+    </Case>
+    <Case name="functionParameter">
+      <Case.Param type="FunctionParameter"/>
+    </Case>
+    <Case name="functionParameterDefaultValue">
+      <Case.Param type="FunctionParameterDefaultValue"/>
+    </Case>
+    <Case name="typeAnnotation">
+      <Case.Param type="TypeAnnotation"/>
+    </Case>
+    <Case name="literal">
+      <Case.Param type="Literal"/>
+    </Case>
+    <Case name="topLevelParameters">
+      <Case.Param type="TopLevelParameters"/>
+    </Case>
+  </Type>
+  <Type name="FunctionParameter">
+    <Record name="parameter">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="externalName" type="Optional">
+        <Record.Substitution generic="Value" instance="String"/>
+      </Record.Param>
+      <Record.Param name="localName" type="Pattern"/>
+      <Record.Param name="annotation" type="TypeAnnotation"/>
+      <Record.Param name="defaultValue" type="FunctionParameterDefaultValue"/>
+    </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+  </Type>
+  <Type name="FunctionParameterDefaultValue">
+    <Record name="none">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="value">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="expression" type="Expression"/>
+    </Record>
+  </Type>
+  <Type name="TypeAnnotation">
+    <Record name="typeIdentifier">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="identifier" type="Identifier"/>
+      <Record.Param name="genericArguments" type="List">
+        <Record.Substitution generic="T" instance="TypeAnnotation"/>
+      </Record.Param>
+    </Record>
+    <Record name="functionType">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="returnType" type="TypeAnnotation"/>
+      <Record.Param name="argumentTypes" type="List">
+        <Record.Substitution generic="T" instance="TypeAnnotation"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Literal">
+    <Record name="string">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="String"/>
+    </Record>
+    <Record name="number">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="CGFloat"/>
+    </Record>
+    <Record name="boolean">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="Bool"/>
+    </Record>
+    <Record name="none">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+  </Type>
+  <Type name="TopLevelParameters">
+    <Record name="topLevelParameters">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="parameters" type="List">
+        <Record.Substitution generic="T" instance="FunctionParameter"/>
+      </Record.Param>
+    </Record>
+  </Type>
+</root>

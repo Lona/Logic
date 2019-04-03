@@ -104,22 +104,31 @@ class Document: NSDocument {
         } else {
             encoder.outputFormatting = [.prettyPrinted]
         }
-        return try encoder.encode(content)
 
-//        let encoder = XMLEncoder()
-//        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-//        let header = XMLHeader(version: 1.0, encoding: "UTF-8", standalone: "yes")
-//        return try encoder.encode(content, withRootKey: "logic", header: header)
+        let data = try encoder.encode(content)
+
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        guard let xmlData = JavaScript.convert(contents: string, to: .xml)?.data(using: .utf8) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        return xmlData
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        do {
-            content = try JSONDecoder().decode(Content.self, from: data)
-            typeListEditor.list = content.types
-        } catch _ {
-            content = try XMLDecoder().decode(Content.self, from: data)
-            typeListEditor.list = content.types
+        guard let string = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
         }
+
+        guard let convertedData = JavaScript.convert(contents: string, to: .json)?.data(using: .utf8) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        content = try JSONDecoder().decode(Content.self, from: convertedData)
+        typeListEditor.list = content.types
     }
 }
 
