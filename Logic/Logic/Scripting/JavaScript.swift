@@ -21,8 +21,7 @@ public enum JavaScript {
 
         guard
             let libraryPath = bundle.path(forResource: "lona-serialization.umd.js", ofType: nil),
-            let libraryScriptData = FileManager.default.contents(atPath: libraryPath),
-            let libraryScript = String(data: libraryScriptData, encoding: .utf8),
+            let libraryScript = try? String(contentsOfFile: libraryPath),
             let context = JSContext()
             else { fatalError("Failed to initialize JSContext") }
 
@@ -38,13 +37,12 @@ public enum JavaScript {
         // Window is necessary also, since we generate a web bundle to mock node deps (e.g. Buffer).
         context.evaluateScript("global = this; window = this;")
         context.evaluateScript(libraryScript)
-        context.evaluateScript("global.convertTypes = global.lonaSerialization.convertTypes;")
 
         return context
     }()
 
     static func convert(contents: String, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
-        let script = "convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
+        let script = "global.lonaSerialization.convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
         return context.evaluateScript(script)?.toString()
     }
 }
