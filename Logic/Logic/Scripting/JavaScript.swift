@@ -38,17 +38,13 @@ public enum JavaScript {
         // Window is necessary also, since we generate a web bundle to mock node deps (e.g. Buffer).
         context.evaluateScript("global = this; window = this;")
         context.evaluateScript(libraryScript)
-        context.evaluateScript("""
-function convert(contents, targetEncoding) {
-    return global.lonaSerialization.convertTypes(contents, targetEncoding);
-}
-""")
+        context.evaluateScript("global.convertTypes = global.lonaSerialization.convertTypes;")
 
         return context
     }()
 
     static func convert(contents: String, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
-        let script = "convert(`\(contents)`, '\(targetEncoding.rawValue)')"
+        let script = "convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
         return context.evaluateScript(script)?.toString()
     }
 }
