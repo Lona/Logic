@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34148C225417F800CC65D1 /* JavaScript.swift */; };
-		6B34148F225418D800CC65D1 /* convert-encoding.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* convert-encoding.umd.js */; };
+		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
 		6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */; };
 		6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */; };
@@ -67,7 +67,7 @@
 
 /* Begin PBXFileReference section */
 		6B34148C225417F800CC65D1 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
-		6B34148E225418D800CC65D1 /* convert-encoding.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "convert-encoding.umd.js"; sourceTree = "<group>"; };
+		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
 		6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+LogicElement.swift"; sourceTree = "<group>"; };
 		6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSOutlineView+Dragging.swift"; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		6B34148B225417E500CC65D1 /* Scripting */ = {
 			isa = PBXGroup;
 			children = (
-				6B34148E225418D800CC65D1 /* convert-encoding.umd.js */,
+				6B34148E225418D800CC65D1 /* lona-serialization.umd.js */,
 				6B34148C225417F800CC65D1 /* JavaScript.swift */,
 			);
 			path = Scripting;
@@ -414,7 +414,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B34148F225418D800CC65D1 /* convert-encoding.umd.js in Resources */,
+				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

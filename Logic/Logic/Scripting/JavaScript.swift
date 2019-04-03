@@ -20,7 +20,7 @@ public enum JavaScript {
         let bundle = BundleHelper.getBundle()
 
         guard
-            let libraryPath = bundle.path(forResource: "convert-encoding.umd.js", ofType: nil),
+            let libraryPath = bundle.path(forResource: "lona-serialization.umd.js", ofType: nil),
             let libraryScriptData = FileManager.default.contents(atPath: libraryPath),
             let libraryScript = String(data: libraryScriptData, encoding: .utf8),
             let context = JSContext()
@@ -34,13 +34,13 @@ public enum JavaScript {
             Swift.print("JS exception", exception.toString() ?? "")
         }
 
-        // The library assigns its export, `convertEncoding`, to `this`.
+        // The library assigns its export, `lonaSerialization`, to `this`.
         // Window is necessary also, since we generate a web bundle to mock node deps (e.g. Buffer).
         context.evaluateScript("global = this; window = this;")
         context.evaluateScript(libraryScript)
         context.evaluateScript("""
 function convert(contents, targetEncoding) {
-    return global.convertEncoding.convertTypes(contents, targetEncoding);
+    return global.lonaSerialization.convertTypes(contents, targetEncoding);
 }
 """)
 
