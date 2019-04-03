@@ -53,9 +53,9 @@ extension LGCIdentifier: SyntaxNodeProtocol {
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCIdentifier {
         switch syntaxNode {
         case .identifier(let newNode) where id == uuid:
-            return LGCIdentifier(id: UUID(), string: newNode.string)
+            return LGCIdentifier(id: UUID(), string: newNode.string, isPlaceholder: newNode.isPlaceholder)
         default:
-            return LGCIdentifier(id: UUID(), string: string)
+            return LGCIdentifier(id: UUID(), string: string, isPlaceholder: isPlaceholder)
         }
     }
 

@@ -18,6 +18,7 @@
     <Record name="identifier">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="string" type="String"/>
+      <Record.Param name="isPlaceholder" type="Bool"/>
     </Record>
   </Type>
   <Type name="Declaration">

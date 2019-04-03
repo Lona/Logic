@@ -10,6 +10,10 @@ import AppKit
 
 public extension LGCIdentifier {
     var formatted: FormatterCommand<LogicElement> {
+        if isPlaceholder {
+            return .element(LogicElement.dropdown(id, string, NSColor.systemYellow))
+        }
+
         return .element(LogicElement.dropdown(id, string, Colors.editableText))
     }
 }
@@ -74,13 +78,25 @@ public extension LGCFunctionParameter {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", Colors.editableText))
         case .parameter(let value):
+            func defaultValue() -> FormatterCommand<LogicElement> {
+                switch value.annotation {
+                case .typeIdentifier(let annotation):
+                    if annotation.identifier.isPlaceholder {
+                        return .element(.text("no default"))
+                    }
+                    return value.defaultValue.formatted
+                case .functionType(let annotation):
+                    return value.defaultValue.formatted
+                }
+            }
+
             return .concat {
                 [
                     value.localName.formatted,
                     .element(.text("of type")),
                     value.annotation.formatted,
                     .element(.text("with")),
-                    value.defaultValue.formatted
+                    defaultValue()
                 ]
             }
         }

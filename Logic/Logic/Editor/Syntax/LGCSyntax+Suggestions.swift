@@ -220,7 +220,7 @@ public extension LGCFunctionParameter {
                         localName: LGCPattern(id: UUID(), name: prefix),
                         annotation: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "type"),
+                            identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
                             genericArguments: .empty
                         ),
                         defaultValue: .none(id: UUID())
