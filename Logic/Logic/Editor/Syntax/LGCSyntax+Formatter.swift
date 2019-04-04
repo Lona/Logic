@@ -92,7 +92,8 @@ public extension LGCFunctionParameter {
 
             return .concat {
                 [
-                    value.localName.formatted,
+                    .element(LogicElement.dropdown(value.id, value.localName.name, .variable)),
+//                    value.localName.formatted,
                     .element(.text("of type")),
                     value.annotation.formatted,
                     .element(.text("with")),
@@ -114,10 +115,11 @@ public extension LGCTypeAnnotation {
                 return .concat {
                     [
                         value.identifier.formatted,
-                        .element(.text("of")),
+                        .element(.text("(")),
                         .join(with: .concat {[.element(.text(",")), .line]}) {
                             value.genericArguments.map { $0.formatted }
-                        }
+                        },
+                        .element(.text(")")),
                     ]
                 }
             }

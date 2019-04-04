@@ -32,6 +32,12 @@ public extension Array where Element == LogicSuggestionItem {
     func titleContains(prefix: String) -> [Element] {
         return self.filter { item in item.titleContains(prefix: prefix) }
     }
+
+    func sorted(byPrefix: String) -> [Element] {
+        return self.sorted { left, right in
+            return left.title < right.title
+        }
+    }
 }
 
 public struct LogicSuggestionCategory {
@@ -204,29 +210,40 @@ public extension LGCPattern {
 }
 
 public extension LGCFunctionParameter {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let items = [
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+        func parameter() -> LGCFunctionParameter {
+            switch self {
+            case .placeholder:
+                return LGCFunctionParameter.parameter(
+                    id: UUID(),
+                    externalName: nil,
+                    localName: LGCPattern(id: UUID(), name: prefix),
+                    annotation: LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
+                        genericArguments: .empty
+                    ),
+                    defaultValue: .none(id: UUID())
+                )
+            case .parameter(let value):
+                return LGCFunctionParameter.parameter(
+                    id: UUID(),
+                    externalName: value.externalName,
+                    localName: LGCPattern(id: UUID(), name: prefix),
+                    annotation: value.annotation, // TODO: new id?
+                    defaultValue: value.defaultValue // TODO: new id?
+                )
+            }
+        }
+
+        return [
             LogicSuggestionItem(
                 title: "Parameter name: \(prefix)",
                 category: "Function Parameter".uppercased(),
-                node: LGCSyntaxNode.functionParameter(
-                    LGCFunctionParameter.parameter(
-                        id: UUID(),
-                        externalName: nil,
-                        localName: LGCPattern(id: UUID(), name: prefix),
-                        annotation: LGCTypeAnnotation.typeIdentifier(
-                            id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
-                            genericArguments: .empty
-                        ),
-                        defaultValue: .none(id: UUID())
-                    )
-                ),
+                node: LGCSyntaxNode.functionParameter(parameter()),
                 disabled: prefix.isEmpty
             )
         ]
-
-        return items
     }
 }
 
@@ -429,7 +446,7 @@ public extension LGCSyntaxNode {
         case .program:
             return []
         case .functionParameter:
-            return LGCFunctionParameter.suggestions(for: prefix)
+            return contents.suggestions(within: root, for: prefix)
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)
         case .functionParameterDefaultValue:
