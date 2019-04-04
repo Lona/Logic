@@ -38,7 +38,7 @@ public struct NativeType: Codable & Equatable {
     public var name: String
     public var parameters: [NativeTypeParameter]
 
-    public init(name: String, parameters: [NativeTypeParameter]) {
+    public init(name: String, parameters: [NativeTypeParameter] = []) {
         self.name = name
         self.parameters = parameters
     }

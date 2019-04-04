@@ -97,7 +97,16 @@ public extension LGCLiteral {
 }
 
 public extension LGCFunctionParameterDefaultValue {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+//        let inferredType = inferType(
+//            within: root,
+//            context: [
+//                TypeEntity.nativeType(NativeType(name: "Boolean")),
+//                TypeEntity.nativeType(NativeType(name: "Number")),
+//                TypeEntity.nativeType(NativeType(name: "String")),
+//            ]
+//        )
+
         let items = [
             LogicSuggestionItem(
                 title: "No default",
@@ -450,7 +459,7 @@ public extension LGCSyntaxNode {
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)
         case .functionParameterDefaultValue:
-            return LGCFunctionParameterDefaultValue.suggestions(for: prefix)
+            return contents.suggestions(within: root, for: prefix)
         case .literal:
             return LGCLiteral.suggestions(for: prefix)
         case .topLevelParameters:

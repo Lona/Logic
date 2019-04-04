@@ -11,6 +11,11 @@ import Foundation
 public struct InferredType {
     var entity: TypeEntity
     var substitutions: [GenericTypeParameterSubstitution]
+
+    public init(entity: TypeEntity, substitutions: [GenericTypeParameterSubstitution] = []) {
+        self.entity = entity
+        self.substitutions = substitutions
+    }
 }
 
 public protocol TypeInferable {
@@ -22,16 +27,28 @@ extension LGCFunctionParameterDefaultValue: TypeInferable {
         guard let path = rootNode.pathTo(id: self.uuid) else { return nil }
 
         guard let functionParameter = path.last(where: {
-            guard case LGCSyntaxNode.functionParameter(_) = $0 else { return true }
-            return false
+            switch $0 {
+            case .functionParameter:
+                return true
+            default:
+                return false
+            }
         }) else { return nil }
 
         switch functionParameter {
-        case .typeAnnotation(.typeIdentifier(let value)):
-            guard let match = context.first(where: { entity in entity.name == value.identifier.string }) else { return nil }
+        case .functionParameter(.placeholder):
+            return nil
+        case .functionParameter(.parameter(let parameter)):
+            switch parameter.annotation {
+            case .typeIdentifier(let typeIdentifier):
+                guard let match = context.first(where: { entity in
+                    entity.name == typeIdentifier.identifier.string
+                }) else { return nil }
 
-//            value.genericArguments.map { $0. }
-            return InferredType(entity: match, substitutions: [])
+                return InferredType(entity: match, substitutions: [])
+            case .functionType:
+                fatalError("Not supported")
+            }
         default:
             fatalError("Problem")
         }
