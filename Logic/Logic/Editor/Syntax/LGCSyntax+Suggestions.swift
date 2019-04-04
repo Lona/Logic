@@ -33,7 +33,7 @@ public extension Array where Element == LogicSuggestionItem {
         return self.filter { item in item.titleContains(prefix: prefix) }
     }
 
-    func sorted(byPrefix: String) -> [Element] {
+    func sortedByPrefix() -> [Element] {
         return self.sorted { left, right in
             return left.title < right.title
         }
