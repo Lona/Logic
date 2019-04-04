@@ -9,8 +9,8 @@
 import Foundation
 
 public struct InferredType {
-    var entity: TypeEntity
-    var substitutions: [GenericTypeParameterSubstitution]
+    public var entity: TypeEntity
+    public var substitutions: [GenericTypeParameterSubstitution]
 
     public init(entity: TypeEntity, substitutions: [GenericTypeParameterSubstitution] = []) {
         self.entity = entity
