@@ -119,12 +119,12 @@ public class TypeList: NSBox {
         outlineView.reloadData()
     }
 
-    public var list: [Entity] {
+    public var list: [TypeEntity] {
         get { return outlineView.list }
         set { outlineView.list = newValue }
     }
 
-    public var onChange: ([Entity]) -> Void {
+    public var onChange: ([TypeEntity]) -> Void {
         get { return outlineView.onChange }
         set { outlineView.onChange = newValue }
     }
@@ -172,7 +172,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         header.tableView = self
         header.onPressPlus = {
             var copy = self.list
-            copy.append(Entity.genericType(GenericType.init(name: "", cases: [])))
+            copy.append(TypeEntity.genericType(GenericType.init(name: "", cases: [])))
             self.onChange(copy)
         }
         header.update()
@@ -196,7 +196,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         setup()
     }
 
-    var list: [Entity] = [] {
+    var list: [TypeEntity] = [] {
         didSet {
 //            saveExpandedItems()
             self.reloadData()
@@ -205,7 +205,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         }
     }
 
-    var onChange: ([Entity]) -> Void = {_ in }
+    var onChange: ([TypeEntity]) -> Void = {_ in }
 
     var getTypeList: () -> [String] = {
         return []
@@ -332,12 +332,12 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 case .genericType(var genericType):
                     view.onPressPlus = {
                         genericType.cases.append(TypeCase.normal("", []))
-                        self.replace(item: item, with: TypeListItem.entity(Entity.genericType(genericType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.genericType(genericType)))
                     }
                 case .nativeType(var nativeType):
                     view.onPressPlus = {
                         nativeType.parameters.append(NativeTypeParameter(name: ""))
-                        self.replace(item: item, with: TypeListItem.entity(Entity.nativeType(nativeType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.nativeType(nativeType)))
                     }
                 }
                 view.onPressMinus = {
@@ -347,10 +347,10 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     switch entity {
                     case .genericType(var genericType):
                         genericType.name = name
-                        self.replace(item: item, with: TypeListItem.entity(Entity.genericType(genericType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.genericType(genericType)))
                     case .nativeType(var nativeType):
                         nativeType.name = name
-                        self.replace(item: item, with: TypeListItem.entity(Entity.nativeType(nativeType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.nativeType(nativeType)))
                     }
                 }
             case .typeCase(let typeCase):
@@ -427,12 +427,12 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     case "Type":
                         self.replace(item: item, with:
                             TypeListItem.entity(
-                                Entity.genericType(
+                                TypeEntity.genericType(
                                     GenericType(name: entity.name, cases: []))))
                     case "Native Type":
                         self.replace(item: item, with:
                             TypeListItem.entity(
-                                Entity.nativeType(
+                                TypeEntity.nativeType(
                                     NativeType(name: entity.name, parameters: []))))
                     default:
                         break

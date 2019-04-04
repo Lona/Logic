@@ -1,5 +1,5 @@
 //
-//  Entity.swift
+//  TypeEntity.swift
 //  Logic
 //
 //  Created by Devin Abbott on 9/25/18.
@@ -44,11 +44,12 @@ public struct NativeType: Codable & Equatable {
     }
 }
 
-public enum Entity: Codable & Equatable {
+public enum TypeEntity: Codable & Equatable {
     case genericType(GenericType)
     //    case instanceType
     //    case aliasType
     case nativeType(NativeType)
+//    case functionType(FunctionType)
 
     enum CodingKeys: String, CodingKey {
         case caseType = "case"
@@ -99,7 +100,7 @@ public enum Entity: Codable & Equatable {
         }
     }
 
-    func removing(itemAtPath path: [Int]) -> Entity {
+    func removing(itemAtPath path: [Int]) -> TypeEntity {
         switch self {
         case .genericType(var genericType):
             if path.count > 1 {
@@ -119,7 +120,7 @@ public enum Entity: Codable & Equatable {
         }
     }
 
-    func appending(item: TypeListItem, atPath path: [Int]) -> Entity {
+    func appending(item: TypeListItem, atPath path: [Int]) -> TypeEntity {
         switch self {
         case .genericType(var genericType):
             if path.count > 1 {
@@ -136,7 +137,7 @@ public enum Entity: Codable & Equatable {
         }
     }
 
-    func inserting(item: TypeListItem, atPath path: [Int]) -> Entity {
+    func inserting(item: TypeListItem, atPath path: [Int]) -> TypeEntity {
         switch self {
         case .genericType(var genericType):
             if path.count > 1 {

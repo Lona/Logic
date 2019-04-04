@@ -11,7 +11,7 @@ import Logic
 import XMLCoder
 
 struct Content: Codable {
-    var types: [Entity]
+    var types: [TypeEntity]
 }
 
 class Document: NSDocument {

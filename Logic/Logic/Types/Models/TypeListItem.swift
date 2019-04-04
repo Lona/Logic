@@ -9,7 +9,7 @@
 import Foundation
 
 public enum TypeListItem: Decodable & Encodable & Equatable {
-    case entity(Entity)
+    case entity(TypeEntity)
     case typeCase(TypeCase)
     case normalTypeCaseParameter(NormalTypeCaseParameter)
     case recordTypeCaseParameter(RecordTypeCaseParameter)
@@ -29,7 +29,7 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
 
         switch type {
         case "entity":
-            self = .entity(try container.decode(Entity.self, forKey: .data))
+            self = .entity(try container.decode(TypeEntity.self, forKey: .data))
         case "typeCase":
             self = .typeCase(try container.decode(TypeCase.self, forKey: .data))
         case "normalTypeCaseParameter":
@@ -98,7 +98,7 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
         }
     }
 
-    var entity: Entity? {
+    var entity: TypeEntity? {
         switch self {
         case .entity(let value):
             return value
