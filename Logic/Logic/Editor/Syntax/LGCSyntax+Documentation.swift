@@ -45,6 +45,24 @@ public extension LGCExpression {
     }
 }
 
+public extension LGCFunctionParameter {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
+        return RichText(
+            blocks: [
+                .alert(
+                    .info,
+                    .paragraph(
+                        [
+                            .text(.none, "Info message")
+                        ]
+                    )
+                ),
+                .heading(.title, "Title")
+            ]
+        )
+    }
+}
+
 public extension LGCStatement {
     func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
         switch self {

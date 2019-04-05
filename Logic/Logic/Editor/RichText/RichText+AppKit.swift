@@ -32,12 +32,72 @@ extension RichText.TextStyle {
     }
 }
 
+extension RichText.AlertStyle {
+    var backgroundColor: NSColor {
+        switch self {
+        case .info:
+            return NSColor.systemBlue.withAlphaComponent(0.5)
+        case .warning:
+            return NSColor.systemYellow.withAlphaComponent(0.5)
+        case .error:
+            return NSColor.systemRed.withAlphaComponent(0.5)
+        }
+    }
+
+    var icon: NSImage {
+        switch self {
+        case .info:
+            return RichText.AlertStyle.iconInfo
+        case .warning:
+            return RichText.AlertStyle.iconWarning
+        case .error:
+            return RichText.AlertStyle.iconError
+        }
+    }
+
+    static var iconInfo = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-info"))!
+    static var iconWarning = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-warning"))!
+    static var iconError = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-error"))!
+}
+
 extension RichText.BlockElement {
     var view: NSView {
         switch self {
         case .heading(let headingSize, let content):
             let attributedString = headingSize.textStyle.apply(to: content)
             return NSTextField(labelWithAttributedString: attributedString)
+        case .alert(let alertStyle, let block):
+            let container = NSBox()
+            container.boxType = .custom
+            container.borderType = .noBorder
+            container.fillColor = alertStyle.backgroundColor
+            container.contentViewMargins = .zero
+            container.cornerRadius = 4
+
+            let icon = alertStyle.icon
+            let iconView = NSImageView(image: icon)
+
+            let blockView = block.view
+
+            container.addSubview(blockView)
+            container.addSubview(iconView)
+
+            container.translatesAutoresizingMaskIntoConstraints = false
+            iconView.translatesAutoresizingMaskIntoConstraints = false
+            blockView.translatesAutoresizingMaskIntoConstraints = false
+
+            iconView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 4).isActive = true
+            iconView.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: 0).isActive = true
+            iconView.widthAnchor.constraint(equalToConstant: icon.size.width).isActive = true
+            iconView.heightAnchor.constraint(equalToConstant: icon.size.height).isActive = true
+
+            blockView.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 4).isActive = true
+
+            blockView.topAnchor.constraint(equalTo: container.topAnchor, constant: 0).isActive = true
+            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -1).isActive = true
+            blockView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -4).isActive = true
+
+            return container
         case .paragraph(let elements):
             let paragraphString = NSMutableAttributedString()
 
@@ -61,12 +121,14 @@ extension RichText.BlockElement {
             case .section:
                 return 24
             case .title:
-                return 0
+                return 18
             }
         case .paragraph:
             return 8
         case .custom:
             return 12
+        case .alert:
+            return 8
         }
     }
 }

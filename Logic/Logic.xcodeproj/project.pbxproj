@@ -12,6 +12,8 @@
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
 		6B34149322554A5500CC65D1 /* LGCSyntax+Init.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149222554A5500CC65D1 /* LGCSyntax+Init.swift */; };
 		6B3414952256591600CC65D1 /* TypeInference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414942256591600CC65D1 /* TypeInference.swift */; };
+		6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B3414982256ECD900CC65D1 /* Assets.xcassets */; };
+		6B34149B2256EF2F00CC65D1 /* BundleLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */; };
 		6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */; };
 		6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */; };
 		6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */; };
@@ -73,6 +75,8 @@
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
 		6B34149222554A5500CC65D1 /* LGCSyntax+Init.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Init.swift"; sourceTree = "<group>"; };
 		6B3414942256591600CC65D1 /* TypeInference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeInference.swift; sourceTree = "<group>"; };
+		6B3414982256ECD900CC65D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocator.swift; sourceTree = "<group>"; };
 		6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+LogicElement.swift"; sourceTree = "<group>"; };
 		6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSOutlineView+Dragging.swift"; sourceTree = "<group>"; };
 		6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCList+SyntaxNode.swift"; sourceTree = "<group>"; };
@@ -268,6 +272,7 @@
 		6B44E196223C19EF00740318 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */,
 				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
 			);
 			path = Utils;
@@ -306,6 +311,7 @@
 				6B5B7520215B198400CDC9C6 /* Logic.h */,
 				6B5B7521215B198400CDC9C6 /* Info.plist */,
 				6B3414902254366C00CC65D1 /* LogicFile.swift */,
+				6B3414982256ECD900CC65D1 /* Assets.xcassets */,
 				6B44E163223B3E2C00740318 /* Controlled */,
 				6B44E195223C19B100740318 /* Editor */,
 				6B44E197223C1A0000740318 /* Lona */,
@@ -420,6 +426,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */,
 				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -452,6 +459,7 @@
 				6B34149322554A5500CC65D1 /* LGCSyntax+Init.swift in Sources */,
 				6B44E184223B40CF00740318 /* LGCList+Sequence.swift in Sources */,
 				6B5B755E215B1ABE00CDC9C6 /* TypeListRowView.swift in Sources */,
+				6B34149B2256EF2F00CC65D1 /* BundleLocator.swift in Sources */,
 				6B44E18A223B40CF00740318 /* LGCSyntaxNode.swift in Sources */,
 				6B44E153223B3DD000740318 /* Colors.swift in Sources */,
 				6B44E192223C0F6000740318 /* SuggestionListItem.swift in Sources */,

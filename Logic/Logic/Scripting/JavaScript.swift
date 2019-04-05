@@ -10,14 +10,8 @@ import Foundation
 import JavaScriptCore
 
 public enum JavaScript {
-    @objc private class BundleHelper: NSObject {
-        @objc static func getBundle() -> Bundle {
-            return Bundle(for: self)
-        }
-    }
-
     private static let context: JSContext = {
-        let bundle = BundleHelper.getBundle()
+        let bundle = BundleLocator.getBundle()
 
         guard
             let libraryPath = bundle.path(forResource: "lona-serialization.umd.js", ofType: nil),

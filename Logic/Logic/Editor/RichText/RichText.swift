@@ -15,6 +15,12 @@ public struct RichText {
         case link
     }
 
+    public enum AlertStyle {
+        case info
+        case warning
+        case error
+    }
+
     public enum HeadingSize {
         case title
         case section
@@ -24,9 +30,10 @@ public struct RichText {
         case text(TextStyle, String)
     }
 
-    public enum BlockElement {
+    public indirect enum BlockElement {
         case custom(NSView)
         case heading(HeadingSize, String)
+        case alert(AlertStyle, BlockElement)
         case paragraph([InlineElement])
     }
 
