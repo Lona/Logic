@@ -138,6 +138,7 @@ public class LogicEditor: NSBox {
         canvasView.onPressTabKey = nextNode
         canvasView.onPressShiftTabKey = previousNode
         canvasView.onPressDeleteKey = handleDelete
+        canvasView.onMoveLine = handleMoveLine
     }
 
     private func setUpConstraints() {
@@ -180,6 +181,21 @@ extension LogicEditor {
             if let selectedId = selectedElements.first?.syntaxNodeID {
                 rootNode = rootNode.delete(id: selectedId)
             }
+        }
+    }
+
+    private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
+        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
+
+        let formattedContent = rootNode.formatted
+        let elements = formattedContent.elements
+
+        if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
+            let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
+            let sourceId = elements[sourceRange].first?.syntaxNodeID,
+            let targetId = elements[destinationRange].first?.syntaxNodeID {
+
+            rootNode = rootNode.swap(sourceId: sourceId, targetId: targetId)
         }
     }
 

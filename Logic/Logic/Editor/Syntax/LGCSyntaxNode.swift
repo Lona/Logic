@@ -23,6 +23,7 @@ public protocol SyntaxNodeProtocol {
     func pathTo(id: UUID) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
     func delete(id: UUID) -> Self
+    func swap(sourceId: UUID, targetId: UUID) -> Self
 
     func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
@@ -42,6 +43,10 @@ public extension SyntaxNodeProtocol {
     }
 
     func delete(id: UUID) -> Self {
+        return self
+    }
+
+    func swap(sourceId: UUID, targetId: UUID) -> Self {
         return self
     }
 }
@@ -831,7 +836,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
     }
 
     public func delete(id: UUID) -> LGCTopLevelParameters {
-        let filtered = parameters.filter { param in
+        let updated = parameters.filter { param in
             switch param {
             case .placeholder:
                 return true
@@ -842,7 +847,33 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
 
         return LGCTopLevelParameters(
             id: UUID(),
-            parameters: LGCList(filtered)
+            parameters: LGCList(updated)
+        )
+    }
+
+    public func swap(sourceId: UUID, targetId: UUID) -> LGCTopLevelParameters {
+        var updated = parameters.map { $0 }
+
+        guard let sourceIndex = updated.firstIndex(where: { param in param.uuid == sourceId }),
+            let targetIndex = updated.lastIndex(where: { param in param.uuid == targetId }) else { return self }
+
+        let sourceNode = updated[sourceIndex]
+
+        updated.remove(at: sourceIndex)
+        updated.insert(sourceNode, at: targetIndex)
+        updated = updated.filter { param in
+            switch param {
+            case .placeholder:
+                return false
+            case .parameter:
+                return true
+            }
+        }
+        updated.append(LGCFunctionParameter.placeholder(id: UUID()))
+
+        return LGCTopLevelParameters(
+            id: UUID(),
+            parameters: LGCList(updated)
         )
     }
 
@@ -948,6 +979,10 @@ extension LGCSyntaxNode {
 
     public func delete(id: UUID) -> LGCSyntaxNode {
         return contents.delete(id: id).node
+    }
+
+    public func swap(sourceId: UUID, targetId: UUID) -> LGCSyntaxNode {
+        return contents.swap(sourceId: sourceId, targetId: targetId).node
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
