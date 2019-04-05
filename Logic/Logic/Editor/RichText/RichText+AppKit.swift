@@ -94,7 +94,7 @@ extension RichText.BlockElement {
             blockView.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 4).isActive = true
 
             blockView.topAnchor.constraint(equalTo: container.topAnchor, constant: 0).isActive = true
-            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -1).isActive = true
+            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: 0).isActive = true
             blockView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -4).isActive = true
 
             return container
