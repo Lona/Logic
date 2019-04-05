@@ -58,6 +58,9 @@ extension RichText.AlertStyle {
     static var iconInfo = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-info"))!
     static var iconWarning = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-warning"))!
     static var iconError = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-error"))!
+
+    static var iconMargin = NSEdgeInsets(top: 3, left: 4, bottom: 0, right: 4)
+    static var paragraphMargin = NSEdgeInsets(top: 0, left: 0, bottom: -1, right: 0)
 }
 
 extension RichText.BlockElement {
@@ -86,16 +89,21 @@ extension RichText.BlockElement {
             iconView.translatesAutoresizingMaskIntoConstraints = false
             blockView.translatesAutoresizingMaskIntoConstraints = false
 
-            iconView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 4).isActive = true
-            iconView.centerYAnchor.constraint(equalTo: container.centerYAnchor, constant: 0).isActive = true
+            let iconMargin = RichText.AlertStyle.iconMargin
+            let paragraphMargin = RichText.AlertStyle.paragraphMargin
+
             iconView.widthAnchor.constraint(equalToConstant: icon.size.width).isActive = true
             iconView.heightAnchor.constraint(equalToConstant: icon.size.height).isActive = true
+            iconView.topAnchor.constraint(equalTo: container.topAnchor, constant: iconMargin.top).isActive = true
+            iconView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: iconMargin.left).isActive = true
 
-            blockView.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 4).isActive = true
+            blockView.leadingAnchor.constraint(
+                equalTo: iconView.trailingAnchor,
+                constant: iconMargin.right + paragraphMargin.left).isActive = true
 
-            blockView.topAnchor.constraint(equalTo: container.topAnchor, constant: 0).isActive = true
-            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: 0).isActive = true
-            blockView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -4).isActive = true
+            blockView.topAnchor.constraint(equalTo: container.topAnchor, constant: paragraphMargin.top).isActive = true
+            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: paragraphMargin.bottom).isActive = true
+            blockView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -paragraphMargin.right).isActive = true
 
             return container
         case .paragraph(let elements):
