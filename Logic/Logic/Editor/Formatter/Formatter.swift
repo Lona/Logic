@@ -105,10 +105,10 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
         var currentOffset: CGFloat = 0
         var currentIndentLevel: Int = 0
 
-        func moveToNextRow() {
+        func moveToNextRow(wrapping: Bool) {
             rows.append(currentRow)
             currentRow = []
-            currentOffset = CGFloat(currentIndentLevel) * indentWidth
+            currentOffset = CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
         }
 
         func process(command: FormatterCommand) {
@@ -119,17 +119,17 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
                 currentIndentLevel -= 1
             case .line:
                 if currentOffset + spaceWidth >= maxLineWidth {
-                    moveToNextRow()
+                    moveToNextRow(wrapping: false)
                 }
 
                 currentOffset += spaceWidth
             case .hardLine:
-                moveToNextRow()
+                moveToNextRow(wrapping: false)
             case .element(let element):
                 let elementWidth = element.width
 
                 if currentOffset + elementWidth >= maxLineWidth && !currentRow.isEmpty {
-                    moveToNextRow()
+                    moveToNextRow(wrapping: true)
                 }
 
                 let formattedElement = FormatterCommand<Element>.FormattedElement(element: element, position: currentOffset)
