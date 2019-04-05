@@ -190,8 +190,8 @@ extension RichText {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
         contentView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: scrollView.contentView.trailingAnchor).isActive = true
 
         return scrollView
     }
