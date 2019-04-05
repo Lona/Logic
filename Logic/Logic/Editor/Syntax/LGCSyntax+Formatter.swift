@@ -85,7 +85,7 @@ public extension LGCFunctionParameter {
                         return .element(.text("no default"))
                     }
                     return value.defaultValue.formatted
-                case .functionType(let annotation):
+                case .functionType:
                     return value.defaultValue.formatted
                 }
             }

@@ -73,6 +73,8 @@ class Document: NSDocument {
                 return Array(all.joined())
             case .nativeType(let nativeType):
                 return nativeType.parameters.map { $0.name }
+            case .functionType:
+                return [] // TODO
             }
         }
 

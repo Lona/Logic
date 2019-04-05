@@ -44,12 +44,24 @@ public struct NativeType: Codable & Equatable {
     }
 }
 
+public struct FunctionType: Codable & Equatable {
+    public var name: String
+    public var parameters: [TypeCaseParameterEntity]
+    public var returnType: TypeCaseParameterEntity
+
+    public init(name: String, parameters: [TypeCaseParameterEntity], returnType: TypeCaseParameterEntity) {
+        self.name = name
+        self.parameters = parameters
+        self.returnType = returnType
+    }
+}
+
 public enum TypeEntity: Codable & Equatable {
     case genericType(GenericType)
     //    case instanceType
     //    case aliasType
     case nativeType(NativeType)
-//    case functionType(FunctionType)
+    case functionType(FunctionType)
 
     enum CodingKeys: String, CodingKey {
         case caseType = "case"
@@ -79,6 +91,9 @@ public enum TypeEntity: Codable & Equatable {
         case .nativeType(let type):
             try container.encode("native", forKey: .caseType)
             try container.encode(type, forKey: .data)
+        case .functionType(let type):
+            try container.encode("function", forKey: .caseType)
+            try container.encode(type, forKey: .data)
         }
     }
 
@@ -88,6 +103,9 @@ public enum TypeEntity: Codable & Equatable {
             return genericType.cases.map { TypeListItem.typeCase($0) }
         case .nativeType(let nativeType):
             return nativeType.parameters.map { TypeListItem.nativeTypeParameter($0) }
+        case .functionType:
+//            return functionType.parameters.map { TypeListItem.nativeTypeParameter($0) }
+            return []
         }
     }
 
@@ -97,6 +115,8 @@ public enum TypeEntity: Codable & Equatable {
             return genericType.name
         case .nativeType(let nativeType):
             return nativeType.name
+        case .functionType(let functionType):
+            return functionType.name
         }
     }
 
@@ -117,6 +137,8 @@ public enum TypeEntity: Codable & Equatable {
                 nativeType.parameters.remove(at: path[0])
             }
             return .nativeType(nativeType)
+        case .functionType(let functionType):
+            return .functionType(functionType)
         }
     }
 
@@ -134,6 +156,8 @@ public enum TypeEntity: Codable & Equatable {
             return .genericType(genericType)
         case .nativeType:
             return self
+        case .functionType:
+            return self
         }
     }
 
@@ -150,6 +174,8 @@ public enum TypeEntity: Codable & Equatable {
             }
             return .genericType(genericType)
         case .nativeType:
+            return self
+        case .functionType(_):
             return self
         }
     }
@@ -175,6 +201,18 @@ public enum TypeEntity: Codable & Equatable {
                         : x
                 }
                 return TypeListItem.entity(.nativeType(nativeType))
+            } else {
+                return item
+            }
+        case .functionType:
+            if path.count > 0 {
+//                nativeType.parameters = nativeType.parameters.enumerated().map { index, x in
+//                    return index == path[0]
+//                        ? x.replacing(itemAtPath: Array(path.dropFirst()), with: item).nativeTypeParameter!
+//                        : x
+//                }
+//                return TypeListItem.entity(.nativeType(nativeType))
+                return item
             } else {
                 return item
             }
