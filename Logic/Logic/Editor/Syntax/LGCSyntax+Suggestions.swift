@@ -197,6 +197,28 @@ public extension LGCTypeAnnotation {
                     )
                 )
             ),
+            LogicSuggestionItem(
+                title: "Function",
+                category: "Function Types".uppercased(),
+                node: LGCSyntaxNode.typeAnnotation(
+                    LGCTypeAnnotation.functionType(
+                        id: UUID(),
+                        returnType: LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                            genericArguments: .empty
+                        ),
+                        argumentTypes: .next(
+                            LGCTypeAnnotation.typeIdentifier(
+                                id: UUID(),
+                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                                genericArguments: .empty
+                            ),
+                            .empty
+                        )
+                    )
+                )
+            )
         ]
 
         return items.titleContains(prefix: prefix)

@@ -109,7 +109,12 @@ extension LGCPattern: SyntaxNodeProtocol {
 
 extension LGCTypeAnnotation: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
-        return "Type Annotation"
+        switch self {
+        case .typeIdentifier:
+            return "Type Annotation"
+        case .functionType:
+            return "Function Type Annotation"
+        }
     }
 
     public var node: LGCSyntaxNode {
@@ -142,8 +147,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         if id == uuid { return node }
 
         switch self {
-        case .functionType:
-            fatalError("Not supported")
+        case .functionType(let value):
+            return value.argumentTypes.find(id: id) ?? value.returnType.find(id: id)
         case .typeIdentifier(let value):
             return value.identifier.find(id: id) ?? value.genericArguments.find(id: id)
         }
@@ -155,8 +160,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         var found: [LGCSyntaxNode]?
 
         switch self {
-        case .functionType:
-            fatalError("Not supported")
+        case .functionType(let value):
+            found = value.argumentTypes.pathTo(id: id) ?? value.returnType.pathTo(id: id)
         case .typeIdentifier(let value):
             found = value.identifier.pathTo(id: id)
 
@@ -189,7 +194,12 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
     }
 
     public var movementAfterInsertion: Movement {
-        return .next
+        switch self {
+        case .typeIdentifier:
+            return .next
+        case .functionType:
+            return .none
+        }
     }
 }
 
@@ -322,7 +332,7 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
 
 extension LGCFunctionParameter: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
-        return "Function Parameter"
+        return "Parameter"
     }
 
     public var node: LGCSyntaxNode {

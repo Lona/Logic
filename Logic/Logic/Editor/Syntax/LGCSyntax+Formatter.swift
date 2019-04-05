@@ -123,8 +123,16 @@ public extension LGCTypeAnnotation {
                     ]
                 }
             }
-        case .functionType:
-            fatalError("Not supported")
+        case .functionType(let value):
+            return .concat {
+                [
+                    .join(with: .concat {[.element(.text(",")), .line]}) {
+                        value.argumentTypes.map { $0.formatted }
+                    },
+                    .element(.text("→")),
+                    value.returnType.formatted
+                ]
+            }
         }
     }
 }
