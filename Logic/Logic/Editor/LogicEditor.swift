@@ -137,6 +137,7 @@ public class LogicEditor: NSBox {
         canvasView.onActivateLine = handleActivateLine
         canvasView.onPressTabKey = nextNode
         canvasView.onPressShiftTabKey = previousNode
+        canvasView.onPressDeleteKey = handleDelete
     }
 
     private func setUpConstraints() {
@@ -160,6 +161,27 @@ public class LogicEditor: NSBox {
 // MARK: - Selection
 
 extension LogicEditor {
+
+    private func handleDelete() {
+        let formattedContent = rootNode.formatted
+        let elements = formattedContent.elements
+
+        func range() -> Range<Int>? {
+            if let selectedLine = canvasView.selectedLine {
+                return formattedContent.elementIndexRange(for: selectedLine)
+            } else {
+                return canvasView.selectedRange
+            }
+        }
+
+        if let selectedRange = range(), selectedRange.upperBound <= elements.count {
+            let selectedElements = elements[selectedRange]
+
+            if let selectedId = selectedElements.first?.syntaxNodeID {
+                rootNode = rootNode.delete(id: selectedId)
+            }
+        }
+    }
 
     private func nextNode() {
         if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvasView.selectedRange?.lowerBound),

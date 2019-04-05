@@ -46,6 +46,7 @@ public class LogicCanvasView: NSView {
     public var onActivateLine: ((Int) -> Void)?
     public var onPressTabKey: (() -> Void)?
     public var onPressShiftTabKey: (() -> Void)?
+    public var onPressDeleteKey: (() -> Void)?
 
     // MARK: Styles
 
@@ -118,8 +119,8 @@ public class LogicCanvasView: NSView {
         case 36: // Enter
             if let selectedIndex = selectedIndex {
                 onActivate?(selectedIndex)
-            } else if let selectedLine = selectedLine {
-                let range = formattedContent.elementIndexRange(for: selectedLine)
+            } else if let selectedLine = selectedLine,
+                let range = formattedContent.elementIndexRange(for: selectedLine) {
                 onActivate?(range.lowerBound)
             } else {
                 onActivate?(nil)
@@ -134,6 +135,8 @@ public class LogicCanvasView: NSView {
             } else {
                 onPressTabKey?()
             }
+        case 51: // Delete
+            onPressDeleteKey?()
         case 123: // Left
             Swift.print("Left arrow")
         case 124: // Right
@@ -166,8 +169,7 @@ public class LogicCanvasView: NSView {
 
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
-        if let selectedLine = selectedLine {
-            let range = formattedContent.elementIndexRange(for: selectedLine)
+        if let selectedLine = selectedLine, let range = formattedContent.elementIndexRange(for: selectedLine) {
             let elements = measuredElements[range]
             if let first = elements.first, let last = elements.last {
                 Colors.highlightedLine.set()

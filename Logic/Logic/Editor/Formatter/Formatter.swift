@@ -78,7 +78,7 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
         fatalError("Could not find line number for element index \(elementIndex)")
     }
 
-    func elementIndexRange(for lineIndex: Int) -> Range<Int> {
+    func elementIndexRange(for lineIndex: Int) -> Range<Int>? {
         var elementCount = 0
         for (offset, formattedLine) in logicalRows.enumerated() {
             let endElementCount = elementCount + formattedLine.count
@@ -90,7 +90,7 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
             elementCount = endElementCount
         }
 
-        fatalError("Could not find element range for line index \(lineIndex)")
+        return nil
     }
 
     func print(

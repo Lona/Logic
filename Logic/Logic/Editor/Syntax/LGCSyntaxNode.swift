@@ -22,6 +22,7 @@ public protocol SyntaxNodeProtocol {
     func find(id: UUID) -> LGCSyntaxNode?
     func pathTo(id: UUID) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
+    func delete(id: UUID) -> Self
 
     func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
@@ -38,6 +39,10 @@ public extension SyntaxNodeProtocol {
 
     func find(id: UUID) -> LGCSyntaxNode? {
         return pathTo(id: id)?.last
+    }
+
+    func delete(id: UUID) -> Self {
+        return self
     }
 }
 
@@ -825,6 +830,22 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         return .topLevelParameters(self)
     }
 
+    public func delete(id: UUID) -> LGCTopLevelParameters {
+        let filtered = parameters.filter { param in
+            switch param {
+            case .placeholder:
+                return true
+            case .parameter(let value):
+                return param.uuid != id && value.localName.id != id
+            }
+        }
+
+        return LGCTopLevelParameters(
+            id: UUID(),
+            parameters: LGCList(filtered)
+        )
+    }
+
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTopLevelParameters {
         return LGCTopLevelParameters(
             id: UUID(),
@@ -925,8 +946,16 @@ extension LGCSyntaxNode {
         }
     }
 
+    public func delete(id: UUID) -> LGCSyntaxNode {
+        return contents.delete(id: id).node
+    }
+
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
         return contents.replace(id: id, with: syntaxNode).node
+    }
+
+    public func find(id: UUID) -> LGCSyntaxNode? {
+        return contents.find(id: id)
     }
 
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {

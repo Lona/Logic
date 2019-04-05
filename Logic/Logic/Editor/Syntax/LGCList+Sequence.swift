@@ -70,3 +70,18 @@ extension LGCList: Collection {
         return i + 1
     }
 }
+
+extension LGCList {
+    public init(_ array: [T]) {
+        let result = array.reversed()
+
+        var resultIterator = result.makeIterator()
+        var output = LGCList<T>.empty
+
+        while let current = resultIterator.next() {
+            output = .next(current, output)
+        }
+
+        self = output
+    }
+}
