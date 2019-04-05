@@ -208,6 +208,9 @@
         <Record.Substitution generic="T" instance="TypeAnnotation"/>
       </Record.Param>
     </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
   </Type>
   <Type name="Literal">
     <Record name="string">

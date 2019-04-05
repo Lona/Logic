@@ -48,6 +48,8 @@ extension LGCFunctionParameterDefaultValue: TypeInferable {
                 return InferredType(entity: match, substitutions: [])
             case .functionType:
                 return nil // TODO
+            case .placeholder:
+                return nil
             }
         default:
             fatalError("Problem")

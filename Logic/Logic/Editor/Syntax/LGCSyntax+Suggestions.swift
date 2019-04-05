@@ -209,11 +209,7 @@ public extension LGCTypeAnnotation {
                             genericArguments: .empty
                         ),
                         argumentTypes: .next(
-                            LGCTypeAnnotation.typeIdentifier(
-                                id: UUID(),
-                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
-                                genericArguments: .empty
-                            ),
+                            LGCTypeAnnotation.placeholder(id: UUID()),
                             .empty
                         )
                     )

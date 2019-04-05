@@ -40,51 +40,6 @@ extension LGCList where T: SyntaxNodeProtocol {
     }
 }
 
-// Preserve placeholders
-extension LGCList where T == LGCStatement {
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
-        // Reverse list so we can easily prepend to the front
-        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
-
-        var resultIterator = result.makeIterator()
-        var output = LGCList<T>.empty
-
-        if let first = result.first, case .placeholderStatement = first {
-
-        } else {
-            output = .next(.placeholderStatement(id: UUID()), output)
-        }
-
-        while let current = resultIterator.next() {
-            output = .next(current, output)
-        }
-
-        return output
-    }
-}
-
-extension LGCList where T == LGCFunctionParameter {
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCList {
-        // Reverse list so we can easily prepend to the front
-        let result = self.map { statement in statement.replace(id: id, with: syntaxNode) }.reversed()
-
-        var resultIterator = result.makeIterator()
-        var output = LGCList<T>.empty
-
-        if let first = result.first, case .placeholder = first {
-
-        } else {
-            output = .next(.placeholder(id: UUID()), output)
-        }
-
-        while let current = resultIterator.next() {
-            output = .next(current, output)
-        }
-
-        return output
-    }
-}
-
 // FunctionCallArguments aren't part of LGCSyntaxNode (yet)
 extension LGCList where T == LGCFunctionCallArgument {
     func find(id: UUID) -> LGCSyntaxNode? {

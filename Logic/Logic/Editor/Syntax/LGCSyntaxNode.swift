@@ -120,7 +120,7 @@ extension LGCPattern: SyntaxNodeProtocol {
 extension LGCTypeAnnotation: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         switch self {
-        case .typeIdentifier:
+        case .typeIdentifier, .placeholder:
             return "Type Annotation"
         case .functionType:
             return "Function Type Annotation"
@@ -147,8 +147,10 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
                 return LGCTypeAnnotation.functionType(
                     id: UUID(),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
-                    argumentTypes: value.argumentTypes.replace(id: id, with: syntaxNode)
+                    argumentTypes: value.argumentTypes.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
+            case .placeholder:
+                return LGCTypeAnnotation.placeholder(id: UUID())
             }
         }
     }
@@ -161,6 +163,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
             return value.argumentTypes.find(id: id) ?? value.returnType.find(id: id)
         case .typeIdentifier(let value):
             return value.identifier.find(id: id) ?? value.genericArguments.find(id: id)
+        case .placeholder:
+            return nil
         }
     }
 
@@ -181,6 +185,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
             }
 
             found = value.genericArguments.pathTo(id: id)
+        case .placeholder:
+            break
         }
 
         if let found = found {
@@ -200,6 +206,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
             return value.id
         case .functionType(let value):
             return value.id
+        case .placeholder(let value):
+            return value
         }
     }
 
@@ -209,6 +217,8 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
             return .next
         case .functionType:
             return .none
+        case .placeholder:
+            return .next
         }
     }
 }
@@ -613,7 +623,7 @@ extension LGCStatement: SyntaxNodeProtocol {
                 return .branch(
                     id: UUID(),
                     condition: value.condition.replace(id: id, with: syntaxNode),
-                    block: value.block.replace(id: id, with: syntaxNode)
+                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
             case .declaration(let value):
                 return LGCStatement.declaration(
@@ -728,7 +738,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     name: value.name.replace(id: id, with: syntaxNode),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
                     parameters: value.parameters.replace(id: id, with: syntaxNode),
-                    block: value.block.replace(id: id, with: syntaxNode))
+                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true))
             }
         }
     }
@@ -790,7 +800,7 @@ extension LGCProgram: SyntaxNodeProtocol {
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCProgram {
         return LGCProgram(
             id: UUID(),
-            block: block.replace(id: id, with: syntaxNode)
+            block: block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
         )
     }
 
@@ -880,7 +890,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTopLevelParameters {
         return LGCTopLevelParameters(
             id: UUID(),
-            parameters: parameters.replace(id: id, with: syntaxNode)
+            parameters: parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
         )
     }
 

@@ -87,6 +87,8 @@ public extension LGCFunctionParameter {
                     return value.defaultValue.formatted
                 case .functionType:
                     return value.defaultValue.formatted
+                case .placeholder:
+                    return .element(.text("no default"))
                 }
             }
 
@@ -111,6 +113,8 @@ public extension LGCTypeAnnotation {
             switch value.genericArguments {
             case .empty:
                 return value.identifier.formatted
+            case .next(.placeholder, _):
+                return value.identifier.formatted
             case .next:
                 return .concat {
                     [
@@ -133,6 +137,8 @@ public extension LGCTypeAnnotation {
                     value.returnType.formatted
                 ]
             }
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
         }
     }
 }

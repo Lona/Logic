@@ -598,6 +598,7 @@ public indirect enum LGCFunctionParameterDefaultValue: Codable & Equatable {
 public indirect enum LGCTypeAnnotation: Codable & Equatable {
   case typeIdentifier(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeAnnotation>)
   case functionType(id: UUID, returnType: LGCTypeAnnotation, argumentTypes: LGCList<LGCTypeAnnotation>)
+  case placeholder(id: UUID)
 
   // MARK: Codable
 
@@ -632,6 +633,8 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
             id: try data.decode(UUID.self, forKey: .id),
             returnType: try data.decode(LGCTypeAnnotation.self, forKey: .returnType),
             argumentTypes: try data.decode(LGCList.self, forKey: .argumentTypes))
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -652,6 +655,9 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
         try data.encode(value.id, forKey: .id)
         try data.encode(value.returnType, forKey: .returnType)
         try data.encode(value.argumentTypes, forKey: .argumentTypes)
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
+        try data.encode(value, forKey: .id)
     }
   }
 }
