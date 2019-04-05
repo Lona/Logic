@@ -33,7 +33,7 @@ extension RichText.TextStyle {
 }
 
 extension RichText.AlertStyle {
-    var backgroundColor: NSColor {
+    public var backgroundColor: NSColor {
         switch self {
         case .info:
             return NSColor.systemBlue.withAlphaComponent(0.5)
@@ -44,7 +44,7 @@ extension RichText.AlertStyle {
         }
     }
 
-    var icon: NSImage {
+    public var icon: NSImage {
         switch self {
         case .info:
             return RichText.AlertStyle.iconInfo
@@ -55,12 +55,12 @@ extension RichText.AlertStyle {
         }
     }
 
-    static var iconInfo = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-info"))!
-    static var iconWarning = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-warning"))!
-    static var iconError = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-error"))!
+    public static var iconInfo = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-info"))!
+    public static var iconWarning = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-warning"))!
+    public static var iconError = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-error"))!
 
-    static var iconMargin = NSEdgeInsets(top: 3, left: 4, bottom: 0, right: 4)
-    static var paragraphMargin = NSEdgeInsets(top: 0, left: 0, bottom: -1, right: 0)
+    public static var iconMargin = NSEdgeInsets(top: 3, left: 4, bottom: 0, right: 4)
+    public static var paragraphMargin = NSEdgeInsets(top: 0, left: 0, bottom: -1, right: 0)
 }
 
 extension RichText.BlockElement {
