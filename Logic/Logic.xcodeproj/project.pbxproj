@@ -15,6 +15,7 @@
 		6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B3414982256ECD900CC65D1 /* Assets.xcassets */; };
 		6B34149B2256EF2F00CC65D1 /* BundleLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */; };
 		6B3414A02258154500CC65D1 /* SyntaxNodePlaceholdable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */; };
+		6B3414A222593E2000CC65D1 /* Array+Union.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414A122593E2000CC65D1 /* Array+Union.swift */; };
 		6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */; };
 		6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */; };
 		6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */; };
@@ -79,6 +80,7 @@
 		6B3414982256ECD900CC65D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocator.swift; sourceTree = "<group>"; };
 		6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodePlaceholdable.swift; sourceTree = "<group>"; };
+		6B3414A122593E2000CC65D1 /* Array+Union.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Union.swift"; sourceTree = "<group>"; };
 		6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+LogicElement.swift"; sourceTree = "<group>"; };
 		6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSOutlineView+Dragging.swift"; sourceTree = "<group>"; };
 		6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCList+SyntaxNode.swift"; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 			children = (
 				6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */,
 				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
+				6B3414A122593E2000CC65D1 /* Array+Union.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -448,6 +451,7 @@
 				6B44E178223B40BA00740318 /* LogicElement.swift in Sources */,
 				6B44E179223B40BA00740318 /* LogicElement+Formatter.swift in Sources */,
 				6B44E156223B3DD000740318 /* LonaViewModel.swift in Sources */,
+				6B3414A222593E2000CC65D1 /* Array+Union.swift in Sources */,
 				6B44E158223B3DD000740318 /* Shadows.swift in Sources */,
 				6B44E144223B3D9000740318 /* RichText+AppKit.swift in Sources */,
 				6B5B7574215C387E00CDC9C6 /* TypeCaseParameterEntity.swift in Sources */,

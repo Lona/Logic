@@ -63,10 +63,6 @@ public class LogicCanvasView: NSView {
         return selectedRange?.lowerBound
     }
 
-    public var selectionEndIndex: Int? {
-        return selectedRange?.upperBound
-    }
-
     public static var textMargin = CGSize(width: 6, height: 6)
     public static var textPadding = CGSize(width: 4, height: 3)
     public static var textBackgroundRadius = CGSize(width: 2, height: 2)
@@ -210,10 +206,7 @@ public class LogicCanvasView: NSView {
         }
 
         if let range = outlinedRange {
-            var rect = measuredElements[range.startIndex].backgroundRect
-            for index in range.startIndex...range.endIndex {
-                rect = rect.union(measuredElements[index].backgroundRect)
-            }
+            let rect = measuredElements[range].map { $0.backgroundRect }.union
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
                 roundedRect: rect.insetBy(dx: LogicCanvasView.outlineWidth / 2, dy: LogicCanvasView.outlineWidth / 2),
@@ -222,11 +215,9 @@ public class LogicCanvasView: NSView {
             path.lineWidth = LogicCanvasView.outlineWidth
             path.stroke()
         } else {
-            if let start = selectedIndex, let end = selectionEndIndex, start < end, end < measuredElements.count {
-                var rect = measuredElements[start].backgroundRect
-                for index in start...end {
-                    rect = rect.union(measuredElements[index].backgroundRect)
-                }
+            if let range = selectedRange {
+                let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
+                let rect = measuredElements[clampedRange].map { $0.backgroundRect }.union
                 Colors.highlightedCode.set()
                 NSBezierPath(
                     roundedRect: rect,
@@ -384,12 +375,9 @@ public class LogicCanvasView: NSView {
 
         guard let range = formattedContent.elementIndexRange(for: selectedLine) else { return }
 
-        var rect = measuredElements[range.startIndex].backgroundRect
+        var rect = measuredElements[range].map { $0.backgroundRect }.union
         rect.origin.x = 0
         rect.size.width = bounds.width
-        for index in range.startIndex..<range.endIndex {
-            rect = rect.union(measuredElements[index].backgroundRect)
-        }
 
         let pdf = dataWithPDF(inside: rect)
         guard let image = NSImage(data: pdf) else { return }

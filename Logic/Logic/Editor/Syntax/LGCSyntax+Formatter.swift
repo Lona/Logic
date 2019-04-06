@@ -364,7 +364,7 @@ public extension LGCSyntaxNode {
 
         let lastIndex = firstIndex + (topNodeFormattedElements.count - topFirstFocusableIndex - 1)
 
-        return firstIndex..<lastIndex
+        return firstIndex..<lastIndex + 1
     }
 
     func topNodeWithEqualElements(as targetID: UUID) -> LGCSyntaxNode {

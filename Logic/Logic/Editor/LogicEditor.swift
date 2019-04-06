@@ -175,12 +175,8 @@ extension LogicEditor {
             }
         }
 
-        if let selectedRange = range(), selectedRange.upperBound <= elements.count {
-            let selectedElements = elements[selectedRange]
-
-            if let selectedId = selectedElements.first?.syntaxNodeID {
-                rootNode = rootNode.delete(id: selectedId)
-            }
+        if let selectedRange = range(), let selectedId = elements[selectedRange].first?.syntaxNodeID {
+            rootNode = rootNode.delete(id: selectedId)
         }
     }
 
@@ -253,11 +249,15 @@ extension LogicEditor {
 
     private func handleActivateElement(_ activatedIndex: Int?) {
         if let activatedIndex = activatedIndex {
-            let id = self.rootNode.formatted.elements[activatedIndex].syntaxNodeID
-            self.select(nodeByID: id)
-        } else {
-            self.select(nodeByID: nil)
+            let elements = self.rootNode.formatted.elements
+
+            if activatedIndex < elements.count {
+                self.select(nodeByID: elements[activatedIndex].syntaxNodeID)
+                return
+            }
         }
+
+        self.select(nodeByID: nil)
     }
 
     private func handleActivateLine(_ activatedLineIndex: Int) {

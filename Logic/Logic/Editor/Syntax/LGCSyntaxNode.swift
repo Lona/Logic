@@ -131,6 +131,30 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         return .typeAnnotation(self)
     }
 
+    public func delete(id: UUID) -> LGCTypeAnnotation {
+        switch self {
+        case .typeIdentifier, .placeholder:
+            return self
+        case .functionType(let value):
+            let updatedArguments = value.argumentTypes
+                .filter {
+                    switch $0 {
+                    case .typeIdentifier(let typeIdentifier):
+                        return typeIdentifier.identifier.id != id
+                    case .functionType, .placeholder:
+                        return true
+                    }
+                }
+                .map { $0.delete(id: id) }
+
+            return LGCTypeAnnotation.functionType(
+                id: UUID(),
+                returnType: value.returnType.delete(id: id),
+                argumentTypes: LGCList(updatedArguments)
+            )
+        }
+    }
+
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTypeAnnotation {
         switch syntaxNode {
         case .typeAnnotation(let newNode) where id == uuid:
@@ -357,6 +381,21 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
 
     public var node: LGCSyntaxNode {
         return .functionParameter(self)
+    }
+
+    public func delete(id: UUID) -> LGCFunctionParameter {
+        switch self {
+        case .placeholder:
+            return self
+        case .parameter(let value):
+            return LGCFunctionParameter.parameter(
+                id: UUID(),
+                externalName: value.externalName,
+                localName: value.localName.delete(id: id),
+                annotation: value.annotation.delete(id: id),
+                defaultValue: value.defaultValue.delete(id: id)
+            )
+        }
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionParameter {
@@ -853,7 +892,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
             case .parameter(let value):
                 return param.uuid != id && value.localName.id != id
             }
-        }
+            }.map { $0.delete(id: id) }
 
         return LGCTopLevelParameters(
             id: UUID(),
