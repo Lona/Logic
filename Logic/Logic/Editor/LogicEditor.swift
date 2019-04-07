@@ -56,6 +56,8 @@ public class LogicEditor: NSBox {
 
     // MARK: Public
 
+    public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
+
     public var rootNode: LGCSyntaxNode {
         didSet {
             canvasView.formattedContent = rootNode.formatted
@@ -176,7 +178,7 @@ extension LogicEditor {
         }
 
         if let selectedRange = range(), let selectedId = elements[selectedRange].first?.syntaxNodeID {
-            rootNode = rootNode.delete(id: selectedId)
+            _ = onChangeRootNode?(rootNode.delete(id: selectedId))
         }
     }
 
@@ -191,7 +193,7 @@ extension LogicEditor {
             let sourceId = elements[sourceRange].first?.syntaxNodeID,
             let targetId = elements[destinationRange].first?.syntaxNodeID {
 
-            rootNode = rootNode.swap(sourceId: sourceId, targetId: targetId)
+            _ = onChangeRootNode?(rootNode.swap(sourceId: sourceId, targetId: targetId))
         }
     }
 
@@ -378,16 +380,16 @@ extension LogicEditor {
 
             let suggestedNode = logicSuggestionItem.node
 
-            Swift.print("Chose suggestion", suggestedNode)
+//            Swift.print("Chose suggestion", suggestedNode)
 
             let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
 
-            self.rootNode = replacement
-
-            if suggestedNode.movementAfterInsertion == .next {
-                self.nextNode()
-            } else {
-                self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
+            if self.onChangeRootNode?(replacement) == true {
+                if suggestedNode.movementAfterInsertion == .next {
+                    self.nextNode()
+                } else {
+                    self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
+                }
             }
         }
 
