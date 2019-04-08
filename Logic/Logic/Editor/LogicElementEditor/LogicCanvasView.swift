@@ -10,6 +10,11 @@ public extension NSPasteboard.PasteboardType {
 
 public class LogicCanvasView: NSView {
 
+    public enum Item: Equatable {
+        case range(Range<Int>)
+        case line(Int)
+    }
+
     // MARK: Lifecycle
 
     public init() {
@@ -101,20 +106,34 @@ public class LogicCanvasView: NSView {
         return measuredElements[index].backgroundRect
     }
 
+    public var draggingThreshold: CGFloat = 2.0
+
+    private var pressed = false
+    private var pressedPoint = CGPoint.zero
+
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
-        if let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) }) {
-            onActivate?(index)
-        // If we didn't select an element, try to select a line.
-        // Find the first element lower than the mouse.
-        } else if let lineElementIndex = measuredElements.firstIndex(where: {
-            point.y < $0.backgroundRect.maxY
-        }) {
-            onActivateLine?(formattedContent.lineIndex(for: lineElementIndex))
-        } else {
-            onActivate?(nil)
+        if bounds.contains(point) {
+            pressed = true
+            pressedPoint = point
         }
+
+        let clickedItem = item(at: point)
+
+        // Activate on mouseDown so the UI feels more responsive
+        switch clickedItem {
+        case .none:
+            onActivate?(nil)
+        case .some(.range(let range)):
+            onActivate?(range.lowerBound)
+        case .some(.line(let index)):
+            onActivateLine?(index)
+        }
+    }
+
+    public override func mouseUp(with event: NSEvent) {
+        pressed = false
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -366,7 +385,23 @@ public class LogicCanvasView: NSView {
     }
 
     public override func mouseDragged(with event: NSEvent) {
-        guard let selectedLine = selectedLine else { return }
+        let point = convert(event.locationInWindow, from: nil)
+
+        if abs(point.x - pressedPoint.x) < draggingThreshold && abs(point.y - pressedPoint.y) < draggingThreshold {
+            return
+        }
+
+        let draggedItem = item(at: pressedPoint)
+        let selectedLine: Int
+
+        switch draggedItem {
+        case .none, .some(.range):
+            return
+        case .some(.line(let index)):
+            selectedLine = index
+        }
+
+        onActivate?(nil)
 
         let pasteboardItem = NSPasteboardItem()
         pasteboardItem.setString(selectedLine.description, forType: .logicLineIndex)
@@ -387,26 +422,16 @@ public class LogicCanvasView: NSView {
         beginDraggingSession(with: [draggingItem], event: event, source: self)
     }
 
-    private func logicalLineIndex(from point: CGPoint) -> Int {
-        if let lineElementIndex = measuredElements.firstIndex(where: {
-            point.y < $0.backgroundRect.midY
-        }) {
-            return formattedContent.lineIndex(for: lineElementIndex)
-        }
-
-        return formattedContent.logicalRows.count
-    }
-
     public override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
         let point = convert(sender.draggingLocation, from: nil)
-        dragDestinationLineIndex = logicalLineIndex(from: point)
+        dragDestinationLineIndex = logicalLineIndex(at: point)
 
         return .move
     }
 
     public override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
         let point = convert(sender.draggingLocation, from: nil)
-        dragDestinationLineIndex = logicalLineIndex(from: point)
+        dragDestinationLineIndex = logicalLineIndex(at: point)
 
         return .move
     }
@@ -435,6 +460,32 @@ public class LogicCanvasView: NSView {
         onMoveLine?(sourceLineIndex, destinationLineIndex > sourceLineIndex ? destinationLineIndex - 1 : destinationLineIndex)
 
         return true
+    }
+}
+
+// MARK: - Coordinates
+
+extension LogicCanvasView {
+    private func item(at point: CGPoint) -> Item? {
+        if let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) }) {
+            return .range(index..<index + 1)
+        } else if let lineElementIndex = measuredElements.firstIndex(where: {
+            point.y < $0.backgroundRect.maxY
+        }) {
+            return .line(formattedContent.lineIndex(for: lineElementIndex))
+        }
+
+        return nil
+    }
+
+    private func logicalLineIndex(at point: CGPoint) -> Int {
+        if let lineElementIndex = measuredElements.firstIndex(where: {
+            point.y < $0.backgroundRect.midY
+        }) {
+            return formattedContent.lineIndex(for: lineElementIndex)
+        }
+
+        return formattedContent.logicalRows.count
     }
 }
 
