@@ -878,7 +878,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     case .placeholder:
                         return true
                     case .enumerationCase(let value):
-                        return value.name.id != id
+                        return value.id != id
                     }
                     }.map { $0.delete(id: id) })
             )

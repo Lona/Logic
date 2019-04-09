@@ -94,6 +94,7 @@ public extension LGCFunctionParameter {
 
             return .concat {
                 [
+                    // Always select the parent node instead of the name
                     .element(LogicElement.dropdown(value.id, value.localName.name, .variable)),
 //                    value.localName.formatted,
                     .element(.text("of type")),
@@ -114,7 +115,8 @@ public extension LGCEnumerationCase {
         case .enumerationCase(let value):
             return .concat {
                 [
-                    value.name.formatted,
+                    // Always select the parent node instead of the name
+                    .element(LogicElement.dropdown(value.id, value.name.name, .variable)),
                     .element(.text("with data")),
                     .join(with: .concat {[.element(.text(",")), .line]}) {
                         value.associatedValueTypes.map { $0.formatted }
