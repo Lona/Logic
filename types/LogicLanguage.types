@@ -36,6 +36,25 @@
         <Record.Substitution generic="T" instance="Statement"/>
       </Record.Param>
     </Record>
+    <Record name="enumeration">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="cases" type="List">
+        <Record.Substitution generic="T" instance="EnumerationCase"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="EnumerationCase">
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
+    </Record>
+    <Record name="enumerationCase">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="associatedValueTypes" type="List">
+        <Record.Substitution generic="T" instance="TypeAnnotation"/>
+      </Record.Param>
+    </Record>
   </Type>
   <Type name="Pattern">
     <Record name="pattern">
@@ -168,6 +187,9 @@
     </Case>
     <Case name="topLevelParameters">
       <Case.Param type="TopLevelParameters"/>
+    </Case>
+    <Case name="enumerationCase">
+      <Case.Param type="EnumerationCase"/>
     </Case>
   </Type>
   <Type name="FunctionParameter">

@@ -106,6 +106,25 @@ public extension LGCFunctionParameter {
     }
 }
 
+public extension LGCEnumerationCase {
+    var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
+        case .enumerationCase(let value):
+            return .concat {
+                [
+                    value.name.formatted,
+                    .element(.text("with data")),
+                    .join(with: .concat {[.element(.text(",")), .line]}) {
+                        value.associatedValueTypes.map { $0.formatted }
+                    }
+                ]
+            }
+        }
+    }
+}
+
 public extension LGCTypeAnnotation {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
@@ -261,7 +280,7 @@ public extension LGCDeclaration {
                     }
                 }
 
-            case .variable:
+            case .variable, .enumeration:
                 fatalError("TODO")
             }
         }
@@ -294,6 +313,24 @@ public extension LGCDeclaration {
                                             }
                                         ]
                                     }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        case .enumeration(let value):
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
+                    value.name.formatted,
+                    .element(.text("with cases:")),
+                    .indent {
+                        .concat {
+                            [
+                                .hardLine,
+                                .join(with: .hardLine) {
+                                    value.cases.map { $0.formatted }
                                 }
                             ]
                         }
@@ -347,6 +384,8 @@ public extension LGCSyntaxNode {
         case .literal(let value):
             return value.formatted
         case .topLevelParameters(let value):
+            return value.formatted
+        case .enumerationCase(let value):
             return value.formatted
         }
     }

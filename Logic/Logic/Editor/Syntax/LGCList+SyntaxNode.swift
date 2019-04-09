@@ -38,6 +38,10 @@ extension LGCList where T: SyntaxNodeProtocol {
 
         return found
     }
+
+    public func delete(id: UUID) -> LGCList {
+        return LGCList.init(self.map { $0.delete(id: id) })
+    }
 }
 
 // FunctionCallArguments aren't part of LGCSyntaxNode (yet)

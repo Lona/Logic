@@ -46,9 +46,9 @@ class Document: NSDocument {
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
         logicEditor.showsDropdown = true
-        logicEditor.rootNode = .topLevelParameters(
-            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
-        )
+//        logicEditor.rootNode = .topLevelParameters(
+//            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
+//        )
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode

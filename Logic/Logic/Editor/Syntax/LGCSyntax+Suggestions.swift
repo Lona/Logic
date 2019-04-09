@@ -274,6 +274,36 @@ public extension LGCFunctionParameter {
     }
 }
 
+public extension LGCEnumerationCase {
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+        func parameter() -> LGCEnumerationCase {
+            switch self {
+            case .placeholder:
+                return LGCEnumerationCase.enumerationCase(
+                    id: UUID(),
+                    name: LGCPattern(id: UUID(), name: prefix),
+                    associatedValueTypes: .next(LGCTypeAnnotation.makePlaceholder(), .empty)
+                )
+            case .enumerationCase(let value):
+                return LGCEnumerationCase.enumerationCase(
+                    id: UUID(),
+                    name: LGCPattern(id: UUID(), name: prefix),
+                    associatedValueTypes: value.associatedValueTypes
+                )
+            }
+        }
+
+        return [
+            LogicSuggestionItem(
+                title: "Case name: \(prefix)",
+                category: "Enumeration Case".uppercased(),
+                node: LGCSyntaxNode.enumerationCase(parameter()),
+                disabled: prefix.isEmpty
+            )
+        ]
+    }
+}
+
 public extension LGCBinaryOperator {
     var displayText: String {
         switch self {
@@ -405,9 +435,24 @@ public extension LGCDeclaration {
         )
     }
 
+    static var enumSuggestionItem: LogicSuggestionItem {
+        return LogicSuggestionItem(
+            title: "Enumeration",
+            category: "Declarations".uppercased(),
+            node: LGCSyntaxNode.declaration(
+                LGCDeclaration.enumeration(
+                    id: UUID(),
+                    name: LGCPattern(id: UUID(), name: "name"),
+                    cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+                )
+            )
+        )
+    }
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            functionSuggestionItem
+            functionSuggestionItem,
+            enumSuggestionItem
         ]
 
         return items.titleContains(prefix: prefix)
@@ -448,8 +493,7 @@ public extension LGCStatement {
                 node: forLoop
             ),
             LGCExpression.assignmentSuggestionItem,
-            LGCDeclaration.functionSuggestionItem
-        ]
+        ] + LGCDeclaration.suggestions(for: prefix)
 
         return items.titleContains(prefix: prefix)
     }
@@ -482,6 +526,8 @@ public extension LGCSyntaxNode {
             return LGCLiteral.suggestions(for: prefix)
         case .topLevelParameters:
             return []
+        case .enumerationCase:
+            return contents.suggestions(within: root, for: prefix)
         }
     }
 }

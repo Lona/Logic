@@ -457,6 +457,98 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
     }
 }
 
+extension LGCEnumerationCase: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Enum Case"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .enumerationCase(self)
+    }
+
+    public func delete(id: UUID) -> LGCEnumerationCase {
+        switch self {
+        case .placeholder:
+            return self
+        case .enumerationCase(let value):
+            let updated = value.associatedValueTypes
+                .filter {
+                    switch $0 {
+                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: _):
+                        return identifier.id != id
+                    case .functionType(let functionType):
+                        // TODO: This doesn't work, since currently the functions placeholder node is what's actually
+                        // selected, even when using the dropdown to move up in scope
+                        return functionType.id != id
+                    case .placeholder:
+                        return true
+                    }
+                }
+                .map { $0.delete(id: id) }
+
+            return LGCEnumerationCase.enumerationCase(
+                id: UUID(),
+                name: value.name.delete(id: id),
+                associatedValueTypes: LGCList(updated)
+            )
+        }
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCEnumerationCase {
+        switch syntaxNode {
+        case .enumerationCase(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .placeholder:
+                return LGCEnumerationCase.placeholder(id: UUID())
+            case .enumerationCase(let value):
+                return LGCEnumerationCase.enumerationCase(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    associatedValueTypes: value.associatedValueTypes.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                )
+            }
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]?
+
+        switch self {
+        case .placeholder:
+            found = nil
+        case .enumerationCase(let value):
+            found = value.name.pathTo(id: id) ?? value.associatedValueTypes.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        return node
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .enumerationCase(let value):
+            return value.id
+        case .placeholder(let value):
+            return value
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension LGCBinaryOperator: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Binary Operator"
@@ -642,6 +734,16 @@ extension LGCStatement: SyntaxNodeProtocol {
         return .statement(self)
     }
 
+    public func delete(id: UUID) -> LGCStatement {
+        switch self {
+        case .declaration(let value):
+            return .declaration(id: UUID(), content: value.content.delete(id: id))
+        default:
+            // TODO
+            return self
+        }
+    }
+
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCStatement {
         switch syntaxNode {
         case .statement(let newNode) where id == uuid:
@@ -763,6 +865,34 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         return .declaration(self)
     }
 
+    public func delete(id: UUID) -> LGCDeclaration {
+        switch self {
+        case .variable:
+            return self
+        case .enumeration(let value):
+            return .enumeration(
+                id: UUID(),
+                name: value.name.delete(id: id),
+                cases: LGCList(value.cases.filter {
+                    switch $0 {
+                    case .placeholder:
+                        return true
+                    case .enumerationCase(let value):
+                        return value.name.id != id
+                    }
+                    }.map { $0.delete(id: id) })
+            )
+        case .function(let value):
+            return .function(
+                id: UUID(),
+                name: value.name.delete(id: id),
+                returnType: value.returnType.delete(id: id),
+                parameters: value.parameters.delete(id: id),
+                block: value.block.delete(id: id)
+            )
+        }
+    }
+
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCDeclaration {
         switch syntaxNode {
         case .declaration(let newNode) where id == uuid:
@@ -777,7 +907,14 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     name: value.name.replace(id: id, with: syntaxNode),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
                     parameters: value.parameters.replace(id: id, with: syntaxNode),
-                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true))
+                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                )
+            case .enumeration(let value):
+                return LGCDeclaration.enumeration(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                )
             }
         }
     }
@@ -795,6 +932,9 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 ?? value.returnType.pathTo(id: id)
                 ?? value.parameters.pathTo(id: id)
                 ?? value.block.pathTo(id: id)
+        case .enumeration(let value):
+            found = value.name.pathTo(id: id)
+                ?? value.cases.pathTo(id: id)
         }
 
         if let found = found {
@@ -810,6 +950,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return node
         case .function(let value):
             return value.block.map { $0 }.last?.lastNode ?? node
+        case .enumeration(let value):
+            return value.cases.map { $0 }.last?.lastNode ?? node
         }
     }
 
@@ -818,6 +960,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .variable(let value):
             return value
         case .function(let value):
+            return value.id
+        case .enumeration(let value):
             return value.id
         }
     }
@@ -834,6 +978,22 @@ extension LGCProgram: SyntaxNodeProtocol {
 
     public var node: LGCSyntaxNode {
         return .program(self)
+    }
+
+    public func delete(id: UUID) -> LGCProgram {
+        let updated = block.filter { param in
+            switch param {
+            case .declaration(id: _, content: .enumeration(id: let innerId, name: _, cases: _)):
+                return innerId != id
+            default:
+                return true
+            }
+            }.map { $0.delete(id: id) }
+
+        return LGCProgram(
+            id: UUID(),
+            block: LGCList(updated)
+        )
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCProgram {
@@ -1022,6 +1182,8 @@ extension LGCSyntaxNode {
         case .literal(let value):
             return value
         case .topLevelParameters(let value):
+            return value
+        case .enumerationCase(let value):
             return value
         }
     }

@@ -47,6 +47,7 @@ public struct LGCIdentifier: Codable & Equatable {
 public indirect enum LGCDeclaration: Codable & Equatable {
   case variable(id: UUID)
   case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>)
+  case enumeration(id: UUID, name: LGCPattern, cases: LGCList<LGCEnumerationCase>)
 
   // MARK: Codable
 
@@ -61,6 +62,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
     case returnType
     case parameters
     case block
+    case cases
   }
 
   public init(from decoder: Decoder) throws {
@@ -79,6 +81,12 @@ public indirect enum LGCDeclaration: Codable & Equatable {
             returnType: try data.decode(LGCTypeAnnotation.self, forKey: .returnType),
             parameters: try data.decode(LGCList.self, forKey: .parameters),
             block: try data.decode(LGCList.self, forKey: .block))
+      case "enumeration":
+        self =
+          .enumeration(
+            id: try data.decode(UUID.self, forKey: .id),
+            name: try data.decode(LGCPattern.self, forKey: .name),
+            cases: try data.decode(LGCList.self, forKey: .cases))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -99,6 +107,64 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try data.encode(value.returnType, forKey: .returnType)
         try data.encode(value.parameters, forKey: .parameters)
         try data.encode(value.block, forKey: .block)
+      case .enumeration(let value):
+        try container.encode("enumeration", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.name, forKey: .name)
+        try data.encode(value.cases, forKey: .cases)
+    }
+  }
+}
+
+public indirect enum LGCEnumerationCase: Codable & Equatable {
+  case placeholder(id: UUID)
+  case enumerationCase(id: UUID, name: LGCPattern, associatedValueTypes: LGCList<LGCTypeAnnotation>)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public enum DataCodingKeys: CodingKey {
+    case id
+    case name
+    case associatedValueTypes
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
+      case "enumerationCase":
+        self =
+          .enumerationCase(
+            id: try data.decode(UUID.self, forKey: .id),
+            name: try data.decode(LGCPattern.self, forKey: .name),
+            associatedValueTypes: try data.decode(LGCList.self, forKey: .associatedValueTypes))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+
+    switch self {
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
+        try data.encode(value, forKey: .id)
+      case .enumerationCase(let value):
+        try container.encode("enumerationCase", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.name, forKey: .name)
+        try data.encode(value.associatedValueTypes, forKey: .associatedValueTypes)
     }
   }
 }
@@ -399,6 +465,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
   case typeAnnotation(LGCTypeAnnotation)
   case literal(LGCLiteral)
   case topLevelParameters(LGCTopLevelParameters)
+  case enumerationCase(LGCEnumerationCase)
 
   // MARK: Codable
 
@@ -437,6 +504,8 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         self = .literal(try container.decode(LGCLiteral.self, forKey: .data))
       case "topLevelParameters":
         self = .topLevelParameters(try container.decode(LGCTopLevelParameters.self, forKey: .data))
+      case "enumerationCase":
+        self = .enumerationCase(try container.decode(LGCEnumerationCase.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -481,6 +550,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .topLevelParameters(let value):
         try container.encode("topLevelParameters", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .enumerationCase(let value):
+        try container.encode("enumerationCase", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
