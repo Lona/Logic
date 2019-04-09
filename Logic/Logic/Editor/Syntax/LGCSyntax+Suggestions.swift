@@ -9,16 +9,18 @@
 import AppKit
 
 public struct LogicSuggestionItem {
-    public init(title: String, category: String, node: LGCSyntaxNode, disabled: Bool = false) {
+    public init(title: String, category: String, node: LGCSyntaxNode, nextFocusId: UUID? = nil, disabled: Bool = false) {
         self.title = title
         self.category = category
         self.node = node
+        self.nextFocusId = nextFocusId
         self.disabled = disabled
     }
 
     public var title: String
     public var category: String
     public var node: LGCSyntaxNode
+    public var nextFocusId: UUID?
     public var disabled: Bool
 
     public func titleContains(prefix: String) -> Bool {

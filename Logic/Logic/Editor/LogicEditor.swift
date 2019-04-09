@@ -385,7 +385,9 @@ extension LogicEditor {
             let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
 
             if self.onChangeRootNode?(replacement) == true {
-                if suggestedNode.movementAfterInsertion == .next {
+                if let nextFocusId = logicSuggestionItem.nextFocusId {
+                    self.select(nodeByID: nextFocusId)
+                } else if suggestedNode.movementAfterInsertion == .next {
                     self.nextNode()
                 } else {
                     self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
