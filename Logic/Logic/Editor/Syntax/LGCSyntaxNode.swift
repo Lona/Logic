@@ -140,7 +140,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
                 .filter {
                     switch $0 {
                     case .typeIdentifier(let typeIdentifier):
-                        return typeIdentifier.identifier.id != id
+                        return typeIdentifier.id != id
                     case .functionType, .placeholder:
                         return true
                     }
@@ -472,18 +472,7 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
             return self
         case .enumerationCase(let value):
             let updated = value.associatedValueTypes
-                .filter {
-                    switch $0 {
-                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: _):
-                        return identifier.id != id
-                    case .functionType(let functionType):
-                        // TODO: This doesn't work, since currently the functions placeholder node is what's actually
-                        // selected, even when using the dropdown to move up in scope
-                        return functionType.id != id
-                    case .placeholder:
-                        return true
-                    }
-                }
+                .filter { isPlaceholder || $0.uuid != id }
                 .map { $0.delete(id: id) }
 
             return LGCEnumerationCase.enumerationCase(
@@ -826,7 +815,6 @@ extension LGCStatement: SyntaxNodeProtocol {
             return value.block.map { $0 }.last?.lastNode ?? value.condition.lastNode
         case .declaration:
             fatalError("Not implemented")
-            return .statement(self)
         case .loop(let value):
             return value.expression.lastNode
         case .expressionStatement(let value):
@@ -981,14 +969,9 @@ extension LGCProgram: SyntaxNodeProtocol {
     }
 
     public func delete(id: UUID) -> LGCProgram {
-        let updated = block.filter { param in
-            switch param {
-            case .declaration(id: _, content: .enumeration(id: let innerId, name: _, cases: _)):
-                return innerId != id
-            default:
-                return true
-            }
-            }.map { $0.delete(id: id) }
+        let updated = block
+            .filter { $0.isPlaceholder || $0.uuid != id }
+            .map { $0.delete(id: id) }
 
         return LGCProgram(
             id: UUID(),

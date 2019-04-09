@@ -414,6 +414,29 @@ public extension LGCSyntaxNode {
         return elementPath[elementPath.count - 1]
     }
 
+    // Returns the top-most node containing the given range.
+    //
+    // Returns nil if a non-focusable node selected. This is most likely due to temporarily
+    // invalid selection range after a modification, e.g. after a deletion but before the selection range
+    // has been updated
+    func topNodeWithEqualRange(as range: Range<Int>) -> LGCSyntaxNode? {
+        let elements = formatted.elements
+        let clampedRange = range.clamped(to: elements.startIndex..<elements.endIndex)
+        guard let firstId = elements[clampedRange].first?.syntaxNodeID else {
+            return nil
+        }
+
+        let uniquePath = uniqueElementPathTo(id: firstId).reversed()
+
+        for node in uniquePath {
+            if node.formatted.elements.count >= range.count {
+                return node
+            }
+        }
+
+        return nil
+    }
+
     func uniqueElementPathTo(id targetID: UUID) -> [LGCSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")

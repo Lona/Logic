@@ -417,10 +417,12 @@ public extension LGCExpression {
 }
 
 public extension LGCDeclaration {
+    static let suggestionCategoryTitle = "Declarations".uppercased()
+
     static var functionSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Function",
-            category: "Declarations".uppercased(),
+            category: suggestionCategoryTitle,
             node: LGCSyntaxNode.declaration(
                 LGCDeclaration.function(
                     id: UUID(),
@@ -440,7 +442,7 @@ public extension LGCDeclaration {
     static var enumSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Enumeration",
-            category: "Declarations".uppercased(),
+            category: suggestionCategoryTitle,
             node: LGCSyntaxNode.declaration(
                 LGCDeclaration.enumeration(
                     id: UUID(),
@@ -462,6 +464,8 @@ public extension LGCDeclaration {
 }
 
 public extension LGCStatement {
+    static let suggestionCategoryTitle = "Statements".uppercased()
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let ifCondition = LGCSyntaxNode.statement(
             LGCStatement.branch(
@@ -486,12 +490,12 @@ public extension LGCStatement {
         let items = [
             LogicSuggestionItem(
                 title: "If condition",
-                category: "Statements".uppercased(),
+                category: suggestionCategoryTitle.uppercased(),
                 node: ifCondition
             ),
             LogicSuggestionItem(
                 title: "For loop",
-                category: "Statements".uppercased(),
+                category: suggestionCategoryTitle.uppercased(),
                 node: forLoop
             ),
             LGCExpression.assignmentSuggestionItem,

@@ -177,8 +177,11 @@ extension LogicEditor {
             }
         }
 
-        if let selectedRange = range(), let selectedId = elements[selectedRange].first?.syntaxNodeID {
-            _ = onChangeRootNode?(rootNode.delete(id: selectedId))
+        if let selectedRange = range(), let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange) {
+            let shouldActivate = onChangeRootNode?(rootNode.delete(id: selectedNode.uuid))
+            if shouldActivate == true {
+                self.handleActivateElement(selectedRange.first)
+            }
         }
     }
 
