@@ -33,14 +33,16 @@ public extension LGCBinaryOperator {
 public extension LGCLiteral {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
+        case .none:
+            return .element(.text("none"))
         case .boolean(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .number(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .string(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
-        case .none:
-            return .element(.text("none"))
+        case .color(let value):
+            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         }
     }
 }

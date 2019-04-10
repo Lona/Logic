@@ -735,10 +735,11 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
 }
 
 public indirect enum LGCLiteral: Codable & Equatable {
-  case string(id: UUID, value: String)
-  case number(id: UUID, value: CGFloat)
-  case boolean(id: UUID, value: Bool)
   case none(id: UUID)
+  case boolean(id: UUID, value: Bool)
+  case number(id: UUID, value: CGFloat)
+  case string(id: UUID, value: String)
+  case color(id: UUID, value: String)
 
   // MARK: Codable
 
@@ -758,15 +759,17 @@ public indirect enum LGCLiteral: Codable & Equatable {
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
-      case "string":
-        self = .string(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(String.self, forKey: .value))
+      case "none":
+        self = .none(id: try data.decode(UUID.self, forKey: .id))
+      case "boolean":
+        self = .boolean(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(Bool.self, forKey: .value))
       case "number":
         self =
           .number(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(CGFloat.self, forKey: .value))
-      case "boolean":
-        self = .boolean(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(Bool.self, forKey: .value))
-      case "none":
-        self = .none(id: try data.decode(UUID.self, forKey: .id))
+      case "string":
+        self = .string(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(String.self, forKey: .value))
+      case "color":
+        self = .color(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(String.self, forKey: .value))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -777,21 +780,25 @@ public indirect enum LGCLiteral: Codable & Equatable {
     var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
 
     switch self {
-      case .string(let value):
-        try container.encode("string", forKey: .type)
+      case .none(let value):
+        try container.encode("none", forKey: .type)
+        try data.encode(value, forKey: .id)
+      case .boolean(let value):
+        try container.encode("boolean", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.value, forKey: .value)
       case .number(let value):
         try container.encode("number", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.value, forKey: .value)
-      case .boolean(let value):
-        try container.encode("boolean", forKey: .type)
+      case .string(let value):
+        try container.encode("string", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.value, forKey: .value)
-      case .none(let value):
-        try container.encode("none", forKey: .type)
-        try data.encode(value, forKey: .id)
+      case .color(let value):
+        try container.encode("color", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.value, forKey: .value)
     }
   }
 }

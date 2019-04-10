@@ -164,35 +164,39 @@ extension SuggestionListView: NSTableViewDelegate {
     }
 
     public func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
-        let item = items[row]
-
-        switch item {
-        case .row:
-            return false
-        case .sectionHeader:
-            return true
-        }
+        return items[row].isGroupRow
     }
 
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = items[row]
 
-        switch item {
-        case .row(let value, let disabled):
-            let rowView = ResultRow(titleText: value, selected: row == selectedIndex, disabled: disabled)
+        var disabledBackgroundColor = Colors.greyBackground
 
-            var disabledBackgroundColor = Colors.greyBackground
+        if #available(OSX 10.14, *) {
+            disabledBackgroundColor = NSColor.unemphasizedSelectedContentBackgroundColor
+        }
 
-            if #available(OSX 10.14, *) {
-                disabledBackgroundColor = NSColor.unemphasizedSelectedContentBackgroundColor
-            }
-
-            rowView.fillColor = row != selectedIndex
+        func fillColor(disabled: Bool) -> NSColor {
+            return row != selectedIndex
                 ? NSColor.clear
                 : disabled
                 ? disabledBackgroundColor
                 : NSColor.selectedMenuItemColor
+        }
 
+        switch item {
+        case .row(let value, let disabled):
+            let rowView = ResultRow(titleText: value, selected: row == selectedIndex, disabled: disabled)
+            rowView.fillColor = fillColor(disabled: disabled)
+            return rowView
+        case .colorRow(name: let value, code: let code, let color, let disabled):
+            let rowView = ColorRow(
+                titleText: value,
+                subtitleText: code,
+                selected: row == selectedIndex,
+                disabled: disabled,
+                previewColor: color)
+            rowView.fillColor = fillColor(disabled: disabled)
             return rowView
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)
@@ -230,6 +234,8 @@ extension SuggestionListView: NSTableViewDataSource {
         switch item {
         case .row:
             return 26
+        case .colorRow:
+            return 40
         case .sectionHeader:
             return 18
         }

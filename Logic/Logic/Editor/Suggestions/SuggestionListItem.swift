@@ -11,13 +11,23 @@ import Foundation
 public enum SuggestionListItem {
     case sectionHeader(String)
     case row(String, Bool)
+    case colorRow(name: String, code: String, NSColor, Bool)
 
     public var isSelectable: Bool {
         switch self {
-        case .row:
+        case .row, .colorRow:
             return true
         case .sectionHeader:
             return false
+        }
+    }
+
+    public var isGroupRow: Bool {
+        switch self {
+        case .row, .colorRow:
+            return false
+        case .sectionHeader:
+            return true
         }
     }
 }

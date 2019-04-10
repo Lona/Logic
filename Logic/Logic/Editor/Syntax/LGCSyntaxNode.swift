@@ -277,6 +277,11 @@ extension LGCLiteral: SyntaxNodeProtocol {
                     id: UUID(),
                     value: value.value
                 )
+            case .color(let value):
+                return LGCLiteral.color(
+                    id: UUID(),
+                    value: value.value
+                )
             case .none:
                 return LGCLiteral.none(id: UUID())
             }
@@ -300,6 +305,8 @@ extension LGCLiteral: SyntaxNodeProtocol {
         case .number(let value):
             return value.id
         case .string(let value):
+            return value.id
+        case .color(let value):
             return value.id
         case .none(let value):
             return value

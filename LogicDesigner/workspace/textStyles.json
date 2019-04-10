@@ -19,6 +19,12 @@
       "color" : "textMuted",
       "id" : "rowDisabled",
       "name" : "Row Disabled"
+    },
+    {
+      "color" : "white",
+      "fontSize" : 10,
+      "id" : "sectionHeaderInverse",
+      "name" : "Section Header Inverse"
     }
   ]
 }

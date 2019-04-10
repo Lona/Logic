@@ -294,7 +294,17 @@ extension LogicEditor {
             suggestionListItems.append((0, .sectionHeader(category.name)))
 
             category.list.forEach { logicItem in
-                suggestionListItems.append((logicItem.offset, .row(logicItem.item.title, logicItem.item.disabled)))
+                switch logicItem.item.style {
+                case .normal:
+                    suggestionListItems.append((logicItem.offset, .row(logicItem.item.title, logicItem.item.disabled)))
+                case .colorPreview(code: let code, let color):
+                    suggestionListItems.append(
+                        (
+                            logicItem.offset,
+                            .colorRow(name: logicItem.item.title, code: code, color, logicItem.item.disabled)
+                        )
+                    )
+                }
             }
         }
 

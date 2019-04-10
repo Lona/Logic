@@ -9,12 +9,24 @@
 import AppKit
 
 public struct LogicSuggestionItem {
-    public init(title: String, category: String, node: LGCSyntaxNode, nextFocusId: UUID? = nil, disabled: Bool = false) {
+    public enum Style {
+        case normal
+        case colorPreview(code: String, NSColor)
+    }
+
+    public init(
+        title: String,
+        category: String,
+        node: LGCSyntaxNode,
+        nextFocusId: UUID? = nil,
+        disabled: Bool = false,
+        style: Style = .normal) {
         self.title = title
         self.category = category
         self.node = node
         self.nextFocusId = nextFocusId
         self.disabled = disabled
+        self.style = style
     }
 
     public var title: String
@@ -22,6 +34,7 @@ public struct LogicSuggestionItem {
     public var node: LGCSyntaxNode
     public var nextFocusId: UUID?
     public var disabled: Bool
+    public var style: Style
 
     public func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
@@ -91,6 +104,12 @@ public extension LGCLiteral {
                 title: "false (Boolean)",
                 category: "Literals".uppercased(),
                 node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
+            ),
+            LogicSuggestionItem(
+                title: "red",
+                category: "Colors".uppercased(),
+                node: LGCSyntaxNode.literal(.color(id: UUID(), value: "red")),
+                style: .colorPreview(code: "#FF0000", .red)
             )
         ]
 
@@ -127,7 +146,9 @@ public extension LGCFunctionParameterDefaultValue {
                         category: item.category,
                         node: .functionParameterDefaultValue(
                             LGCFunctionParameterDefaultValue.value(id: UUID(), expression: expression)
-                        )
+                        ),
+                        disabled: item.disabled,
+                        style: item.style
                     )
                 default:
                     return nil
@@ -400,11 +421,9 @@ public extension LGCExpression {
             .compactMap({ item in
                 switch item.node {
                 case .literal(let literal):
-                    return LogicSuggestionItem(
-                        title: item.title,
-                        category: item.category,
-                        node: .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
-                    )
+                    var copy = item
+                    copy.node = .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
+                    return copy
                 default:
                     return nil
                 }

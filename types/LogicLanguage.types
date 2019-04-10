@@ -235,20 +235,24 @@
     </Record>
   </Type>
   <Type name="Literal">
-    <Record name="string">
+    <Record name="none">
       <Record.Param name="id" type="UUID"/>
-      <Record.Param name="value" type="String"/>
-    </Record>
-    <Record name="number">
-      <Record.Param name="id" type="UUID"/>
-      <Record.Param name="value" type="CGFloat"/>
     </Record>
     <Record name="boolean">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="value" type="Bool"/>
     </Record>
-    <Record name="none">
+    <Record name="number">
       <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="CGFloat"/>
+    </Record>
+    <Record name="string">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="String"/>
+    </Record>
+    <Record name="color">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="String"/>
     </Record>
   </Type>
   <Type name="TopLevelParameters">
