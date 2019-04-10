@@ -77,7 +77,7 @@ public class LogicEditor: NSBox {
 
     public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
 
-    public var getDecorationForNodeID: ((UUID) -> LogicElement.Decoration?)? {
+    public var decorationForNodeID: ((UUID) -> LogicElement.Decoration?)? {
         get { return canvasView.getElementDecoration }
         set { canvasView.getElementDecoration = newValue }
     }

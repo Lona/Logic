@@ -50,7 +50,7 @@ class Document: NSDocument {
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
 //        )
 
-        logicEditor.getDecorationForNodeID = { id in
+        logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
             switch node {
             case .literal(.color(id: _, value: _)):
