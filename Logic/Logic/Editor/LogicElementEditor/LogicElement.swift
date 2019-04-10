@@ -11,13 +11,13 @@ import AppKit
 public enum LogicElement {
 
     public enum DropdownStyle {
-        case source, variable, placeholder
+        case source, variable, placeholder, colorPreview(NSColor)
 
         var color: NSColor {
             switch self {
             case .source:
                 return Colors.text
-            case .variable:
+            case .variable, .colorPreview:
                 return Colors.editableText
             case .placeholder:
                 return NSColor.systemYellow
@@ -120,11 +120,19 @@ extension LogicElement {
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
-            let rect = CGRect(origin: offset, size: attributedStringSize)
+            var rect = CGRect(origin: offset, size: attributedStringSize)
             var backgroundRect = rect.insetBy(dx: -LogicCanvasView.textPadding.width, dy: -LogicCanvasView.textPadding.height)
 
             if LogicCanvasView.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
+            }
+
+            switch dropdownStyle {
+            case .colorPreview:
+                rect.origin.x += 18
+                backgroundRect.size.width += 18
+            default:
+                break
             }
 
             return LogicMeasuredElement(

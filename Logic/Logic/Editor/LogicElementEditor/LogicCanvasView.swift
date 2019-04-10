@@ -293,6 +293,17 @@ public class LogicCanvasView: NSView {
                     caret.stroke()
                 }
 
+                switch dropdownStyle {
+                case .colorPreview(let color):
+                    color.set()
+                    let size: CGFloat = 13
+                    let colorPreviewRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
+                    let colorPreviewPath = NSBezierPath(roundedRect: colorPreviewRect, xRadius: 2, yRadius: 2)
+                    colorPreviewPath.fill()
+                default:
+                    break
+                }
+
                 if drawSelection {
                     let attributedString = NSMutableAttributedString(attributedString: attributedString)
                     attributedString.addAttributes(
