@@ -212,14 +212,9 @@ public class SuggestionWindow: NSWindow {
     }
 
     public func anchorTo(rect: NSRect) {
-        let margin: CGFloat = 2.0
-        let textInset: CGFloat = 12.0
-        if let contentBox = contentBox {
-            let origin = NSPoint(
-                x: rect.minX - textInset + LogicCanvasView.textPadding.width,
-                y: rect.minY - contentBox.frame.height - margin)
-            setFrameOrigin(origin)
-        }
+        guard let contentBox = contentBox else { return }
+        let origin = NSPoint(x: rect.minX, y: rect.minY - contentBox.frame.height)
+        setFrameOrigin(origin)
     }
 
     // MARK: Overrides

@@ -10,6 +10,21 @@ public extension NSPasteboard.PasteboardType {
 
 public class LogicCanvasView: NSView {
 
+    public struct Style {
+        public var font = TextStyle(family: "San Francisco", size: 13).nsFont
+        public var textPadding = CGSize(width: 4, height: 3)
+        public var textMargin = CGSize(width: 6, height: 6)
+        public var textBackgroundRadius = CGSize(width: 2, height: 2)
+        public var outlineWidth: CGFloat = 2.0
+        public var textSpacing: CGFloat = 4.0
+        public var lineSpacing: CGFloat = 6.0
+        public var minimumLineHeight: CGFloat = 22.0
+
+        public init() {}
+    }
+
+    public static var dropdownCarets: Bool = false
+
     public enum Item: Equatable {
         case range(Range<Int>)
         case line(Int)
@@ -33,6 +48,13 @@ public class LogicCanvasView: NSView {
     }
 
     // MARK: Public
+
+    public var style: Style = Style() {
+        didSet {
+            update()
+            invalidateIntrinsicContentSize()
+        }
+    }
 
     public var formattedContent: FormatterCommand<LogicElement> = .hardLine {
         didSet {
@@ -74,19 +96,6 @@ public class LogicCanvasView: NSView {
     private var selectedIndex: Int? {
         return selectedRange?.lowerBound
     }
-
-    public static var textMargin = CGSize(width: 6, height: 6)
-    public static var textPadding = CGSize(width: 4, height: 3)
-    public static var textBackgroundRadius = CGSize(width: 2, height: 2)
-
-    public static var outlineWidth: CGFloat = 2.0
-
-    public static var textSpacing: CGFloat = 4.0
-    public static var lineSpacing: CGFloat = 6.0
-    public static var minimumLineHeight: CGFloat = 22.0
-    public static var dropdownCarets: Bool = false
-
-    public static var font = TextStyle(family: "San Francisco", size: 13).nsFont
 
     var selectedElement: LogicElement? {
         return selectedMeasuredElement?.element
@@ -235,10 +244,10 @@ public class LogicCanvasView: NSView {
             let rect = measuredElements[range].map { $0.backgroundRect }.union
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
-                roundedRect: rect.insetBy(dx: LogicCanvasView.outlineWidth / 2, dy: LogicCanvasView.outlineWidth / 2),
-                xRadius: LogicCanvasView.textBackgroundRadius.width,
-                yRadius: LogicCanvasView.textBackgroundRadius.height)
-            path.lineWidth = LogicCanvasView.outlineWidth
+                roundedRect: rect.insetBy(dx: style.outlineWidth / 2, dy: style.outlineWidth / 2),
+                xRadius: style.textBackgroundRadius.width,
+                yRadius: style.textBackgroundRadius.height)
+            path.lineWidth = style.outlineWidth
             path.stroke()
         } else {
             if let range = selectedRange {
@@ -247,8 +256,8 @@ public class LogicCanvasView: NSView {
                 Colors.highlightedCode.set()
                 NSBezierPath(
                     roundedRect: rect,
-                    xRadius: LogicCanvasView.textBackgroundRadius.width,
-                    yRadius: LogicCanvasView.textBackgroundRadius.height).fill()
+                    xRadius: style.textBackgroundRadius.width,
+                    yRadius: style.textBackgroundRadius.height).fill()
             }
         }
 
@@ -280,8 +289,8 @@ public class LogicCanvasView: NSView {
 
                 let backgroundPath = NSBezierPath(
                     roundedRect: backgroundRect,
-                    xRadius: LogicCanvasView.textBackgroundRadius.width,
-                    yRadius: LogicCanvasView.textBackgroundRadius.height)
+                    xRadius: style.textBackgroundRadius.width,
+                    yRadius: style.textBackgroundRadius.height)
                 backgroundPath.fill()
 
                 NSShadow().set()
@@ -347,18 +356,20 @@ public class LogicCanvasView: NSView {
         }
 
         let formattedElementLines = formattedContent.print(
-            width: bounds.width - LogicCanvasView.textMargin.width * 2,
-            spaceWidth: LogicCanvasView.textSpacing,
+            width: bounds.width - style.textMargin.width * 2,
+            spaceWidth: style.textSpacing,
             indentWidth: 20,
             getElementWidth: { [unowned self] element, index in
                 element.measured(
                     selected: self.selectedIndex == index,
                     offset: .zero,
+                    font: self.style.font,
+                    padding: self.style.textPadding,
                     decoration: self.cachedDecoration(for: element)
                     ).backgroundRect.width }
         )
 
-        let yOffset = LogicCanvasView.textMargin.height
+        let yOffset = style.textMargin.height
         var measuredLine: [LogicMeasuredElement] = []
         var formattedElementIndex = 0
 
@@ -374,8 +385,10 @@ public class LogicCanvasView: NSView {
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
-                        x: LogicCanvasView.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * LogicCanvasView.minimumLineHeight),
+                        x: style.textMargin.width + formattedElement.position,
+                        y: yOffset + CGFloat(rowIndex) * style.minimumLineHeight),
+                    font: style.font,
+                    padding: style.textPadding,
                     decoration: decoration
                 )
 
@@ -391,8 +404,8 @@ public class LogicCanvasView: NSView {
     }
 
     private var minHeight: CGFloat {
-        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? LogicCanvasView.textMargin.height
-        let minHeight = contentHeight + LogicCanvasView.textMargin.height
+        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? style.textMargin.height
+        let minHeight = contentHeight + style.textMargin.height
         return minHeight
     }
 

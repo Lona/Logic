@@ -56,6 +56,12 @@ public class LogicEditor: NSBox {
 
     // MARK: Public
 
+    public var canvasStyle = LogicCanvasView.Style() {
+        didSet {
+            canvasView.style = canvasStyle
+        }
+    }
+
     public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
 
     public var getDecorationForNodeID: ((UUID) -> LogicElement.Decoration?)? {
@@ -438,7 +444,14 @@ extension LogicEditor {
             let windowRect = canvasView.convert(elementRect, to: nil)
             let screenRect = window.convertToScreen(windowRect)
 
-            childWindow.anchorTo(rect: screenRect)
+            // Adjust the window to left-align suggestions with the element's text
+            let adjustedRect = NSRect(
+                x: screenRect.minX - 12 + canvasStyle.textPadding.width,
+                y: screenRect.minY - 2,
+                width: screenRect.width,
+                height: screenRect.height)
+
+            childWindow.anchorTo(rect: adjustedRect)
             childWindow.focusSearchField()
         }
     }
