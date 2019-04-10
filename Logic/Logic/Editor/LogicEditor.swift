@@ -57,6 +57,14 @@ public class LogicEditor: NSBox {
 
     // MARK: Public
 
+    public var supportsLineSelection = true {
+        didSet {
+            if !supportsLineSelection, let _ = canvasView.selectedLine {
+                canvasView.selectedLine = nil
+            }
+        }
+    }
+
     public var scrollsVertically = true {
         didSet { setScroll(enabled: scrollsVertically) }
     }
@@ -306,7 +314,9 @@ extension LogicEditor {
     private func handleActivateLine(_ activatedLineIndex: Int) {
         handleActivateElement(nil)
 
-        canvasView.selectedLine = activatedLineIndex
+        if supportsLineSelection {
+            canvasView.selectedLine = activatedLineIndex
+        }
     }
 }
 
