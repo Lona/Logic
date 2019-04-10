@@ -21,6 +21,7 @@ public class LogicEditor: NSBox {
 
         setUpViews()
         setUpConstraints()
+        setScroll(enabled: true)
 
         update()
 
@@ -55,6 +56,10 @@ public class LogicEditor: NSBox {
     }
 
     // MARK: Public
+
+    public var scrollsVertically = true {
+        didSet { setScroll(enabled: scrollsVertically) }
+    }
 
     public var canvasStyle = LogicCanvasView.Style() {
         didSet {
@@ -137,6 +142,29 @@ public class LogicEditor: NSBox {
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
 
+    private func setScroll(enabled: Bool) {
+        if enabled {
+            canvasView.removeFromSuperview()
+
+            scrollView.documentView = canvasView
+            scrollView.isHidden = false
+
+            canvasView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
+            canvasView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor).isActive = true
+            canvasView.trailingAnchor.constraint(equalTo: scrollView.contentView.trailingAnchor).isActive = true
+        } else {
+            addSubview(canvasView)
+
+            scrollView.documentView = nil
+            scrollView.isHidden = true
+
+            canvasView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+            canvasView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+            canvasView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+            canvasView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        }
+    }
+
     private func setUpViews() {
         boxType = .custom
         borderType = .noBorder
@@ -145,7 +173,6 @@ public class LogicEditor: NSBox {
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
         scrollView.drawsBackground = false
-        scrollView.documentView = canvasView
 
         addSubview(scrollView)
 
@@ -162,10 +189,6 @@ public class LogicEditor: NSBox {
         translatesAutoresizingMaskIntoConstraints = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         canvasView.translatesAutoresizingMaskIntoConstraints = false
-
-        canvasView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
-        canvasView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor).isActive = true
-        canvasView.trailingAnchor.constraint(equalTo: scrollView.contentView.trailingAnchor).isActive = true
 
         scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
