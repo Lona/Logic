@@ -58,6 +58,11 @@ public class LogicEditor: NSBox {
 
     public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
 
+    public var getDecorationForNodeID: ((UUID) -> LogicElement.Decoration?)? {
+        get { return canvasView.getElementDecoration }
+        set { canvasView.getElementDecoration = newValue }
+    }
+
     public var rootNode: LGCSyntaxNode {
         didSet {
             canvasView.formattedContent = rootNode.formatted
@@ -99,6 +104,10 @@ public class LogicEditor: NSBox {
         LGCSyntaxNode,
         String) -> RichText = { node, rootNode, query in
             return node.documentation(within: rootNode, for: query)
+    }
+
+    public func forceUpdate() {
+        canvasView.forceUpdate()
     }
 
     // MARK: Private

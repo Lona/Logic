@@ -62,6 +62,13 @@ public class LogicCanvasView: NSView {
     public var onPressDeleteKey: (() -> Void)?
     public var onMoveLine: ((Int, Int) -> Void)?
 
+    public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
+
+    public func forceUpdate() {
+        update()
+        invalidateIntrinsicContentSize()
+    }
+
     // MARK: Styles
 
     private var selectedIndex: Int? {
@@ -293,15 +300,15 @@ public class LogicCanvasView: NSView {
                     caret.stroke()
                 }
 
-                switch dropdownStyle {
-                case .colorPreview(let color):
+                switch self.cachedDecoration(for: text) {
+                case .none:
+                    break
+                case .some(.color(let color)):
                     color.set()
                     let size: CGFloat = 13
                     let colorPreviewRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
                     let colorPreviewPath = NSBezierPath(roundedRect: colorPreviewRect, xRadius: 2, yRadius: 2)
                     colorPreviewPath.fill()
-                default:
-                    break
                 }
 
                 if drawSelection {
@@ -318,6 +325,21 @@ public class LogicCanvasView: NSView {
     }
 
     private var _cachedMeasuredElements: [LogicMeasuredElement]? = nil
+    private var _cachedElementDecorations: [UUID: LogicElement.Decoration?] = [:]
+
+    private func cachedDecoration(for element: LogicElement) -> LogicElement.Decoration? {
+        guard let id = element.syntaxNodeID else { return nil }
+
+        if let decoration = _cachedElementDecorations[id] {
+            return decoration
+        }
+
+        let decoration = self.getElementDecoration?(id)
+
+        _cachedElementDecorations[id] = decoration
+
+        return decoration
+    }
 
     private var measuredElements: [LogicMeasuredElement] {
         if let cached = _cachedMeasuredElements {
@@ -327,7 +349,14 @@ public class LogicCanvasView: NSView {
         let formattedElementLines = formattedContent.print(
             width: bounds.width - LogicCanvasView.textMargin.width * 2,
             spaceWidth: LogicCanvasView.textSpacing,
-            indentWidth: 20)
+            indentWidth: 20,
+            getElementWidth: { [unowned self] element, index in
+                element.measured(
+                    selected: self.selectedIndex == index,
+                    offset: .zero,
+                    decoration: self.cachedDecoration(for: element)
+                    ).backgroundRect.width }
+        )
 
         let yOffset = LogicCanvasView.textMargin.height
         var measuredLine: [LogicMeasuredElement] = []
@@ -335,11 +364,20 @@ public class LogicCanvasView: NSView {
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
             formattedElementLine.forEach { formattedElement in
+                let decoration: LogicElement.Decoration?
+                if let id = formattedElement.element.syntaxNodeID {
+                    decoration = self.getElementDecoration?(id)
+                } else {
+                    decoration = nil
+                }
+
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     offset: CGPoint(
                         x: LogicCanvasView.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * LogicCanvasView.minimumLineHeight))
+                        y: yOffset + CGFloat(rowIndex) * LogicCanvasView.minimumLineHeight),
+                    decoration: decoration
+                )
 
                 measuredLine.append(measured)
 
@@ -369,20 +407,25 @@ public class LogicCanvasView: NSView {
     }
 
     private func update() {
-        _cachedMeasuredElements = nil
+        clearCache()
         needsDisplay = true
     }
 
     public override func layout() {
         super.layout()
 
-        _cachedMeasuredElements = nil
+        clearCache()
 
         let minHeight = self.minHeight
         if minHeight != previousHeight {
             previousHeight = minHeight
             invalidateIntrinsicContentSize()
         }
+    }
+
+    private func clearCache() {
+        _cachedMeasuredElements = nil
+        _cachedElementDecorations.removeAll(keepingCapacity: true)
     }
 
     // MARK: Drag and drop

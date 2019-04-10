@@ -8,11 +8,7 @@
 
 import Foundation
 
-public protocol FormattableElement {
-    var width: CGFloat { get }
-}
-
-public indirect enum FormatterCommand<Element: FormattableElement> {
+public indirect enum FormatterCommand<Element> {
     case element(Element)
     case line
     case indent(() -> FormatterCommand)
@@ -96,7 +92,8 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
     func print(
         width maxLineWidth: CGFloat,
         spaceWidth: CGFloat,
-        indentWidth: CGFloat
+        indentWidth: CGFloat,
+        getElementWidth: @escaping (Element, Int) -> CGFloat
         ) -> [[FormattedElement]] {
 
         var rows: [[FormattedElement]] = []
@@ -104,6 +101,12 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
         var currentRow: [FormattedElement] = []
         var currentOffset: CGFloat = 0
         var currentIndentLevel: Int = 0
+        var currentElementIndex: Int = 0
+
+        func append(element: FormattedElement) {
+            currentRow.append(element)
+            currentElementIndex += 1
+        }
 
         func moveToNextRow(wrapping: Bool) {
             rows.append(currentRow)
@@ -126,14 +129,14 @@ public indirect enum FormatterCommand<Element: FormattableElement> {
             case .hardLine:
                 moveToNextRow(wrapping: false)
             case .element(let element):
-                let elementWidth = element.width
+                let elementWidth = getElementWidth(element, currentElementIndex)
 
                 if currentOffset + elementWidth >= maxLineWidth && !currentRow.isEmpty {
                     moveToNextRow(wrapping: true)
                 }
 
                 let formattedElement = FormatterCommand<Element>.FormattedElement(element: element, position: currentOffset)
-                currentRow.append(formattedElement)
+                append(element: formattedElement)
 
                 currentOffset += elementWidth
             case .concat(let commands):

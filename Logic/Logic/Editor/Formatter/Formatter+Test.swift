@@ -8,12 +8,6 @@
 
 import Foundation
 
-extension String: FormattableElement {
-    public var width: CGFloat {
-        return CGFloat(count)
-    }
-}
-
 func testFormatter() {
     let command: FormatterCommand<String> = .concat {
         [
@@ -34,7 +28,7 @@ func testFormatter() {
         ]
     }
 
-    let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4)
+    let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4, getElementWidth: { string, _ in CGFloat(string.count) })
 
     Swift.print(lines)
 }

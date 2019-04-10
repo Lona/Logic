@@ -10,14 +10,18 @@ import AppKit
 
 public enum LogicElement {
 
+    public enum Decoration {
+        case color(NSColor)
+    }
+
     public enum DropdownStyle {
-        case source, variable, placeholder, colorPreview(NSColor)
+        case source, variable, placeholder
 
         var color: NSColor {
             switch self {
             case .source:
                 return Colors.text
-            case .variable, .colorPreview:
+            case .variable:
                 return Colors.editableText
             case .placeholder:
                 return NSColor.systemYellow
@@ -73,7 +77,7 @@ public enum LogicElement {
 }
 
 extension LogicElement {
-    func measured(selected: Bool, offset: CGPoint) -> LogicMeasuredElement {
+    func measured(selected: Bool, offset: CGPoint, decoration: Decoration?) -> LogicMeasuredElement {
         let attributedString = NSMutableAttributedString(string: self.value)
         let range = NSRange(location: 0, length: attributedString.length)
 
@@ -127,11 +131,11 @@ extension LogicElement {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 
-            switch dropdownStyle {
-            case .colorPreview:
+            switch decoration {
+            case .some(.color):
                 rect.origin.x += 18
                 backgroundRect.size.width += 18
-            default:
+            case .none:
                 break
             }
 
