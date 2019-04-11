@@ -211,10 +211,22 @@ public class SuggestionWindow: NSWindow {
         selectedIndex = selectablePairs.first?.offset
     }
 
-    public func anchorTo(rect: NSRect) {
+    public func anchorTo(rect: NSRect, verticalOffset: CGFloat = 0) {
         guard let contentBox = contentBox else { return }
-        let origin = NSPoint(x: rect.minX, y: rect.minY - contentBox.frame.height)
-        setFrameOrigin(origin)
+
+        var contentRect = NSRect(
+            origin: NSPoint(x: rect.minX, y: rect.minY - contentBox.frame.height - verticalOffset),
+            size: contentBox.frame.size)
+
+        if let visibleFrame = NSScreen.main?.visibleFrame {
+            contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width)
+
+            if contentRect.minY < visibleFrame.minY {
+                contentRect.origin.y = rect.maxY + verticalOffset
+            }
+        }
+
+        setFrameOrigin(contentRect.origin)
     }
 
     // MARK: Overrides

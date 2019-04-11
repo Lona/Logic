@@ -480,11 +480,11 @@ extension LogicEditor {
             // Adjust the window to left-align suggestions with the element's text
             let adjustedRect = NSRect(
                 x: screenRect.minX - 12 + canvasStyle.textPadding.width,
-                y: screenRect.minY - 2,
+                y: screenRect.minY,
                 width: screenRect.width,
                 height: screenRect.height)
 
-            childWindow.anchorTo(rect: adjustedRect)
+            childWindow.anchorTo(rect: adjustedRect, verticalOffset: 2)
             childWindow.focusSearchField()
         }
     }
