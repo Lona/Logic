@@ -11,7 +11,7 @@ import AppKit
 public class SuggestionWindow: NSWindow {
     convenience init() {
         self.init(
-            contentRect: NSRect(x: 0, y: 0, width: 610, height: 380),
+            contentRect: NSRect(origin: .zero, size: SuggestionWindow.defaultWindowSize),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false)
@@ -25,32 +25,29 @@ public class SuggestionWindow: NSWindow {
         shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
         shadow.shadowOffset = NSSize(width: 0, height: -2)
 
-        let box = NSBox()
-        box.boxType = .custom
-        box.borderType = .noBorder
-        box.contentViewMargins = .zero
-        box.fillColor = Colors.suggestionWindowBackground
-        box.shadow = shadow
-        box.cornerRadius = 4
+        shadowView.boxType = .custom
+        shadowView.borderType = .noBorder
+        shadowView.contentViewMargins = .zero
+        shadowView.fillColor = Colors.suggestionWindowBackground
+        shadowView.shadow = shadow
+        shadowView.cornerRadius = 4
 
         let view = NSView()
 
-        view.addSubview(box)
-        box.addSubview(suggestionView)
+        view.addSubview(shadowView)
+        shadowView.addSubview(suggestionView)
 
-        box.translatesAutoresizingMaskIntoConstraints = false
-        box.topAnchor.constraint(equalTo: view.topAnchor, constant: 12).isActive = true
-        box.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
-        box.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12).isActive = true
-        box.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -12).isActive = true
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        shadowView.topAnchor.constraint(equalTo: view.topAnchor, constant: SuggestionWindow.shadowViewMargin).isActive = true
+        shadowView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: SuggestionWindow.shadowViewMargin).isActive = true
+        shadowView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -SuggestionWindow.shadowViewMargin).isActive = true
+        shadowView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -SuggestionWindow.shadowViewMargin).isActive = true
 
         suggestionView.translatesAutoresizingMaskIntoConstraints = false
-        suggestionView.topAnchor.constraint(equalTo: box.topAnchor).isActive = true
-        suggestionView.leadingAnchor.constraint(equalTo: box.leadingAnchor).isActive = true
-        suggestionView.trailingAnchor.constraint(equalTo: box.trailingAnchor).isActive = true
-        suggestionView.bottomAnchor.constraint(equalTo: box.bottomAnchor).isActive = true
-
-        self.contentBox = box
+        suggestionView.topAnchor.constraint(equalTo: shadowView.topAnchor).isActive = true
+        suggestionView.leadingAnchor.constraint(equalTo: shadowView.leadingAnchor).isActive = true
+        suggestionView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
+        suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
         suggestionView.searchInput.isBordered = false
         suggestionView.searchInput.focusRingType = .none
@@ -116,7 +113,7 @@ public class SuggestionWindow: NSWindow {
         window.contentView = view
     }
 
-    var contentBox: NSView?
+    var shadowView = NSBox()
 
     var suggestionView = SuggestionView()
 
@@ -212,22 +209,45 @@ public class SuggestionWindow: NSWindow {
     }
 
     public func anchorTo(rect: NSRect, verticalOffset: CGFloat = 0) {
-        guard let contentBox = contentBox else { return }
-
         var contentRect = NSRect(
-            origin: NSPoint(x: rect.minX, y: rect.minY - contentBox.frame.height - verticalOffset),
-            size: contentBox.frame.size)
+            origin: NSPoint(x: rect.minX, y: rect.minY - SuggestionWindow.defaultContentViewSize.height - verticalOffset),
+            size: SuggestionWindow.defaultWindowSize)
 
         if let visibleFrame = NSScreen.main?.visibleFrame {
-            contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width)
+            if contentRect.maxX > visibleFrame.maxX {
+                let horizontalShrinkSize = min(
+                    contentRect.maxX - visibleFrame.maxX, SuggestionWindow.allowedShrinkingSize.width)
+
+                contentRect.size.width = contentRect.width - horizontalShrinkSize + 16
+                contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width + 16)
+            }
 
             if contentRect.minY < visibleFrame.minY {
-                contentRect.origin.y = rect.maxY + verticalOffset
+                let verticalShrinkSize = visibleFrame.minY - contentRect.minY
+                if verticalShrinkSize < SuggestionWindow.allowedShrinkingSize.height {
+                    contentRect.size.height = contentRect.height - verticalShrinkSize
+                    contentRect.origin.y += verticalShrinkSize
+                } else {
+                    contentRect.origin.y = rect.maxY + verticalOffset
+                }
             }
         }
 
+        setContentSize(contentRect.size)
         setFrameOrigin(contentRect.origin)
     }
+
+    public static var defaultWindowSize = CGSize(width: 610, height: 380)
+
+    public static var allowedShrinkingSize = CGSize(width: 180, height: 200)
+
+    public static var defaultContentViewSize: CGSize {
+        return CGSize(
+            width: defaultWindowSize.width - shadowViewMargin * 2,
+            height: defaultWindowSize.height - shadowViewMargin * 2)
+    }
+
+    private static var shadowViewMargin: CGFloat = 12
 
     // MARK: Overrides
 
@@ -235,7 +255,9 @@ public class SuggestionWindow: NSWindow {
         return true
     }
 
+    // Offset the origin to account for the shadow view's margin
     public override func setFrameOrigin(_ point: NSPoint) {
-        super.setFrameOrigin(NSPoint(x: point.x - 12, y: point.y - 12))
+        let offsetOrigin = NSPoint(x: point.x - SuggestionWindow.shadowViewMargin, y: point.y - SuggestionWindow.shadowViewMargin)
+        super.setFrameOrigin(offsetOrigin)
     }
 }
