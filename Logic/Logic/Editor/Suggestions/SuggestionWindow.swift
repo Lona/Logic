@@ -111,13 +111,46 @@ public class SuggestionWindow: NSWindow {
         }
 
         window.contentView = view
+
+        let notificationTokens = [
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.didResignKeyNotification,
+                object: self,
+                queue: nil,
+                using: { [weak self] notification in self?.handleHide() }
+            ),
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.didResignMainNotification,
+                object: self,
+                queue: nil,
+                using: { [weak self] notification in self?.handleHide() }
+            )
+        ]
+
+        subscriptions.append({
+            notificationTokens.forEach {
+                NotificationCenter.default.removeObserver($0)
+            }
+        })
     }
+
+    deinit {
+        subscriptions.forEach { subscription in subscription() }
+    }
+
+    private var subscriptions: [() -> Void] = []
 
     var shadowView = NSBox()
 
     var suggestionView = SuggestionView()
 
+    private func handleHide() {
+        self.onRequestHide?()
+    }
+
     // MARK: Public
+
+    public var onRequestHide: (() -> Void)?
 
     public var onSubmit: ((Int) -> Void)?
 
