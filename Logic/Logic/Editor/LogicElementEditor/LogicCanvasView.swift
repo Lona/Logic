@@ -116,6 +116,12 @@ public class LogicCanvasView: NSView {
         return true
     }
 
+    public override func resignFirstResponder() -> Bool {
+        onActivate?(nil)
+
+        return super.resignFirstResponder()
+    }
+
     public func getElementRect(for index: Int) -> CGRect? {
         if index >= measuredElements.count { return nil }
 
