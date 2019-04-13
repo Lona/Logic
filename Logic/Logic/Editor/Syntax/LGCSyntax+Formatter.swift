@@ -40,7 +40,7 @@ public extension LGCLiteral {
         case .number(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .string(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
+            return .element(LogicElement.dropdown(value.id, "\"" + value.value + "\"", .variable))
         case .color(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         }
