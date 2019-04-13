@@ -9,6 +9,8 @@
 import AppKit
 
 public class SuggestionWindow: NSWindow {
+    static var shared = SuggestionWindow()
+
     convenience init() {
         self.init(
             contentRect: NSRect(origin: .zero, size: SuggestionWindow.defaultWindowSize),

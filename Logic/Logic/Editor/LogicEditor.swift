@@ -118,7 +118,9 @@ public class LogicEditor: NSBox {
         }
     }
 
-    private lazy var childWindow: SuggestionWindow = SuggestionWindow()
+    private var childWindow: SuggestionWindow {
+        return SuggestionWindow.shared
+    }
 
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
