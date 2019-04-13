@@ -53,6 +53,8 @@ public class LogicEditor: NSBox {
 
     deinit {
         subscriptions.forEach { subscription in subscription() }
+
+        hideSuggestionWindow()
     }
 
     // MARK: Public
