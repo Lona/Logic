@@ -83,6 +83,8 @@ public class LogicCanvasView: NSView {
     public var onPressShiftTabKey: (() -> Void)?
     public var onPressDeleteKey: (() -> Void)?
     public var onMoveLine: ((Int, Int) -> Void)?
+    public var onFocus: (() -> Void)?
+    public var onBlur: (() -> Void)?
 
     public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
 
@@ -116,9 +118,13 @@ public class LogicCanvasView: NSView {
         return true
     }
 
-    public override func resignFirstResponder() -> Bool {
-        onActivate?(nil)
+    public override func becomeFirstResponder() -> Bool {
+        onFocus?()
+        return super.becomeFirstResponder()
+    }
 
+    public override func resignFirstResponder() -> Bool {
+        onBlur?()
         return super.resignFirstResponder()
     }
 

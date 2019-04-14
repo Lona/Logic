@@ -166,6 +166,8 @@ public class LogicEditor: NSBox {
         canvasView.onPressShiftTabKey = previousNode
         canvasView.onPressDeleteKey = handleDelete
         canvasView.onMoveLine = handleMoveLine
+        canvasView.onBlur = handleBlur
+        canvasView.onFocus = handleFocus
     }
 
     private func setUpConstraints() {
@@ -185,6 +187,16 @@ public class LogicEditor: NSBox {
 // MARK: - Selection
 
 extension LogicEditor {
+
+    private func handleFocus() {
+        if let firstIndex = rootNode.formatted.elements.firstIndex(where: { $0.isActivatable }) {
+            canvasView.selectedRange = firstIndex..<firstIndex + 1
+        }
+    }
+
+    private func handleBlur() {
+        handleActivateElement(nil)
+    }
 
     private func handleDelete() {
         let formattedContent = rootNode.formatted
@@ -231,9 +243,11 @@ extension LogicEditor {
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
             self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
         } else {
-            Swift.print("No next node to activate")
-
             self.hideSuggestionWindow()
+
+            if let nextKeyView = nextKeyView {
+                window?.makeFirstResponder(nextKeyView)
+            }
         }
     }
 
@@ -247,9 +261,11 @@ extension LogicEditor {
             let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
             self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
         } else {
-            Swift.print("No previous node to activate")
-
             self.hideSuggestionWindow()
+
+            if let previousKeyView = previousKeyView {
+                window?.makeFirstResponder(previousKeyView)
+            }
         }
     }
 
