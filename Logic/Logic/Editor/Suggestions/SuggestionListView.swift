@@ -198,6 +198,14 @@ extension SuggestionListView: NSTableViewDelegate {
                 previewColor: color)
             rowView.fillColor = fillColor(disabled: disabled)
             return rowView
+        case .textStyleRow(let value, let style, let disabled):
+            let rowView = TextStyleRow(
+                titleText: value,
+                textStyle: style,
+                selected: row == selectedIndex,
+                disabled: disabled)
+            rowView.fillColor = fillColor(disabled: disabled)
+            return rowView
         case .sectionHeader(let value):
             return ResultSectionHeader(titleText: value)
         }
@@ -238,6 +246,8 @@ extension SuggestionListView: NSTableViewDataSource {
             return 40
         case .sectionHeader:
             return 18
+        case .textStyleRow(let value, let style, _):
+            return 8 + style.apply(to: value).size().height
         }
     }
 }

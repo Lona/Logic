@@ -12,6 +12,7 @@ public struct LogicSuggestionItem {
     public enum Style {
         case normal
         case colorPreview(code: String, NSColor)
+        case textStylePreview(TextStyle)
     }
 
     public init(
@@ -429,8 +430,16 @@ public extension LGCExpression {
                 }
             })
 
+        let textStyleExample = LogicSuggestionItem(
+            title: "Title Muted",
+            category: "Text Styles".uppercased(),
+            node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "TextStyles.title")),
+            style: .textStylePreview(TextStyle(weight: .bold, size: 18, color: NSColor.purple))
+        )
+
         return items.titleContains(prefix: prefix) +
             LGCIdentifier.suggestions(for: prefix) +
+            [textStyleExample].titleContains(prefix: prefix) +
             literalExpressions
     }
 }

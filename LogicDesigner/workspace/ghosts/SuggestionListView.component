@@ -1,12 +1,10 @@
 {
   "devices" : [
     {
-      "deviceId" : "iPhone SE",
-      "heightMode" : "At Least"
-    },
-    {
-      "deviceId" : "Pixel 2",
-      "heightMode" : "At Least"
+      "height" : 200,
+      "heightMode" : "Exactly",
+      "name" : "",
+      "width" : 320
     }
   ],
   "examples" : [
@@ -83,6 +81,17 @@
           "titleText" : "For loop"
         },
         "type" : "ResultRow"
+      },
+      {
+        "id" : "ColorRow",
+        "params" : {
+          "disabled" : false,
+          "previewColor" : "editableText",
+          "selected" : false,
+          "subtitleText" : "#ABCABC",
+          "titleText" : "Color name"
+        },
+        "type" : "ColorRow"
       }
     ],
     "id" : "View",

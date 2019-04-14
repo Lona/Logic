@@ -12,10 +12,11 @@ public enum SuggestionListItem {
     case sectionHeader(String)
     case row(String, Bool)
     case colorRow(name: String, code: String, NSColor, Bool)
+    case textStyleRow(String, TextStyle, Bool)
 
     public var isSelectable: Bool {
         switch self {
-        case .row, .colorRow:
+        case .row, .colorRow, .textStyleRow:
             return true
         case .sectionHeader:
             return false
@@ -24,7 +25,7 @@ public enum SuggestionListItem {
 
     public var isGroupRow: Bool {
         switch self {
-        case .row, .colorRow:
+        case .row, .colorRow, .textStyleRow:
             return false
         case .sectionHeader:
             return true

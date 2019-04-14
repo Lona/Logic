@@ -343,6 +343,13 @@ extension LogicEditor {
                             .colorRow(name: logicItem.item.title, code: code, color, logicItem.item.disabled)
                         )
                     )
+                case .textStylePreview(let style):
+                    suggestionListItems.append(
+                        (
+                            logicItem.offset,
+                            .textStyleRow(logicItem.item.title, style, logicItem.item.disabled)
+                        )
+                    )
                 }
             }
         }

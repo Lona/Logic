@@ -72,6 +72,7 @@ public class SuggestionListView: NSBox {
   private var resultSectionHeaderView = ResultSectionHeader()
   private var resultRowView = ResultRow()
   private var resultRow1View = ResultRow()
+  private var colorRowView = ColorRow()
 
   private func setUpViews() {
     boxType = .custom
@@ -84,11 +85,17 @@ public class SuggestionListView: NSBox {
     addSubview(rowWrapperView)
     addSubview(resultRowView)
     addSubview(resultRow1View)
+    addSubview(colorRowView)
     rowWrapperView.addSubview(resultSectionHeaderView)
 
     resultSectionHeaderView.titleText = "STATEMENTS"
     resultRowView.titleText = "If condition"
     resultRow1View.titleText = "For loop"
+    colorRowView.disabled = false
+    colorRowView.previewColor = Colors.editableText
+    colorRowView.selected = false
+    colorRowView.subtitleText = "#ABCABC"
+    colorRowView.titleText = "Color name"
   }
 
   private func setUpConstraints() {
@@ -96,6 +103,7 @@ public class SuggestionListView: NSBox {
     rowWrapperView.translatesAutoresizingMaskIntoConstraints = false
     resultRowView.translatesAutoresizingMaskIntoConstraints = false
     resultRow1View.translatesAutoresizingMaskIntoConstraints = false
+    colorRowView.translatesAutoresizingMaskIntoConstraints = false
     resultSectionHeaderView.translatesAutoresizingMaskIntoConstraints = false
 
     let rowWrapperViewTopAnchorConstraint = rowWrapperView.topAnchor.constraint(equalTo: topAnchor)
@@ -107,6 +115,9 @@ public class SuggestionListView: NSBox {
     let resultRow1ViewTopAnchorConstraint = resultRow1View.topAnchor.constraint(equalTo: resultRowView.bottomAnchor)
     let resultRow1ViewLeadingAnchorConstraint = resultRow1View.leadingAnchor.constraint(equalTo: leadingAnchor)
     let resultRow1ViewTrailingAnchorConstraint = resultRow1View.trailingAnchor.constraint(equalTo: trailingAnchor)
+    let colorRowViewTopAnchorConstraint = colorRowView.topAnchor.constraint(equalTo: resultRow1View.bottomAnchor)
+    let colorRowViewLeadingAnchorConstraint = colorRowView.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let colorRowViewTrailingAnchorConstraint = colorRowView.trailingAnchor.constraint(equalTo: trailingAnchor)
     let rowWrapperViewHeightAnchorConstraint = rowWrapperView.heightAnchor.constraint(equalToConstant: 18)
     let resultSectionHeaderViewTopAnchorConstraint = resultSectionHeaderView
       .topAnchor
@@ -131,6 +142,9 @@ public class SuggestionListView: NSBox {
       resultRow1ViewTopAnchorConstraint,
       resultRow1ViewLeadingAnchorConstraint,
       resultRow1ViewTrailingAnchorConstraint,
+      colorRowViewTopAnchorConstraint,
+      colorRowViewLeadingAnchorConstraint,
+      colorRowViewTrailingAnchorConstraint,
       rowWrapperViewHeightAnchorConstraint,
       resultSectionHeaderViewTopAnchorConstraint,
       resultSectionHeaderViewBottomAnchorConstraint,

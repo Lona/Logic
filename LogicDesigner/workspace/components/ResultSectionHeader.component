@@ -1,8 +1,10 @@
 {
   "devices" : [
     {
-      "deviceId" : "iPhone SE",
-      "heightMode" : "At Least"
+      "height" : 18,
+      "heightMode" : "Exactly",
+      "name" : "",
+      "width" : 320
     },
     {
       "deviceId" : "Pixel 2",

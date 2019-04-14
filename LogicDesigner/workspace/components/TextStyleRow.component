@@ -1,0 +1,118 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+        "textStyle" : "sectionHeader"
+      }
+    },
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+        "textStyle" : "row"
+      }
+    },
+    {
+      "id" : "Selected",
+      "name" : "Selected",
+      "params" : {
+        "selected" : true
+      }
+    },
+    {
+      "id" : "Disabled",
+      "name" : "Disabled",
+      "params" : {
+        "disabled" : true
+      }
+    }
+  ],
+  "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "Text",
+        "text"
+      ],
+      "content" : [
+        "parameters",
+        "titleText"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "Text",
+        "textStyle"
+      ],
+      "content" : [
+        "parameters",
+        "textStyle"
+      ],
+      "type" : "AssignExpr"
+    }
+  ],
+  "params" : [
+    {
+      "name" : "titleText",
+      "type" : "String"
+    },
+    {
+      "name" : "textStyle",
+      "type" : "TextStyle"
+    },
+    {
+      "name" : "selected",
+      "type" : "Boolean"
+    },
+    {
+      "name" : "disabled",
+      "type" : "Boolean"
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "children" : [
+          {
+            "id" : "Text",
+            "params" : {
+              "font" : "row",
+              "numberOfLines" : 1,
+              "text" : "Text goes here"
+            },
+            "type" : "Lona:Text"
+          }
+        ],
+        "id" : "Details",
+        "params" : {
+          "flex" : 1
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "View",
+    "params" : {
+      "alignSelf" : "stretch",
+      "flexDirection" : "row",
+      "paddingBottom" : 4,
+      "paddingLeft" : 12,
+      "paddingRight" : 12,
+      "paddingTop" : 4
+    },
+    "type" : "Lona:View"
+  }
+}
