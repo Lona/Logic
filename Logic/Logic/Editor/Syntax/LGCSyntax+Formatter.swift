@@ -38,7 +38,8 @@ public extension LGCLiteral {
         case .boolean(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
         case .number(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
+            let formatted = value.value.description.replacingOccurrences(of: ".0", with: "")
+            return .element(LogicElement.dropdown(value.id, formatted, .variable))
         case .string(let value):
             return .element(LogicElement.dropdown(value.id, "\"" + value.value + "\"", .variable))
         case .color(let value):
