@@ -327,9 +327,39 @@ public class LogicCanvasView: NSView {
                 case .some(.color(let color)):
                     color.set()
                     let size: CGFloat = 13
-                    let colorPreviewRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
-                    let colorPreviewPath = NSBezierPath(roundedRect: colorPreviewRect, xRadius: 2, yRadius: 2)
-                    colorPreviewPath.fill()
+                    let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
+                    let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: 2, yRadius: 2)
+                    symbolPath.fill()
+                case .some(.text(let attributedString, let textStyleColor)):
+                    let size: CGFloat = 13
+                    let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
+                        .insetBy(dx: 0.5, dy: 0.5)
+                    let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: 2, yRadius: 2)
+                    symbolPath.lineWidth = 1
+
+                    if let strokeColor = textStyleColor.blended(withFraction: 0.5, of: textStyleColor.withAlphaComponent(0)) {
+                        strokeColor.setStroke()
+                        symbolPath.stroke()
+                    }
+
+                    if let fillColor = textStyleColor.blended(withFraction: 0.7, of: textStyleColor.withAlphaComponent(0)) {
+                        fillColor.setFill()
+                        symbolPath.fill()
+                    }
+
+                    let image = NSImage(size: attributedString.size(), flipped: false, drawingHandler: { rect in
+                        attributedString.draw(at: rect.origin)
+                        return true
+                    })
+
+                    let scaledSize = image.size.resized(within: symbolRect.size).size
+                    let imageRect = NSRect(
+                        origin: NSPoint(
+                            x: symbolRect.origin.x + (symbolRect.width - scaledSize.width) / 2,
+                            y: symbolRect.origin.y + (symbolRect.height - scaledSize.height) / 2),
+                        size: scaledSize)
+
+                    image.draw(in: imageRect)
                 }
 
                 if drawSelection {

@@ -12,6 +12,7 @@ public enum LogicElement {
 
     public enum Decoration {
         case color(NSColor)
+        case text(NSAttributedString, NSColor)
     }
 
     public enum DropdownStyle {
@@ -137,7 +138,7 @@ extension LogicElement {
             }
 
             switch decoration {
-            case .some(.color):
+            case .some(.color), .some(.text):
                 rect.origin.x += 18
                 backgroundRect.size.width += 18
             case .none:

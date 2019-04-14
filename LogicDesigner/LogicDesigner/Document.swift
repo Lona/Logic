@@ -55,6 +55,8 @@ class Document: NSDocument {
             switch node {
             case .literal(.color(id: _, value: _)):
                 return .color(.red)
+            case .identifier(let identifier) where identifier.string.starts(with: "TextStyles."):
+                return .text(TextStyle(size: 18, color: .purple).apply(to: "S"), .purple)
             default:
                 return nil
             }
