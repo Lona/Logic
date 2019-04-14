@@ -63,10 +63,7 @@ public class LogicEditor: NSBox {
         }
     }
 
-    public var showsDropdown: Bool {
-        get { return childWindow.showsDropdown }
-        set { childWindow.showsDropdown = newValue }
-    }
+    public var showsDropdown: Bool = true
 
     public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _
         in return []
@@ -379,6 +376,8 @@ extension LogicEditor {
         }
     }
 
+    // The suggestion window is shared between all logic editors, so we need to assign every parameter
+    // to it each time we show it. Otherwise, we may be showing parameters set by another logic editor.
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window else { return }
 
@@ -388,6 +387,7 @@ extension LogicEditor {
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
+        childWindow.showsDropdown = showsDropdown
         childWindow.onRequestHide = hideSuggestionWindow
         childWindow.detailView = makeDetailView(for: logicSuggestions.first?.node, query: suggestionText)
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
