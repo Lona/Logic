@@ -50,11 +50,15 @@ public extension LGCLiteral {
 
 public extension LGCFunctionCallArgument {
     var formatted: FormatterCommand<LogicElement> {
-        return .concat {
-            [
-                .element(.text(self.label + " :")),
-                self.expression.formatted
-            ]
+        if let label = self.label {
+            return .concat {
+                [
+                    .element(.text(label + " :")),
+                    self.expression.formatted
+                ]
+            }
+        } else {
+            return self.expression.formatted
         }
     }
 }

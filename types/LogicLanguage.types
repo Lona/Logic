@@ -88,7 +88,9 @@
   <Type name="FunctionCallArgument">
     <Record name="functionCallArgument">
       <Record.Param name="id" type="UUID"/>
-      <Record.Param name="label" type="String"/>
+      <Record.Param name="label" type="Optional">
+        <Record.Substitution generic="Value" instance="String"/>
+      </Record.Param>
       <Record.Param name="expression" type="Expression"/>
     </Record>
   </Type>

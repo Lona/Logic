@@ -255,14 +255,14 @@ public indirect enum LGCBinaryOperator: Codable & Equatable {
 }
 
 public struct LGCFunctionCallArgument: Codable & Equatable {
-  public init(id: UUID, label: String, expression: LGCExpression) {
+  public init(id: UUID, label: Optional<String>, expression: LGCExpression) {
     self.id = id
     self.label = label
     self.expression = expression
   }
 
   public var id: UUID
-  public var label: String
+  public var label: Optional<String>
   public var expression: LGCExpression
 }
 
