@@ -447,6 +447,28 @@ public extension LGCExpression {
 public extension LGCDeclaration {
     static let suggestionCategoryTitle = "Declarations".uppercased()
 
+    static var variableSuggestionItem: LogicSuggestionItem {
+        return LogicSuggestionItem(
+            title: "Variable",
+            category: suggestionCategoryTitle,
+            node: LGCSyntaxNode.declaration(
+                LGCDeclaration.variable(
+                    id: UUID(),
+                    name: LGCPattern(id: UUID(), name: "name"),
+                    annotation: LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
+                        genericArguments: .empty
+                    ),
+                    initializer: .identifierExpression(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                    )
+                )
+            )
+        )
+    }
+
     static var functionSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Function",
@@ -483,6 +505,7 @@ public extension LGCDeclaration {
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
+            variableSuggestionItem,
             functionSuggestionItem,
             enumSuggestionItem
         ]

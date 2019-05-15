@@ -295,8 +295,23 @@ public extension LGCDeclaration {
         }
 
         switch self {
-        case .variable:
-            return .element(.text("VARIABLE"))
+        case .variable(let value):
+            var contents: [FormatterCommand<LogicElement>] = [
+                .element(LogicElement.dropdown(value.id, "Let", .source)),
+                value.name.formatted
+            ]
+
+            if let annotation = value.annotation {
+                contents.append(.element(.text(":")))
+                contents.append(annotation.formatted)
+            }
+
+            if let initializer = value.initializer {
+                contents.append(.element(.text("=")))
+                contents.append(initializer.formatted)
+            }
+
+            return .concat { contents }
         case .function(let value):
             return .concat {
                 [

@@ -24,6 +24,13 @@
   <Type name="Declaration">
     <Record name="variable">
       <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="annotation" type="Optional">
+        <Record.Substitution generic="Value" instance="TypeAnnotation"/>
+      </Record.Param>
+      <Record.Param name="initializer" type="Optional">
+        <Record.Substitution generic="Value" instance="Expression"/>
+      </Record.Param>
     </Record>
     <Record name="function">
       <Record.Param name="id" type="UUID"/>

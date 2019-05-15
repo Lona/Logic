@@ -894,8 +894,13 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return newNode
         default:
             switch self {
-            case .variable:
-                return LGCDeclaration.variable(id: UUID())
+            case .variable(let value):
+                return LGCDeclaration.variable(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    annotation: value.annotation?.replace(id: id, with: syntaxNode),
+                    initializer: value.initializer?.replace(id: id, with: syntaxNode)
+                )
             case .function(let value):
                 return LGCDeclaration.function(
                     id: UUID(),
@@ -920,8 +925,10 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         let found: [LGCSyntaxNode]?
 
         switch self {
-        case .variable:
-            found = nil
+        case .variable(let value):
+            found = value.name.pathTo(id: id)
+                ?? value.annotation?.pathTo(id: id)
+                ?? value.initializer?.pathTo(id: id)
         case .function(let value):
             found = value.name.pathTo(id: id)
                 ?? value.returnType.pathTo(id: id)
@@ -953,7 +960,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
     public var uuid: UUID {
         switch self {
         case .variable(let value):
-            return value
+            return value.id
         case .function(let value):
             return value.id
         case .enumeration(let value):

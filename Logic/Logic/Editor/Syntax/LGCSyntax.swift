@@ -45,7 +45,7 @@ public struct LGCIdentifier: Codable & Equatable {
 }
 
 public indirect enum LGCDeclaration: Codable & Equatable {
-  case variable(id: UUID)
+  case variable(id: UUID, name: LGCPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>)
   case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>)
   case enumeration(id: UUID, name: LGCPattern, cases: LGCList<LGCEnumerationCase>)
 
@@ -59,6 +59,8 @@ public indirect enum LGCDeclaration: Codable & Equatable {
   public enum DataCodingKeys: CodingKey {
     case id
     case name
+    case annotation
+    case initializer
     case returnType
     case parameters
     case block
@@ -72,7 +74,12 @@ public indirect enum LGCDeclaration: Codable & Equatable {
 
     switch type {
       case "variable":
-        self = .variable(id: try data.decode(UUID.self, forKey: .id))
+        self =
+          .variable(
+            id: try data.decode(UUID.self, forKey: .id),
+            name: try data.decode(LGCPattern.self, forKey: .name),
+            annotation: try data.decode(Optional.self, forKey: .annotation),
+            initializer: try data.decode(Optional.self, forKey: .initializer))
       case "function":
         self =
           .function(
@@ -99,7 +106,10 @@ public indirect enum LGCDeclaration: Codable & Equatable {
     switch self {
       case .variable(let value):
         try container.encode("variable", forKey: .type)
-        try data.encode(value, forKey: .id)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.name, forKey: .name)
+        try data.encode(value.annotation, forKey: .annotation)
+        try data.encode(value.initializer, forKey: .initializer)
       case .function(let value):
         try container.encode("function", forKey: .type)
         try data.encode(value.id, forKey: .id)
