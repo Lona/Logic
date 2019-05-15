@@ -50,23 +50,34 @@ class Document: NSDocument {
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
 //        )
 
+        let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
+
+        var annotations: [UUID: String] = [:]
+
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
+
+            if let annotation = annotations[node.uuid] {
+                return .label(labelFont, annotation)
+            }
+
             switch node {
             case .literal(.color(id: _, value: _)):
                 return .color(.red)
             case .identifier(let identifier) where identifier.string.starts(with: "TextStyles."):
-                return .text(TextStyle(size: 18, color: .purple).apply(to: "S"), .purple)
+                return .character(TextStyle(size: 18, color: .purple).apply(to: "S"), .purple)
             default:
                 return nil
             }
         }
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
-            self.logicEditor.rootNode = rootNode
-
             let context = Environment.evaluate(rootNode, in: .standard).1
             Swift.print(context.scopes, context.errors)
+
+            annotations = context.annotations
+
+            self.logicEditor.rootNode = rootNode
 
             return true
         }

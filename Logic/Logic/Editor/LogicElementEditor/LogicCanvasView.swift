@@ -330,7 +330,7 @@ public class LogicCanvasView: NSView {
                     let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
                     let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: 2, yRadius: 2)
                     symbolPath.fill()
-                case .some(.text(let attributedString, let textStyleColor)):
+                case .some(.character(let attributedString, let textStyleColor)):
                     let size: CGFloat = 13
                     let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
                         .insetBy(dx: 0.5, dy: 0.5)
@@ -360,6 +360,34 @@ public class LogicCanvasView: NSView {
                         size: scaledSize)
 
                     image.draw(in: imageRect)
+                case .some(.label(let font, let text)):
+                    let attributes: [NSAttributedString.Key: Any] = [
+                        NSAttributedString.Key.foregroundColor: NSColor.white,
+                        NSAttributedString.Key.font: font,
+                    ]
+                    let labelString = NSAttributedString(string: text, attributes: attributes)
+                    let labelSize = labelString.size()
+                    let labelWidth = labelSize.width + 6
+
+                    let size: CGFloat = 13
+                    let symbolRect = NSRect(
+                        x: measuredText.attributedStringRect.maxX + 5,
+                        y: ceil(backgroundRect.midY - (size / 2)),
+                        width: labelWidth,
+                        height: size
+                    )
+                    let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: size / 2, yRadius: size / 2)
+                    symbolPath.lineWidth = 0
+
+                    (selected ? NSColor.white.withAlphaComponent(0.4) : Colors.editableText).setFill()
+                    symbolPath.fill()
+
+                    let labelOrigin = CGPoint(
+                        x: symbolRect.origin.x + 3.0,
+                        y: symbolRect.origin.y + (symbolRect.height - labelSize.height) / 2
+                    )
+
+                    labelString.draw(at: labelOrigin)
                 }
 
                 if drawSelection {

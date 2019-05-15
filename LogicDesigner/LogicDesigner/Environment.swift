@@ -19,7 +19,7 @@ public enum Environment {
             return (LogicValue.unit, newContext)
         case .identifier(let identifier):
             if let value = context.value(for: identifier.string) {
-                return (value, context)
+                return (value, context.with(annotation: value.memory.description, for: identifier.id))
             }
 
             return (LogicValue.unit, context.with(error: .runtime("Undefined identifier \(identifier.string)", identifier.id)))
@@ -41,16 +41,16 @@ public enum Environment {
         case .literal(.number(id: _, value: let literal)):
             return (LogicValue(type: Types.number, memory: [literal]), context)
         case .statement(.branch(id: _, condition: let condition, block: let block)):
-            let evaluatedCondition = evaluate(.expression(condition), in: context).0
+            let evaluatedCondition = evaluate(.expression(condition), in: context)
 
-            if evaluatedCondition.type == Types.boolean, let memory = evaluatedCondition.memory as? [Bool] {
+            if evaluatedCondition.0.type == Types.boolean, let memory = evaluatedCondition.0.memory as? [Bool] {
                 if memory == [true] {
-                    let resultingContext = block.reduce(context, { result, node in
+                    let resultingContext = block.reduce(evaluatedCondition.1, { result, node in
                         return evaluate(.statement(node), in: result).1
                     })
                     return (LogicValue.unit, resultingContext)
                 } else {
-                    return (LogicValue.unit, context)
+                    return (LogicValue.unit, evaluatedCondition.1)
                 }
             } else {
                 Swift.print("Evaluating condition failed -- non-boolean type")
@@ -124,6 +124,7 @@ extension Environment {
         public var types: [TypeEntity]
         public var scopes: [[String: LogicValue]]
         public var errors: [Error]
+        public var annotations: [UUID: String]
 
         public static let standard = Context(
             types: [
@@ -138,7 +139,8 @@ extension Environment {
                     "none": LogicValue.unit
                 ]
             ],
-            errors: []
+            errors: [],
+            annotations: [:]
         )
 
         public func with(name: String, boundToValue value: LogicValue) -> Context {
@@ -150,6 +152,12 @@ extension Environment {
         public func with(error: Error) -> Context {
             var copy = self
             copy.errors.append(error)
+            return copy
+        }
+
+        public func with(annotation: String, for nodeId: UUID) -> Context {
+            var copy = self
+            copy.annotations[nodeId] = annotation
             return copy
         }
 

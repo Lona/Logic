@@ -12,7 +12,8 @@ public enum LogicElement {
 
     public enum Decoration {
         case color(NSColor)
-        case text(NSAttributedString, NSColor)
+        case character(NSAttributedString, NSColor)
+        case label(NSFont, String)
     }
 
     public enum DropdownStyle {
@@ -138,7 +139,16 @@ extension LogicElement {
             }
 
             switch decoration {
-            case .some(.color), .some(.text):
+            case .some(.label(let font, let text)):
+                let attributes: [NSAttributedString.Key: Any] = [
+                    NSAttributedString.Key.foregroundColor: NSColor.white,
+                    NSAttributedString.Key.font: font,
+                ]
+                let labelString = NSAttributedString(string: text, attributes: attributes)
+                let labelWidth = labelString.size().width + 5 + 6
+                
+                backgroundRect.size.width += labelWidth
+            case .some(.color), .some(.character):
                 rect.origin.x += 18
                 backgroundRect.size.width += 18
             case .none:
