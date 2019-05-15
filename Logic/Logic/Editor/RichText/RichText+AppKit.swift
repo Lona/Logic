@@ -185,6 +185,7 @@ extension RichText {
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
         scrollView.drawsBackground = false
         scrollView.documentView = contentView
         scrollView.translatesAutoresizingMaskIntoConstraints = false

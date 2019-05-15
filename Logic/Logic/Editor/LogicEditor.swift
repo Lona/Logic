@@ -152,6 +152,7 @@ public class LogicEditor: NSBox {
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
         scrollView.drawsBackground = false
 
         addSubview(scrollView)

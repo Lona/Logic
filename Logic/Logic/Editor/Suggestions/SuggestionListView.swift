@@ -119,6 +119,7 @@ public class SuggestionListView: NSBox {
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
         scrollView.drawsBackground = false
         scrollView.documentView = tableView
 
