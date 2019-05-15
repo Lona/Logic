@@ -64,6 +64,10 @@ class Document: NSDocument {
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode
+
+            let context = Environment.evaluate(rootNode, in: .standard).1
+            Swift.print(context.scopes, context.errors)
+
             return true
         }
 
