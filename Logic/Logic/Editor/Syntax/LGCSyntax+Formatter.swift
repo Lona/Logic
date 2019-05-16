@@ -304,11 +304,16 @@ public extension LGCDeclaration {
             if let annotation = value.annotation {
                 contents.append(.element(.text(":")))
                 contents.append(annotation.formatted)
-            }
 
-            if let initializer = value.initializer {
-                contents.append(.element(.text("=")))
-                contents.append(initializer.formatted)
+                if let initializer = value.initializer {
+                    switch annotation {
+                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty) where identifier.isPlaceholder:
+                        break
+                    default:
+                        contents.append(.element(.text("=")))
+                        contents.append(initializer.formatted)
+                    }
+                }
             }
 
             return .concat { contents }
