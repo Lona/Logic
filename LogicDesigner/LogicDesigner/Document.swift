@@ -84,6 +84,8 @@ class Document: NSDocument {
                 self.logicEditor.underlinedId = nil
             } catch let error {
                 if let error = error as? LogicError {
+                    annotations = error.context.annotations
+                    
                     self.logicEditor.underlinedId = error.nodeId
                 }
             }

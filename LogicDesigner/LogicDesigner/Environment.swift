@@ -10,15 +10,24 @@ import Foundation
 import Logic
 
 enum LogicError: Error {
-    case undefinedType(UUID)
-    case undefinedIdentifier(UUID)
-    case typeMismatch([UUID])
+    case undefinedType(Environment.Context, UUID)
+    case undefinedIdentifier(Environment.Context, UUID)
+    case typeMismatch(Environment.Context, [UUID])
+
+    var context: Environment.Context {
+        switch self {
+        case .undefinedType(let context, _), .undefinedIdentifier(let context, _):
+            return context
+        case .typeMismatch(let context, _):
+            return context
+        }
+    }
 
     var nodeId: UUID {
         switch self {
-        case .undefinedType(let id), .undefinedIdentifier(let id):
+        case .undefinedType(_, let id), .undefinedIdentifier(_, let id):
             return id
-        case .typeMismatch(let ids):
+        case .typeMismatch(_, let ids):
             return ids.first!
         }
     }
@@ -35,7 +44,7 @@ public enum Environment {
             if let type = context.types.first(where: { entity in entity.name == identifier.string }) {
                 return (type, context)
             } else {
-                throw LogicError.undefinedType(node.uuid)
+                throw LogicError.undefinedType(context, node.uuid)
             }
         default:
             break
@@ -55,7 +64,7 @@ public enum Environment {
                 return (value, context.with(annotation: value.memory.description, for: identifier.id))
             }
 
-            throw LogicError.undefinedIdentifier(identifier.id)
+            throw LogicError.undefinedIdentifier(context, identifier.id)
         case .statement(.declaration(id: _, content: let declaration)):
             return try evaluate(.declaration(declaration), in: context)
         case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
@@ -66,7 +75,7 @@ public enum Environment {
 
                 let evaluatedTypeAnnotation = try evaluateType(.typeAnnotation(annotation), in: context).0
                 if evaluatedInitializer.0.type != evaluatedTypeAnnotation {
-                    throw LogicError.typeMismatch([node.uuid])
+                    throw LogicError.typeMismatch(context, [node.uuid])
                 }
 
                 let newContext = evaluatedInitializer.1.with(
@@ -94,7 +103,7 @@ public enum Environment {
                     return (LogicValue.unit, evaluatedCondition.1)
                 }
             } else {
-                throw LogicError.typeMismatch([condition.uuid])
+                throw LogicError.typeMismatch(evaluatedCondition.1, [condition.uuid])
             }
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
             return try evaluate(.identifier(identifier), in: context)
