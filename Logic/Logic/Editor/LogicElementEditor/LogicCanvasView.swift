@@ -281,7 +281,7 @@ public class LogicCanvasView: NSView {
         if let range = underlinedRange {
             let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
 
-            NSColor.red.setFill()
+            NSColor.red.setStroke()
 
             measuredElements[clampedRange].forEach { element in
                 let underlineRect = NSRect(
@@ -290,7 +290,9 @@ public class LogicCanvasView: NSView {
                     width: element.backgroundRect.width,
                     height: 2)
 
-                underlineRect.fill()
+                let underlinePath = NSBezierPath(squiggleWithin: underlineRect, lineWidth: 1)
+
+                underlinePath.stroke()
             }
         }
 
