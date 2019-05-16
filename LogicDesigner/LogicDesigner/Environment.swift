@@ -9,12 +9,45 @@
 import Foundation
 import Logic
 
+enum LogicError: Error {
+    case undefinedType(UUID)
+    case undefinedIdentifier(UUID)
+    case typeMismatch([UUID])
+
+    var nodeId: UUID {
+        switch self {
+        case .undefinedType(let id), .undefinedIdentifier(let id):
+            return id
+        case .typeMismatch(let ids):
+            return ids.first!
+        }
+    }
+}
+
 public enum Environment {
-    public static func evaluate(_ node: LGCSyntaxNode, in context: Context) -> (LogicValue, Context) {
+    public static func evaluateType(_ node: LGCSyntaxNode, in context: Context) throws -> (TypeEntity, Context) {
+        switch node {
+        case .typeAnnotation(.typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments)):
+            if !arguments.isEmpty {
+                fatalError("Handle generics")
+            }
+
+            if let type = context.types.first(where: { entity in entity.name == identifier.string }) {
+                return (type, context)
+            } else {
+                throw LogicError.undefinedType(node.uuid)
+            }
+        default:
+            break
+        }
+
+        return (Types.unit, context)
+    }
+    public static func evaluate(_ node: LGCSyntaxNode, in context: Context) throws -> (LogicValue, Context) {
         switch node {
         case .program(let program):
-            let newContext = program.block.reduce(context, { result, node in
-                return evaluate(.statement(node), in: result).1
+            let newContext = try program.block.reduce(context, { result, node in
+                return try evaluate(.statement(node), in: result).1
             })
             return (LogicValue.unit, newContext)
         case .identifier(let identifier):
@@ -22,12 +55,20 @@ public enum Environment {
                 return (value, context.with(annotation: value.memory.description, for: identifier.id))
             }
 
-            return (LogicValue.unit, context.with(error: .runtime("Undefined identifier \(identifier.string)", identifier.id)))
+            throw LogicError.undefinedIdentifier(identifier.id)
         case .statement(.declaration(id: _, content: let declaration)):
-            return evaluate(.declaration(declaration), in: context)
-        case .declaration(.variable(id: _, name: let name, annotation: _, initializer: let value)):
-            if let value = value {
-                let evaluatedInitializer = self.evaluate(.expression(value), in: context)
+            return try evaluate(.declaration(declaration), in: context)
+        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
+            if let value = initializer {
+                let evaluatedInitializer = try self.evaluate(.expression(value), in: context)
+
+                guard let annotation = annotation else { fatalError("We require type annotations for now") }
+
+                let evaluatedTypeAnnotation = try evaluateType(.typeAnnotation(annotation), in: context).0
+                if evaluatedInitializer.0.type != evaluatedTypeAnnotation {
+                    throw LogicError.typeMismatch([node.uuid])
+                }
+
                 let newContext = evaluatedInitializer.1.with(
                     name: name.name,
                     boundToValue: evaluatedInitializer.0
@@ -41,28 +82,28 @@ public enum Environment {
         case .literal(.number(id: _, value: let literal)):
             return (LogicValue(type: Types.number, memory: [literal]), context)
         case .statement(.branch(id: _, condition: let condition, block: let block)):
-            let evaluatedCondition = evaluate(.expression(condition), in: context)
+            let evaluatedCondition = try evaluate(.expression(condition), in: context)
 
             if evaluatedCondition.0.type == Types.boolean, let memory = evaluatedCondition.0.memory as? [Bool] {
                 if memory == [true] {
-                    let resultingContext = block.reduce(evaluatedCondition.1, { result, node in
-                        return evaluate(.statement(node), in: result).1
+                    let resultingContext = try block.reduce(evaluatedCondition.1, { result, node in
+                        return try evaluate(.statement(node), in: result).1
                     })
                     return (LogicValue.unit, resultingContext)
                 } else {
                     return (LogicValue.unit, evaluatedCondition.1)
                 }
             } else {
-                Swift.print("Evaluating condition failed -- non-boolean type")
+                throw LogicError.typeMismatch([condition.uuid])
             }
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
-            return evaluate(.identifier(identifier), in: context)
+            return try evaluate(.identifier(identifier), in: context)
         case .expression(.literalExpression(id: _, literal: let literal)):
-            return evaluate(.literal(literal), in: context)
+            return try evaluate(.literal(literal), in: context)
         case .expression(.functionCallExpression(id: _, expression: .identifierExpression(id: _, identifier: let functionName), arguments: let args)):
             for type in context.types where type.name == functionName.string {
                 // TODO: Verify subtypes?
-                let memory: [Any] = args.map { arg in evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
+                let memory: [Any] = try args.map { arg in try evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
                 return (LogicValue(type: type, memory: memory), context)
             }
         default:
@@ -123,7 +164,6 @@ extension Environment {
     public struct Context {
         public var types: [TypeEntity]
         public var scopes: [[String: LogicValue]]
-        public var errors: [Error]
         public var annotations: [UUID: String]
 
         public static let standard = Context(
@@ -139,19 +179,12 @@ extension Environment {
                     "none": LogicValue.unit
                 ]
             ],
-            errors: [],
             annotations: [:]
         )
 
         public func with(name: String, boundToValue value: LogicValue) -> Context {
             var copy = self
             copy.scopes[copy.scopes.count - 1][name] = value
-            return copy
-        }
-
-        public func with(error: Error) -> Context {
-            var copy = self
-            copy.errors.append(error)
             return copy
         }
 

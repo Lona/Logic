@@ -72,20 +72,20 @@ class Document: NSDocument {
         }
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
-            let context = Environment.evaluate(rootNode, in: .standard).1
-            Swift.print(context.scopes, context.errors)
-
-            annotations = context.annotations
-
             self.logicEditor.rootNode = rootNode
 
-            if let error = context.errors.first {
-                switch error {
-                case .compiler(_, let id), .runtime(_, let id):
-                    self.logicEditor.underlinedId = id
-                }
-            } else {
+            do {
+                let context = try Environment.evaluate(rootNode, in: .standard).1
+
+                Swift.print(context.scopes)
+
+                annotations = context.annotations
+
                 self.logicEditor.underlinedId = nil
+            } catch let error {
+                if let error = error as? LogicError {
+                    self.logicEditor.underlinedId = error.nodeId
+                }
             }
 
             return true
