@@ -79,6 +79,15 @@ class Document: NSDocument {
 
             self.logicEditor.rootNode = rootNode
 
+            if let error = context.errors.first {
+                switch error {
+                case .compiler(_, let id), .runtime(_, let id):
+                    self.logicEditor.underlinedId = id
+                }
+            } else {
+                self.logicEditor.underlinedId = nil
+            }
+
             return true
         }
 

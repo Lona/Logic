@@ -77,6 +77,11 @@ public class LogicCanvasView: NSView {
             update()
         }
     }
+    public var underlinedRange: Range<Int>? {
+        didSet {
+            update()
+        }
+    }
     public var onActivate: ((Int?) -> Void)?
     public var onActivateLine: ((Int) -> Void)?
     public var onPressTabKey: (() -> Void)?
@@ -270,6 +275,22 @@ public class LogicCanvasView: NSView {
                     roundedRect: rect,
                     xRadius: style.textBackgroundRadius.width,
                     yRadius: style.textBackgroundRadius.height).fill()
+            }
+        }
+
+        if let range = underlinedRange {
+            let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
+
+            NSColor.red.setFill()
+
+            measuredElements[clampedRange].forEach { element in
+                let underlineRect = NSRect(
+                    x: element.backgroundRect.minX,
+                    y: element.backgroundRect.maxY - 2,
+                    width: element.backgroundRect.width,
+                    height: 2)
+
+                underlineRect.fill()
             }
         }
 

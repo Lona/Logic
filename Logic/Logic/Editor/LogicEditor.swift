@@ -63,6 +63,23 @@ public class LogicEditor: NSBox {
         }
     }
 
+    public var underlinedId: UUID? {
+        didSet {
+            guard let underlinedId = underlinedId else {
+                canvasView.underlinedRange = nil
+                return
+            }
+
+            let topNode = self.rootNode.topNodeWithEqualElements(as: underlinedId)
+
+            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid) {
+                self.canvasView.underlinedRange = selectedRange
+            } else {
+                self.canvasView.underlinedRange = nil
+            }
+        }
+    }
+
     public var showsDropdown: Bool = true
 
     public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _
