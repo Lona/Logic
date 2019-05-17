@@ -54,6 +54,9 @@ class Document: NSDocument {
 
         var annotations: [UUID: String] = [:]
 
+        var alphaSubstitution: AlphaRenaming.Substitution = [:]
+//        var unificationContext = Environment.UnificationContext()
+
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
 
@@ -71,18 +74,99 @@ class Document: NSDocument {
             }
         }
 
+        logicEditor.suggestionsForNode = { [unowned self] node, query in
+            let rootNode = self.logicEditor.rootNode
+
+            switch node {
+            case .expression(let expression):
+                do {
+//                    let compilerContext = try Environment.compile(rootNode, in: .standard)
+
+                    let alphaSubstitution = AlphaRenaming.rename(rootNode)
+                    let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
+
+                    Swift.print("Unification context", unificationContext.constraints)
+
+                    guard let type = unificationContext.nodes[expression.uuid] else {
+                        Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
+                        return []
+                    }
+
+                    Swift.print("Typename", type)
+
+                    if type == "Boolean" {
+                        return [
+                            LogicSuggestionItem(
+                                title: "true (Boolean)",
+                                category: "Literals".uppercased(),
+                                node: LGCSyntaxNode.expression(
+                                    .literalExpression(
+                                        id: UUID(),
+                                        literal: .boolean(id: UUID(), value: true)
+                                    )
+                                )
+                            ),
+                            LogicSuggestionItem(
+                                title: "false (Boolean)",
+                                category: "Literals".uppercased(),
+                                node: LGCSyntaxNode.expression(
+                                    .literalExpression(
+                                        id: UUID(),
+                                        literal: .boolean(id: UUID(), value: false)
+                                    )
+                                )
+                            )
+                        ]
+                    }
+
+                    return []
+
+//                    switch type {
+//                    default:
+//                        return []
+//                    }
+                } catch let error {
+                    Swift.print("Can't determine suggestions - compiler error", error)
+                    return []
+                }
+            default:
+                return LogicEditor.defaultSuggestionsForNode(node, self.logicEditor.rootNode, query)
+            }
+        }
+
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode
 
             do {
+                let alphaSubstitution = AlphaRenaming.rename(rootNode)
+                let context = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
+
+//                unificationContext = context
+
+//                Swift.print("Unification context", context)
+            } catch let error {
+                Swift.print("Unification failed")
+            }
+
+            do {
+                let compilerContext = try Environment.compile(rootNode, in: .standard)
+
+//                Swift.print(compilerContext.nodeType, compilerContext.scopes)
+
                 let context = try Environment.evaluate(rootNode, in: .standard).1
 
-                Swift.print(context.scopes)
+//                Swift.print(context.scopes)
 
                 annotations = context.annotations
 
                 self.logicEditor.underlinedId = nil
             } catch let error {
+                if let error = error as? CompilerError {
+//                    Swift.print("Compiler error", error)
+
+                    self.logicEditor.underlinedId = error.nodeId
+                }
+
                 if let error = error as? LogicError {
                     annotations = error.context.annotations
                     

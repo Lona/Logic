@@ -9,12 +9,33 @@
 import Foundation
 import Logic
 
-enum LogicError: Error {
-    case undefinedType(Environment.Context, UUID)
-    case undefinedIdentifier(Environment.Context, UUID)
-    case typeMismatch(Environment.Context, [UUID])
+enum CompilerError: Error {
+    case undefinedType(Environment.CompilerContext, UUID)
+    case typeMismatch(Environment.CompilerContext, [UUID])
 
-    var context: Environment.Context {
+    var context: Environment.CompilerContext {
+        switch self {
+        case .undefinedType(let context, _), .typeMismatch(let context, _):
+            return context
+        }
+    }
+
+    var nodeId: UUID {
+        switch self {
+        case .undefinedType(_, let id):
+            return id
+        case .typeMismatch(_, let ids):
+            return ids.first!
+        }
+    }
+}
+
+enum LogicError: Error {
+    case undefinedType(Environment.RuntimeContext, UUID)
+    case undefinedIdentifier(Environment.RuntimeContext, UUID)
+    case typeMismatch(Environment.RuntimeContext, [UUID])
+
+    var context: Environment.RuntimeContext {
         switch self {
         case .undefinedType(let context, _), .undefinedIdentifier(let context, _):
             return context
@@ -33,26 +54,205 @@ enum LogicError: Error {
     }
 }
 
+public enum UnificationError: Error {
+    case problem
+}
+
 public enum Environment {
-    public static func evaluateType(_ node: LGCSyntaxNode, in context: Context) throws -> (TypeEntity, Context) {
+    public typealias UnificationResult = Result<UnificationContext, UnificationError>
+
+    public struct UnificationContext {
+        var types: [TypeEntity] = TypeEntity.standardTypes
+        var constraints: [(String, String)] = []
+        var substitution: [String: String] = [:]
+        var nodes: [UUID: String] = [:]
+
+        public init() {}
+
+        public func with(type typeA: String, constrainedTo typeB: String) -> UnificationContext {
+            var copy = self
+            copy.constraints.append((typeA, typeB))
+            return copy
+        }
+
+        public func with(nodeId: UUID, boundTo typeName: String) -> UnificationContext {
+            var copy = self
+            copy.nodes[nodeId] = typeName
+            return copy
+        }
+
+        public func value(forNode id: UUID) -> Result<String, UnificationError> {
+            guard let value = nodes[id] else {
+                Swift.print("Failed to find \(id)")
+                return Result.failure(UnificationError.problem)
+            }
+            return Result.success(value)
+        }
+
+        private static var currentIndex: Int = 0
+
+        func makeGenericName() -> String {
+            Environment.UnificationContext.currentIndex += 1
+            let name = String(Environment.UnificationContext.currentIndex, radix: 36, uppercase: true)
+            return "?\(name)"
+        }
+
+        public func unify() -> Result<UnificationContext, UnificationError> {
+            return .success(self)
+        }
+    }
+
+    public static func makeConstraints(
+        _ rootNode: LGCSyntaxNode,
+        alphaSubstitution: AlphaRenaming.Substitution,
+        context initialContext: UnificationContext = UnificationContext()
+        ) throws -> UnificationContext {
+
+        let initialResult = UnificationResult.success(initialContext)
+
+        let finalResult: UnificationResult = rootNode.reduce(order: .post, initialResult: initialResult, f: {
+            (result, node) -> (result: UnificationResult, ignoreChildren: Bool) in
+
+            // Exit early upon failure
+            switch result {
+            case .failure:
+                return (result, true)
+            case .success(let context):
+                switch node {
+                case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
+                    guard let initializer = initializer, let annotation = annotation else { return (result, true) }
+
+                    if annotation.isPlaceholder { return (result, true) }
+
+                    let typeVariable = context.makeGenericName()
+                    let annotationTypeName = Environment.typeOf(annotation, in: context.types)?.name ?? context.makeGenericName()
+
+                    let context2 = context
+                        .with(type: typeVariable, constrainedTo: annotationTypeName)
+                        .with(nodeId: pattern.uuid, boundTo: typeVariable)
+                        .with(nodeId: initializer.uuid, boundTo: typeVariable)
+
+                    return (Result.success(context2), false)
+                case .expression(.identifierExpression(id: _, identifier: let identifier)):
+                    return (Result.success(context.with(nodeId: node.uuid, boundTo: context.makeGenericName())), false)
+                case .expression(.literalExpression(id: _, literal: let literal)):
+                    let context2 = context.value(forNode: literal.uuid).map { typeName in
+                        context.with(nodeId: node.uuid, boundTo: typeName)
+                    }
+
+                    return (context2, false)
+                case .literal(.boolean):
+                    return (Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean.name)), false)
+                default:
+                    break
+                }
+
+                return (Result.success(context), false)
+            }
+        })
+
+        return try finalResult.get()
+    }
+
+    public static func compile(_ node: LGCSyntaxNode, in context: CompilerContext) throws -> CompilerContext {
         switch node {
-        case .typeAnnotation(.typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments)):
+        case .program(let program):
+            return try program.block.reduce(context, { result, node in
+                return try compile(.statement(node), in: result)
+            })
+//        case .identifier(let identifier):
+//            if let type = context.type(for: identifier.string) {
+//                return (value, context.with(annotation: value.memory.description, for: identifier.id))
+//            }
+//
+//            throw LogicError.undefinedIdentifier(context, identifier.id)
+        case .statement(.declaration(id: _, content: let declaration)):
+            return try compile(.declaration(declaration), in: context)
+        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
+            if let value = initializer {
+                let newContext = try compile(.expression(value), in: context)
+
+                guard let annotation = annotation else { fatalError("We require type annotations for now") }
+
+                guard let evaluatedTypeAnnotation = typeOf(annotation, in: newContext.types) else {
+                    throw CompilerError.undefinedType(newContext, annotation.uuid)
+                }
+
+                return newContext
+                    .with(name: name.name, boundToType: evaluatedTypeAnnotation)
+                    .with(nodeId: annotation.uuid, boundToType: evaluatedTypeAnnotation)
+                    .with(nodeId: value.uuid, boundToType: evaluatedTypeAnnotation)
+            }
+        case .statement(.branch(id: _, condition: let condition, block: _)):
+            let newContext = try compile(.expression(condition), in: context)
+
+            if newContext.nodeType[condition.uuid] != Types.boolean {
+                throw CompilerError.typeMismatch(newContext, [condition.uuid])
+            }
+
+            return newContext
+        case .expression(.identifierExpression(id: _, identifier: let identifier)):
+            if identifier.isPlaceholder {
+                return context
+            }
+
+            let newContext = try compile(.identifier(identifier), in: context)
+
+            guard let boundType = newContext.type(for: identifier.string) else {
+                throw CompilerError.undefinedType(context, node.uuid)
+            }
+
+            return newContext.with(nodeId: node.uuid, boundToType: boundType)
+        case .expression(.literalExpression(id: _, literal: let literal)):
+            let newContext = try compile(.literal(literal), in: context)
+
+            guard let boundType = newContext.nodeType[literal.uuid] else {
+                throw CompilerError.undefinedType(context, node.uuid)
+            }
+
+            return newContext.with(nodeId: node.uuid, boundToType: boundType)
+//        case .expression(.functionCallExpression(id: _, expression: .identifierExpression(id: _, identifier: let functionName), arguments: let args)):
+//            for type in context.types where type.name == functionName.string {
+//                // TODO: Verify subtypes?
+//                let memory: [Any] = try args.map { arg in try evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
+//                return (LogicValue(type: type, memory: memory), context)
+//            }
+        case .literal(.boolean):
+            return context.with(nodeId: node.uuid, boundToType: Types.boolean)
+        case .literal(.string):
+            return context.with(nodeId: node.uuid, boundToType: Types.string)
+        case .literal(.number):
+            return context.with(nodeId: node.uuid, boundToType: Types.number)
+        default:
+            break
+        }
+
+        return context
+    }
+
+    public static func typeOf(_ annotation: LGCTypeAnnotation, in types: [TypeEntity]) -> TypeEntity? {
+        switch annotation {
+        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
+
+            // TODO: Placeholder annotations don't have a type... should we introduce a type variable?
+            if identifier.isPlaceholder { return nil }
+
             if !arguments.isEmpty {
                 fatalError("Handle generics")
             }
 
-            if let type = context.types.first(where: { entity in entity.name == identifier.string }) {
-                return (type, context)
+            if let type = types.first(where: { entity in entity.name == identifier.string }) {
+                return type
             } else {
-                throw LogicError.undefinedType(context, node.uuid)
+                return nil
             }
         default:
             break
         }
 
-        return (Types.unit, context)
+        return Types.unit
     }
-    public static func evaluate(_ node: LGCSyntaxNode, in context: Context) throws -> (LogicValue, Context) {
+    public static func evaluate(_ node: LGCSyntaxNode, in context: RuntimeContext) throws -> (LogicValue, RuntimeContext) {
         switch node {
         case .program(let program):
             let newContext = try program.block.reduce(context, { result, node in
@@ -73,7 +273,10 @@ public enum Environment {
 
                 guard let annotation = annotation else { fatalError("We require type annotations for now") }
 
-                let evaluatedTypeAnnotation = try evaluateType(.typeAnnotation(annotation), in: context).0
+                guard let evaluatedTypeAnnotation = typeOf(annotation, in: context.types) else {
+                    throw LogicError.undefinedType(context, annotation.uuid)
+                }
+
                 if evaluatedInitializer.0.type != evaluatedTypeAnnotation {
                     throw LogicError.typeMismatch(context, [node.uuid])
                 }
@@ -164,25 +367,62 @@ public struct LogicValue {
     static let unit = LogicValue(type: Environment.Types.unit, memory: [0])
 }
 
+extension TypeEntity {
+    public static let standardTypes: [TypeEntity] = [
+        Environment.Types.unit,
+        Environment.Types.boolean,
+        Environment.Types.number,
+        Environment.Types.string,
+        Environment.Types.genericList
+    ]
+}
+
 extension Environment {
-    public enum Error {
-        case compiler(String, UUID)
-        case runtime(String, UUID)
+    public struct CompilerContext {
+        public var types: [TypeEntity]
+        public var scopes: [[String: TypeEntity]]
+        public var nodeType: [UUID: TypeEntity]
+
+        public static let standard = CompilerContext(
+            types: TypeEntity.standardTypes,
+            scopes: [
+                [
+                    "none": Types.unit
+                ]
+            ],
+            nodeType: [:]
+        )
+
+        public func type(for name: String) -> TypeEntity? {
+            for scope in scopes.reversed() {
+                if let type = scope[name] {
+                    return type
+                }
+            }
+
+            return nil
+        }
+
+        public func with(name: String, boundToType type: TypeEntity) -> CompilerContext {
+            var copy = self
+            copy.scopes[copy.scopes.count - 1][name] = type
+            return copy
+        }
+
+        public func with(nodeId: UUID, boundToType type: TypeEntity) -> CompilerContext {
+            var copy = self
+            copy.nodeType[nodeId] = type
+            return copy
+        }
     }
 
-    public struct Context {
+    public struct RuntimeContext {
         public var types: [TypeEntity]
         public var scopes: [[String: LogicValue]]
         public var annotations: [UUID: String]
 
-        public static let standard = Context(
-            types: [
-                Types.unit,
-                Types.boolean,
-                Types.number,
-                Types.string,
-                Types.genericList
-            ],
+        public static let standard = RuntimeContext(
+            types: TypeEntity.standardTypes,
             scopes: [
                 [
                     "none": LogicValue.unit
@@ -191,13 +431,13 @@ extension Environment {
             annotations: [:]
         )
 
-        public func with(name: String, boundToValue value: LogicValue) -> Context {
+        public func with(name: String, boundToValue value: LogicValue) -> RuntimeContext {
             var copy = self
             copy.scopes[copy.scopes.count - 1][name] = value
             return copy
         }
 
-        public func with(annotation: String, for nodeId: UUID) -> Context {
+        public func with(annotation: String, for nodeId: UUID) -> RuntimeContext {
             var copy = self
             copy.annotations[nodeId] = annotation
             return copy

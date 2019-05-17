@@ -521,7 +521,10 @@ public extension LGCStatement {
         let ifCondition = LGCSyntaxNode.statement(
             LGCStatement.branch(
                 id: UUID(),
-                condition: idExpression("condition"),
+                condition: .identifierExpression(
+                    id: UUID(),
+                    identifier: LGCIdentifier(id: UUID(), string: "condition", isPlaceholder: true)
+                ),
                 block: LGCList<LGCStatement>.next(
                     LGCStatement.placeholderStatement(id: UUID()),
                     .empty
