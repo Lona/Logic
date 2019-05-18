@@ -114,19 +114,23 @@ public enum Environment {
 
         let initialResult = UnificationResult.success(initialContext)
 
-        let finalResult: UnificationResult = rootNode.reduce(order: .post, initialResult: initialResult, f: {
-            (result, node) -> (result: UnificationResult, ignoreChildren: Bool) in
-
-            // Exit early upon failure
+        let finalResult: UnificationResult = rootNode.reduce(initialResult: initialResult) { (result, node, config) in
             switch result {
             case .failure:
-                return (result, true)
+                config.stopTraversal = true
+                return result
             case .success(let context):
                 switch node {
                 case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
-                    guard let initializer = initializer, let annotation = annotation else { return (result, true) }
+                    guard let initializer = initializer, let annotation = annotation else {
+                        config.ignoreChildren = true
+                        return result
+                    }
 
-                    if annotation.isPlaceholder { return (result, true) }
+                    if annotation.isPlaceholder {
+                        config.ignoreChildren = true
+                        return result
+                    }
 
                     let typeVariable = context.makeGenericType()
                     let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
@@ -136,24 +140,30 @@ public enum Environment {
                         .with(nodeId: pattern.uuid, boundTo: typeVariable)
                         .with(nodeId: initializer.uuid, boundTo: typeVariable)
 
-                    return (Result.success(context2), false)
+                    return Result.success(context2)
                 case .expression(.identifierExpression(id: _, identifier: let identifier)):
-                    return (Result.success(context.with(nodeId: node.uuid, boundTo: context.makeGenericType())), false)
+                    let typeVariable = context.makeGenericType()
+
+                    return Result.success(
+                        context
+                            .with(nodeId: node.uuid, boundTo: typeVariable)
+                            .with(nodeId: identifier.uuid, boundTo: typeVariable)
+                    )
                 case .expression(.literalExpression(id: _, literal: let literal)):
                     let context2 = context.value(forNode: literal.uuid).map { typeName in
                         context.with(nodeId: node.uuid, boundTo: typeName)
                     }
 
-                    return (context2, false)
+                    return context2
                 case .literal(.boolean):
-                    return (Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean)), false)
+                    return Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean))
                 default:
                     break
                 }
 
-                return (Result.success(context), false)
+                return Result.success(context)
             }
-        })
+        }
 
         return try finalResult.get()
     }
@@ -458,4 +468,3 @@ extension Environment {
         }
     }
 }
-

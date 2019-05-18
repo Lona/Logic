@@ -83,6 +83,9 @@ class Document: NSDocument {
                     //                    let compilerContext = try Environment.compile(rootNode, in: .standard)
 
                     let alphaSubstitution = AlphaRenaming.rename(rootNode)
+
+                    Swift.print("Alpha sub", alphaSubstitution)
+
                     let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
 
                     Swift.print("Unification context", unificationContext.constraints)
@@ -151,7 +154,7 @@ class Document: NSDocument {
 
             do {
                 let alphaSubstitution = AlphaRenaming.rename(rootNode)
-                let context = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
+//                let context = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
 
 //                unificationContext = context
 
