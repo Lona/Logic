@@ -80,51 +80,63 @@ class Document: NSDocument {
             switch node {
             case .expression(let expression):
                 do {
-//                    let compilerContext = try Environment.compile(rootNode, in: .standard)
+                    //                    let compilerContext = try Environment.compile(rootNode, in: .standard)
 
                     let alphaSubstitution = AlphaRenaming.rename(rootNode)
                     let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
 
                     Swift.print("Unification context", unificationContext.constraints)
 
-                    guard let type = unificationContext.nodes[expression.uuid] else {
-                        Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
+                    switch TypeEntity.unify(constraints: unificationContext.constraints) {
+                    case .failure(let error):
+                        Swift.print("Unification failed", error)
+                        return []
+                    case .success(let substitution):
+                        Swift.print("Substitution", substitution)
+
+                        guard var type = unificationContext.nodes[expression.uuid] else {
+                            Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
+                            return []
+                        }
+
+                        Swift.print("Typename", type, "Substituted as", substitution[type])
+
+                        if type.name.starts(with: "?") {
+                            guard let substitutedType = substitution[type] else {
+                                Swift.print("Can't determine suggestions - no type substitution", expression.uuid)
+                                return []
+                            }
+
+                            type = substitutedType
+                        }
+
+                        if type.name == "Boolean" {
+                            return [
+                                LogicSuggestionItem(
+                                    title: "true (Boolean)",
+                                    category: "Literals".uppercased(),
+                                    node: LGCSyntaxNode.expression(
+                                        .literalExpression(
+                                            id: UUID(),
+                                            literal: .boolean(id: UUID(), value: true)
+                                        )
+                                    )
+                                ),
+                                LogicSuggestionItem(
+                                    title: "false (Boolean)",
+                                    category: "Literals".uppercased(),
+                                    node: LGCSyntaxNode.expression(
+                                        .literalExpression(
+                                            id: UUID(),
+                                            literal: .boolean(id: UUID(), value: false)
+                                        )
+                                    )
+                                )
+                            ]
+                        }
+
                         return []
                     }
-
-                    Swift.print("Typename", type)
-
-                    if type == "Boolean" {
-                        return [
-                            LogicSuggestionItem(
-                                title: "true (Boolean)",
-                                category: "Literals".uppercased(),
-                                node: LGCSyntaxNode.expression(
-                                    .literalExpression(
-                                        id: UUID(),
-                                        literal: .boolean(id: UUID(), value: true)
-                                    )
-                                )
-                            ),
-                            LogicSuggestionItem(
-                                title: "false (Boolean)",
-                                category: "Literals".uppercased(),
-                                node: LGCSyntaxNode.expression(
-                                    .literalExpression(
-                                        id: UUID(),
-                                        literal: .boolean(id: UUID(), value: false)
-                                    )
-                                )
-                            )
-                        ]
-                    }
-
-                    return []
-
-//                    switch type {
-//                    default:
-//                        return []
-//                    }
                 } catch let error {
                     Swift.print("Can't determine suggestions - compiler error", error)
                     return []

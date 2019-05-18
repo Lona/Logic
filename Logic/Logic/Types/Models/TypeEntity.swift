@@ -12,7 +12,7 @@ public struct GenericType: Codable & Equatable {
     public var name: String
     public var cases: [TypeCase]
 
-    public init(name: String, cases: [TypeCase]) {
+    public init(name: String, cases: [TypeCase] = []) {
         self.name = name
         self.cases = cases
     }

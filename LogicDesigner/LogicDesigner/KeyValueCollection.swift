@@ -7,8 +7,8 @@
 
 import Foundation
 
-public protocol KeyValueCollection: Collection {
-    associatedtype Key where Key: Hashable
+public protocol KeyValueCollection {
+    associatedtype Key
     associatedtype Value
 
     func value(for key: Key) -> Value?
@@ -21,6 +21,10 @@ public extension KeyValueCollection {
         var copy = self
         copy.set(value, for: key)
         return copy
+    }
+
+    subscript(key: Key) -> Value? {
+        return value(for: key)
     }
 }
 

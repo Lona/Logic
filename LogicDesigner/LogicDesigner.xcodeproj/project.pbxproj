@@ -19,6 +19,8 @@
 		6BD44E60228E53A30025A3C8 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5F228E53A30025A3C8 /* Scope.swift */; };
 		6BD44E62228F2D080025A3C8 /* KeyValueCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */; };
 		6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E63228F31950025A3C8 /* Immutable.swift */; };
+		6BD44E66228F62670025A3C8 /* KeyValueList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E65228F62670025A3C8 /* KeyValueList.swift */; };
+		6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E67228F86B70025A3C8 /* Unify.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +52,8 @@
 		6BD44E5F228E53A30025A3C8 /* Scope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
 		6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueCollection.swift; sourceTree = "<group>"; };
 		6BD44E63228F31950025A3C8 /* Immutable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Immutable.swift; sourceTree = "<group>"; };
+		6BD44E65228F62670025A3C8 /* KeyValueList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueList.swift; sourceTree = "<group>"; };
+		6BD44E67228F86B70025A3C8 /* Unify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unify.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,11 +95,13 @@
 				6B12C5E52218BD75005A808C /* Document.swift */,
 				6BD44E59228CCA830025A3C8 /* Environment.swift */,
 				6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */,
+				6BD44E65228F62670025A3C8 /* KeyValueList.swift */,
 				6BD44E5F228E53A30025A3C8 /* Scope.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
 				6BD44E63228F31950025A3C8 /* Immutable.swift */,
+				6BD44E67228F86B70025A3C8 /* Unify.swift */,
 			);
 			path = LogicDesigner;
 			sourceTree = "<group>";
@@ -180,10 +186,12 @@
 				6B12C5E62218BD75005A808C /* Document.swift in Sources */,
 				6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */,
 				6BD44E5E228E0A910025A3C8 /* AlphaRenaming.swift in Sources */,
+				6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */,
 				6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */,
 				6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */,
 				6BD44E62228F2D080025A3C8 /* KeyValueCollection.swift in Sources */,
 				6BD44E60228E53A30025A3C8 /* Scope.swift in Sources */,
+				6BD44E66228F62670025A3C8 /* KeyValueList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

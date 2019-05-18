@@ -63,25 +63,25 @@ public enum Environment {
 
     public struct UnificationContext {
         var types: [TypeEntity] = TypeEntity.standardTypes
-        var constraints: [(String, String)] = []
+        var constraints: [(TypeEntity, TypeEntity)] = []
         var substitution: [String: String] = [:]
-        var nodes: [UUID: String] = [:]
+        var nodes: [UUID: TypeEntity] = [:]
 
         public init() {}
 
-        public func with(type typeA: String, constrainedTo typeB: String) -> UnificationContext {
+        public func with(type typeA: TypeEntity, constrainedTo typeB: TypeEntity) -> UnificationContext {
             var copy = self
             copy.constraints.append((typeA, typeB))
             return copy
         }
 
-        public func with(nodeId: UUID, boundTo typeName: String) -> UnificationContext {
+        public func with(nodeId: UUID, boundTo typeName: TypeEntity) -> UnificationContext {
             var copy = self
             copy.nodes[nodeId] = typeName
             return copy
         }
 
-        public func value(forNode id: UUID) -> Result<String, UnificationError> {
+        public func value(forNode id: UUID) -> Result<TypeEntity, UnificationError> {
             guard let value = nodes[id] else {
                 Swift.print("Failed to find \(id)")
                 return Result.failure(UnificationError.problem)
@@ -95,6 +95,10 @@ public enum Environment {
             Environment.UnificationContext.currentIndex += 1
             let name = String(Environment.UnificationContext.currentIndex, radix: 36, uppercase: true)
             return "?\(name)"
+        }
+
+        func makeGenericType() -> TypeEntity {
+            return .genericType(.init(name: makeGenericName()))
         }
 
         public func unify() -> Result<UnificationContext, UnificationError> {
@@ -124,8 +128,8 @@ public enum Environment {
 
                     if annotation.isPlaceholder { return (result, true) }
 
-                    let typeVariable = context.makeGenericName()
-                    let annotationTypeName = Environment.typeOf(annotation, in: context.types)?.name ?? context.makeGenericName()
+                    let typeVariable = context.makeGenericType()
+                    let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
 
                     let context2 = context
                         .with(type: typeVariable, constrainedTo: annotationTypeName)
@@ -134,7 +138,7 @@ public enum Environment {
 
                     return (Result.success(context2), false)
                 case .expression(.identifierExpression(id: _, identifier: let identifier)):
-                    return (Result.success(context.with(nodeId: node.uuid, boundTo: context.makeGenericName())), false)
+                    return (Result.success(context.with(nodeId: node.uuid, boundTo: context.makeGenericType())), false)
                 case .expression(.literalExpression(id: _, literal: let literal)):
                     let context2 = context.value(forNode: literal.uuid).map { typeName in
                         context.with(nodeId: node.uuid, boundTo: typeName)
@@ -142,7 +146,7 @@ public enum Environment {
 
                     return (context2, false)
                 case .literal(.boolean):
-                    return (Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean.name)), false)
+                    return (Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean)), false)
                 default:
                     break
                 }
@@ -454,3 +458,4 @@ extension Environment {
         }
     }
 }
+
