@@ -1,5 +1,5 @@
 //
-//  RecordTypeCaseParameter.swift
+//  KeyedParameter.swift
 //  Logic
 //
 //  Created by Devin Abbott on 9/26/18.
@@ -8,14 +8,14 @@
 
 import Foundation
 
-public struct RecordTypeCaseParameter: Codable & Equatable {
-    public init(key: String, value: TypeCaseParameterEntity) {
+public struct KeyedParameter: Codable & Equatable {
+    public init(key: String, value: TypeParameterEntity) {
         self.key = key
         self.value = value
     }
 
     public var key: String
-    public var value: TypeCaseParameterEntity
+    public var value: TypeParameterEntity
 
     public var children: [TypeListItem] {
         return value.children
@@ -34,8 +34,8 @@ public struct RecordTypeCaseParameter: Codable & Equatable {
                         }
                     }
                     return TypeListItem.recordTypeCaseParameter(
-                        RecordTypeCaseParameter(key: key, value:
-                            TypeCaseParameterEntity.type(name, substitution)))
+                        KeyedParameter(key: key, value:
+                            TypeParameterEntity.type(name, substitution)))
                 } else {
                     return item
                 }

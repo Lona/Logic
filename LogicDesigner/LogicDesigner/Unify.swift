@@ -9,7 +9,7 @@
 import Foundation
 import Logic
 
-public extension GenericType {
+public extension EnumType {
     fileprivate var isTypeVariable: Bool {
         return name.starts(with: "?")
     }
@@ -60,11 +60,11 @@ public extension TypeEntity {
             }
 
             switch (constraint.head, constraint.tail) {
-            case (.genericType(let head), let tail):
+            case (.enumType(let head), let tail):
                 if head.isTypeVariable {
                     substitution = substitution.with(tail, for: constraint.head)
                 }
-            case (let head, .genericType(let tail)):
+            case (let head, .enumType(let tail)):
                 if tail.isTypeVariable {
                     substitution = substitution.with(head, for: constraint.tail)
                 }

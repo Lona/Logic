@@ -98,7 +98,7 @@ public enum Environment {
         }
 
         func makeGenericType() -> TypeEntity {
-            return .genericType(.init(name: makeGenericName()))
+            return .enumType(.init(name: makeGenericName()))
         }
 
         public func unify() -> Result<UnificationContext, UnificationError> {
@@ -357,8 +357,8 @@ public extension Environment {
         static let number = TypeEntity.nativeType(.init(name: "Number"))
         static let string = TypeEntity.nativeType(.init(name: "String"))
 
-        static func list(_ element: TypeCaseParameterEntity) -> TypeEntity {
-            return TypeEntity.genericType(
+        static func list(_ element: TypeParameterEntity) -> TypeEntity {
+            return TypeEntity.enumType(
                 .init(
                     name: "List",
                     cases: [

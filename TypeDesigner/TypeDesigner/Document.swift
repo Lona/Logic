@@ -45,7 +45,7 @@ class Document: NSDocument {
             guard let entity = self.content.types.first(where: { $0.name == name }) else { return [] }
 
             switch entity {
-            case .genericType(let genericType):
+            case .enumType(let genericType):
                 let all = genericType.cases.map({ genericCase -> [String] in
                     switch genericCase {
                     case .normal(_, let parameters):

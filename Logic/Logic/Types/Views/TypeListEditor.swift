@@ -172,7 +172,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
         header.tableView = self
         header.onPressPlus = {
             var copy = self.list
-            copy.append(TypeEntity.genericType(GenericType.init(name: "", cases: [])))
+            copy.append(TypeEntity.enumType(EnumType.init(name: "", cases: [])))
             self.onChange(copy)
         }
         header.update()
@@ -209,7 +209,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
 
     var defaultTypeName = "Unit"
 
-    var defaultTypeParameter = TypeCaseParameterEntity.type("Unit", [])
+    var defaultTypeParameter = TypeParameterEntity.type("Unit", [])
 
     var getTypeList: () -> [String] = {
         return []
@@ -323,7 +323,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             case .entity(let entity):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
                 switch entity {
-                case .genericType:
+                case .enumType:
                     view.textColor = #colorLiteral(red: 0.5568627715, green: 0.3529411852, blue: 0.9686274529, alpha: 1)
                 case .nativeType:
                     view.textColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
@@ -335,10 +335,10 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 cell = view
 
                 switch entity {
-                case .genericType(var genericType):
+                case .enumType(var genericType):
                     view.onPressPlus = {
                         genericType.cases.append(TypeCase.normal("", []))
-                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.genericType(genericType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.enumType(genericType)))
                     }
                 case .nativeType(var nativeType):
                     view.onPressPlus = {
@@ -356,15 +356,16 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
                 view.onChangeText = { name in
                     switch entity {
-                    case .genericType(var genericType):
+                    case .enumType(var genericType):
                         genericType.name = name
-                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.genericType(genericType)))
+                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.enumType(genericType)))
                     case .nativeType(var nativeType):
                         nativeType.name = name
                         self.replace(item: item, with: TypeListItem.entity(TypeEntity.nativeType(nativeType)))
-                    case .functionType(var functionType):
-                        functionType.name = name
-                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.functionType(functionType)))
+                    case .functionType:
+                        break
+//                        functionType.name = name
+//                        self.replace(item: item, with: TypeListItem.entity(TypeEntity.functionType(functionType)))
                     }
                 }
             case .typeCase(let typeCase):
@@ -381,7 +382,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with: TypeListItem.typeCase(TypeCase.normal(name, parameters)))
                     case .record(let name, var parameters):
                         parameters.append(
-                            RecordTypeCaseParameter(key: "", value: self.defaultTypeParameter))
+                            KeyedParameter(key: "", value: self.defaultTypeParameter))
                         self.replace(item: item, with: TypeListItem.typeCase(TypeCase.record(name, parameters)))
                     }
                 }
@@ -409,7 +410,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 view.onPressMinus = { self.remove(item: item) }
                 view.onChangeText = { name in
                     self.replace(item: item, with: TypeListItem.recordTypeCaseParameter(
-                        RecordTypeCaseParameter(key: name, value: parameter.value)))
+                        KeyedParameter(key: name, value: parameter.value)))
                 }
             case .genericTypeParameterSubstitution(let substitution):
                 let view = NameCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
@@ -426,11 +427,11 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             switch typeListItem {
             case .entity(let entity):
                 let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
-//                view.items = ["Type", "Generic Type", "Native Type", "Instance Type", "Alias Type"]
-                view.items = ["Type", "Native Type", "Function Type"]
+//                view.items = ["Enum Type", "Generic Type", "Native Type", "Instance Type", "Alias Type"]
+                view.items = ["Enum Type", "Native Type"]
                 switch entity {
-                case .genericType:
-                    view.selectedItem = "Type"
+                case .enumType:
+                    view.selectedItem = "Enum Type"
                 case .nativeType:
                     view.selectedItem = "Native Type"
                 case .functionType:
@@ -438,21 +439,21 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 }
                 view.onChangeSelectedItem = { selectedItem in
                     switch selectedItem {
-                    case "Type":
+                    case "Enum Type":
                         self.replace(item: item, with:
                             TypeListItem.entity(
-                                TypeEntity.genericType(
-                                    GenericType(name: entity.name, cases: []))))
+                                TypeEntity.enumType(
+                                    EnumType(name: entity.name, cases: []))))
                     case "Native Type":
                         self.replace(item: item, with:
                             TypeListItem.entity(
                                 TypeEntity.nativeType(
                                     NativeType(name: entity.name, parameters: []))))
-                    case "Function Type":
-                        self.replace(item: item, with:
-                            TypeListItem.entity(
-                                TypeEntity.functionType(
-                                    FunctionType(name: entity.name, parameters: [], returnType: self.defaultTypeParameter))))
+//                    case "Function Type":
+//                        self.replace(item: item, with:
+//                            TypeListItem.entity(
+//                                TypeEntity.functionType(
+//                                    FunctionType(name: entity.name, parameters: [], returnType: self.defaultTypeParameter))))
                     default:
                         break
                     }
@@ -482,7 +483,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 let entity = list[path(forItem: item)[0]]
                 // If the top-level entity is generic, then we allow using generic parameters
                 switch entity {
-                case .genericType:
+                case .enumType:
                     let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
                     view.items = ["Type", "Generic Parameter"]
                     switch parameter.value {
@@ -501,7 +502,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                             self.replace(item: item, with:
                                 TypeListItem.normalTypeCaseParameter(
                                     NormalTypeCaseParameter(value:
-                                        TypeCaseParameterEntity.generic("T"))))
+                                        TypeParameterEntity.generic("T"))))
                         default:
                             break
                         }
@@ -516,7 +517,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                 let entity = list[path(forItem: item)[0]]
                 // If the top-level entity is generic, then we allow using generic parameters
                 switch entity {
-                case .genericType:
+                case .enumType:
                     let view = EntityCellView(frame: NSRect(x: 0, y: 0, width: 300, height: 100))
                     view.items = ["Type", "Generic Parameter"]
                     switch parameter.value {
@@ -530,12 +531,12 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         case "Type":
                             self.replace(item: item, with:
                                 TypeListItem.recordTypeCaseParameter(
-                                    RecordTypeCaseParameter(key: parameter.key, value: self.defaultTypeParameter)))
+                                    KeyedParameter(key: parameter.key, value: self.defaultTypeParameter)))
                         case "Generic Parameter":
                             self.replace(item: item, with:
                                 TypeListItem.recordTypeCaseParameter(
-                                    RecordTypeCaseParameter(key: parameter.key, value:
-                                        TypeCaseParameterEntity.generic("T"))))
+                                    KeyedParameter(key: parameter.key, value:
+                                        TypeParameterEntity.generic("T"))))
                         default:
                             break
                         }
@@ -585,7 +586,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.normalTypeCaseParameter(
                                 NormalTypeCaseParameter(value:
-                                    TypeCaseParameterEntity.type(selectedItem, substitutions))))
+                                    TypeParameterEntity.type(selectedItem, substitutions))))
                     }
                     cell = view
                 case .generic:
@@ -596,7 +597,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.normalTypeCaseParameter(
                                 NormalTypeCaseParameter(value:
-                                    TypeCaseParameterEntity.generic(name))))
+                                    TypeParameterEntity.generic(name))))
                     }
                     cell = view
                 }
@@ -619,8 +620,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
 
                         self.replace(item: item, with:
                             TypeListItem.recordTypeCaseParameter(
-                                RecordTypeCaseParameter(key: parameter.key, value:
-                                    TypeCaseParameterEntity.type(selectedItem, substitutions))))
+                                KeyedParameter(key: parameter.key, value:
+                                    TypeParameterEntity.type(selectedItem, substitutions))))
                     }
                     cell = view
                 case .generic:
@@ -630,8 +631,8 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                     view.onChangeText = { name in
                         self.replace(item: item, with:
                             TypeListItem.recordTypeCaseParameter(
-                                RecordTypeCaseParameter(key: parameter.key, value:
-                                    TypeCaseParameterEntity.generic(name))))
+                                KeyedParameter(key: parameter.key, value:
+                                    TypeParameterEntity.generic(name))))
                     }
                     cell = view
                 }
@@ -736,7 +737,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
             switch acceptanceCategory {
             case .into(parent: let parent, at: _):
                 switch (sourceItem, parent) {
-                case (.typeCase, .entity(.genericType)):
+                case (.typeCase, .entity(.enumType)):
                     return NSDragOperation.move
                 default:
                     break

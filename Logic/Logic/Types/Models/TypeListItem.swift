@@ -12,7 +12,7 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
     case entity(TypeEntity)
     case typeCase(TypeCase)
     case normalTypeCaseParameter(NormalTypeCaseParameter)
-    case recordTypeCaseParameter(RecordTypeCaseParameter)
+    case recordTypeCaseParameter(KeyedParameter)
     case genericTypeParameterSubstitution(GenericTypeParameterSubstitution)
     case nativeTypeParameter(NativeTypeParameter)
     
@@ -35,7 +35,7 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
         case "normalTypeCaseParameter":
             self = .normalTypeCaseParameter(try container.decode(NormalTypeCaseParameter.self, forKey: .data))
         case "recordTypeCaseParameter":
-            self = .recordTypeCaseParameter(try container.decode(RecordTypeCaseParameter.self, forKey: .data))
+            self = .recordTypeCaseParameter(try container.decode(KeyedParameter.self, forKey: .data))
         case "genericTypeParameterSubstitution":
             self = .genericTypeParameterSubstitution(try container.decode(GenericTypeParameterSubstitution.self, forKey: .data))
         case "nativeTypeParameter":
@@ -116,7 +116,7 @@ public enum TypeListItem: Decodable & Encodable & Equatable {
         }
     }
 
-    var recordTypeCaseParameter: RecordTypeCaseParameter? {
+    var recordTypeCaseParameter: KeyedParameter? {
         switch self {
         case .recordTypeCaseParameter(let value):
             return value

@@ -10,7 +10,7 @@ import Foundation
 
 public enum TypeCase: Codable & Equatable {
     case normal(String, [NormalTypeCaseParameter])
-    case record(String, [RecordTypeCaseParameter])
+    case record(String, [KeyedParameter])
 
     enum CodingKeys: String, CodingKey {
         case caseType = "case"
@@ -27,7 +27,7 @@ public enum TypeCase: Codable & Equatable {
         case "normal":
             self = .normal(name, try container.decode([NormalTypeCaseParameter].self, forKey: .parameters))
         case "record":
-            self = .record(name, try container.decode([RecordTypeCaseParameter].self, forKey: .parameters))
+            self = .record(name, try container.decode([KeyedParameter].self, forKey: .parameters))
         default:
             fatalError("Failed to decode TypeCaseParameterEntity")
         }

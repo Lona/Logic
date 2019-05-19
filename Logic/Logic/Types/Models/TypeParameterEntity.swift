@@ -1,5 +1,5 @@
 //
-//  TypeCaseParameterEntity.swift
+//  TypeParameterEntity.swift
 //  Logic
 //
 //  Created by Devin Abbott on 9/26/18.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum TypeCaseParameterEntity: Codable & Equatable {
+public enum TypeParameterEntity: Codable & Equatable {
     case type(String, [GenericTypeParameterSubstitution])
     case generic(String)
 

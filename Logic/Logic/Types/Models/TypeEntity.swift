@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GenericType: Codable & Equatable {
+public struct EnumType: Codable & Equatable {
     public var name: String
     public var cases: [TypeCase]
 
@@ -94,12 +94,10 @@ public struct NativeType: Codable & Equatable, CustomDebugStringConvertible {
 }
 
 public struct FunctionType: Codable & Equatable {
-    public var name: String
-    public var parameters: [TypeCaseParameterEntity]
-    public var returnType: TypeCaseParameterEntity
+    public var parameters: [TypeParameterEntity]
+    public var returnType: TypeParameterEntity
 
-    public init(name: String, parameters: [TypeCaseParameterEntity], returnType: TypeCaseParameterEntity) {
-        self.name = name
+    public init(parameters: [TypeParameterEntity], returnType: TypeParameterEntity) {
         self.parameters = parameters
         self.returnType = returnType
     }
@@ -110,16 +108,17 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
         switch self {
         case .nativeType(let value):
             return value.debugDescription
-        case .genericType(let value):
+        case .enumType(let value):
             return value.debugDescription
         case .functionType:
             return "functionType(TODO)"
         }
     }
 
-    case genericType(GenericType)
+    case enumType(EnumType)
     //    case instanceType
     //    case aliasType
+    //    case recordType
     case nativeType(NativeType)
     case functionType(FunctionType)
 
@@ -134,7 +133,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
         switch caseType {
         case "type":
-            self = .genericType(try container.decode(GenericType.self, forKey: .data))
+            self = .enumType(try container.decode(EnumType.self, forKey: .data))
         case "native":
             self = .nativeType(try container.decode(NativeType.self, forKey: .data))
         default:
@@ -145,7 +144,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
-        case .genericType(let type):
+        case .enumType(let type):
             try container.encode("type", forKey: .caseType)
             try container.encode(type, forKey: .data)
         case .nativeType(let type):
@@ -159,7 +158,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
     public var children: [TypeListItem] {
         switch self {
-        case .genericType(let genericType):
+        case .enumType(let genericType):
             return genericType.cases.map { TypeListItem.typeCase($0) }
         case .nativeType(let nativeType):
             return nativeType.parameters.map { TypeListItem.nativeTypeParameter($0) }
@@ -171,25 +170,25 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
     public var name: String {
         switch self {
-        case .genericType(let genericType):
+        case .enumType(let genericType):
             return genericType.name
         case .nativeType(let nativeType):
             return nativeType.name
         case .functionType(let functionType):
-            return functionType.name
+            return "function"
         }
     }
 
     func removing(itemAtPath path: [Int]) -> TypeEntity {
         switch self {
-        case .genericType(var genericType):
+        case .enumType(var genericType):
             if path.count > 1 {
                 let item = genericType.cases.remove(at: path[0])
                 genericType.cases.insert(item.removing(itemAtPath: Array(path.dropFirst())), at: path[0])
             } else {
                 genericType.cases.remove(at: path[0])
             }
-            return .genericType(genericType)
+            return .enumType(genericType)
         case .nativeType(var nativeType):
             if path.count > 1 {
                 fatalError("Nothing to remove")
@@ -204,7 +203,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
     func appending(item: TypeListItem, atPath path: [Int]) -> TypeEntity {
         switch self {
-        case .genericType(var genericType):
+        case .enumType(var genericType):
             if path.count > 1 {
                 genericType.cases = genericType.cases.replacing(
                     itemAt: path[0],
@@ -213,7 +212,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
             } else {
                 genericType.cases.append(item.typeCase!)
             }
-            return .genericType(genericType)
+            return .enumType(genericType)
         case .nativeType:
             return self
         case .functionType:
@@ -223,7 +222,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
     func inserting(item: TypeListItem, atPath path: [Int]) -> TypeEntity {
         switch self {
-        case .genericType(var genericType):
+        case .enumType(var genericType):
             if path.count > 1 {
                 genericType.cases = genericType.cases.replacing(
                     itemAt: path[0],
@@ -232,7 +231,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
             } else {
                 genericType.cases.insert(item.typeCase!, at: path[0])
             }
-            return .genericType(genericType)
+            return .enumType(genericType)
         case .nativeType:
             return self
         case .functionType(_):
@@ -242,14 +241,14 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
 
     func replacing(itemAtPath path: [Int], with item: TypeListItem) -> TypeListItem {
         switch self {
-        case .genericType(var genericType):
+        case .enumType(var genericType):
             if path.count > 0 {
                 genericType.cases = genericType.cases.enumerated().map { index, x in
                     return index == path[0]
                         ? x.replacing(itemAtPath: Array(path.dropFirst()), with: item).typeCase!
                         : x
                 }
-                return TypeListItem.entity(.genericType(genericType))
+                return TypeListItem.entity(.enumType(genericType))
             } else {
                 return item
             }
@@ -277,5 +276,14 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
                 return item
             }
         }
+    }
+
+    static func make(name: String, genericParameterNames: [String], withContextualTypes types: [TypeEntity]) -> TypeEntity? {
+        guard let type = types.first(where: { $0.name == name }) else {
+            Swift.print("Failed to find type `\(name)` in context.")
+            return nil
+        }
+
+        return type
     }
 }
