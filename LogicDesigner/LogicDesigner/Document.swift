@@ -75,6 +75,8 @@ class Document: NSDocument {
         }
 
         logicEditor.suggestionsForNode = { [unowned self] node, query in
+            Swift.print("---------")
+
             let rootNode = self.logicEditor.rootNode
 
             switch node {
@@ -82,11 +84,19 @@ class Document: NSDocument {
                 do {
                     //                    let compilerContext = try Environment.compile(rootNode, in: .standard)
 
-                    let alphaSubstitution = AlphaRenaming.rename(rootNode)
+                    let alphaRenamingContext = AlphaRenaming.rename(rootNode)
 
-                    Swift.print("Alpha sub", alphaSubstitution)
+                    Swift.print("Alpha sub", alphaRenamingContext)
 
-                    let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
+//                    let namesInScope =
+//                        Set(
+//                            Environment.scope(rootNode, targetId: node.uuid).flattened.keys
+//                                .compactMap { alphaRenamingContext.originalNames[$0] }
+//                        )
+//
+//                    Swift.print("Scope", namesInScope)
+
+                    let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaRenamingContext.substitution)
 
                     Swift.print("Unification context", unificationContext.constraints)
 
@@ -114,7 +124,40 @@ class Document: NSDocument {
                         }
 
                         if type.name == "Boolean" {
-                            return [
+                            let namesInScope = Environment.scope(rootNode, targetId: node.uuid).flattened.keys
+
+                            Swift.print("Scope", namesInScope)
+
+                            let matchingIdentifiers: [String] = namesInScope.compactMap({ nodeId in
+//                                let newName = alphaSubstitution[pair.value]
+
+                                guard var type = unificationContext.nodes[nodeId] else { return nil }
+
+                                if type.name.starts(with: "?") {
+                                    guard let substitutedType = substitution[type] else { return nil }
+                                    type = substitutedType
+                                }
+
+                                if type.name == "Boolean" {
+                                    return alphaRenamingContext.originalNames[nodeId]
+                                }
+
+                                return nil
+                            })
+
+                            Swift.print("Matching ids", matchingIdentifiers)
+
+                            let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { identifier in
+                                LogicSuggestionItem(
+                                    title: identifier,
+                                    category: "Variables".uppercased(),
+                                    node: LGCSyntaxNode.expression(
+                                        .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: identifier))
+                                    )
+                                )
+                            }
+
+                            let literals: [LogicSuggestionItem] = [
                                 LogicSuggestionItem(
                                     title: "true (Boolean)",
                                     category: "Literals".uppercased(),
@@ -136,6 +179,8 @@ class Document: NSDocument {
                                     )
                                 )
                             ]
+
+                            return identifiers + literals
                         }
 
                         return []

@@ -23,6 +23,14 @@ public struct ScopeStack<Key: Hashable, Value> {
 
     // MARK: Public
 
+    public var flattened: Scope {
+        return scopes.reduce(Scope(), { (result, scope) -> Scope in
+            return result.merging(scope, uniquingKeysWith: { (current, new) -> Value in
+                return current
+            })
+        })
+    }
+
     public func value(for key: Key) -> Value? {
         for scope in scopes.reversed() {
             if let value = scope[key] {

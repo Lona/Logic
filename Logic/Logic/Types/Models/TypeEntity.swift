@@ -16,6 +16,43 @@ public struct GenericType: Codable & Equatable {
         self.name = name
         self.cases = cases
     }
+
+    public var debugDescription: String {
+        if genericParameterNames.isEmpty {
+            return name
+        } else {
+            return "\(name)<\(genericParameterNames.joined(separator: ", "))>"
+        }
+    }
+
+    public var genericParameterNames: [String] {
+        let all = cases.map({ genericCase -> [String] in
+            switch genericCase {
+            case .normal(_, let parameters):
+                let all = parameters.map({ parameter -> [String] in
+                    switch parameter.value {
+                    case .generic(let name):
+                        return [name]
+                    case .type:
+                        return []
+                    }
+                })
+                return Array(all.joined())
+            case .record(_, let parameters):
+                let all = parameters.map({ parameter -> [String] in
+                    switch parameter.value {
+                    case .generic(let name):
+                        return [name]
+                    case .type:
+                        return []
+                    }
+                })
+                return Array(all.joined())
+            }
+        })
+
+        return Array(all.joined())
+    }
 }
 
 public struct NativeTypeParameter: Codable & Equatable {
@@ -34,13 +71,25 @@ public struct NativeTypeParameter: Codable & Equatable {
     }
 }
 
-public struct NativeType: Codable & Equatable {
+public struct NativeType: Codable & Equatable, CustomDebugStringConvertible {
     public var name: String
     public var parameters: [NativeTypeParameter]
 
     public init(name: String, parameters: [NativeTypeParameter] = []) {
         self.name = name
         self.parameters = parameters
+    }
+
+    public var debugDescription: String {
+        if genericParameterNames.isEmpty {
+            return name
+        } else {
+            return "*\(name)<\(genericParameterNames.joined(separator: ", "))>"
+        }
+    }
+
+    public var genericParameterNames: [String] {
+        return parameters.map { $0.name }
     }
 }
 
@@ -56,7 +105,18 @@ public struct FunctionType: Codable & Equatable {
     }
 }
 
-public enum TypeEntity: Codable & Equatable {
+public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
+    public var debugDescription: String {
+        switch self {
+        case .nativeType(let value):
+            return value.debugDescription
+        case .genericType(let value):
+            return value.debugDescription
+        case .functionType:
+            return "functionType(TODO)"
+        }
+    }
+
     case genericType(GenericType)
     //    case instanceType
     //    case aliasType

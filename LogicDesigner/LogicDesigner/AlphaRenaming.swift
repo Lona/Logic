@@ -21,9 +21,10 @@ private func makeAlphaVariableName() -> String {
 public enum AlphaRenaming {
     public typealias Substitution = [UUID: String]
 
-    private struct Context {
-        var scopeStack = ScopeStack<String, String>()
-        var substitution: Substitution = [:]
+    public struct Context {
+        public var scopeStack = ScopeStack<String, String>()
+        public var substitution: Substitution = [:]
+        public var originalNames: Substitution = [:]
         var currentIndex: Int = 0
 
         func newName(for originalName: String) -> String? {
@@ -33,6 +34,7 @@ public enum AlphaRenaming {
         func with(nodeId: UUID, boundTo originalName: String) -> Context {
             var copy = self
             copy.substitution[nodeId] = copy.scopeStack.value(for: originalName)
+            copy.originalNames[nodeId] = originalName
             return copy
         }
 
@@ -43,18 +45,21 @@ public enum AlphaRenaming {
         }
     }
 
-    public static func rename(_ node: LGCSyntaxNode) -> Substitution {
+    public static func rename(_ node: LGCSyntaxNode) -> Context {
         var defaultConfig = LGCSyntaxNode.TraversalConfig(order: .post)
 
         let result: Context = node.reduce(config: &defaultConfig, initialResult: Context(), f: {
             (context, node, config) -> Context in
             switch node {
-            case .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: _)):
+            case .declaration(.variable(id: let id, name: let pattern, annotation: _, initializer: _)):
                 let newName = makeAlphaVariableName()
 
                 config.ignoreChildren = true
 
-                return context.with(newName: newName, boundTo: pattern.name).with(nodeId: pattern.id, boundTo: pattern.name)
+                return context
+                    .with(newName: newName, boundTo: pattern.name)
+                    .with(nodeId: pattern.id, boundTo: pattern.name)
+                    .with(nodeId: id, boundTo: pattern.name)
             case .expression(.identifierExpression(id: _, identifier: let identifier)):
                 if identifier.isPlaceholder {
                     return context
@@ -68,7 +73,7 @@ public enum AlphaRenaming {
             return context
         })
 
-        return result.substitution
+        return result
     }
 }
 
@@ -86,18 +91,6 @@ extension LGCSyntaxNode {
 
         public init(order: TraversalOrder = TraversalOrder.post) {
             self.order = order
-        }
-
-        public var ignoringChildren: TraversalConfig {
-            var copy = self
-            copy.ignoreChildren = true
-            return copy
-        }
-
-        public var stoppingTraversal: TraversalConfig {
-            var copy = self
-            copy.stopTraversal = true
-            return copy
         }
     }
 
@@ -168,7 +161,6 @@ extension LGCSyntaxNode {
         initialResult: Result,
         f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) -> Result
         ) -> Result {
-
         var config = TraversalConfig()
 
         return reduce(config: &config, initialResult: initialResult, f: f)

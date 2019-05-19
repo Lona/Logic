@@ -135,6 +135,7 @@ public enum Environment {
                     let typeVariable = context.makeGenericType()
                     let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
 
+                    // TODO: We still need to know the variable name (either via the node or the original/new name), though maybe we do alpha substition outside of this function
                     let context2 = context
                         .with(type: typeVariable, constrainedTo: annotationTypeName)
                         .with(nodeId: pattern.uuid, boundTo: typeVariable)

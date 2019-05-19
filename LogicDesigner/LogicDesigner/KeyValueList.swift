@@ -32,6 +32,21 @@ public struct KeyValueList<Key: Equatable, Value>: KeyValueCollection {
     }
 }
 
+extension KeyValueList where Key: Hashable {
+    public var dictionary: [Key: Value] {
+        return pairs.reduce(into: [:], { (result, pair) in
+            result[pair.0] = pair.1
+        })
+    }
+}
+
+extension KeyValueList: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        let contents = pairs.map { "\($0.0): \($0.1)" }.joined(separator: ", ")
+        return "[\(contents)]"
+    }
+}
+
 extension KeyValueList: Collection {
     public typealias Index = Int
     public typealias Element = Pair
