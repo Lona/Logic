@@ -106,6 +106,12 @@ extension LGCSyntaxNode {
             })
         case .statement(.declaration(id: _, content: let declaration)):
             return declaration.node.reduce(config: &config, initialResult: context, f: f)
+        case .statement(.branch(id: _, condition: let condition, block: let block)):
+            let context2 = condition.node.reduce(config: &config, initialResult: context, f: f)
+
+            if config.ignoreChildren { return context2 }
+
+            return block.map { $0.node }.reduce(config: &config, initialResult: context2, f: f)
         case .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: let initializer)):
             var context2: Result
 
