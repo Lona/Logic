@@ -121,6 +121,8 @@ public enum Environment {
                 return result
             case .success(let context):
                 switch node {
+                case .statement(.branch(id: _, condition: let condition, block: _)):
+                    return .success(context.with(nodeId: condition.uuid, boundTo: Types.boolean))
                 case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
                     guard let initializer = initializer, let annotation = annotation else {
                         config.ignoreChildren = true
@@ -156,6 +158,13 @@ public enum Environment {
                     }
 
                     return context2
+                case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
+                    switch op {
+                    case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
+                        return .success(context.with(nodeId: node.uuid, boundTo: Types.boolean))
+                    case .setEqualTo: // TODO
+                        break
+                    }
                 case .literal(.boolean):
                     return Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean))
                 default:
