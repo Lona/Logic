@@ -158,29 +158,11 @@ class Document: NSDocument {
                             }
 
                             let literals: [LogicSuggestionItem] = [
-                                LogicSuggestionItem(
-                                    title: "true (Boolean)",
-                                    category: "Literals".uppercased(),
-                                    node: LGCSyntaxNode.expression(
-                                        .literalExpression(
-                                            id: UUID(),
-                                            literal: .boolean(id: UUID(), value: true)
-                                        )
-                                    )
-                                ),
-                                LogicSuggestionItem(
-                                    title: "false (Boolean)",
-                                    category: "Literals".uppercased(),
-                                    node: LGCSyntaxNode.expression(
-                                        .literalExpression(
-                                            id: UUID(),
-                                            literal: .boolean(id: UUID(), value: false)
-                                        )
-                                    )
-                                )
-                            ]
+                                LGCLiteral.Suggestion.true,
+                                LGCLiteral.Suggestion.false
+                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-                            return identifiers + literals
+                            return (identifiers + literals).titleContains(prefix: query)
                         }
 
                         return []

@@ -94,18 +94,30 @@ public extension LGCIdentifier {
 }
 
 public extension LGCLiteral {
+    enum Suggestion {
+        public static var `true`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "true (Boolean)",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
+            )
+        }
+
+        public static var `false`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "false (Boolean)",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
+            )
+        }
+
+        public static let categoryTitle = "Literals".uppercased()
+    }
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            LogicSuggestionItem(
-                title: "true (Boolean)",
-                category: "Literals".uppercased(),
-                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
-            ),
-            LogicSuggestionItem(
-                title: "false (Boolean)",
-                category: "Literals".uppercased(),
-                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
-            ),
+            Suggestion.true,
+            Suggestion.false,
             LogicSuggestionItem(
                 title: "red",
                 category: "Colors".uppercased(),
@@ -369,6 +381,19 @@ public extension LGCBinaryOperator {
 }
 
 public extension LGCExpression {
+    enum Suggestion {
+        public static func from(literalSuggestion: LogicSuggestionItem) -> LogicSuggestionItem? {
+            switch literalSuggestion.node {
+            case .literal(let literal):
+                var copy = literalSuggestion
+                copy.node = .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
+                return copy
+            default:
+                return nil
+            }
+        }
+    }
+
     static var assignmentSuggestionItem: LogicSuggestionItem {
         return LogicSuggestionItem(
             title: "Assignment",
@@ -419,16 +444,7 @@ public extension LGCExpression {
 
         let literalExpressions: [LogicSuggestionItem] = LGCLiteral
             .suggestions(for: prefix)
-            .compactMap({ item in
-                switch item.node {
-                case .literal(let literal):
-                    var copy = item
-                    copy.node = .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
-                    return copy
-                default:
-                    return nil
-                }
-            })
+            .compactMap(Suggestion.from(literalSuggestion:))
 
         let textStyleExample = LogicSuggestionItem(
             title: "Title Muted",
