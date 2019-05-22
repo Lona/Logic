@@ -19,9 +19,7 @@
 		6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E59228CCA830025A3C8 /* Environment.swift */; };
 		6BD44E5E228E0A910025A3C8 /* AlphaRenaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5D228E0A910025A3C8 /* AlphaRenaming.swift */; };
 		6BD44E60228E53A30025A3C8 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5F228E53A30025A3C8 /* Scope.swift */; };
-		6BD44E62228F2D080025A3C8 /* KeyValueCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */; };
 		6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E63228F31950025A3C8 /* Immutable.swift */; };
-		6BD44E66228F62670025A3C8 /* KeyValueList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E65228F62670025A3C8 /* KeyValueList.swift */; };
 		6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E67228F86B70025A3C8 /* Unify.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,9 +52,7 @@
 		6BD44E59228CCA830025A3C8 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6BD44E5D228E0A910025A3C8 /* AlphaRenaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaRenaming.swift; sourceTree = "<group>"; };
 		6BD44E5F228E53A30025A3C8 /* Scope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
-		6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueCollection.swift; sourceTree = "<group>"; };
 		6BD44E63228F31950025A3C8 /* Immutable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Immutable.swift; sourceTree = "<group>"; };
-		6BD44E65228F62670025A3C8 /* KeyValueList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueList.swift; sourceTree = "<group>"; };
 		6BD44E67228F86B70025A3C8 /* Unify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unify.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,8 +97,6 @@
 				6BD44E59228CCA830025A3C8 /* Environment.swift */,
 				6BBD0BF62290CA9F00EB87A9 /* Environment+Scope.swift */,
 				6BD44E63228F31950025A3C8 /* Immutable.swift */,
-				6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */,
-				6BD44E65228F62670025A3C8 /* KeyValueList.swift */,
 				6BD44E5F228E53A30025A3C8 /* Scope.swift */,
 				6BD44E67228F86B70025A3C8 /* Unify.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
@@ -197,9 +191,7 @@
 				6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */,
 				6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */,
 				6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */,
-				6BD44E62228F2D080025A3C8 /* KeyValueCollection.swift in Sources */,
 				6BD44E60228E53A30025A3C8 /* Scope.swift in Sources */,
-				6BD44E66228F62670025A3C8 /* KeyValueList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

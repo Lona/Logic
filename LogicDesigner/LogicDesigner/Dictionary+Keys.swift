@@ -24,7 +24,7 @@ extension Dictionary where Value: Equatable {
     public func firstKey(for value: Value) -> Key? {
         for pair in self {
             if value == pair.value {
-                return value
+                return pair.key
             }
         }
 

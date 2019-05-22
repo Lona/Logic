@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Logic
 
 public struct Box<Wrapped> {
     public let value: Wrapped
