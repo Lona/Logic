@@ -209,7 +209,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
 
     var defaultTypeName = "Unit"
 
-    var defaultTypeParameter = TypeParameterEntity.type("Unit", [])
+    var defaultTypeParameter = TypeParameter.type("Unit", [])
 
     var getTypeList: () -> [String] = {
         return []
@@ -502,7 +502,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                             self.replace(item: item, with:
                                 TypeListItem.normalTypeCaseParameter(
                                     NormalTypeCaseParameter(value:
-                                        TypeParameterEntity.generic("T"))))
+                                        TypeParameter.generic("T"))))
                         default:
                             break
                         }
@@ -536,7 +536,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                             self.replace(item: item, with:
                                 TypeListItem.recordTypeCaseParameter(
                                     KeyedParameter(key: parameter.key, value:
-                                        TypeParameterEntity.generic("T"))))
+                                        TypeParameter.generic("T"))))
                         default:
                             break
                         }
@@ -586,7 +586,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.normalTypeCaseParameter(
                                 NormalTypeCaseParameter(value:
-                                    TypeParameterEntity.type(selectedItem, substitutions))))
+                                    TypeParameter.type(selectedItem, substitutions))))
                     }
                     cell = view
                 case .generic:
@@ -597,7 +597,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.normalTypeCaseParameter(
                                 NormalTypeCaseParameter(value:
-                                    TypeParameterEntity.generic(name))))
+                                    TypeParameter.generic(name))))
                     }
                     cell = view
                 }
@@ -621,7 +621,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.recordTypeCaseParameter(
                                 KeyedParameter(key: parameter.key, value:
-                                    TypeParameterEntity.type(selectedItem, substitutions))))
+                                    TypeParameter.type(selectedItem, substitutions))))
                     }
                     cell = view
                 case .generic:
@@ -632,7 +632,7 @@ class TypeListEditor: NSOutlineView, NSOutlineViewDataSource, NSOutlineViewDeleg
                         self.replace(item: item, with:
                             TypeListItem.recordTypeCaseParameter(
                                 KeyedParameter(key: parameter.key, value:
-                                    TypeParameterEntity.generic(name))))
+                                    TypeParameter.generic(name))))
                     }
                     cell = view
                 }

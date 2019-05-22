@@ -9,11 +9,11 @@
 import Foundation
 
 public struct NormalTypeCaseParameter: Codable & Equatable {
-    public init(value: TypeParameterEntity) {
+    public init(value: TypeParameter) {
         self.value = value
     }
 
-    public var value: TypeParameterEntity
+    public var value: TypeParameter
 
     public var children: [TypeListItem] {
         return value.children
@@ -33,7 +33,7 @@ public struct NormalTypeCaseParameter: Codable & Equatable {
                     }
                     return TypeListItem.normalTypeCaseParameter(
                         NormalTypeCaseParameter(value:
-                            TypeParameterEntity.type(name, substitution)))
+                            TypeParameter.type(name, substitution)))
                 } else {
                     return item
                 }

@@ -15,6 +15,7 @@
 		6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; };
 		6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6BBD0BF72290CA9F00EB87A9 /* Environment+Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF62290CA9F00EB87A9 /* Environment+Scope.swift */; };
+		6BBD0BFD2292165000EB87A9 /* Dictionary+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFC2292165000EB87A9 /* Dictionary+Keys.swift */; };
 		6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E59228CCA830025A3C8 /* Environment.swift */; };
 		6BD44E5E228E0A910025A3C8 /* AlphaRenaming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5D228E0A910025A3C8 /* AlphaRenaming.swift */; };
 		6BD44E60228E53A30025A3C8 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5F228E53A30025A3C8 /* Scope.swift */; };
@@ -49,6 +50,7 @@
 		6B12C5F02218BD77005A808C /* LogicDesigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LogicDesigner.entitlements; sourceTree = "<group>"; };
 		6B44E13C223B3CED00740318 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BBD0BF62290CA9F00EB87A9 /* Environment+Scope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+Scope.swift"; sourceTree = "<group>"; };
+		6BBD0BFC2292165000EB87A9 /* Dictionary+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Keys.swift"; sourceTree = "<group>"; };
 		6BD44E59228CCA830025A3C8 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6BD44E5D228E0A910025A3C8 /* AlphaRenaming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaRenaming.swift; sourceTree = "<group>"; };
 		6BD44E5F228E53A30025A3C8 /* Scope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
@@ -94,17 +96,18 @@
 				6B12C5EF2218BD77005A808C /* Info.plist */,
 				6BD44E5D228E0A910025A3C8 /* AlphaRenaming.swift */,
 				6B12C5E32218BD75005A808C /* AppDelegate.swift */,
+				6BBD0BFC2292165000EB87A9 /* Dictionary+Keys.swift */,
 				6B12C5E52218BD75005A808C /* Document.swift */,
 				6BD44E59228CCA830025A3C8 /* Environment.swift */,
 				6BBD0BF62290CA9F00EB87A9 /* Environment+Scope.swift */,
+				6BD44E63228F31950025A3C8 /* Immutable.swift */,
 				6BD44E61228F2D080025A3C8 /* KeyValueCollection.swift */,
 				6BD44E65228F62670025A3C8 /* KeyValueList.swift */,
 				6BD44E5F228E53A30025A3C8 /* Scope.swift */,
+				6BD44E67228F86B70025A3C8 /* Unify.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
-				6BD44E63228F31950025A3C8 /* Immutable.swift */,
-				6BD44E67228F86B70025A3C8 /* Unify.swift */,
 			);
 			path = LogicDesigner;
 			sourceTree = "<group>";
@@ -190,6 +193,7 @@
 				6B12C5E62218BD75005A808C /* Document.swift in Sources */,
 				6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */,
 				6BD44E5E228E0A910025A3C8 /* AlphaRenaming.swift in Sources */,
+				6BBD0BFD2292165000EB87A9 /* Dictionary+Keys.swift in Sources */,
 				6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */,
 				6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */,
 				6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */,

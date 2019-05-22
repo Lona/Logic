@@ -8,53 +8,6 @@
 
 import Foundation
 
-public struct EnumType: Codable & Equatable {
-    public var name: String
-    public var cases: [TypeCase]
-
-    public init(name: String, cases: [TypeCase] = []) {
-        self.name = name
-        self.cases = cases
-    }
-
-    public var debugDescription: String {
-        if genericParameterNames.isEmpty {
-            return name
-        } else {
-            return "\(name)<\(genericParameterNames.joined(separator: ", "))>"
-        }
-    }
-
-    public var genericParameterNames: [String] {
-        let all = cases.map({ genericCase -> [String] in
-            switch genericCase {
-            case .normal(_, let parameters):
-                let all = parameters.map({ parameter -> [String] in
-                    switch parameter.value {
-                    case .generic(let name):
-                        return [name]
-                    case .type:
-                        return []
-                    }
-                })
-                return Array(all.joined())
-            case .record(_, let parameters):
-                let all = parameters.map({ parameter -> [String] in
-                    switch parameter.value {
-                    case .generic(let name):
-                        return [name]
-                    case .type:
-                        return []
-                    }
-                })
-                return Array(all.joined())
-            }
-        })
-
-        return Array(all.joined())
-    }
-}
-
 public struct NativeTypeParameter: Codable & Equatable {
     public var name: String
 
@@ -94,10 +47,10 @@ public struct NativeType: Codable & Equatable, CustomDebugStringConvertible {
 }
 
 public struct FunctionType: Codable & Equatable {
-    public var parameters: [TypeParameterEntity]
-    public var returnType: TypeParameterEntity
+    public var parameters: [TypeParameter]
+    public var returnType: TypeParameter
 
-    public init(parameters: [TypeParameterEntity], returnType: TypeParameterEntity) {
+    public init(parameters: [TypeParameter], returnType: TypeParameter) {
         self.parameters = parameters
         self.returnType = returnType
     }

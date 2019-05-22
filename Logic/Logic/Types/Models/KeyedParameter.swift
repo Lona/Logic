@@ -9,13 +9,13 @@
 import Foundation
 
 public struct KeyedParameter: Codable & Equatable {
-    public init(key: String, value: TypeParameterEntity) {
+    public init(key: String, value: TypeParameter) {
         self.key = key
         self.value = value
     }
 
     public var key: String
-    public var value: TypeParameterEntity
+    public var value: TypeParameter
 
     public var children: [TypeListItem] {
         return value.children
@@ -35,7 +35,7 @@ public struct KeyedParameter: Codable & Equatable {
                     }
                     return TypeListItem.recordTypeCaseParameter(
                         KeyedParameter(key: key, value:
-                            TypeParameterEntity.type(name, substitution)))
+                            TypeParameter.type(name, substitution)))
                 } else {
                     return item
                 }

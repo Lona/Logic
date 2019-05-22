@@ -357,7 +357,7 @@ public extension Environment {
         static let number = TypeEntity.nativeType(.init(name: "Number"))
         static let string = TypeEntity.nativeType(.init(name: "String"))
 
-        static func list(_ element: TypeParameterEntity) -> TypeEntity {
+        static func list(_ element: TypeParameter) -> TypeEntity {
             return TypeEntity.enumType(
                 .init(
                     name: "List",
