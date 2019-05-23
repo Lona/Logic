@@ -522,7 +522,7 @@ public extension LGCDeclaration {
                         genericArguments: .empty
                     ),
                     parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                    block: .empty
+                    block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
                 )
             )
         )
