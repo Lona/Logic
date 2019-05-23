@@ -29,13 +29,36 @@ extension LGCSyntaxNode {
     }
 
     public func makeUnificationContext() -> UnificationContext {
-        return self.reduce(initialResult: UnificationContext()) { (result, node, config) in
-            switch node {
-            case .statement(.branch(id: _, condition: let condition, block: _)):
+        var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
+
+        return self.reduce(config: &traversalConfig, initialResult: UnificationContext()) { (result, node, config) in
+//            Swift.print("pre", node.nodeTypeDescription)
+
+            config.needsRevisitAfterTraversingChildren = true
+
+            switch (config.isRevisit, node) {
+            case (true, .statement(.branch(id: _, condition: let condition, block: _))):
                 result.nodes[condition.uuid] = .cons(name: "Boolean")
 
                 return result
-            case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
+            case (false, .declaration(.function(id: _, name: _, returnType: _, parameters: let parameters, block: _))):
+                result.scopeStack = result.scopeStack.push()
+
+                parameters.forEach { parameter in
+                    switch parameter {
+                    case .parameter(id: _, externalName: _, localName: let pattern, annotation: let annotation, defaultValue: _):
+                        let annotationType = annotation.unificationType { result.makeGenericName() }
+
+                        result.nodes[pattern.uuid] = annotationType
+//                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
+                        result.scopeStack.set(annotationType, for: pattern.name)
+                    default:
+                        break
+                    }
+                }
+            case (true, .declaration(.function(id: _, name: _, returnType: _, parameters: _, block: _))):
+                result.scopeStack = result.scopeStack.pop()
+            case (true, .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer))):
                 guard let initializer = initializer, let annotation = annotation else {
                     config.ignoreChildren = true
                     return result
@@ -53,7 +76,7 @@ extension LGCSyntaxNode {
                 result.scopeStack.set(annotationType, for: pattern.name)
 
                 return result
-            case .expression(.identifierExpression(id: _, identifier: let identifier)):
+            case (true, .expression(.identifierExpression(id: _, identifier: let identifier))):
                 let typeVariable = result.makeEvar()
 
                 result.nodes[node.uuid] = typeVariable
@@ -64,10 +87,10 @@ extension LGCSyntaxNode {
                 }
 
                 return result
-            case .expression(.literalExpression(id: _, literal: let literal)):
+            case (true, .expression(.literalExpression(id: _, literal: let literal))):
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!
                 return result
-            case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
+            case (true, .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _))):
                 switch op {
                 case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
                     result.nodes[node.uuid] = .cons(name: "Boolean")
@@ -76,15 +99,15 @@ extension LGCSyntaxNode {
                 case .setEqualTo: // TODO
                     break
                 }
-            case .literal(.boolean):
+            case (true, .literal(.boolean)):
                 result.nodes[node.uuid] = .cons(name: "Boolean")
 
                 return result
-            case .literal(.number):
+            case (true, .literal(.number)):
                 result.nodes[node.uuid] = .cons(name: "Number")
 
                 return result
-            case .literal(.string):
+            case (true, .literal(.string)):
                 result.nodes[node.uuid] = .cons(name: "String")
 
                 return result
