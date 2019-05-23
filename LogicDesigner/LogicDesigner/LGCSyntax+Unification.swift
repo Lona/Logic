@@ -27,7 +27,7 @@ extension LGCSyntaxNode {
         }
     }
 
-    public func makeConstraints() -> UnificationContext {
+    public func makeUnificationContext() -> UnificationContext {
         let context: UnificationContext = UnificationContext()
 
         return self.reduce(initialResult: context) { (result, node, config) in

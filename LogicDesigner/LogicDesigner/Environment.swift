@@ -64,95 +64,6 @@ public enum UnificationError: Error {
 }
 
 public enum Environment {
-    public typealias UnificationResult = Result<UnificationContext, UnificationError>
-
-    public class UnificationContext {
-        var constraints: [Unification.Constraint] = []
-        var nodes: [UUID: Unification.T] = [:]
-
-        public init() {}
-
-        private var typeNameGenerator = NameGenerator(prefix: "?")
-
-        func makeGenericName() -> String {
-            return typeNameGenerator.next()
-        }
-
-        func makeEvar() -> Unification.T {
-            return .evar(makeGenericName())
-        }
-    }
-
-    public static func makeConstraints(_ rootNode: LGCSyntaxNode) -> UnificationResult {
-        let initialContext: UnificationContext = UnificationContext()
-
-        return rootNode.reduce(initialResult: .success(initialContext)) { (result, node, config) in
-            switch result {
-            case .failure:
-                config.stopTraversal = true
-                return result
-            case .success(let context):
-                switch node {
-                case .statement(.branch(id: _, condition: let condition, block: _)):
-                    context.nodes[condition.uuid] = .cons(name: "Boolean")
-
-                    return .success(context)
-                case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
-                    guard let initializer = initializer, let annotation = annotation else {
-                        config.ignoreChildren = true
-                        return result
-                    }
-
-                    if annotation.isPlaceholder {
-                        config.ignoreChildren = true
-                        return result
-                    }
-
-                    let typeVariable = context.makeEvar()
-                    let annotationType = Environment.unificationType(of: annotation, context: context)
-
-                    // TODO: We still need to know the variable name (either via the node or the original/new name),
-                    // though maybe we do alpha substition outside of this function
-                    context.constraints.append(Unification.Constraint(annotationType, typeVariable))
-                    context.nodes[pattern.uuid] = typeVariable
-                    context.nodes[initializer.uuid] = typeVariable
-
-                    return .success(context)
-                case .expression(.identifierExpression(id: _, identifier: let identifier)):
-                    let typeVariable = context.makeEvar()
-
-                    context.nodes[node.uuid] = typeVariable
-                    context.nodes[identifier.uuid] = typeVariable
-
-                    return .success(context)
-                case .expression(.literalExpression(id: _, literal: let literal)):
-                    if let type = context.nodes[literal.uuid] {
-                        context.nodes[node.uuid] = type
-                    }
-
-                    return .success(context)
-                case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
-                    switch op {
-                    case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                        context.nodes[node.uuid] = .cons(name: "Boolean")
-
-                        return .success(context)
-                    case .setEqualTo: // TODO
-                        break
-                    }
-                case .literal(.boolean):
-                    context.nodes[node.uuid] = .cons(name: "Boolean")
-
-                    return .success(context)
-                default:
-                    break
-                }
-
-                return Result.success(context)
-            }
-        }
-    }
-
     public static func compile(_ node: LGCSyntaxNode, in context: CompilerContext) throws -> CompilerContext {
         switch node {
         case .program(let program):
@@ -227,19 +138,6 @@ public enum Environment {
         }
 
         return context
-    }
-
-    public static func unificationType(of annotation: LGCTypeAnnotation, context: UnificationContext) -> Unification.T {
-        switch annotation {
-        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
-            if identifier.isPlaceholder { return .evar(context.makeGenericName()) }
-
-            let parameters = arguments.map { self.unificationType(of: $0, context: context) }
-
-            return .cons(name: identifier.string, parameters: parameters)
-        default:
-            fatalError("Not supported")
-        }
     }
 
     public static func typeOf(_ annotation: LGCTypeAnnotation, in types: [TypeEntity]) -> TypeEntity? {

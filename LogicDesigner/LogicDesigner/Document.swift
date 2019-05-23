@@ -86,7 +86,7 @@ class Document: NSDocument {
 
                     Swift.print("Alpha sub", alphaRenamingContext)
 
-                    guard case .success(let unificationContext) = Environment.makeConstraints(rootNode) else { return [] }
+                    let unificationContext = rootNode.makeUnificationContext()
 
                     Swift.print("Unification context", unificationContext.constraints)
 
