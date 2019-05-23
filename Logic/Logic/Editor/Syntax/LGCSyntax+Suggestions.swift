@@ -68,18 +68,22 @@ public struct LogicSuggestionCategory {
 }
 
 public extension LGCIdentifier {
+    enum Suggestion {
+        public static func name(_ string: String) -> LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: string,
+                category: "Variables".uppercased(),
+                node: LGCSyntaxNode.identifier(.init(id: UUID(), string: string))
+            )
+        }
+
+        public static let categoryTitle = "Identifiers".uppercased()
+    }
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            LogicSuggestionItem(
-                title: "bar",
-                category: "Variables".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "bar"))
-            ),
-            LogicSuggestionItem(
-                title: "foo",
-                category: "Variables".uppercased(),
-                node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "foo"))
-            )
+            Suggestion.name("bar"),
+            Suggestion.name("foo")
         ]
 
         return items.titleContains(prefix: prefix)
@@ -384,16 +388,54 @@ public extension LGCBinaryOperator {
 
 public extension LGCExpression {
     enum Suggestion {
-        public static func from(literalSuggestion: LogicSuggestionItem) -> LogicSuggestionItem? {
-            switch literalSuggestion.node {
+        public static func from(literalSuggestion suggestion: LogicSuggestionItem) -> LogicSuggestionItem? {
+            switch suggestion.node {
             case .literal(let literal):
-                var copy = literalSuggestion
-                copy.node = .expression(LGCExpression.literalExpression(id: UUID(), literal: literal))
+                var copy = suggestion
+                copy.node = .expression(.literalExpression(id: UUID(), literal: literal))
                 return copy
             default:
                 return nil
             }
         }
+
+        public static func from(identifierSuggestion suggestion: LogicSuggestionItem) -> LogicSuggestionItem? {
+            switch suggestion.node {
+            case .identifier(let identifier):
+                var copy = suggestion
+                copy.node = .expression(.identifierExpression(id: UUID(), identifier: identifier))
+                return copy
+            default:
+                return nil
+            }
+        }
+
+        public static var comparison: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Comparison",
+                category: categoryTitle,
+                node: LGCSyntaxNode.expression(
+                    LGCExpression.binaryExpression(
+                        left: LGCExpression.identifierExpression(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "left", isPlaceholder: true)
+                        ),
+                        right: LGCExpression.identifierExpression(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "right", isPlaceholder: true)
+                        ),
+                        op: .isEqualTo(id: UUID()),
+                        id: UUID()
+                    )
+                )
+            )
+        }
+
+        public static func identifier(name: String) -> LogicSuggestionItem {
+            return from(identifierSuggestion: LGCIdentifier.Suggestion.name(name))!
+        }
+
+        public static let categoryTitle = "Expressions".uppercased()
     }
 
     static var assignmentSuggestionItem: LogicSuggestionItem {
@@ -417,30 +459,9 @@ public extension LGCExpression {
         )
     }
 
-    static var comparisonSuggestionItem: LogicSuggestionItem {
-        return LogicSuggestionItem(
-            title: "Comparison",
-            category: "Expressions".uppercased(),
-            node: LGCSyntaxNode.expression(
-                LGCExpression.binaryExpression(
-                    left: LGCExpression.identifierExpression(
-                        id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "left", isPlaceholder: true)
-                    ),
-                    right: LGCExpression.identifierExpression(
-                        id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "right", isPlaceholder: true)
-                    ),
-                    op: .isEqualTo(id: UUID()),
-                    id: UUID()
-                )
-            )
-        )
-    }
-
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            comparisonSuggestionItem,
+            Suggestion.comparison,
             assignmentSuggestionItem
         ]
 
@@ -448,16 +469,16 @@ public extension LGCExpression {
             .suggestions(for: prefix)
             .compactMap(Suggestion.from(literalSuggestion:))
 
-        let textStyleExample = LogicSuggestionItem(
-            title: "Title Muted",
-            category: "Text Styles".uppercased(),
-            node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "TextStyles.title")),
-            style: .textStylePreview(TextStyle(weight: .bold, size: 18, color: NSColor.purple))
-        )
+//        let textStyleExample = LogicSuggestionItem(
+//            title: "Title Muted",
+//            category: "Text Styles".uppercased(),
+//            node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "TextStyles.title")),
+//            style: .textStylePreview(TextStyle(weight: .bold, size: 18, color: NSColor.purple))
+//        )
 
         return items.titleContains(prefix: prefix) +
             LGCIdentifier.suggestions(for: prefix) +
-            [textStyleExample].titleContains(prefix: prefix) +
+//            [textStyleExample].titleContains(prefix: prefix) +
             literalExpressions
     }
 }

@@ -45,12 +45,10 @@ extension LGCSyntaxNode {
                     return result
                 }
 
-                let typeVariable = result.makeEvar()
                 let annotationType = annotation.unificationType { result.makeGenericName() }
 
-                result.constraints.append(Unification.Constraint(annotationType, typeVariable))
-                result.nodes[pattern.uuid] = typeVariable
-                result.nodes[initializer.uuid] = typeVariable
+                result.nodes[pattern.uuid] = annotationType
+                result.constraints.append(Unification.Constraint(annotationType, result.nodes[initializer.uuid]!))
 
                 return result
             case .expression(.identifierExpression(id: _, identifier: let identifier)):
@@ -61,22 +59,27 @@ extension LGCSyntaxNode {
 
                 return result
             case .expression(.literalExpression(id: _, literal: let literal)):
-                if let type = result.nodes[literal.uuid] {
-                    result.nodes[node.uuid] = type
-                }
-
+                result.nodes[node.uuid] = result.nodes[literal.uuid]!
                 return result
-            case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
+            case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
                 switch op {
                 case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
                     result.nodes[node.uuid] = .cons(name: "Boolean")
-
+                    result.constraints.append(Unification.Constraint(result.nodes[left.uuid]!, result.nodes[right.uuid]!))
                     return result
                 case .setEqualTo: // TODO
                     break
                 }
             case .literal(.boolean):
                 result.nodes[node.uuid] = .cons(name: "Boolean")
+
+                return result
+            case .literal(.number):
+                result.nodes[node.uuid] = .cons(name: "Number")
+
+                return result
+            case .literal(.string):
+                result.nodes[node.uuid] = .cons(name: "String")
 
                 return result
             default:

@@ -80,7 +80,7 @@ class Document: NSDocument {
             case .expression(let expression):
                 let unificationContext = rootNode.makeUnificationContext()
 
-                Swift.print("Unification context", unificationContext.constraints)
+                Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
                 guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
                     Swift.print("Unification failed")
@@ -96,16 +96,31 @@ class Document: NSDocument {
 
                 let type = Unification.substitute(substitution, in: unificationType)
 
+                let currentScope = Environment.scope(rootNode, targetId: node.uuid).flattened
+
+                Swift.print("Scope", currentScope)
+
+                let common: [LogicSuggestionItem] = [
+                    LGCExpression.Suggestion.comparison,
+                ]
+
                 switch type {
                 case .evar:
-                    Swift.print("Couldn't determine concrete type")
-                    return []
+                    Swift.print("Resolved type: \(type)")
+
+                    let matchingIdentifiers = currentScope.values
+
+                    let literals: [LogicSuggestionItem] = [
+                        LGCLiteral.Suggestion.true,
+                        LGCLiteral.Suggestion.false,
+                        LGCLiteral.Suggestion.rationalNumber(for: query)
+                        ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
+
+                    return (literals + identifiers + common).titleContains(prefix: query)
                 case .cons(name: let name, parameters: _):
-                    Swift.print("Resolved type: \(name)")
-
-                    let currentScope = Environment.scope(rootNode, targetId: node.uuid).flattened
-
-                    Swift.print("Scope", currentScope)
+                    Swift.print("Resolved type: \(type)")
 
                     let matchingIdentifiers: [String] = currentScope.keys.compactMap({ nodeId in
                         guard let identifierType = unificationContext.nodes[nodeId] else { return nil }
@@ -123,15 +138,7 @@ class Document: NSDocument {
 
                     Swift.print("Matching ids", matchingIdentifiers)
 
-                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { identifier in
-                        LogicSuggestionItem(
-                            title: identifier,
-                            category: "Variables".uppercased(),
-                            node: LGCSyntaxNode.expression(
-                                .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: identifier))
-                            )
-                        )
-                    }
+                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 
                     switch name {
                     case "Boolean":
@@ -140,15 +147,15 @@ class Document: NSDocument {
                             LGCLiteral.Suggestion.false
                             ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-                        return (identifiers + literals).titleContains(prefix: query)
+                        return (identifiers + literals + common).titleContains(prefix: query)
                     case "Number":
                         let literals: [LogicSuggestionItem] = [
                             LGCLiteral.Suggestion.rationalNumber(for: query)
                             ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-                        return (identifiers + literals).titleContains(prefix: query)
+                        return (identifiers + literals + common).titleContains(prefix: query)
                     default:
-                        return identifiers.titleContains(prefix: query)
+                        return (identifiers + common).titleContains(prefix: query)
                     }
                 }
             default:
@@ -175,13 +182,15 @@ class Document: NSDocument {
                 if let error = error as? CompilerError {
 //                    Swift.print("Compiler error", error)
 
-                    self.logicEditor.underlinedId = error.nodeId
+                    // TODO:
+//                    self.logicEditor.underlinedId = error.nodeId
                 }
 
                 if let error = error as? LogicError {
                     annotations = error.context.annotations
-                    
-                    self.logicEditor.underlinedId = error.nodeId
+
+                    // TODO:
+//                    self.logicEditor.underlinedId = error.nodeId
                 }
             }
 
