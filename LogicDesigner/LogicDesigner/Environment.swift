@@ -69,19 +69,11 @@ public enum Environment {
 
         public init() {}
 
-        public func value(forNode id: UUID) -> Result<TypeEntity, UnificationError> {
-            guard let value = nodes[id] else {
-                Swift.print("Failed to find \(id)")
-                return Result.failure(UnificationError.problem)
-            }
-            return Result.success(value)
-        }
-
-        private static var currentIndex: Int = 0
+        private var currentIndex: Int = 0
 
         func makeGenericName() -> String {
-            Environment.UnificationContext.currentIndex += 1
-            let name = String(Environment.UnificationContext.currentIndex, radix: 36, uppercase: true)
+            currentIndex += 1
+            let name = String(currentIndex, radix: 36, uppercase: true)
             return "?\(name)"
         }
 
