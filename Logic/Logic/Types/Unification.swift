@@ -47,7 +47,6 @@ public enum Unification {
                 }
             }
         }
-
     }
 
     public enum UnificationError: Error {

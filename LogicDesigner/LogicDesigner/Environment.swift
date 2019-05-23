@@ -9,6 +9,11 @@
 import Foundation
 import Logic
 
+extension NameGenerator {
+    static let type = NameGenerator(prefix: "?")
+    static let variable = NameGenerator(prefix: "variable")
+}
+
 enum CompilerError: Error {
     case undefinedType(Environment.CompilerContext, UUID)
     case typeMismatch(Environment.CompilerContext, [UUID])
@@ -69,12 +74,10 @@ public enum Environment {
 
         public init() {}
 
-        private var currentIndex: Int = 0
+        private var typeNameGenerator = NameGenerator(prefix: "?")
 
         func makeGenericName() -> String {
-            currentIndex += 1
-            let name = String(currentIndex, radix: 36, uppercase: true)
-            return "?\(name)"
+            return typeNameGenerator.next()
         }
 
         func makeGenericType() -> TypeEntity {
@@ -114,7 +117,8 @@ public enum Environment {
                     let typeVariable = context.makeGenericType()
                     let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
 
-                    // TODO: We still need to know the variable name (either via the node or the original/new name), though maybe we do alpha substition outside of this function
+                    // TODO: We still need to know the variable name (either via the node or the original/new name),
+                    // though maybe we do alpha substition outside of this function
                     context.constraints.append((typeVariable, annotationTypeName))
                     context.nodes[pattern.uuid] = typeVariable
                     context.nodes[initializer.uuid] = typeVariable
@@ -229,6 +233,19 @@ public enum Environment {
         }
 
         return context
+    }
+
+    public static func unificationType(of annotation: LGCTypeAnnotation) -> Unification.T {
+        switch annotation {
+        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
+            if identifier.isPlaceholder { return .evar(NameGenerator.type.next()) }
+
+            let parameters = arguments.map { self.unificationType(of: $0) }
+
+            return .cons(name: identifier.string, parameters: parameters)
+        default:
+            fatalError("Not supported")
+        }
     }
 
     public static func typeOf(_ annotation: LGCTypeAnnotation, in types: [TypeEntity]) -> TypeEntity? {
