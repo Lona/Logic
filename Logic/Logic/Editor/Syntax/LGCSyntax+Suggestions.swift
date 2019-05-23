@@ -67,13 +67,6 @@ public struct LogicSuggestionCategory {
     }
 }
 
-private func idExpression(_ string: String) -> LGCExpression {
-    return LGCExpression.identifierExpression(
-        id: UUID(),
-        identifier: LGCIdentifier(id: UUID(), string: string)
-    )
-}
-
 public extension LGCIdentifier {
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
@@ -97,7 +90,7 @@ public extension LGCLiteral {
     enum Suggestion {
         public static var `true`: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "true (Boolean)",
+                title: "Boolean: true",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
             )
@@ -105,9 +98,18 @@ public extension LGCLiteral {
 
         public static var `false`: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "false (Boolean)",
+                title: "Boolean: false",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
+            )
+        }
+
+        public static func rationalNumber(for prefix: String) -> LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Number: \(prefix)",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(.number(id: UUID(), value: CGFloat(Double(prefix) ?? 0))),
+                disabled: Double(prefix) == nil
             )
         }
 
@@ -551,7 +553,10 @@ public extension LGCStatement {
         let forLoop = LGCSyntaxNode.statement(
             LGCStatement.loop(
                 pattern: LGCPattern(id: UUID(), name: "item"),
-                expression: idExpression("array"),
+                expression: LGCExpression.identifierExpression(
+                    id: UUID(),
+                    identifier: LGCIdentifier(id: UUID(), string: "array", isPlaceholder: true)
+                ),
                 block: LGCList<LGCStatement>.empty,
                 id: UUID()
             )

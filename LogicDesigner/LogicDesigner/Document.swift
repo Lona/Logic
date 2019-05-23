@@ -133,14 +133,21 @@ class Document: NSDocument {
                         )
                     }
 
-                    if name == "Boolean" {
+                    switch name {
+                    case "Boolean":
                         let literals: [LogicSuggestionItem] = [
                             LGCLiteral.Suggestion.true,
                             LGCLiteral.Suggestion.false
                             ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                         return (identifiers + literals).titleContains(prefix: query)
-                    } else {
+                    case "Number":
+                        let literals: [LogicSuggestionItem] = [
+                            LGCLiteral.Suggestion.rationalNumber(for: query)
+                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                        return (identifiers + literals).titleContains(prefix: query)
+                    default:
                         return identifiers.titleContains(prefix: query)
                     }
                 }
