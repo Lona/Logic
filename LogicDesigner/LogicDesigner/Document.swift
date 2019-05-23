@@ -82,25 +82,15 @@ class Document: NSDocument {
             switch node {
             case .expression(let expression):
                 do {
-                    //                    let compilerContext = try Environment.compile(rootNode, in: .standard)
-
                     let alphaRenamingContext = AlphaRenaming.rename(rootNode)
 
                     Swift.print("Alpha sub", alphaRenamingContext)
-
-//                    let namesInScope =
-//                        Set(
-//                            Environment.scope(rootNode, targetId: node.uuid).flattened.keys
-//                                .compactMap { alphaRenamingContext.originalNames[$0] }
-//                        )
-//
-//                    Swift.print("Scope", namesInScope)
 
                     guard case .success(let unificationContext) = Environment.makeConstraints(rootNode) else { return [] }
 
                     Swift.print("Unification context", unificationContext.constraints)
 
-                    switch TypeEntity.unify(constraints: unificationContext.constraints) {
+                    switch Unification.unify(constraints: unificationContext.constraints) {
                     case .failure(let error):
                         Swift.print("Unification failed", error)
                         return []

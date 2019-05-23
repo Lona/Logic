@@ -67,10 +67,8 @@ public enum Environment {
     public typealias UnificationResult = Result<UnificationContext, UnificationError>
 
     public class UnificationContext {
-        var types: [TypeEntity] = TypeEntity.standardTypes
-        var constraints: [(TypeEntity, TypeEntity)] = []
-        var substitution: [String: String] = [:]
-        var nodes: [UUID: TypeEntity] = [:]
+        var constraints: [Unification.Constraint] = []
+        var nodes: [UUID: Unification.T] = [:]
 
         public init() {}
 
@@ -80,12 +78,8 @@ public enum Environment {
             return typeNameGenerator.next()
         }
 
-        func makeGenericType() -> TypeEntity {
-            return .enumType(.init(name: makeGenericName()))
-        }
-
-        public func unify() -> Result<UnificationContext, UnificationError> {
-            return .success(self)
+        func makeEvar() -> Unification.T {
+            return .evar(makeGenericName())
         }
     }
 
@@ -100,7 +94,7 @@ public enum Environment {
             case .success(let context):
                 switch node {
                 case .statement(.branch(id: _, condition: let condition, block: _)):
-                    context.nodes[condition.uuid] = Types.boolean
+                    context.nodes[condition.uuid] = .cons(name: "Boolean")
 
                     return .success(context)
                 case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
@@ -114,18 +108,18 @@ public enum Environment {
                         return result
                     }
 
-                    let typeVariable = context.makeGenericType()
-                    let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
+                    let typeVariable = context.makeEvar()
+                    let annotationType = Environment.unificationType(of: annotation, context: context)
 
                     // TODO: We still need to know the variable name (either via the node or the original/new name),
                     // though maybe we do alpha substition outside of this function
-                    context.constraints.append((typeVariable, annotationTypeName))
+                    context.constraints.append(Unification.Constraint(annotationType, typeVariable))
                     context.nodes[pattern.uuid] = typeVariable
                     context.nodes[initializer.uuid] = typeVariable
 
                     return .success(context)
                 case .expression(.identifierExpression(id: _, identifier: let identifier)):
-                    let typeVariable = context.makeGenericType()
+                    let typeVariable = context.makeEvar()
 
                     context.nodes[node.uuid] = typeVariable
                     context.nodes[identifier.uuid] = typeVariable
@@ -140,14 +134,14 @@ public enum Environment {
                 case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
                     switch op {
                     case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                        context.nodes[node.uuid] = Types.boolean
+                        context.nodes[node.uuid] = .cons(name: "Boolean")
 
                         return .success(context)
                     case .setEqualTo: // TODO
                         break
                     }
                 case .literal(.boolean):
-                    context.nodes[node.uuid] = Types.boolean
+                    context.nodes[node.uuid] = .cons(name: "Boolean")
 
                     return .success(context)
                 default:
@@ -235,12 +229,12 @@ public enum Environment {
         return context
     }
 
-    public static func unificationType(of annotation: LGCTypeAnnotation) -> Unification.T {
+    public static func unificationType(of annotation: LGCTypeAnnotation, context: UnificationContext) -> Unification.T {
         switch annotation {
         case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
-            if identifier.isPlaceholder { return .evar(NameGenerator.type.next()) }
+            if identifier.isPlaceholder { return .evar(context.makeGenericName()) }
 
-            let parameters = arguments.map { self.unificationType(of: $0) }
+            let parameters = arguments.map { self.unificationType(of: $0, context: context) }
 
             return .cons(name: identifier.string, parameters: parameters)
         default:
