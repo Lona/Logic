@@ -906,7 +906,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     id: UUID(),
                     name: value.name.replace(id: id, with: syntaxNode),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
-                    parameters: value.parameters.replace(id: id, with: syntaxNode),
+                    parameters: value.parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
             case .enumeration(let value):
