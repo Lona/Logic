@@ -21,7 +21,7 @@ public extension Environment {
             switch node {
             case .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: let initializer)):
                 guard let initializer = initializer else { return context }
-                return context.set(pattern.name, for: initializer.uuid)
+                return context.with(pattern.name, for: initializer.uuid)
             default:
                 break
             }

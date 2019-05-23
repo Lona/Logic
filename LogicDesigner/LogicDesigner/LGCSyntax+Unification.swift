@@ -13,6 +13,7 @@ extension LGCSyntaxNode {
     public class UnificationContext {
         var constraints: [Unification.Constraint] = []
         var nodes: [UUID: Unification.T] = [:]
+        var scopeStack = ScopeStack<String, Unification.T>()
 
         public init() {}
 
@@ -49,6 +50,7 @@ extension LGCSyntaxNode {
 
                 result.nodes[pattern.uuid] = annotationType
                 result.constraints.append(Unification.Constraint(annotationType, result.nodes[initializer.uuid]!))
+                result.scopeStack.set(annotationType, for: pattern.name)
 
                 return result
             case .expression(.identifierExpression(id: _, identifier: let identifier)):
@@ -56,6 +58,10 @@ extension LGCSyntaxNode {
 
                 result.nodes[node.uuid] = typeVariable
                 result.nodes[identifier.uuid] = typeVariable
+
+                if let scopedType = result.scopeStack.value(for: identifier.string) {
+                    result.constraints.append(.init(scopedType, typeVariable))
+                }
 
                 return result
             case .expression(.literalExpression(id: _, literal: let literal)):

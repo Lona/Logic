@@ -41,7 +41,11 @@ public struct ScopeStack<Key: Hashable, Value> {
         return nil
     }
 
-    public func set(_ value: Value, for key: Key) -> ScopeStack<Key, Value> {
+    public mutating func set(_ value: Value, for key: Key) {
+        self.scopes[self.scopes.count - 1][key] = value
+    }
+
+    public func with(_ value: Value, for key: Key) -> ScopeStack<Key, Value> {
         var copy = self
         copy.scopes[copy.scopes.count - 1][key] = value
         return copy

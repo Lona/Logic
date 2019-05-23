@@ -40,7 +40,7 @@ public enum AlphaRenaming {
 
         func with(newName: String, boundTo originalName: String) -> Context {
             var copy = self
-            copy.scopeStack = copy.scopeStack.set(newName, for: originalName)
+            copy.scopeStack = copy.scopeStack.with(newName, for: originalName)
             return copy
         }
     }
