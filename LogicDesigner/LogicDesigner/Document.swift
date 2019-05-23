@@ -78,76 +78,71 @@ class Document: NSDocument {
 
             switch node {
             case .expression(let expression):
-                do {
-                    let alphaRenamingContext = AlphaRenaming.rename(rootNode)
+                let unificationContext = rootNode.makeUnificationContext()
 
-                    Swift.print("Alpha sub", alphaRenamingContext)
+                Swift.print("Unification context", unificationContext.constraints)
 
-                    let unificationContext = rootNode.makeUnificationContext()
+                guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+                    Swift.print("Unification failed")
+                    return []
+                }
 
-                    Swift.print("Unification context", unificationContext.constraints)
+                Swift.print("Substitution", substitution)
 
-                    guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
-                        Swift.print("Unification failed")
-                        return []
-                    }
+                guard let unificationType = unificationContext.nodes[expression.uuid] else {
+                    Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
+                    return []
+                }
 
-                    Swift.print("Substitution", substitution)
+                let type = Unification.substitute(substitution, in: unificationType)
 
-                    guard let type = unificationContext.nodes[expression.uuid] else {
-                        Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
-                        return []
-                    }
+                switch type {
+                case .evar:
+                    Swift.print("Couldn't determine concrete type")
+                    return []
+                case .cons(name: let name, parameters: _):
+                    Swift.print("Resolved type: \(name)")
 
-                    switch Unification.substitute(substitution, in: type) {
-                    case .evar:
-                        Swift.print("Couldn't determine concrete type")
-                        return []
-                    case .cons(name: let name, parameters: _):
-                        Swift.print("Resolved type: \(name)")
+                    let currentScope = Environment.scope(rootNode, targetId: node.uuid).flattened
 
-                        if name == "Boolean" {
-                            let namesInScope = Environment.scope(rootNode, targetId: node.uuid).flattened.keys
+                    Swift.print("Scope", currentScope)
 
-                            Swift.print("Scope", namesInScope)
+                    let matchingIdentifiers: [String] = currentScope.keys.compactMap({ nodeId in
+                        guard let identifierType = unificationContext.nodes[nodeId] else { return nil }
 
-                            let matchingIdentifiers: [String] = namesInScope.compactMap({ nodeId in
-                                guard let type = unificationContext.nodes[nodeId] else { return nil }
+                        let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                                let resolvedType = Unification.substitute(substitution, in: type)
+                        Swift.print("Resolved type of \(nodeId): \(identifierType) == \(resolvedType)")
 
-                                if name == "Boolean" {
-                                    return alphaRenamingContext.originalNames[nodeId]
-                                }
-
-                                return nil
-                            })
-
-                            Swift.print("Matching ids", matchingIdentifiers)
-
-                            let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { identifier in
-                                LogicSuggestionItem(
-                                    title: identifier,
-                                    category: "Variables".uppercased(),
-                                    node: LGCSyntaxNode.expression(
-                                        .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: identifier))
-                                    )
-                                )
-                            }
-
-                            let literals: [LogicSuggestionItem] = [
-                                LGCLiteral.Suggestion.true,
-                                LGCLiteral.Suggestion.false
-                                ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
-
-                            return (identifiers + literals).titleContains(prefix: query)
+                        if type == resolvedType {
+                            return currentScope[nodeId]
                         }
+
+                        return nil
+                    })
+
+                    Swift.print("Matching ids", matchingIdentifiers)
+
+                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { identifier in
+                        LogicSuggestionItem(
+                            title: identifier,
+                            category: "Variables".uppercased(),
+                            node: LGCSyntaxNode.expression(
+                                .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: identifier))
+                            )
+                        )
                     }
 
-                    return []
-                } catch let error {
-                    Swift.print("Can't determine suggestions - compiler error", error)
-                    return []
+                    if name == "Boolean" {
+                        let literals: [LogicSuggestionItem] = [
+                            LGCLiteral.Suggestion.true,
+                            LGCLiteral.Suggestion.false
+                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                        return (identifiers + literals).titleContains(prefix: query)
+                    } else {
+                        return identifiers.titleContains(prefix: query)
+                    }
                 }
             default:
                 return LogicEditor.defaultSuggestionsForNode(node, self.logicEditor.rootNode, query)
@@ -156,17 +151,6 @@ class Document: NSDocument {
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode
-
-            do {
-                let alphaSubstitution = AlphaRenaming.rename(rootNode)
-//                let context = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaSubstitution)
-
-//                unificationContext = context
-
-//                Swift.print("Unification context", context)
-            } catch let error {
-                Swift.print("Unification failed")
-            }
 
             do {
                 let compilerContext = try Environment.compile(rootNode, in: .standard)

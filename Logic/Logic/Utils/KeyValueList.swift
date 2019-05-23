@@ -23,10 +23,14 @@ public struct KeyValueList<Key: Equatable, Value>: KeyValueCollection {
         return pairs.first(where: { $0.0 == key })?.1
     }
 
-    public mutating func set(_ value: Value, for key: Key) {
+    public mutating func set(_ value: Value?, for key: Key) {
         if let index = pairs.firstIndex(where: { $0.0 == key }) {
-            pairs[index] = (key, value)
-        } else {
+            if let value = value {
+                pairs[index] = (key, value)
+            } else {
+                pairs.remove(at: index)
+            }
+        } else if let value = value {
             pairs.append((key, value))
         }
     }

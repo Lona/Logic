@@ -12,12 +12,12 @@ public protocol KeyValueCollection {
     associatedtype Value
 
     func value(for key: Key) -> Value?
-    mutating func set(_ value: Value, for key: Key)
-    func with(_ value: Value, for key: Key) -> Self
+    mutating func set(_ value: Value?, for key: Key)
+    func with(_ value: Value?, for key: Key) -> Self
 }
 
 public extension KeyValueCollection {
-    func with(_ value: Value, for key: Key) -> Self {
+    func with(_ value: Value?, for key: Key) -> Self {
         var copy = self
         copy.set(value, for: key)
         return copy
@@ -33,7 +33,7 @@ extension Dictionary: KeyValueCollection {
         return self[key]
     }
 
-    public mutating func set(_ value: Value, for key: Key) {
+    public mutating func set(_ value: Value?, for key: Key) {
         self[key] = value
     }
 }
