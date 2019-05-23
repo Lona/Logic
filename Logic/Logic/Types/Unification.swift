@@ -38,7 +38,7 @@ public enum Unification {
         public var debugDescription: String {
             switch self {
             case .evar(let name):
-                return "'\(name)"
+                return name
             case .cons(name: let name, parameters: let parameters):
                 if parameters.isEmpty {
                     return name
@@ -119,5 +119,15 @@ public enum Unification {
         }
 
         return .success(substitution)
+    }
+
+    public static func substitute(_ substitution: Unification.Substitution, in type: Unification.T) -> Unification.T {
+        var type = type
+
+        while let newType = substitution[type] {
+            type = newType
+        }
+
+        return type
     }
 }

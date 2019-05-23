@@ -28,14 +28,12 @@ extension LGCSyntaxNode {
     }
 
     public func makeUnificationContext() -> UnificationContext {
-        let context: UnificationContext = UnificationContext()
-
-        return self.reduce(initialResult: context) { (result, node, config) in
+        return self.reduce(initialResult: UnificationContext()) { (result, node, config) in
             switch node {
             case .statement(.branch(id: _, condition: let condition, block: _)):
-                context.nodes[condition.uuid] = .cons(name: "Boolean")
+                result.nodes[condition.uuid] = .cons(name: "Boolean")
 
-                return context
+                return result
             case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
                 guard let initializer = initializer, let annotation = annotation else {
                     config.ignoreChildren = true
@@ -47,47 +45,45 @@ extension LGCSyntaxNode {
                     return result
                 }
 
-                let typeVariable = context.makeEvar()
-                let annotationType = annotation.unificationType { context.makeGenericName() }
+                let typeVariable = result.makeEvar()
+                let annotationType = annotation.unificationType { result.makeGenericName() }
 
-                // TODO: We still need to know the variable name (either via the node or the original/new name),
-                // though maybe we do alpha substition outside of this function
-                context.constraints.append(Unification.Constraint(annotationType, typeVariable))
-                context.nodes[pattern.uuid] = typeVariable
-                context.nodes[initializer.uuid] = typeVariable
+                result.constraints.append(Unification.Constraint(annotationType, typeVariable))
+                result.nodes[pattern.uuid] = typeVariable
+                result.nodes[initializer.uuid] = typeVariable
 
-                return context
+                return result
             case .expression(.identifierExpression(id: _, identifier: let identifier)):
-                let typeVariable = context.makeEvar()
+                let typeVariable = result.makeEvar()
 
-                context.nodes[node.uuid] = typeVariable
-                context.nodes[identifier.uuid] = typeVariable
+                result.nodes[node.uuid] = typeVariable
+                result.nodes[identifier.uuid] = typeVariable
 
-                return context
+                return result
             case .expression(.literalExpression(id: _, literal: let literal)):
-                if let type = context.nodes[literal.uuid] {
-                    context.nodes[node.uuid] = type
+                if let type = result.nodes[literal.uuid] {
+                    result.nodes[node.uuid] = type
                 }
 
-                return context
+                return result
             case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
                 switch op {
                 case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                    context.nodes[node.uuid] = .cons(name: "Boolean")
+                    result.nodes[node.uuid] = .cons(name: "Boolean")
 
-                    return context
+                    return result
                 case .setEqualTo: // TODO
                     break
                 }
             case .literal(.boolean):
-                context.nodes[node.uuid] = .cons(name: "Boolean")
+                result.nodes[node.uuid] = .cons(name: "Boolean")
 
-                return context
+                return result
             default:
                 break
             }
 
-            return context
+            return result
         }
     }
 }

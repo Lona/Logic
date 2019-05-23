@@ -54,9 +54,6 @@ class Document: NSDocument {
 
         var annotations: [UUID: String] = [:]
 
-        var alphaSubstitution: AlphaRenaming.Substitution = [:]
-//        var unificationContext = Environment.UnificationContext()
-
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
 
@@ -90,45 +87,36 @@ class Document: NSDocument {
 
                     Swift.print("Unification context", unificationContext.constraints)
 
-                    switch Unification.unify(constraints: unificationContext.constraints) {
-                    case .failure(let error):
-                        Swift.print("Unification failed", error)
+                    guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+                        Swift.print("Unification failed")
                         return []
-                    case .success(let substitution):
-                        Swift.print("Substitution", substitution)
+                    }
 
-                        guard var type = unificationContext.nodes[expression.uuid] else {
-                            Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
-                            return []
-                        }
+                    Swift.print("Substitution", substitution)
 
-                        Swift.print("Typename", type, "Substituted as", substitution[type])
+                    guard let type = unificationContext.nodes[expression.uuid] else {
+                        Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
+                        return []
+                    }
 
-                        if type.name.starts(with: "?") {
-                            guard let substitutedType = substitution[type] else {
-                                Swift.print("Can't determine suggestions - no type substitution", expression.uuid)
-                                return []
-                            }
+                    switch Unification.substitute(substitution, in: type) {
+                    case .evar:
+                        Swift.print("Couldn't determine concrete type")
+                        return []
+                    case .cons(name: let name, parameters: _):
+                        Swift.print("Resolved type: \(name)")
 
-                            type = substitutedType
-                        }
-
-                        if type.name == "Boolean" {
+                        if name == "Boolean" {
                             let namesInScope = Environment.scope(rootNode, targetId: node.uuid).flattened.keys
 
                             Swift.print("Scope", namesInScope)
 
                             let matchingIdentifiers: [String] = namesInScope.compactMap({ nodeId in
-//                                let newName = alphaSubstitution[pair.value]
+                                guard let type = unificationContext.nodes[nodeId] else { return nil }
 
-                                guard var type = unificationContext.nodes[nodeId] else { return nil }
+                                let resolvedType = Unification.substitute(substitution, in: type)
 
-                                if type.name.starts(with: "?") {
-                                    guard let substitutedType = substitution[type] else { return nil }
-                                    type = substitutedType
-                                }
-
-                                if type.name == "Boolean" {
+                                if name == "Boolean" {
                                     return alphaRenamingContext.originalNames[nodeId]
                                 }
 
@@ -150,13 +138,13 @@ class Document: NSDocument {
                             let literals: [LogicSuggestionItem] = [
                                 LGCLiteral.Suggestion.true,
                                 LGCLiteral.Suggestion.false
-                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+                                ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                             return (identifiers + literals).titleContains(prefix: query)
                         }
-
-                        return []
                     }
+
+                    return []
                 } catch let error {
                     Swift.print("Can't determine suggestions - compiler error", error)
                     return []
