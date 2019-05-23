@@ -96,7 +96,7 @@ class Document: NSDocument {
 //
 //                    Swift.print("Scope", namesInScope)
 
-                    let unificationContext = try Environment.makeConstraints(rootNode, alphaSubstitution: alphaRenamingContext.substitution)
+                    guard case .success(let unificationContext) = Environment.makeConstraints(rootNode) else { return [] }
 
                     Swift.print("Unification context", unificationContext.constraints)
 

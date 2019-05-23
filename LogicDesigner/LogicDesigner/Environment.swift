@@ -61,25 +61,13 @@ public enum UnificationError: Error {
 public enum Environment {
     public typealias UnificationResult = Result<UnificationContext, UnificationError>
 
-    public struct UnificationContext {
+    public class UnificationContext {
         var types: [TypeEntity] = TypeEntity.standardTypes
         var constraints: [(TypeEntity, TypeEntity)] = []
         var substitution: [String: String] = [:]
         var nodes: [UUID: TypeEntity] = [:]
 
         public init() {}
-
-        public func with(type typeA: TypeEntity, constrainedTo typeB: TypeEntity) -> UnificationContext {
-            var copy = self
-            copy.constraints.append((typeA, typeB))
-            return copy
-        }
-
-        public func with(nodeId: UUID, boundTo typeName: TypeEntity) -> UnificationContext {
-            var copy = self
-            copy.nodes[nodeId] = typeName
-            return copy
-        }
 
         public func value(forNode id: UUID) -> Result<TypeEntity, UnificationError> {
             guard let value = nodes[id] else {
@@ -106,15 +94,10 @@ public enum Environment {
         }
     }
 
-    public static func makeConstraints(
-        _ rootNode: LGCSyntaxNode,
-        alphaSubstitution: AlphaRenaming.Substitution,
-        context initialContext: UnificationContext = UnificationContext()
-        ) throws -> UnificationContext {
+    public static func makeConstraints(_ rootNode: LGCSyntaxNode) -> UnificationResult {
+        let initialContext: UnificationContext = UnificationContext()
 
-        let initialResult = UnificationResult.success(initialContext)
-
-        let finalResult: UnificationResult = rootNode.reduce(initialResult: initialResult) { (result, node, config) in
+        return rootNode.reduce(initialResult: .success(initialContext)) { (result, node, config) in
             switch result {
             case .failure:
                 config.stopTraversal = true
@@ -122,7 +105,9 @@ public enum Environment {
             case .success(let context):
                 switch node {
                 case .statement(.branch(id: _, condition: let condition, block: _)):
-                    return .success(context.with(nodeId: condition.uuid, boundTo: Types.boolean))
+                    context.nodes[condition.uuid] = Types.boolean
+
+                    return .success(context)
                 case .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer)):
                     guard let initializer = initializer, let annotation = annotation else {
                         config.ignoreChildren = true
@@ -138,35 +123,37 @@ public enum Environment {
                     let annotationTypeName = Environment.typeOf(annotation, in: context.types) ?? context.makeGenericType()
 
                     // TODO: We still need to know the variable name (either via the node or the original/new name), though maybe we do alpha substition outside of this function
-                    let context2 = context
-                        .with(type: typeVariable, constrainedTo: annotationTypeName)
-                        .with(nodeId: pattern.uuid, boundTo: typeVariable)
-                        .with(nodeId: initializer.uuid, boundTo: typeVariable)
+                    context.constraints.append((typeVariable, annotationTypeName))
+                    context.nodes[pattern.uuid] = typeVariable
+                    context.nodes[initializer.uuid] = typeVariable
 
-                    return Result.success(context2)
+                    return .success(context)
                 case .expression(.identifierExpression(id: _, identifier: let identifier)):
                     let typeVariable = context.makeGenericType()
 
-                    return Result.success(
-                        context
-                            .with(nodeId: node.uuid, boundTo: typeVariable)
-                            .with(nodeId: identifier.uuid, boundTo: typeVariable)
-                    )
+                    context.nodes[node.uuid] = typeVariable
+                    context.nodes[identifier.uuid] = typeVariable
+
+                    return .success(context)
                 case .expression(.literalExpression(id: _, literal: let literal)):
-                    let context2 = context.value(forNode: literal.uuid).map { typeName in
-                        context.with(nodeId: node.uuid, boundTo: typeName)
+                    if let type = context.nodes[literal.uuid] {
+                        context.nodes[node.uuid] = type
                     }
 
-                    return context2
+                    return .success(context)
                 case .expression(.binaryExpression(left: _, right: _, op: let op, id: _)):
                     switch op {
                     case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                        return .success(context.with(nodeId: node.uuid, boundTo: Types.boolean))
+                        context.nodes[node.uuid] = Types.boolean
+
+                        return .success(context)
                     case .setEqualTo: // TODO
                         break
                     }
                 case .literal(.boolean):
-                    return Result.success(context.with(nodeId: node.uuid, boundTo: Types.boolean))
+                    context.nodes[node.uuid] = Types.boolean
+
+                    return .success(context)
                 default:
                     break
                 }
@@ -174,8 +161,6 @@ public enum Environment {
                 return Result.success(context)
             }
         }
-
-        return try finalResult.get()
     }
 
     public static func compile(_ node: LGCSyntaxNode, in context: CompilerContext) throws -> CompilerContext {
