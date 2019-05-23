@@ -17,6 +17,10 @@ extension LGCSyntaxNode {
         public var order: TraversalOrder
         public var ignoreChildren = false
         public var stopTraversal = false
+        public var needsRevisitAfterTraversingChildren = false
+
+        fileprivate var _isRevisit = false
+        public var isRevisit: Bool { return _isRevisit }
 
         public init(order: TraversalOrder = TraversalOrder.post) {
             self.order = order
@@ -83,14 +87,29 @@ extension LGCSyntaxNode {
 
             return f(context, self, &config)
         case .pre:
-            let context = f(initialResult, self, &config)
+            var context = f(initialResult, self, &config)
 
-            if config.ignoreChildren || config.stopTraversal {
+            let shouldRevisit = config.needsRevisitAfterTraversingChildren
+
+            if config.stopTraversal { return context }
+
+            if config.ignoreChildren {
                 config.ignoreChildren = false
-                return context
             } else {
-                return self.reduceChildren(config: &config, initialResult: context, f: f)
+                context = self.reduceChildren(config: &config, initialResult: context, f: f)
             }
+
+            if config.stopTraversal { return context }
+
+            if shouldRevisit {
+                config._isRevisit = true
+
+                context = f(context, self, &config)
+
+                config._isRevisit = false
+            }
+
+            return context
         }
     }
 
