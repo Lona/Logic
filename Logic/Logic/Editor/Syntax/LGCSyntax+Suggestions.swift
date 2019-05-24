@@ -431,6 +431,18 @@ public extension LGCExpression {
             )
         }
 
+        public static func memberExpression(names: [String]) -> LogicSuggestionItem {
+            return memberExpression(identifiers: names.map { LGCIdentifier(id: UUID(), string: $0) })
+        }
+
+        public static func memberExpression(identifiers: [LGCIdentifier]) -> LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: identifiers.map { $0.string }.joined(separator: "."),
+                category: categoryTitle,
+                node: .expression(LGCExpression.makeMemberExpression(identifiers: identifiers))
+            )
+        }
+
         public static func identifier(name: String) -> LogicSuggestionItem {
             return from(identifierSuggestion: LGCIdentifier.Suggestion.name(name))!
         }

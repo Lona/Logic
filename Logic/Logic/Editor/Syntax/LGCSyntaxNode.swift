@@ -649,6 +649,12 @@ extension LGCExpression: SyntaxNodeProtocol {
                 id: UUID(),
                 literal: value.literal.replace(id: id, with: syntaxNode)
             )
+        case (_, .memberExpression(let value)):
+            return .memberExpression(
+                id: UUID(),
+                expression: value.expression.replace(id: id, with: syntaxNode),
+                memberName: value.memberName.replace(id: id, with: syntaxNode)
+            )
         }
     }
 
@@ -672,6 +678,8 @@ extension LGCExpression: SyntaxNodeProtocol {
             found = value.expression.pathTo(id: id) ?? foundInArguments
         case .literalExpression(let value):
             found = value.literal.pathTo(id: id)
+        case .memberExpression(let value):
+            found = value.expression.pathTo(id: id) ?? value.memberName.pathTo(id: id)
         }
 
         if let found = found {
@@ -691,6 +699,8 @@ extension LGCExpression: SyntaxNodeProtocol {
             return value.arguments.isEmpty ? value.expression.lastNode : value.arguments[value.arguments.count - 1].lastNode
         case .literalExpression(let value):
             return value.literal.lastNode
+        case .memberExpression(let value):
+            return value.memberName.lastNode
         }
     }
 
@@ -704,6 +714,8 @@ extension LGCExpression: SyntaxNodeProtocol {
             return value.id
         case .literalExpression(let value):
             return value.id
+        case .memberExpression(let value):
+            return value.id
         }
     }
 
@@ -716,6 +728,8 @@ extension LGCExpression: SyntaxNodeProtocol {
         case .functionCallExpression:
             return .next
         case .literalExpression:
+            return .next
+        case .memberExpression:
             return .next
         }
     }

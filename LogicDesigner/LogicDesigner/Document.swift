@@ -156,6 +156,27 @@ class Document: NSDocument {
                             ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                         return (identifiers + literals + common).titleContains(prefix: query)
+                    case "Optional":
+                        let suggestion = LogicSuggestionItem(
+                            title: "Value",
+                            category: LGCExpression.Suggestion.categoryTitle,
+                            node: .expression(
+                                .functionCallExpression(
+                                    id: UUID(),
+                                    expression: .makeMemberExpression(names: ["Optional", "value"]),
+                                    arguments: .next(
+                                        .init(
+                                            id: UUID(),
+                                            label: nil,
+                                            expression: .literalExpression(id: UUID(), literal: .number(id: UUID(), value: 42))
+                                        ),
+                                        .empty
+                                    )
+                                )
+                            )
+                        )
+
+                        return (identifiers + [suggestion]).titleContains(prefix: query)
                     default:
                         return (identifiers + common).titleContains(prefix: query)
                     }

@@ -69,7 +69,14 @@ extension LGCSyntaxNode {
                 let annotationType = annotation.unificationType { result.makeGenericName() }
 
                 result.nodes[pattern.uuid] = annotationType
-                result.constraints.append(Unification.Constraint(annotationType, result.nodes[initializer.uuid]!))
+
+                // TODO: If this doesn't exist, we probably need to implement another node
+                if let initializerType = result.nodes[initializer.uuid] {
+                    result.constraints.append(Unification.Constraint(annotationType, initializerType))
+                } else {
+                    Swift.print("No initializer type for \(initializer.uuid)")
+                }
+
                 result.patternTypes[pattern.uuid] = annotationType
 
                 return result
@@ -84,6 +91,16 @@ extension LGCSyntaxNode {
                 }
 
                 return result
+            case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
+                let resultType: Unification.T = .cons(name: "Optional", parameters: [.cons(name: "Number")])
+                result.nodes[node.uuid] = resultType
+
+                result.constraints.append(Unification.Constraint(.cons(name: "Number"), result.nodes[expression.uuid]!))
+
+            case (true, .expression(.memberExpression(id: _, expression: _, memberName: _))):
+                 // TODO: How do we determine the type here?
+                result.nodes[node.uuid] = result.makeEvar()
+
             case (true, .expression(.literalExpression(id: _, literal: let literal))):
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!
                 return result

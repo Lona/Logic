@@ -123,6 +123,11 @@
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="literal" type="Literal"/>
     </Record>
+    <Record name="memberExpression">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="expression" type="Expression"/>
+      <Record.Param name="memberName" type="Identifier"/>
+    </Record>
   </Type>
   <Type name="Statement">
     <Record name="loop">

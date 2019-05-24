@@ -281,6 +281,7 @@ public indirect enum LGCExpression: Codable & Equatable {
   case identifierExpression(id: UUID, identifier: LGCIdentifier)
   case functionCallExpression(id: UUID, expression: LGCExpression, arguments: LGCList<LGCFunctionCallArgument>)
   case literalExpression(id: UUID, literal: LGCLiteral)
+  case memberExpression(id: UUID, expression: LGCExpression, memberName: LGCIdentifier)
 
   // MARK: Codable
 
@@ -298,6 +299,7 @@ public indirect enum LGCExpression: Codable & Equatable {
     case expression
     case arguments
     case literal
+    case memberName
   }
 
   public init(from decoder: Decoder) throws {
@@ -329,6 +331,12 @@ public indirect enum LGCExpression: Codable & Equatable {
           .literalExpression(
             id: try data.decode(UUID.self, forKey: .id),
             literal: try data.decode(LGCLiteral.self, forKey: .literal))
+      case "memberExpression":
+        self =
+          .memberExpression(
+            id: try data.decode(UUID.self, forKey: .id),
+            expression: try data.decode(LGCExpression.self, forKey: .expression),
+            memberName: try data.decode(LGCIdentifier.self, forKey: .memberName))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -358,6 +366,11 @@ public indirect enum LGCExpression: Codable & Equatable {
         try container.encode("literalExpression", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.literal, forKey: .literal)
+      case .memberExpression(let value):
+        try container.encode("memberExpression", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.expression, forKey: .expression)
+        try data.encode(value.memberName, forKey: .memberName)
     }
   }
 }

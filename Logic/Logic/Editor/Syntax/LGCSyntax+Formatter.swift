@@ -8,6 +8,14 @@
 
 import AppKit
 
+fileprivate extension FormatterCommand where Element == LogicElement {
+    var stringContents: String {
+        return elements.reduce("", { (result, element) -> String in
+            return result + element.value
+        })
+    }
+}
+
 public extension LGCIdentifier {
     var formatted: FormatterCommand<LogicElement> {
         if isPlaceholder {
@@ -203,7 +211,7 @@ public extension LGCExpression {
                     .indent {
                         .concat {
                             [
-                                .line,
+//                                .line,
                                 .join(with: .concat {[.element(.text(",")), .line]}) {
                                     value.arguments.map { $0.formatted }
                                 }
@@ -215,6 +223,12 @@ public extension LGCExpression {
             }
         case .literalExpression(let value):
             return value.literal.formatted
+        case .memberExpression(let value):
+            let joined = FormatterCommand<LogicElement>.concat {
+                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
+            }
+
+            return .element(.dropdown(value.id, joined.stringContents, .variable))
         }
     }
 }
