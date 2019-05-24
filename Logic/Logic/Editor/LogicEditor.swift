@@ -19,6 +19,10 @@ public class LogicEditor: NSBox {
             return LogicEditor.defaultDocumentationForNode(node, self.rootNode, query)
         }
 
+        self.willSelectNode = { [unowned self] nodeId in
+            return LogicEditor.defaultWillSelectNode(nodeId, self.rootNode)
+        }
+
         setUpViews()
         setUpConstraints()
         setScroll(enabled: true)
@@ -49,6 +53,8 @@ public class LogicEditor: NSBox {
             canvasView.style = canvasStyle
         }
     }
+
+    public var willSelectNode: ((UUID?) -> UUID?)?
 
     public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
 
@@ -112,6 +118,12 @@ public class LogicEditor: NSBox {
         LGCSyntaxNode,
         String) -> RichText = { node, rootNode, query in
             return node.documentation(within: rootNode, for: query)
+    }
+
+    public static let defaultWillSelectNode: (UUID?, LGCSyntaxNode) -> UUID? = { (nodeId: UUID?, rootNode: LGCSyntaxNode) in
+        guard let nodeId = nodeId else { return nil }
+
+        return rootNode.redirectSelection(nodeId)
     }
 
     public func forceUpdate() {
@@ -252,11 +264,7 @@ extension LogicEditor {
         if let index = rootNode.formatted.nextActivatableElementIndex(after: self.canvasView.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.canvasView.selectedRange = self.rootNode.elementRange(for: id)
-            self.suggestionText = ""
-
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
-            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
+            select(nodeByID: id)
         } else {
             self.hideSuggestionWindow()
 
@@ -270,11 +278,7 @@ extension LogicEditor {
         if let index = rootNode.formatted.previousActivatableElementIndex(before: self.canvasView.selectedRange?.lowerBound),
             let id = self.rootNode.formatted.elements[index].syntaxNodeID {
 
-            self.canvasView.selectedRange = self.rootNode.elementRange(for: id)
-            self.suggestionText = ""
-
-            let nextSyntaxNode = self.rootNode.topNodeWithEqualElements(as: id)
-            self.showSuggestionWindow(for: index, syntaxNode: nextSyntaxNode)
+            select(nodeByID: id)
         } else {
             self.hideSuggestionWindow()
 
@@ -285,6 +289,8 @@ extension LogicEditor {
     }
 
     private func select(nodeByID syntaxNodeId: UUID?) {
+        let syntaxNodeId = willSelectNode?(syntaxNodeId) ?? syntaxNodeId
+
         self.canvasView.selectedLine = nil
         self.suggestionText = ""
 
