@@ -92,13 +92,15 @@ extension LGCSyntaxNode {
 
                 return result
             case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
-                let resultType: Unification.T = .cons(name: "Optional", parameters: [.cons(name: "Number")])
+
+                let contentsType = result.makeEvar()
+                let resultType: Unification.T = .cons(name: "Optional", parameters: [contentsType])
                 result.nodes[node.uuid] = resultType
 
                 let argumentValues = arguments.map { $0.expression }
                 let arg0 = argumentValues[0]
 
-                result.constraints.append(Unification.Constraint(.cons(name: "Number"), result.nodes[arg0.uuid]!))
+                result.constraints.append(Unification.Constraint(contentsType, result.nodes[arg0.uuid]!))
 
             case (true, .expression(.memberExpression(id: _, expression: _, memberName: _))):
                  // TODO: How do we determine the type here?

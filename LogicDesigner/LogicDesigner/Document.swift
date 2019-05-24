@@ -71,6 +71,63 @@ class Document: NSDocument {
             }
         }
 
+        func suggestions(for type: Unification.T, query: String) -> [LogicSuggestionItem] {
+            switch type {
+            case .evar:
+                return []
+            case .cons(name: "Boolean", parameters: []):
+                let literals: [LogicSuggestionItem] = [
+                    LGCLiteral.Suggestion.true,
+                    LGCLiteral.Suggestion.false
+                    ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                return literals
+            case .cons(name: "Number", parameters: []):
+                let literals: [LogicSuggestionItem] = [
+                    LGCLiteral.Suggestion.rationalNumber(for: query)
+                    ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                return literals
+            case .cons(name: "Optional", parameters: let parameters) where parameters.count == 1:
+                let innerSuggestions = suggestions(for: parameters[0], query: query)
+
+                let wrappedSuggestions: [LogicSuggestionItem] = innerSuggestions.compactMap { item in
+                    guard case .expression(let contents) = item.node else { return nil }
+
+                    return LogicSuggestionItem(
+                        title: "Value(\(item.title))",
+                        category: LGCExpression.Suggestion.categoryTitle,
+                        node: .expression(
+                            .functionCallExpression(
+                                id: UUID(),
+                                expression: .makeMemberExpression(names: ["Optional", "value"]),
+                                arguments: .next(
+                                    .init(id: UUID(), label: nil, expression: contents),
+                                    .empty
+                                )
+                            )
+                        )
+                    )
+                }
+
+                let noneSuggestion = LogicSuggestionItem(
+                    title: "None",
+                    category: LGCExpression.Suggestion.categoryTitle,
+                    node: .expression(
+                        .functionCallExpression(
+                            id: UUID(),
+                            expression: .makeMemberExpression(names: ["Optional", "none"]),
+                            arguments: .empty
+                        )
+                    )
+                )
+
+                return wrappedSuggestions + [noneSuggestion]
+            default:
+                return []
+            }
+        }
+
         logicEditor.suggestionsForNode = { [unowned self] node, query in
             Swift.print("---------")
 
@@ -121,7 +178,7 @@ class Document: NSDocument {
                     let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 
                     return (literals + identifiers + common).titleContains(prefix: query)
-                case .cons(name: let name, parameters: _):
+                case .cons:
                     Swift.print("Resolved type: \(type)")
 
                     let matchingIdentifiers: [String] = currentScopeContext.patternsInScope.compactMap({ pattern in
@@ -142,44 +199,9 @@ class Document: NSDocument {
 
                     let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 
-                    switch name {
-                    case "Boolean":
-                        let literals: [LogicSuggestionItem] = [
-                            LGCLiteral.Suggestion.true,
-                            LGCLiteral.Suggestion.false
-                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+                    let literals = suggestions(for: type, query: query)
 
-                        return (identifiers + literals + common).titleContains(prefix: query)
-                    case "Number":
-                        let literals: [LogicSuggestionItem] = [
-                            LGCLiteral.Suggestion.rationalNumber(for: query)
-                            ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
-
-                        return (identifiers + literals + common).titleContains(prefix: query)
-                    case "Optional":
-                        let suggestion = LogicSuggestionItem(
-                            title: "Value",
-                            category: LGCExpression.Suggestion.categoryTitle,
-                            node: .expression(
-                                .functionCallExpression(
-                                    id: UUID(),
-                                    expression: .makeMemberExpression(names: ["Optional", "value"]),
-                                    arguments: .next(
-                                        .init(
-                                            id: UUID(),
-                                            label: nil,
-                                            expression: .literalExpression(id: UUID(), literal: .number(id: UUID(), value: 42))
-                                        ),
-                                        .empty
-                                    )
-                                )
-                            )
-                        )
-
-                        return (identifiers + [suggestion]).titleContains(prefix: query)
-                    default:
-                        return (identifiers + common).titleContains(prefix: query)
-                    }
+                    return (identifiers + literals + common).titleContains(prefix: query)
                 }
             default:
                 return LogicEditor.defaultSuggestionsForNode(node, self.logicEditor.rootNode, query)

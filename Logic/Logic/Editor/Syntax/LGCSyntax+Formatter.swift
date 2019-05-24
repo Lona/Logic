@@ -204,6 +204,15 @@ public extension LGCExpression {
                 }
             }
         case .functionCallExpression(let value):
+            if value.arguments.isEmpty {
+                return .concat {
+                    [
+                        value.expression.formatted,
+                        .element(.text("()"))
+                    ]
+                }
+            }
+
             return .concat {
                 [
                     value.expression.formatted,
