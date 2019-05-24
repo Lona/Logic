@@ -9,11 +9,6 @@
 import Foundation
 import Logic
 
-extension NameGenerator {
-    static let type = NameGenerator(prefix: "?")
-    static let variable = NameGenerator(prefix: "variable")
-}
-
 enum CompilerError: Error {
     case undefinedType(Environment.CompilerContext, UUID)
     case typeMismatch(Environment.CompilerContext, [UUID])
@@ -64,176 +59,177 @@ public enum UnificationError: Error {
 }
 
 public enum Environment {
-    public static func compile(_ node: LGCSyntaxNode, in context: CompilerContext) throws -> CompilerContext {
-        switch node {
-        case .program(let program):
-            return try program.block.reduce(context, { result, node in
-                return try compile(.statement(node), in: result)
-            })
+//    public static func compile(_ node: LGCSyntaxNode, in context: CompilerContext) throws -> CompilerContext {
+//        switch node {
+//        case .program(let program):
+//            return try program.block.reduce(context, { result, node in
+//                return try compile(.statement(node), in: result)
+//            })
+////        case .identifier(let identifier):
+////            if let type = context.type(for: identifier.string) {
+////                return (value, context.with(annotation: value.memory.description, for: identifier.id))
+////            }
+////
+////            throw LogicError.undefinedIdentifier(context, identifier.id)
+//        case .statement(.declaration(id: _, content: let declaration)):
+//            return try compile(.declaration(declaration), in: context)
+//        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
+//            if let value = initializer {
+//                let newContext = try compile(.expression(value), in: context)
+//
+//                guard let annotation = annotation else { fatalError("We require type annotations for now") }
+//
+//                guard let evaluatedTypeAnnotation = typeOf(annotation, in: newContext.types) else {
+//                    throw CompilerError.undefinedType(newContext, annotation.uuid)
+//                }
+//
+//                return newContext
+//                    .with(name: name.name, boundToType: evaluatedTypeAnnotation)
+//                    .with(nodeId: annotation.uuid, boundToType: evaluatedTypeAnnotation)
+//                    .with(nodeId: value.uuid, boundToType: evaluatedTypeAnnotation)
+//            }
+//        case .statement(.branch(id: _, condition: let condition, block: _)):
+//            let newContext = try compile(.expression(condition), in: context)
+//
+//            if newContext.nodeType[condition.uuid] != Types.boolean {
+//                throw CompilerError.typeMismatch(newContext, [condition.uuid])
+//            }
+//
+//            return newContext
+//        case .expression(.identifierExpression(id: _, identifier: let identifier)):
+//            if identifier.isPlaceholder {
+//                return context
+//            }
+//
+//            let newContext = try compile(.identifier(identifier), in: context)
+//
+//            guard let boundType = newContext.type(for: identifier.string) else {
+//                throw CompilerError.undefinedType(context, node.uuid)
+//            }
+//
+//            return newContext.with(nodeId: node.uuid, boundToType: boundType)
+//        case .expression(.literalExpression(id: _, literal: let literal)):
+//            let newContext = try compile(.literal(literal), in: context)
+//
+//            guard let boundType = newContext.nodeType[literal.uuid] else {
+//                throw CompilerError.undefinedType(context, node.uuid)
+//            }
+//
+//            return newContext.with(nodeId: node.uuid, boundToType: boundType)
+////        case .expression(.functionCallExpression(id: _, expression: .identifierExpression(id: _, identifier: let functionName), arguments: let args)):
+////            for type in context.types where type.name == functionName.string {
+////                // TODO: Verify subtypes?
+////                let memory: [Any] = try args.map { arg in try evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
+////                return (LogicValue(type: type, memory: memory), context)
+////            }
+//        case .literal(.boolean):
+//            return context.with(nodeId: node.uuid, boundToType: Types.boolean)
+//        case .literal(.string):
+//            return context.with(nodeId: node.uuid, boundToType: Types.string)
+//        case .literal(.number):
+//            return context.with(nodeId: node.uuid, boundToType: Types.number)
+//        default:
+//            break
+//        }
+//
+//        return context
+//    }
+
+//    public static func typeOf(_ annotation: LGCTypeAnnotation, in types: [TypeEntity]) -> TypeEntity? {
+//        switch annotation {
+//        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
+//
+//            // TODO: Placeholder annotations don't have a type... should we introduce a type variable?
+//            if identifier.isPlaceholder { return nil }
+//
+//            if !arguments.isEmpty {
+//                fatalError("Handle generics")
+//            }
+//
+//            if let type = types.first(where: { entity in entity.name == identifier.string }) {
+//                return type
+//            } else {
+//                return nil
+//            }
+//        default:
+//            break
+//        }
+//
+//        return Types.unit
+//    }
+//
+//    public static func evaluate(_ node: LGCSyntaxNode, in context: RuntimeContext) throws -> (LogicValue, RuntimeContext) {
+//        switch node {
+//        case .program(let program):
+//            let newContext = try program.block.reduce(context, { result, node in
+//                return try evaluate(.statement(node), in: result).1
+//            })
+//            return (LogicValue.unit, newContext)
 //        case .identifier(let identifier):
-//            if let type = context.type(for: identifier.string) {
+//            if let value = context.value(for: identifier.string) {
 //                return (value, context.with(annotation: value.memory.description, for: identifier.id))
 //            }
 //
 //            throw LogicError.undefinedIdentifier(context, identifier.id)
-        case .statement(.declaration(id: _, content: let declaration)):
-            return try compile(.declaration(declaration), in: context)
-        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
-            if let value = initializer {
-                let newContext = try compile(.expression(value), in: context)
-
-                guard let annotation = annotation else { fatalError("We require type annotations for now") }
-
-                guard let evaluatedTypeAnnotation = typeOf(annotation, in: newContext.types) else {
-                    throw CompilerError.undefinedType(newContext, annotation.uuid)
-                }
-
-                return newContext
-                    .with(name: name.name, boundToType: evaluatedTypeAnnotation)
-                    .with(nodeId: annotation.uuid, boundToType: evaluatedTypeAnnotation)
-                    .with(nodeId: value.uuid, boundToType: evaluatedTypeAnnotation)
-            }
-        case .statement(.branch(id: _, condition: let condition, block: _)):
-            let newContext = try compile(.expression(condition), in: context)
-
-            if newContext.nodeType[condition.uuid] != Types.boolean {
-                throw CompilerError.typeMismatch(newContext, [condition.uuid])
-            }
-
-            return newContext
-        case .expression(.identifierExpression(id: _, identifier: let identifier)):
-            if identifier.isPlaceholder {
-                return context
-            }
-
-            let newContext = try compile(.identifier(identifier), in: context)
-
-            guard let boundType = newContext.type(for: identifier.string) else {
-                throw CompilerError.undefinedType(context, node.uuid)
-            }
-
-            return newContext.with(nodeId: node.uuid, boundToType: boundType)
-        case .expression(.literalExpression(id: _, literal: let literal)):
-            let newContext = try compile(.literal(literal), in: context)
-
-            guard let boundType = newContext.nodeType[literal.uuid] else {
-                throw CompilerError.undefinedType(context, node.uuid)
-            }
-
-            return newContext.with(nodeId: node.uuid, boundToType: boundType)
+//        case .statement(.declaration(id: _, content: let declaration)):
+//            return try evaluate(.declaration(declaration), in: context)
+//        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
+//            if let value = initializer {
+//                let evaluatedInitializer = try self.evaluate(.expression(value), in: context)
+//
+//                guard let annotation = annotation else { fatalError("We require type annotations for now") }
+//
+//                guard let evaluatedTypeAnnotation = typeOf(annotation, in: context.types) else {
+//                    throw LogicError.undefinedType(context, annotation.uuid)
+//                }
+//
+//                if evaluatedInitializer.0.type != evaluatedTypeAnnotation {
+//                    throw LogicError.typeMismatch(context, [node.uuid])
+//                }
+//
+//                let newContext = evaluatedInitializer.1.with(
+//                    name: name.name,
+//                    boundToValue: evaluatedInitializer.0
+//                )
+//                return (LogicValue.unit, newContext)
+//            }
+//        case .literal(.boolean(id: _, value: let literal)):
+//            return (LogicValue(type: Types.boolean, memory: [literal]), context)
+//        case .literal(.string(id: _, value: let literal)):
+//            return (LogicValue(type: Types.string, memory: [literal]), context)
+//        case .literal(.number(id: _, value: let literal)):
+//            return (LogicValue(type: Types.number, memory: [literal]), context)
+//        case .statement(.branch(id: _, condition: let condition, block: let block)):
+//            let evaluatedCondition = try evaluate(.expression(condition), in: context)
+//
+//            if evaluatedCondition.0.type == Types.boolean, let memory = evaluatedCondition.0.memory as? [Bool] {
+//                if memory == [true] {
+//                    let resultingContext = try block.reduce(evaluatedCondition.1, { result, node in
+//                        return try evaluate(.statement(node), in: result).1
+//                    })
+//                    return (LogicValue.unit, resultingContext)
+//                } else {
+//                    return (LogicValue.unit, evaluatedCondition.1)
+//                }
+//            } else {
+//                throw LogicError.typeMismatch(evaluatedCondition.1, [condition.uuid])
+//            }
+//        case .expression(.identifierExpression(id: _, identifier: let identifier)):
+//            return try evaluate(.identifier(identifier), in: context)
+//        case .expression(.literalExpression(id: _, literal: let literal)):
+//            return try evaluate(.literal(literal), in: context)
 //        case .expression(.functionCallExpression(id: _, expression: .identifierExpression(id: _, identifier: let functionName), arguments: let args)):
 //            for type in context.types where type.name == functionName.string {
 //                // TODO: Verify subtypes?
 //                let memory: [Any] = try args.map { arg in try evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
 //                return (LogicValue(type: type, memory: memory), context)
 //            }
-        case .literal(.boolean):
-            return context.with(nodeId: node.uuid, boundToType: Types.boolean)
-        case .literal(.string):
-            return context.with(nodeId: node.uuid, boundToType: Types.string)
-        case .literal(.number):
-            return context.with(nodeId: node.uuid, boundToType: Types.number)
-        default:
-            break
-        }
-
-        return context
-    }
-
-    public static func typeOf(_ annotation: LGCTypeAnnotation, in types: [TypeEntity]) -> TypeEntity? {
-        switch annotation {
-        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
-
-            // TODO: Placeholder annotations don't have a type... should we introduce a type variable?
-            if identifier.isPlaceholder { return nil }
-
-            if !arguments.isEmpty {
-                fatalError("Handle generics")
-            }
-
-            if let type = types.first(where: { entity in entity.name == identifier.string }) {
-                return type
-            } else {
-                return nil
-            }
-        default:
-            break
-        }
-
-        return Types.unit
-    }
-    public static func evaluate(_ node: LGCSyntaxNode, in context: RuntimeContext) throws -> (LogicValue, RuntimeContext) {
-        switch node {
-        case .program(let program):
-            let newContext = try program.block.reduce(context, { result, node in
-                return try evaluate(.statement(node), in: result).1
-            })
-            return (LogicValue.unit, newContext)
-        case .identifier(let identifier):
-            if let value = context.value(for: identifier.string) {
-                return (value, context.with(annotation: value.memory.description, for: identifier.id))
-            }
-
-            throw LogicError.undefinedIdentifier(context, identifier.id)
-        case .statement(.declaration(id: _, content: let declaration)):
-            return try evaluate(.declaration(declaration), in: context)
-        case .declaration(.variable(id: _, name: let name, annotation: let annotation, initializer: let initializer)):
-            if let value = initializer {
-                let evaluatedInitializer = try self.evaluate(.expression(value), in: context)
-
-                guard let annotation = annotation else { fatalError("We require type annotations for now") }
-
-                guard let evaluatedTypeAnnotation = typeOf(annotation, in: context.types) else {
-                    throw LogicError.undefinedType(context, annotation.uuid)
-                }
-
-                if evaluatedInitializer.0.type != evaluatedTypeAnnotation {
-                    throw LogicError.typeMismatch(context, [node.uuid])
-                }
-
-                let newContext = evaluatedInitializer.1.with(
-                    name: name.name,
-                    boundToValue: evaluatedInitializer.0
-                )
-                return (LogicValue.unit, newContext)
-            }
-        case .literal(.boolean(id: _, value: let literal)):
-            return (LogicValue(type: Types.boolean, memory: [literal]), context)
-        case .literal(.string(id: _, value: let literal)):
-            return (LogicValue(type: Types.string, memory: [literal]), context)
-        case .literal(.number(id: _, value: let literal)):
-            return (LogicValue(type: Types.number, memory: [literal]), context)
-        case .statement(.branch(id: _, condition: let condition, block: let block)):
-            let evaluatedCondition = try evaluate(.expression(condition), in: context)
-
-            if evaluatedCondition.0.type == Types.boolean, let memory = evaluatedCondition.0.memory as? [Bool] {
-                if memory == [true] {
-                    let resultingContext = try block.reduce(evaluatedCondition.1, { result, node in
-                        return try evaluate(.statement(node), in: result).1
-                    })
-                    return (LogicValue.unit, resultingContext)
-                } else {
-                    return (LogicValue.unit, evaluatedCondition.1)
-                }
-            } else {
-                throw LogicError.typeMismatch(evaluatedCondition.1, [condition.uuid])
-            }
-        case .expression(.identifierExpression(id: _, identifier: let identifier)):
-            return try evaluate(.identifier(identifier), in: context)
-        case .expression(.literalExpression(id: _, literal: let literal)):
-            return try evaluate(.literal(literal), in: context)
-        case .expression(.functionCallExpression(id: _, expression: .identifierExpression(id: _, identifier: let functionName), arguments: let args)):
-            for type in context.types where type.name == functionName.string {
-                // TODO: Verify subtypes?
-                let memory: [Any] = try args.map { arg in try evaluate(.expression(arg.expression), in: context) }.map { $0.0.memory }
-                return (LogicValue(type: type, memory: memory), context)
-            }
-        default:
-            break
-        }
-
-        return (LogicValue.unit, context)
-    }
+//        default:
+//            break
+//        }
+//
+//        return (LogicValue.unit, context)
+//    }
 }
 
 public extension Environment {

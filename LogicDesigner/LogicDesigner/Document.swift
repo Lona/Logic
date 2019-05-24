@@ -78,7 +78,9 @@ class Document: NSDocument {
 
             switch node {
             case .expression(let expression):
-                let unificationContext = rootNode.makeUnificationContext()
+                let scopeContext = Environment.scopeContext(rootNode)
+
+                let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext)
 
                 Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
@@ -96,9 +98,9 @@ class Document: NSDocument {
 
                 let type = Unification.substitute(substitution, in: unificationType)
 
-                let currentScope = Environment.scope(rootNode, targetId: node.uuid).flattened
+                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid)
 
-                Swift.print("Scope", currentScope)
+                Swift.print("Scope", currentScopeContext)
 
                 let common: [LogicSuggestionItem] = [
                     LGCExpression.Suggestion.comparison,
@@ -108,7 +110,7 @@ class Document: NSDocument {
                 case .evar:
                     Swift.print("Resolved type: \(type)")
 
-                    let matchingIdentifiers = currentScope.values
+                    let matchingIdentifiers = currentScopeContext.namesInScope
 
                     let literals: [LogicSuggestionItem] = [
                         LGCLiteral.Suggestion.true,
@@ -122,15 +124,15 @@ class Document: NSDocument {
                 case .cons(name: let name, parameters: _):
                     Swift.print("Resolved type: \(type)")
 
-                    let matchingIdentifiers: [String] = currentScope.keys.compactMap({ nodeId in
-                        guard let identifierType = unificationContext.nodes[nodeId] else { return nil }
+                    let matchingIdentifiers: [String] = currentScopeContext.patternsInScope.compactMap({ pattern in
+                        guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print("Resolved type of \(nodeId): \(identifierType) == \(resolvedType)")
+                        Swift.print("Resolved type of pattern \(pattern.uuid): \(identifierType) == \(resolvedType)")
 
                         if type == resolvedType {
-                            return currentScope[nodeId]
+                            return pattern.name
                         }
 
                         return nil
@@ -166,35 +168,37 @@ class Document: NSDocument {
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode
 
-            do {
-                let compilerContext = try Environment.compile(rootNode, in: .standard)
-
-//                Swift.print(compilerContext.nodeType, compilerContext.scopes)
-
-                let context = try Environment.evaluate(rootNode, in: .standard).1
-
-//                Swift.print(context.scopes)
-
-                annotations = context.annotations
-
-                self.logicEditor.underlinedId = nil
-            } catch let error {
-                if let error = error as? CompilerError {
-//                    Swift.print("Compiler error", error)
-
-                    // TODO:
-//                    self.logicEditor.underlinedId = error.nodeId
-                }
-
-                if let error = error as? LogicError {
-                    annotations = error.context.annotations
-
-                    // TODO:
-//                    self.logicEditor.underlinedId = error.nodeId
-                }
-            }
-
             return true
+
+//            do {
+////                let compilerContext = try Environment.compile(rootNode, in: .standard)
+//
+////                Swift.print(compilerContext.nodeType, compilerContext.scopes)
+//
+//                let context = try Environment.evaluate(rootNode, in: .standard).1
+//
+////                Swift.print(context.scopes)
+//
+//                annotations = context.annotations
+//
+//                self.logicEditor.underlinedId = nil
+//            } catch let error {
+//                if let error = error as? CompilerError {
+////                    Swift.print("Compiler error", error)
+//
+//                    // TODO:
+////                    self.logicEditor.underlinedId = error.nodeId
+//                }
+//
+//                if let error = error as? LogicError {
+//                    annotations = error.context.annotations
+//
+//                    // TODO:
+////                    self.logicEditor.underlinedId = error.nodeId
+//                }
+//            }
+//
+//            return true
         }
 
         window.backgroundColor = Colors.background

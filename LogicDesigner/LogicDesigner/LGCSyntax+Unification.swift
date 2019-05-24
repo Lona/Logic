@@ -13,7 +13,7 @@ extension LGCSyntaxNode {
     public class UnificationContext {
         var constraints: [Unification.Constraint] = []
         var nodes: [UUID: Unification.T] = [:]
-        var scopeStack = ScopeStack<String, Unification.T>()
+        var patternTypes: [UUID: Unification.T] = [:]
 
         public init() {}
 
@@ -28,7 +28,7 @@ extension LGCSyntaxNode {
         }
     }
 
-    public func makeUnificationContext() -> UnificationContext {
+    public func makeUnificationContext(scopeContext: Environment.ScopeContext) -> UnificationContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
         return self.reduce(config: &traversalConfig, initialResult: UnificationContext()) { (result, node, config) in
@@ -42,7 +42,6 @@ extension LGCSyntaxNode {
 
                 return result
             case (false, .declaration(.function(id: _, name: _, returnType: _, parameters: let parameters, block: _))):
-                result.scopeStack = result.scopeStack.push()
 
                 parameters.forEach { parameter in
                     switch parameter {
@@ -51,13 +50,11 @@ extension LGCSyntaxNode {
 
                         result.nodes[pattern.uuid] = annotationType
 //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
-                        result.scopeStack.set(annotationType, for: pattern.name)
+                        result.patternTypes[pattern.uuid] = annotationType
                     default:
                         break
                     }
                 }
-            case (true, .declaration(.function(id: _, name: _, returnType: _, parameters: _, block: _))):
-                result.scopeStack = result.scopeStack.pop()
             case (true, .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer))):
                 guard let initializer = initializer, let annotation = annotation else {
                     config.ignoreChildren = true
@@ -73,7 +70,7 @@ extension LGCSyntaxNode {
 
                 result.nodes[pattern.uuid] = annotationType
                 result.constraints.append(Unification.Constraint(annotationType, result.nodes[initializer.uuid]!))
-                result.scopeStack.set(annotationType, for: pattern.name)
+                result.patternTypes[pattern.uuid] = annotationType
 
                 return result
             case (true, .expression(.identifierExpression(id: _, identifier: let identifier))):
@@ -82,7 +79,7 @@ extension LGCSyntaxNode {
                 result.nodes[node.uuid] = typeVariable
                 result.nodes[identifier.uuid] = typeVariable
 
-                if let scopedType = result.scopeStack.value(for: identifier.string) {
+                if let patternId = scopeContext.identifierToPattern[identifier.uuid], let scopedType = result.patternTypes[patternId] {
                     result.constraints.append(.init(scopedType, typeVariable))
                 }
 
