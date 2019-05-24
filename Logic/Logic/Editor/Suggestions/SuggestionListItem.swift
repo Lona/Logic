@@ -10,7 +10,7 @@ import Foundation
 
 public enum SuggestionListItem {
     case sectionHeader(String)
-    case row(String, Bool)
+    case row(String, Bool, String?)
     case colorRow(name: String, code: String, NSColor, Bool)
     case textStyleRow(String, TextStyle, Bool)
 

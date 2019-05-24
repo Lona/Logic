@@ -95,7 +95,8 @@ class Document: NSDocument {
                     guard case .expression(let contents) = item.node else { return nil }
 
                     return LogicSuggestionItem(
-                        title: "Value(\(item.title))",
+                        title: ".value(\(item.title))",
+                        badge: "Optional",
                         category: LGCExpression.Suggestion.categoryTitle,
                         node: .expression(
                             .functionCallExpression(
@@ -111,7 +112,8 @@ class Document: NSDocument {
                 }
 
                 let noneSuggestion = LogicSuggestionItem(
-                    title: "None",
+                    title: ".none",
+                    badge: "Optional",
                     category: LGCExpression.Suggestion.categoryTitle,
                     node: .expression(
                         .functionCallExpression(

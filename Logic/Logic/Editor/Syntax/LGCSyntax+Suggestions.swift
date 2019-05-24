@@ -17,12 +17,14 @@ public struct LogicSuggestionItem {
 
     public init(
         title: String,
+        badge: String? = nil,
         category: String,
         node: LGCSyntaxNode,
         nextFocusId: UUID? = nil,
         disabled: Bool = false,
         style: Style = .normal) {
         self.title = title
+        self.badge = badge
         self.category = category
         self.node = node
         self.nextFocusId = nextFocusId
@@ -31,6 +33,7 @@ public struct LogicSuggestionItem {
     }
 
     public var title: String
+    public var badge: String?
     public var category: String
     public var node: LGCSyntaxNode
     public var nextFocusId: UUID?
@@ -62,7 +65,7 @@ public struct LogicSuggestionCategory {
 
     public var suggestionListItems: [SuggestionListItem] {
         let sectionHeader = SuggestionListItem.sectionHeader(title)
-        let rows = items.map { SuggestionListItem.row($0.title, $0.disabled) }
+        let rows = items.map { SuggestionListItem.row($0.title, $0.disabled, $0.badge) }
         return Array([[sectionHeader], rows].joined())
     }
 }
@@ -94,7 +97,8 @@ public extension LGCLiteral {
     enum Suggestion {
         public static var `true`: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Boolean: true",
+                title: "true",
+                badge: "Boolean",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
             )
@@ -102,7 +106,8 @@ public extension LGCLiteral {
 
         public static var `false`: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Boolean: false",
+                title: "false",
+                badge: "Boolean",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
             )
@@ -110,7 +115,8 @@ public extension LGCLiteral {
 
         public static func rationalNumber(for prefix: String) -> LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Number: \(prefix)",
+                title: prefix.isEmpty ? "Number" : prefix,
+                badge: "Number",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.number(id: UUID(), value: CGFloat(Double(prefix) ?? 0))),
                 disabled: Double(prefix) == nil
