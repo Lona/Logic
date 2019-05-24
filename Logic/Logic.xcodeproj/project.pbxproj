@@ -76,6 +76,7 @@
 		6BBD0C052296152200EB87A9 /* TypeEntity+Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C042296152200EB87A9 /* TypeEntity+Unification.swift */; };
 		6BBD0C0722961B9C00EB87A9 /* NameGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C0622961B9C00EB87A9 /* NameGenerator.swift */; };
 		6BBD0C0F2298759F00EB87A9 /* LGCExpression+Builders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C0E2298759F00EB87A9 /* LGCExpression+Builders.swift */; };
+		6BBD0C1122988ED100EB87A9 /* NativeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C1022988ED100EB87A9 /* NativeType.swift */; };
 		6BC2D44E2263B7AE003A9F63 /* TextStyleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC2D44D2263B7AE003A9F63 /* TextStyleRow.swift */; };
 		6BC606342247DDFB003E616B /* Colors+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC606332247DDFB003E616B /* Colors+Appearance.swift */; };
 		6BD44E5C228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */; };
@@ -153,6 +154,7 @@
 		6BBD0C042296152200EB87A9 /* TypeEntity+Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TypeEntity+Unification.swift"; sourceTree = "<group>"; };
 		6BBD0C0622961B9C00EB87A9 /* NameGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameGenerator.swift; sourceTree = "<group>"; };
 		6BBD0C0E2298759F00EB87A9 /* LGCExpression+Builders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCExpression+Builders.swift"; sourceTree = "<group>"; };
+		6BBD0C1022988ED100EB87A9 /* NativeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeType.swift; sourceTree = "<group>"; };
 		6BC2D44D2263B7AE003A9F63 /* TextStyleRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextStyleRow.swift; sourceTree = "<group>"; };
 		6BC606332247DDFB003E616B /* Colors+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Appearance.swift"; sourceTree = "<group>"; };
 		6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSBezierPath+Squiggle.swift"; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 				6BBD0BFA2292134700EB87A9 /* EnumType.swift */,
 				6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */,
 				6B5B756F215C383B00CDC9C6 /* KeyedParameter.swift */,
+				6BBD0C1022988ED100EB87A9 /* NativeType.swift */,
 				6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */,
 				6B5B7559215B1ABE00CDC9C6 /* TypeCase.swift */,
 				6B5B7557215B1ABE00CDC9C6 /* TypeEntity.swift */,
@@ -522,6 +525,7 @@
 				6B44E157223B3DD000740318 /* NSImage+Resizing.swift in Sources */,
 				6B5B7566215B1ABE00CDC9C6 /* TypeListEditor.swift in Sources */,
 				6B44E16D223B3E9E00740318 /* SuggestionDetailView.swift in Sources */,
+				6BBD0C1122988ED100EB87A9 /* NativeType.swift in Sources */,
 				6B44E155223B3DD000740318 /* LNATextField.swift in Sources */,
 				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
