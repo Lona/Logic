@@ -128,6 +128,11 @@ public enum Unification {
             type = newType
         }
 
-        return type
+        switch type {
+        case .evar:
+            return type
+        case .cons(name: let name, parameters: let parameters):
+            return .cons(name: name, parameters: parameters.map { substitute(substitution, in: $0) })
+        }
     }
 }
