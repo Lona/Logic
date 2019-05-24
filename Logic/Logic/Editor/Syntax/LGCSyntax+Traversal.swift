@@ -60,8 +60,8 @@ extension LGCSyntaxNode {
 
             return context2
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
-            // TODO: Arguments?
-            return [expression.node].reduce(config: &config, initialResult: context, f: f)
+            let argumentNodes = arguments.map { $0.expression.node }
+            return ([expression.node] + argumentNodes).reduce(config: &config, initialResult: context, f: f)
         case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
             return [left.node, right.node, op.node].reduce(config: &config, initialResult: context, f: f)
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
