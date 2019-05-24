@@ -14,13 +14,14 @@
       "id" : "Default",
       "name" : "Default",
       "params" : {
-
+        "badgeText" : null
       }
     },
     {
       "id" : "Selected",
       "name" : "Selected",
       "params" : {
+        "badgeText" : null,
         "selected" : true
       }
     },
@@ -28,7 +29,15 @@
       "id" : "Disabled",
       "name" : "Disabled",
       "params" : {
+        "badgeText" : null,
         "disabled" : true
+      }
+    },
+    {
+      "id" : "Badged",
+      "name" : "Badged",
+      "params" : {
+        "badgeText" : "Text"
       }
     }
   ],
@@ -58,6 +67,36 @@
             "value" : {
               "data" : "rowInverse",
               "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "BadgeText",
+            "textStyle"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "sectionHeaderInverse",
+              "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "BadgeView",
+            "backgroundColor"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "transparent",
+              "type" : "Color"
             }
           },
           "type" : "AssignExpr"
@@ -96,6 +135,36 @@
             }
           },
           "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "BadgeText",
+            "textStyle"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "sectionHeaderDisabled",
+              "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "BadgeView",
+            "backgroundColor"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "transparent",
+              "type" : "Color"
+            }
+          },
+          "type" : "AssignExpr"
         }
       ],
       "condition" : {
@@ -114,6 +183,45 @@
         "type" : "BinExpr"
       },
       "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "BadgeView",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "BadgeText",
+            "text"
+          ],
+          "content" : [
+            "badgeText"
+          ],
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "content" : [
+          "parameters",
+          "badgeText"
+        ],
+        "id" : "badgeText",
+        "type" : "VarDeclExpr"
+      },
+      "type" : "IfExpr"
     }
   ],
   "params" : [
@@ -128,6 +236,10 @@
     {
       "name" : "disabled",
       "type" : "Boolean"
+    },
+    {
+      "name" : "badgeText",
+      "type" : "String?"
     }
   ],
   "root" : {
@@ -135,15 +247,42 @@
       {
         "id" : "Text",
         "params" : {
+          "flex" : 1,
           "font" : "row",
           "text" : "Text goes here"
         },
         "type" : "Lona:Text"
+      },
+      {
+        "children" : [
+          {
+            "id" : "BadgeText",
+            "params" : {
+              "font" : "sectionHeader",
+              "text" : "Badge"
+            },
+            "type" : "Lona:Text"
+          }
+        ],
+        "id" : "BadgeView",
+        "params" : {
+          "backgroundColor" : "raisedBackground",
+          "borderRadius" : 4,
+          "flexDirection" : "row",
+          "height" : 14,
+          "paddingLeft" : 4,
+          "paddingRight" : 4,
+          "paddingTop" : 1,
+          "visible" : false
+        },
+        "type" : "Lona:View"
       }
     ],
     "id" : "View",
     "params" : {
+      "alignItems" : "center",
       "alignSelf" : "stretch",
+      "flexDirection" : "row",
       "paddingBottom" : 4,
       "paddingLeft" : 12,
       "paddingRight" : 12,

@@ -7,6 +7,18 @@
       "name" : "Section Header"
     },
     {
+      "color" : "white",
+      "fontSize" : 10,
+      "id" : "sectionHeaderInverse",
+      "name" : "Section Header Inverse"
+    },
+    {
+      "color" : "textMuted",
+      "fontSize" : 10,
+      "id" : "sectionHeaderDisabled",
+      "name" : "Section Header Disabled"
+    },
+    {
       "id" : "row",
       "name" : "Row"
     },
@@ -19,12 +31,6 @@
       "color" : "textMuted",
       "id" : "rowDisabled",
       "name" : "Row Disabled"
-    },
-    {
-      "color" : "white",
-      "fontSize" : 10,
-      "id" : "sectionHeaderInverse",
-      "name" : "Section Header Inverse"
     }
   ]
 }

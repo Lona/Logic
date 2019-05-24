@@ -1,69 +1,74 @@
 {
-  "colors": [
+  "colors" : [
     {
-      "id": "background",
-      "name": "Background",
-      "value": "white",
-      "metadata": {
-        "shouldGenerateCode": {
-          "macos": false
+      "id" : "background",
+      "metadata" : {
+        "shouldGenerateCode" : {
+          "macos" : false
         }
-      }
+      },
+      "name" : "Background",
+      "value" : "white"
     },
     {
-      "id": "raisedBackground",
-      "name": "Raised Background",
-      "value": "rgba(0,0,0,0.03)",
-      "metadata": {
-        "shouldGenerateCode": {
-          "macos": false
+      "id" : "raisedBackground",
+      "metadata" : {
+        "shouldGenerateCode" : {
+          "macos" : false
         }
-      }
+      },
+      "name" : "Raised Background",
+      "value" : "rgba(0,0,0,0.03)"
     },
     {
-      "id": "greyBackground",
-      "name": "Grey Background",
-      "value": "rgba(0,0,0,0.03)"
+      "id" : "greyBackground",
+      "name" : "Grey Background",
+      "value" : "rgba(0,0,0,0.03)"
     },
     {
-      "id": "divider",
-      "name": "divider",
-      "value": "rgba(237,237,237,1.0)",
-      "metadata": {
-        "shouldGenerateCode": {
-          "macos": false
+      "id" : "divider",
+      "metadata" : {
+        "shouldGenerateCode" : {
+          "macos" : false
         }
-      }
+      },
+      "name" : "divider",
+      "value" : "rgba(237,237,237,1.0)"
     },
     {
-      "id": "dividerBackground",
-      "name": "dividerBackground",
-      "value": "rgba(212,212,212,1.0)"
+      "id" : "dividerBackground",
+      "name" : "dividerBackground",
+      "value" : "rgba(212,212,212,1.0)"
     },
     {
-      "id": "textMuted",
-      "name": "textMuted",
-      "value": "rgba(144,144,144,1.0)"
+      "id" : "textMuted",
+      "name" : "textMuted",
+      "value" : "rgba(144,144,144,1.0)"
     },
     {
-      "id": "text",
-      "name": "Text",
-      "value": "black",
-      "metadata": {
-        "shouldGenerateCode": {
-          "macos": false
+      "id" : "text",
+      "metadata" : {
+        "shouldGenerateCode" : {
+          "macos" : false
         }
-      }
+      },
+      "name" : "Text",
+      "value" : "black"
     },
     {
-      "id": "editableText",
-      "name": "editableText",
-      "value": "#4a90e2"
+      "id" : "editableText",
+      "name" : "editableText",
+      "value" : "#4a90e2"
     },
     {
-      "id": "white",
-      "name": "white",
-      "value": "white"
+      "id" : "white",
+      "name" : "white",
+      "value" : "white"
+    },
+    {
+      "id" : "transparent",
+      "name" : "transparent",
+      "value" : "transparent"
     }
   ]
 }
