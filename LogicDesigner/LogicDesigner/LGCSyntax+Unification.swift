@@ -34,7 +34,6 @@ extension LGCSyntaxNode {
         ) -> UnificationContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        return self.reduce(config: &traversalConfig, initialResult: UnificationContext()) { (result, node, config) in
         return self.reduce(config: &traversalConfig, initialResult: initialContext) { (result, node, config) in
 //            Swift.print("pre", node.nodeTypeDescription)
 
