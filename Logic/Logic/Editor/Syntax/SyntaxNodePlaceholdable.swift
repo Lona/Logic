@@ -86,6 +86,21 @@ extension LGCFunctionParameter: SyntaxNodePlaceholdable {
     }
 }
 
+extension LGCGenericParameter: SyntaxNodePlaceholdable {
+    public var isPlaceholder: Bool {
+        switch self {
+        case .placeholder:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public static func makePlaceholder() -> LGCGenericParameter {
+        return .placeholder(id: UUID())
+    }
+}
+
 extension LGCEnumerationCase: SyntaxNodePlaceholdable {
     public var isPlaceholder: Bool {
         switch self {

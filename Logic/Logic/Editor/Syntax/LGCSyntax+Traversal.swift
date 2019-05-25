@@ -45,7 +45,7 @@ extension LGCSyntaxNode {
             if config.ignoreChildren { return context2 }
 
             return block.map { $0.node }.reduce(config: &config, initialResult: context2, f: f)
-        case .declaration(.function(id: _, name: let pattern, returnType: let returnType, parameters: let parameters, block: let block)):
+        case .declaration(.function(id: _, name: let pattern, returnType: let returnType, genericParameters: _, parameters: let parameters, block: let block)):
             return ([pattern.node, returnType.node] + parameters.map { $0.node } + block.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
         case .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: let initializer)):
             var context2: Result

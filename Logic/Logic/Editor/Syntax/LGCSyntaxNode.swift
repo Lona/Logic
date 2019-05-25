@@ -464,6 +464,81 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
     }
 }
 
+extension LGCGenericParameter: SyntaxNodeProtocol {
+    public var nodeTypeDescription: String {
+        return "Generic Parameter"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .genericParameter(self)
+    }
+
+    public func delete(id: UUID) -> LGCGenericParameter {
+        switch self {
+        case .placeholder:
+            return self
+        case .parameter(let value):
+            return .parameter(
+                id: UUID(),
+                name: value.name.delete(id: id)
+            )
+        }
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCGenericParameter {
+        switch syntaxNode {
+        case .genericParameter(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .placeholder:
+                return .placeholder(id: UUID())
+            case .parameter(let value):
+                return .parameter(
+                    id: UUID(),
+                    name: value.name.replace(id: UUID(), with: syntaxNode)
+                )
+            }
+        }
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]?
+
+        switch self {
+        case .placeholder:
+            found = nil
+        case .parameter(let value):
+            found = value.name.pathTo(id: id)
+        }
+
+        if let found = found {
+            return [self.node] + found
+        } else {
+            return nil
+        }
+    }
+
+    public var lastNode: LGCSyntaxNode {
+        return node
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .parameter(let value):
+            return value.id
+        case .placeholder(let value):
+            return value
+        }
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension LGCEnumerationCase: SyntaxNodeProtocol {
     public var nodeTypeDescription: String {
         return "Enum Case"
@@ -909,6 +984,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 id: UUID(),
                 name: value.name.delete(id: id),
                 returnType: value.returnType.delete(id: id),
+                genericParameters: value.genericParameters.delete(id: id),
                 parameters: value.parameters.delete(id: id),
                 block: value.block.delete(id: id)
             )
@@ -935,6 +1011,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     id: UUID(),
                     name: value.name.replace(id: id, with: syntaxNode),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
                     parameters: value.parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
@@ -1231,6 +1308,8 @@ extension LGCSyntaxNode {
         case .topLevelParameters(let value):
             return value
         case .enumerationCase(let value):
+            return value
+        case .genericParameter(let value):
             return value
         }
     }

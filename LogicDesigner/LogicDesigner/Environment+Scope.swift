@@ -170,7 +170,7 @@ public extension Environment {
                 context.setInCurrentNamespace(key: pattern.name, value: .pattern(pattern.id))
 
                 return context
-            case (false, .declaration(.function(id: _, name: _, returnType: _, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: let parameters, block: _))):
                 context.patternNames = context.patternNames.push()
 
                 parameters.forEach { parameter in
@@ -184,7 +184,7 @@ public extension Environment {
                 }
 
                 return context
-            case (true, .declaration(.function(id: _, name: _, returnType: _, parameters: _, block: _))):
+            case (true, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: _, block: _))):
                 context.patternNames = context.patternNames.pop()
 
                 return context

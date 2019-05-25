@@ -44,7 +44,7 @@ extension LGCSyntaxNode {
                 result.nodes[condition.uuid] = .cons(name: "Boolean")
 
                 return result
-            case (false, .declaration(.function(id: _, name: _, returnType: _, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: let parameters, block: _))):
 
                 parameters.forEach { parameter in
                     switch parameter {

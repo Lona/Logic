@@ -36,6 +36,9 @@
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="name" type="Pattern"/>
       <Record.Param name="returnType" type="TypeAnnotation"/>
+      <Record.Param name="genericParameters" type="List">
+        <Record.Substitution generic="T" instance="GenericParameter"/>
+      </Record.Param>
       <Record.Param name="parameters" type="List">
         <Record.Substitution generic="T" instance="FunctionParameter"/>
       </Record.Param>
@@ -215,6 +218,9 @@
     <Case name="enumerationCase">
       <Case.Param type="EnumerationCase"/>
     </Case>
+    <Case name="genericParameter">
+      <Case.Param type="GenericParameter"/>
+    </Case>
   </Type>
   <Type name="FunctionParameter">
     <Record name="parameter">
@@ -285,6 +291,15 @@
       <Record.Param name="parameters" type="List">
         <Record.Substitution generic="T" instance="FunctionParameter"/>
       </Record.Param>
+    </Record>
+  </Type>
+  <Type name="GenericParameter">
+    <Record name="parameter">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+    </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
     </Record>
   </Type>
 </root>

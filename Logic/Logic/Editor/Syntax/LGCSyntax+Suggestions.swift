@@ -538,6 +538,7 @@ public extension LGCDeclaration {
                             identifier: LGCIdentifier(id: UUID(), string: "Void"),
                             genericArguments: .empty
                         ),
+                        genericParameters: .empty,
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
                         block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
                     )
@@ -654,6 +655,8 @@ public extension LGCSyntaxNode {
         case .program:
             return []
         case .functionParameter:
+            return contents.suggestions(within: root, for: prefix)
+        case .genericParameter:
             return contents.suggestions(within: root, for: prefix)
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)

@@ -122,6 +122,17 @@ public extension LGCFunctionParameter {
     }
 }
 
+public extension LGCGenericParameter {
+    var formatted: FormatterCommand<LogicElement> {
+        switch self {
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
+        case .parameter(let value):
+            return value.name.formatted
+        }
+    }
+}
+
 public extension LGCEnumerationCase {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
@@ -457,6 +468,8 @@ public extension LGCSyntaxNode {
         case .topLevelParameters(let value):
             return value.formatted
         case .enumerationCase(let value):
+            return value.formatted
+        case .genericParameter(let value):
             return value.formatted
         }
     }
