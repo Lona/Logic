@@ -129,7 +129,7 @@ class Document: NSDocument {
                 return []
             }
         }
-
+        
         logicEditor.suggestionsForNode = { [unowned self] node, query in
             Swift.print("---------")
 
@@ -139,9 +139,11 @@ class Document: NSDocument {
 
             switch node {
             case .expression(let expression):
-                let scopeContext = Environment.scopeContext(rootNode)
+                let baseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
+                let baseUnificationContext = LGCSyntaxNode.program(StandardLibrary.include).makeUnificationContext(scopeContext: baseScopeContext)
 
-                let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext)
+                let scopeContext = Environment.scopeContext(rootNode, initialContext: baseScopeContext)
+                let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
 
                 Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
@@ -159,7 +161,7 @@ class Document: NSDocument {
 
                 let type = Unification.substitute(substitution, in: unificationType)
 
-                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid)
+                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: baseScopeContext)
 
                 Swift.print("Scope", currentScopeContext)
 
@@ -189,6 +191,9 @@ class Document: NSDocument {
                     Swift.print("Resolved type: \(type)")
 
                     let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> [String]? in
+                        // Variables in scope are listed elsewhere
+                        if keyPath.count == 1 { return nil }
+
                         guard let identifierType = unificationContext.patternTypes[pattern] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)

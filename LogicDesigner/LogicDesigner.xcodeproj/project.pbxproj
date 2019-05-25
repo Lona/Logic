@@ -18,6 +18,7 @@
 		6BBD0BFD2292165000EB87A9 /* Dictionary+Keys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFC2292165000EB87A9 /* Dictionary+Keys.swift */; };
 		6BBD0C0B229620DB00EB87A9 /* LGCSyntax+Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C0A229620DB00EB87A9 /* LGCSyntax+Unification.swift */; };
 		6BBD0C0D2296211400EB87A9 /* LGCTypeAnnotation+Type.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C0C2296211400EB87A9 /* LGCTypeAnnotation+Type.swift */; };
+		6BBD0C152299D8AF00EB87A9 /* StandardLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C142299D8AF00EB87A9 /* StandardLibrary.swift */; };
 		6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E59228CCA830025A3C8 /* Environment.swift */; };
 		6BD44E60228E53A30025A3C8 /* ScopeStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5F228E53A30025A3C8 /* ScopeStack.swift */; };
 		6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E63228F31950025A3C8 /* Immutable.swift */; };
@@ -52,6 +53,7 @@
 		6BBD0BFC2292165000EB87A9 /* Dictionary+Keys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Keys.swift"; sourceTree = "<group>"; };
 		6BBD0C0A229620DB00EB87A9 /* LGCSyntax+Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Unification.swift"; sourceTree = "<group>"; };
 		6BBD0C0C2296211400EB87A9 /* LGCTypeAnnotation+Type.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCTypeAnnotation+Type.swift"; sourceTree = "<group>"; };
+		6BBD0C142299D8AF00EB87A9 /* StandardLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardLibrary.swift; sourceTree = "<group>"; };
 		6BD44E59228CCA830025A3C8 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		6BD44E5F228E53A30025A3C8 /* ScopeStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeStack.swift; sourceTree = "<group>"; };
 		6BD44E63228F31950025A3C8 /* Immutable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Immutable.swift; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
+				6BBD0C142299D8AF00EB87A9 /* StandardLibrary.swift */,
 			);
 			path = LogicDesigner;
 			sourceTree = "<group>";
@@ -191,6 +194,7 @@
 				6BD44E64228F31950025A3C8 /* Immutable.swift in Sources */,
 				6BBD0C0D2296211400EB87A9 /* LGCTypeAnnotation+Type.swift in Sources */,
 				6BBD0BFD2292165000EB87A9 /* Dictionary+Keys.swift in Sources */,
+				6BBD0C152299D8AF00EB87A9 /* StandardLibrary.swift in Sources */,
 				6BD44E68228F86B70025A3C8 /* Unify.swift in Sources */,
 				6BBD0C0B229620DB00EB87A9 /* LGCSyntax+Unification.swift in Sources */,
 				6BD44E5A228CCA830025A3C8 /* Environment.swift in Sources */,

@@ -444,7 +444,7 @@ public extension LGCExpression {
         public static func memberExpression(identifiers: [LGCIdentifier]) -> LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: identifiers.map { $0.string }.joined(separator: "."),
-                category: categoryTitle,
+                category: "Variables".uppercased(),
                 node: .expression(LGCExpression.makeMemberExpression(identifiers: identifiers))
             )
         }

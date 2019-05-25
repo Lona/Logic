@@ -117,10 +117,14 @@ public extension Environment {
         }
     }
 
-    static func scopeContext(_ node: LGCSyntaxNode, targetId: UUID? = nil) -> ScopeContext {
+    static func scopeContext(
+        _ node: LGCSyntaxNode,
+        targetId: UUID? = nil,
+        initialContext: ScopeContext = ScopeContext()
+        ) -> ScopeContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        return node.reduce(config: &traversalConfig, initialResult: ScopeContext()) {
+        return node.reduce(config: &traversalConfig, initialResult: initialContext) {
             (context, node, config) -> ScopeContext in
             if node.uuid == targetId {
                 config.stopTraversal = true
