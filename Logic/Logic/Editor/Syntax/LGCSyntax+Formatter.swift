@@ -259,7 +259,7 @@ public extension LGCStatement {
         case .loop(let loop):
             return .concat {
                 [
-                    .element(LogicElement.dropdown(loop.id, "For", .source)),
+                    .element(LogicElement.dropdown(loop.id, "For each", .source)),
                     loop.pattern.formatted,
                     .element(LogicElement.text("in")),
                     loop.expression.formatted,
@@ -294,6 +294,27 @@ public extension LGCStatement {
 
 public extension LGCDeclaration {
     var formatted: FormatterCommand<LogicElement> {
+        func genericParameters() -> FormatterCommand<LogicElement> {
+            switch self {
+            case .function(let value):
+                if value.genericParameters.isEmpty {
+                    return .concat { [] }
+                } else {
+                    return .concat {
+                        [
+                            .hardLine,
+                            .element(.text("Generic type parameters:")),
+                            .join(with: .concat {[.element(.text(",")), .line]}) {
+                                value.genericParameters.map { param in param.formatted }
+                            }
+                        ]
+                    }
+                }
+            case .variable, .enumeration, .namespace, .placeholder:
+                fatalError("TODO")
+            }
+        }
+
         func parameters() -> FormatterCommand<LogicElement> {
             switch self {
             case .function(let value):
@@ -323,7 +344,7 @@ public extension LGCDeclaration {
                     }
                 }
 
-            case .variable, .enumeration:
+            case .variable, .enumeration, .namespace, .placeholder:
                 fatalError("TODO")
             }
         }
@@ -359,6 +380,7 @@ public extension LGCDeclaration {
                     .indent {
                         .concat {
                             [
+                                genericParameters(),
                                 .hardLine,
                                 parameters(),
                                 .hardLine,

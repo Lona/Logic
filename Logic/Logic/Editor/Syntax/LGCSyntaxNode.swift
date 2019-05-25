@@ -1046,6 +1046,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .function(let value):
             found = value.name.pathTo(id: id)
                 ?? value.returnType.pathTo(id: id)
+                ?? value.genericParameters.pathTo(id: id)
                 ?? value.parameters.pathTo(id: id)
                 ?? value.block.pathTo(id: id)
         case .enumeration(let value):

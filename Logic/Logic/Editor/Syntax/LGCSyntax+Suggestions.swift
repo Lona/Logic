@@ -284,6 +284,21 @@ public extension LGCPattern {
     }
 }
 
+public extension LGCGenericParameter {
+    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+        let items = [
+            LogicSuggestionItem(
+                title: "Type name: \(prefix)",
+                category: "Generic Parameter".uppercased(),
+                node: .genericParameter(.parameter(id: UUID(), name: .init(id: UUID(), name: prefix))),
+                disabled: prefix.isEmpty
+            )
+        ]
+
+        return items
+    }
+}
+
 public extension LGCFunctionParameter {
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
         func parameter() -> LGCFunctionParameter {
@@ -546,6 +561,27 @@ public extension LGCDeclaration {
             )
         }
 
+        static var genericFunction: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Generic Function",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.function(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        returnType: LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                            genericArguments: .empty
+                        ),
+                        genericParameters: .next(LGCGenericParameter.makePlaceholder(), .empty),
+                        parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
+                        block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
+                    )
+                )
+            )
+        }
+
         static var `enum`: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Enumeration",
@@ -581,6 +617,7 @@ public extension LGCDeclaration {
         let items = [
             Suggestion.variable,
             Suggestion.function,
+            Suggestion.genericFunction,
             Suggestion.enum,
             Suggestion.namespace
         ]
@@ -657,7 +694,7 @@ public extension LGCSyntaxNode {
         case .functionParameter:
             return contents.suggestions(within: root, for: prefix)
         case .genericParameter:
-            return contents.suggestions(within: root, for: prefix)
+            return LGCGenericParameter.suggestions(for: prefix)
         case .typeAnnotation:
             return LGCTypeAnnotation.suggestions(for: prefix)
         case .functionParameterDefaultValue:
