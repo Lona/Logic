@@ -110,11 +110,18 @@ extension LGCSyntaxNode {
                 result.constraints.append(Unification.Constraint(placeholderArgType, result.nodes[arg0.uuid]!))
 
                 return result
-            case (true, .expression(.memberExpression(id: _, expression: let expression, memberName: _))):
-                // TODO: Determine dynamically (currently hardcoded to Optional)
-                let argType = result.makeEvar()
-                let functionCallType: Unification.T = .fun(arguments: [argType], returnType: .cons(name: "Optional", parameters: [argType]))
-                result.nodes[node.uuid] = functionCallType
+            case (false, .expression(.memberExpression)):
+                // The only supported children are identifiers currently, and we will handle them here when we revisit them
+                config.ignoreChildren = true
+
+            case (true, .expression(.memberExpression)):
+                let typeVariable = result.makeEvar()
+
+                result.nodes[node.uuid] = typeVariable
+
+                if let patternId = scopeContext.identifierToPattern[node.uuid], let scopedType = result.patternTypes[patternId] {
+                    result.constraints.append(.init(scopedType, typeVariable))
+                }
 
                 return result
             case (true, .expression(.literalExpression(id: _, literal: let literal))):

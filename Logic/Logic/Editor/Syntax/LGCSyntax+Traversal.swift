@@ -59,6 +59,8 @@ extension LGCSyntaxNode {
             context2 = pattern.node.reduce(config: &config, initialResult: context2, f: f)
 
             return context2
+        case .declaration(.namespace(id: _, name: let pattern, declarations: let declarations)):
+            return ([pattern.node] + declarations.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
             let argumentNodes = arguments.map { $0.expression.node }
             return ([expression.node] + argumentNodes).reduce(config: &config, initialResult: context, f: f)
@@ -110,6 +112,9 @@ extension LGCSyntaxNode {
                 context = f(context, self, &config)
 
                 config._isRevisit = false
+
+                // Reset ignoreChildren in case the caller set it (it should do nothing if set here)
+                config.ignoreChildren = false
             }
 
             return context

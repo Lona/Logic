@@ -891,6 +891,19 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     }
                     }.map { $0.delete(id: id) })
             )
+        case .namespace(let value):
+            return .namespace(
+                id: UUID(),
+                name: value.name.delete(id: id),
+                declarations: LGCList(value.declarations.filter {
+                    switch $0 {
+                    case .placeholder:
+                        return true
+                    default:
+                        return $0.uuid != id
+                    }
+                    }.map { $0.delete(id: id) })
+            )
         case .function(let value):
             return .function(
                 id: UUID(),
@@ -899,6 +912,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 parameters: value.parameters.delete(id: id),
                 block: value.block.delete(id: id)
             )
+        case .placeholder:
+            return .placeholder(id: UUID())
         }
     }
 

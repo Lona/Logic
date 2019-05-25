@@ -30,4 +30,22 @@ public extension LGCExpression {
             )
         })
     }
+
+    var flattenedMemberExpression: [LGCIdentifier]? {
+        switch self {
+        case .memberExpression(id: _, expression: let expression, memberName: let memberName):
+            switch expression {
+            case .identifierExpression(id: _, identifier: let parentName):
+                return [parentName, memberName]
+            default:
+                if let nested = expression.flattenedMemberExpression {
+                    return nested + [memberName]
+                } else {
+                    return nil
+                }
+            }
+        default:
+            return nil
+        }
+    }
 }

@@ -135,6 +135,8 @@ class Document: NSDocument {
 
             let rootNode = self.logicEditor.rootNode
 
+            Swift.print(Environment.scopeContext(rootNode).namespace)
+
             switch node {
             case .expression(let expression):
                 let scopeContext = Environment.scopeContext(rootNode)
@@ -186,6 +188,22 @@ class Document: NSDocument {
                 case .cons:
                     Swift.print("Resolved type: \(type)")
 
+                    let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> [String]? in
+                        guard let identifierType = unificationContext.patternTypes[pattern] else { return nil }
+
+                        let resolvedType = Unification.substitute(substitution, in: identifierType)
+
+                        Swift.print("Resolved type of pattern \(pattern): \(identifierType) == \(resolvedType)")
+
+                        if type == resolvedType {
+                            return keyPath
+                        }
+
+                        return nil
+                    })
+
+                    Swift.print("namespace identifiers", matchingNamespaceIdentifiers)
+
                     let matchingIdentifiers: [String] = currentScopeContext.patternsInScope.compactMap({ pattern in
                         guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
@@ -202,11 +220,13 @@ class Document: NSDocument {
 
                     Swift.print("Matching ids", matchingIdentifiers)
 
+                    let namespaceIdentifiers: [LogicSuggestionItem] = matchingNamespaceIdentifiers.map(LGCExpression.Suggestion.memberExpression(names:))
+
                     let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 
                     let literals = suggestions(for: type, query: query)
 
-                    return (identifiers + literals + common).titleContains(prefix: query)
+                    return (identifiers + namespaceIdentifiers + literals + common).titleContains(prefix: query)
                 }
             default:
                 return LogicEditor.defaultSuggestionsForNode(node, self.logicEditor.rootNode, query)
