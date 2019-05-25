@@ -929,6 +929,14 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     name: value.name.replace(id: id, with: syntaxNode),
                     cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
+            case .namespace(let value):
+                return LGCDeclaration.namespace(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                )
+            case .placeholder:
+                return LGCDeclaration.placeholder(id: UUID())
             }
         }
     }
@@ -951,6 +959,11 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .enumeration(let value):
             found = value.name.pathTo(id: id)
                 ?? value.cases.pathTo(id: id)
+        case .namespace(let value):
+            found = value.name.pathTo(id: id)
+                ?? value.declarations.pathTo(id: id)
+        case .placeholder:
+            found = nil
         }
 
         if let found = found {
@@ -968,6 +981,10 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return value.block.map { $0 }.last?.lastNode ?? node
         case .enumeration(let value):
             return value.cases.map { $0 }.last?.lastNode ?? node
+        case .namespace(let value):
+            return value.declarations.map { $0 }.last?.lastNode ?? node
+        case .placeholder:
+            return node
         }
     }
 
@@ -979,6 +996,10 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return value.id
         case .enumeration(let value):
             return value.id
+        case .namespace(let value):
+            return value.id
+        case .placeholder(let value):
+            return value
         }
     }
 

@@ -502,69 +502,86 @@ public extension LGCExpression {
 }
 
 public extension LGCDeclaration {
-    static let suggestionCategoryTitle = "Declarations".uppercased()
-
-    static var variableSuggestionItem: LogicSuggestionItem {
-        return LogicSuggestionItem(
-            title: "Variable",
-            category: suggestionCategoryTitle,
-            node: LGCSyntaxNode.declaration(
-                LGCDeclaration.variable(
-                    id: UUID(),
-                    name: LGCPattern(id: UUID(), name: "name"),
-                    annotation: LGCTypeAnnotation.typeIdentifier(
+    enum Suggestion {
+        static var variable: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Variable",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.variable(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
-                        genericArguments: .empty
-                    ),
-                    initializer: .identifierExpression(
-                        id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        annotation: LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
+                            genericArguments: .empty
+                        ),
+                        initializer: .identifierExpression(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                        )
                     )
                 )
             )
-        )
-    }
+        }
 
-    static var functionSuggestionItem: LogicSuggestionItem {
-        return LogicSuggestionItem(
-            title: "Function",
-            category: suggestionCategoryTitle,
-            node: LGCSyntaxNode.declaration(
-                LGCDeclaration.function(
-                    id: UUID(),
-                    name: LGCPattern(id: UUID(), name: "name"),
-                    returnType: LGCTypeAnnotation.typeIdentifier(
+        static var function: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Function",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.function(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "Void"),
-                        genericArguments: .empty
-                    ),
-                    parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                    block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        returnType: LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                            genericArguments: .empty
+                        ),
+                        parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
+                        block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
+                    )
                 )
             )
-        )
-    }
+        }
 
-    static var enumSuggestionItem: LogicSuggestionItem {
-        return LogicSuggestionItem(
-            title: "Enumeration",
-            category: suggestionCategoryTitle,
-            node: LGCSyntaxNode.declaration(
-                LGCDeclaration.enumeration(
-                    id: UUID(),
-                    name: LGCPattern(id: UUID(), name: "name"),
-                    cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+        static var `enum`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Enumeration",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.enumeration(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+                    )
                 )
             )
-        )
+        }
+
+        static var `namespace`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Namespace",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.namespace(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                    )
+                )
+            )
+        }
+
+        static let categoryTitle = "Declarations".uppercased()
     }
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            variableSuggestionItem,
-            functionSuggestionItem,
-            enumSuggestionItem
+            Suggestion.variable,
+            Suggestion.function,
+            Suggestion.enum,
+            Suggestion.namespace
         ]
 
         return items.titleContains(prefix: prefix)

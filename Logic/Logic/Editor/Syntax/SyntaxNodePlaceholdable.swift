@@ -41,6 +41,21 @@ extension LGCStatement: SyntaxNodePlaceholdable {
     }
 }
 
+extension LGCDeclaration: SyntaxNodePlaceholdable {
+    public var isPlaceholder: Bool {
+        switch self {
+        case .placeholder:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public static func makePlaceholder() -> LGCDeclaration {
+        return .placeholder(id: UUID())
+    }
+}
+
 extension LGCTypeAnnotation: SyntaxNodePlaceholdable {
     public var isPlaceholder: Bool {
         switch self {

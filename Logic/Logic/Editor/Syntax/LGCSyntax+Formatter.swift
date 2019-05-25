@@ -389,6 +389,25 @@ public extension LGCDeclaration {
                     }
                 ]
             }
+        case .namespace(let value):
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Namespace", .source)),
+                    value.name.formatted,
+                    .indent {
+                        .concat {
+                            [
+                                .hardLine,
+                                .join(with: .hardLine) {
+                                    value.declarations.map { $0.formatted }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
         }
     }
 }

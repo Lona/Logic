@@ -48,6 +48,8 @@ public indirect enum LGCDeclaration: Codable & Equatable {
   case variable(id: UUID, name: LGCPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>)
   case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>)
   case enumeration(id: UUID, name: LGCPattern, cases: LGCList<LGCEnumerationCase>)
+  case namespace(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
+  case placeholder(id: UUID)
 
   // MARK: Codable
 
@@ -65,6 +67,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
     case parameters
     case block
     case cases
+    case declarations
   }
 
   public init(from decoder: Decoder) throws {
@@ -94,6 +97,14 @@ public indirect enum LGCDeclaration: Codable & Equatable {
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
             cases: try data.decode(LGCList.self, forKey: .cases))
+      case "namespace":
+        self =
+          .namespace(
+            id: try data.decode(UUID.self, forKey: .id),
+            name: try data.decode(LGCPattern.self, forKey: .name),
+            declarations: try data.decode(LGCList.self, forKey: .declarations))
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -122,6 +133,14 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
         try data.encode(value.cases, forKey: .cases)
+      case .namespace(let value):
+        try container.encode("namespace", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.name, forKey: .name)
+        try data.encode(value.declarations, forKey: .declarations)
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
+        try data.encode(value, forKey: .id)
     }
   }
 }
