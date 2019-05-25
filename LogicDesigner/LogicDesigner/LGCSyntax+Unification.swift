@@ -92,22 +92,34 @@ extension LGCSyntaxNode {
 
                 return result
             case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
+                let calleeType = result.nodes[expression.uuid]!
 
-                let contentsType = result.makeEvar()
-                let resultType: Unification.T = .cons(name: "Optional", parameters: [contentsType])
-                result.nodes[node.uuid] = resultType
+                // Unify against these to enforce a function type
+                let placeholderReturnType = result.makeEvar()
+                let placeholderArgType = result.makeEvar()
+                let placeholderFunctionType: Unification.T = .fun(arguments: [placeholderArgType], returnType: placeholderReturnType)
 
+                result.constraints.append(.init(calleeType, placeholderFunctionType))
+
+                result.nodes[node.uuid] = placeholderReturnType
+
+                // TODO: Currently we're hardcoding a single argument
                 let argumentValues = arguments.map { $0.expression }
                 let arg0 = argumentValues[0]
 
-                result.constraints.append(Unification.Constraint(contentsType, result.nodes[arg0.uuid]!))
+                result.constraints.append(Unification.Constraint(placeholderArgType, result.nodes[arg0.uuid]!))
 
-            case (true, .expression(.memberExpression(id: _, expression: _, memberName: _))):
-                 // TODO: How do we determine the type here?
-                result.nodes[node.uuid] = result.makeEvar()
+                return result
+            case (true, .expression(.memberExpression(id: _, expression: let expression, memberName: _))):
+                // TODO: Determine dynamically (currently hardcoded to Optional)
+                let argType = result.makeEvar()
+                let functionCallType: Unification.T = .fun(arguments: [argType], returnType: .cons(name: "Optional", parameters: [argType]))
+                result.nodes[node.uuid] = functionCallType
 
+                return result
             case (true, .expression(.literalExpression(id: _, literal: let literal))):
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!
+
                 return result
             case (true, .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _))):
                 switch op {

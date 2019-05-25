@@ -12,6 +12,7 @@ public enum Unification {
     public enum T: Equatable, CustomDebugStringConvertible {
         case evar(String)
         case cons(name: String, parameters: [T])
+        indirect case fun(arguments: [T], returnType: T)
 
         public static func cons(name: String) -> T {
             return .cons(name: name, parameters: [])
@@ -23,6 +24,8 @@ public enum Unification {
                 return true
             case .cons:
                 return false
+            case .fun:
+                return false
             }
         }
 
@@ -32,6 +35,8 @@ public enum Unification {
                 return name
             case .cons(name: let name, parameters: _):
                 return name
+            case .fun:
+                fatalError("Function types have no name")
             }
         }
 
@@ -45,6 +50,8 @@ public enum Unification {
                 } else {
                     return "\(name)<\(parameters.map { $0.debugDescription }.joined(separator: ", "))>"
                 }
+            case .fun(arguments: let arguments, returnType: let returnType):
+                return "(\(arguments.map { $0.debugDescription }.joined(separator: ", "))) -> \(returnType)"
             }
         }
     }
@@ -52,6 +59,7 @@ public enum Unification {
     public enum UnificationError: Error {
         case nameMismatch(T, T)
         case genericArgumentsCountMismatch(T, T)
+        case kindMismatch(T, T)
     }
 
     public typealias Substitution = KeyValueList<T, T>
@@ -93,6 +101,17 @@ public enum Unification {
             if head == tail { continue }
 
             switch (head, tail) {
+            case (.fun(arguments: let headArguments, returnType: let headReturnType),
+                  .fun(arguments: let tailArguments, returnType: let tailReturnType)):
+                if headArguments.count != tailArguments.count {
+                    return .failure(UnificationError.genericArgumentsCountMismatch(head, tail))
+                }
+
+                zip(headArguments, tailArguments).forEach { a, b in
+                    constraints.append(Constraint(a, b))
+                }
+
+                constraints.append(.init(headReturnType, tailReturnType))
             case (.cons(_, let headParameters), .cons(_, let tailParameters)):
                 if head.name != tail.name {
                     return .failure(UnificationError.nameMismatch(head, tail))
@@ -109,6 +128,8 @@ public enum Unification {
                 substitution = substitution.with(tail, for: head)
             case (_, .evar):
                 substitution = substitution.with(head, for: tail)
+            case (.cons, .fun), (.fun, .cons):
+                return .failure(.kindMismatch(head, tail))
             }
 
 //            Swift.print("SUBS", substitution)
@@ -133,6 +154,11 @@ public enum Unification {
             return type
         case .cons(name: let name, parameters: let parameters):
             return .cons(name: name, parameters: parameters.map { substitute(substitution, in: $0) })
+        case .fun(let arguments, let returnType):
+            return .fun(
+                arguments: arguments.map { substitute(substitution, in: $0) },
+                returnType: substitute(substitution, in: returnType)
+            )
         }
     }
 }

@@ -166,6 +166,9 @@ class Document: NSDocument {
                 ]
 
                 switch type {
+                case .fun:
+                    // TODO: Suggestion functions?
+                    return []
                 case .evar:
                     Swift.print("Resolved type: \(type)")
 
