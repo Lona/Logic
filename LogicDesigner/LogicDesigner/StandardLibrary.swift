@@ -15,6 +15,31 @@ public enum StandardLibrary {
         name: .init(id: UUID(), name: "Math"),
         declarations: LGCList<LGCDeclaration>.init(
             [
+                .function(
+                    id: UUID(),
+                    name: .init(id: UUID(), name: "min"),
+                    returnType: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Number"), genericArguments: .empty),
+                    genericParameters: .empty,
+                    parameters: LGCList<LGCFunctionParameter>(
+                        [
+                            .parameter(
+                                id: UUID(),
+                                externalName: nil,
+                                localName: .init(id: UUID(), name: "a"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Number"), genericArguments: .empty),
+                                defaultValue: .none(id: UUID())
+                            ),
+                            .parameter(
+                                id: UUID(),
+                                externalName: nil,
+                                localName: .init(id: UUID(), name: "b"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Number"), genericArguments: .empty),
+                                defaultValue: .none(id: UUID())
+                            ),
+                        ]
+                    ),
+                    block: .empty
+                ),
                 .variable(
                     id: UUID(),
                     name: .init(id: UUID(), name: "PI"),

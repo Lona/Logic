@@ -148,7 +148,7 @@ class Document: NSDocument {
                 Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
                 guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
-                    Swift.print("Unification failed")
+                    Swift.print("Unification failed", Unification.unify(constraints: unificationContext.constraints))
                     return []
                 }
 
@@ -190,7 +190,7 @@ class Document: NSDocument {
                 case .cons:
                     Swift.print("Resolved type: \(type)")
 
-                    let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> [String]? in
+                    let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
                         // Variables in scope are listed elsewhere
                         if keyPath.count == 1 { return nil }
 
@@ -201,10 +201,15 @@ class Document: NSDocument {
                         Swift.print("Resolved type of pattern \(pattern): \(identifierType) == \(resolvedType)")
 
                         if type == resolvedType {
-                            return keyPath
+                            return (keyPath, resolvedType)
                         }
 
-                        return nil
+                        switch resolvedType {
+                        case .fun(arguments: _, returnType: let returnType) where type == returnType:
+                            return (keyPath, resolvedType)
+                        default:
+                            return nil
+                        }
                     })
 
                     Swift.print("namespace identifiers", matchingNamespaceIdentifiers)
@@ -225,7 +230,35 @@ class Document: NSDocument {
 
                     Swift.print("Matching ids", matchingIdentifiers)
 
-                    let namespaceIdentifiers: [LogicSuggestionItem] = matchingNamespaceIdentifiers.map(LGCExpression.Suggestion.memberExpression(names:))
+                    let namespaceIdentifiers: [LogicSuggestionItem] = matchingNamespaceIdentifiers.map { (keyPath, resolvedType) in
+                        switch resolvedType {
+                        case .fun(arguments: let arguments, returnType: _):
+                            return LogicSuggestionItem(
+                                title: keyPath.joined(separator: "."),
+                                category: "FUNCTIONS",
+                                node: .expression(
+                                    .functionCallExpression(
+                                        id: UUID(),
+                                        expression: LGCExpression.makeMemberExpression(names: keyPath),
+                                        arguments: LGCList<LGCFunctionCallArgument>(
+                                            arguments.map { arg in
+                                                LGCFunctionCallArgument(
+                                                    id: UUID(),
+                                                    label: nil,
+                                                    expression: .identifierExpression(
+                                                        id: UUID(),
+                                                        identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        default:
+                            return LGCExpression.Suggestion.memberExpression(names: keyPath)
+                        }
+                    }
 
                     let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 

@@ -170,8 +170,13 @@ public extension Environment {
                 context.setInCurrentNamespace(key: pattern.name, value: .pattern(pattern.id))
 
                 return context
-            case (false, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: let functionName, returnType: _, genericParameters: _, parameters: let parameters, block: _))):
                 context.patternNames = context.patternNames.push()
+
+                context.patternToName[functionName.uuid] = functionName.name
+                context.patternNames.set(functionName, for: functionName.name)
+
+                context.setInCurrentNamespace(key: functionName.name, value: .pattern(functionName.id))
 
                 parameters.forEach { parameter in
                     switch parameter {

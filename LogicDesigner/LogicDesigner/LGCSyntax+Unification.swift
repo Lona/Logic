@@ -44,12 +44,16 @@ extension LGCSyntaxNode {
                 result.nodes[condition.uuid] = .cons(name: "Boolean")
 
                 return result
-            case (false, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: _, parameters: let parameters, block: _))):
+
+                var parameterTypes: [Unification.T] = []
 
                 parameters.forEach { parameter in
                     switch parameter {
                     case .parameter(id: _, externalName: _, localName: let pattern, annotation: let annotation, defaultValue: _):
                         let annotationType = annotation.unificationType { result.makeGenericName() }
+
+                        parameterTypes.append(annotationType)
 
                         result.nodes[pattern.uuid] = annotationType
 //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
@@ -58,6 +62,12 @@ extension LGCSyntaxNode {
                         break
                     }
                 }
+
+                let returnType = returnTypeAnnotation.unificationType { result.makeGenericName() }
+                let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
+
+                result.nodes[functionName.uuid] = functionType
+                result.patternTypes[functionName.uuid] = functionType
             case (true, .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer))):
                 guard let initializer = initializer, let annotation = annotation else {
                     config.ignoreChildren = true
@@ -77,7 +87,7 @@ extension LGCSyntaxNode {
                 if let initializerType = result.nodes[initializer.uuid] {
                     result.constraints.append(Unification.Constraint(annotationType, initializerType))
                 } else {
-                    Swift.print("No initializer type for \(initializer.uuid)")
+                    Swift.print("WARNING: No initializer type for \(initializer.uuid)")
                 }
 
                 result.patternTypes[pattern.uuid] = annotationType
@@ -99,18 +109,18 @@ extension LGCSyntaxNode {
 
                 // Unify against these to enforce a function type
                 let placeholderReturnType = result.makeEvar()
-                let placeholderArgType = result.makeEvar()
-                let placeholderFunctionType: Unification.T = .fun(arguments: [placeholderArgType], returnType: placeholderReturnType)
+                let placeholderArgTypes = arguments.map { _ in result.makeEvar() }
+                let placeholderFunctionType: Unification.T = .fun(arguments: placeholderArgTypes, returnType: placeholderReturnType)
 
                 result.constraints.append(.init(calleeType, placeholderFunctionType))
 
                 result.nodes[node.uuid] = placeholderReturnType
 
-                // TODO: Currently we're hardcoding a single argument
                 let argumentValues = arguments.map { $0.expression }
-                let arg0 = argumentValues[0]
 
-                result.constraints.append(Unification.Constraint(placeholderArgType, result.nodes[arg0.uuid]!))
+                zip(placeholderArgTypes, argumentValues).forEach { (argType, argValue) in
+                    result.constraints.append(Unification.Constraint(argType, result.nodes[argValue.uuid]!))
+                }
 
                 return result
             case (false, .expression(.memberExpression)):
@@ -118,14 +128,12 @@ extension LGCSyntaxNode {
                 config.ignoreChildren = true
 
             case (true, .expression(.memberExpression)):
-                let typeVariable = result.makeEvar()
-
-                result.nodes[node.uuid] = typeVariable
-
                 if let patternId = scopeContext.identifierToPattern[node.uuid], let scopedType = result.patternTypes[patternId] {
-                    result.constraints.append(.init(scopedType, typeVariable))
+                    result.nodes[node.uuid] = scopedType
+                } else {
+                    let typeVariable = result.makeEvar()
+                    result.nodes[node.uuid] = typeVariable
                 }
-
                 return result
             case (true, .expression(.literalExpression(id: _, literal: let literal))):
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!
