@@ -214,7 +214,7 @@ class Document: NSDocument {
 
                     Swift.print("namespace identifiers", matchingNamespaceIdentifiers)
 
-                    let matchingIdentifiers: [String] = currentScopeContext.patternsInScope.compactMap({ pattern in
+                    let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> (String, Unification.T)? in
                         guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
@@ -222,10 +222,15 @@ class Document: NSDocument {
                         Swift.print("Resolved type of pattern \(pattern.uuid): \(identifierType) == \(resolvedType)")
 
                         if type == resolvedType {
-                            return pattern.name
+                            return (pattern.name, resolvedType)
                         }
 
-                        return nil
+                        switch resolvedType {
+                        case .fun(arguments: _, returnType: let returnType) where type == returnType:
+                            return (pattern.name, resolvedType)
+                        default:
+                            return nil
+                        }
                     })
 
                     Swift.print("Matching ids", matchingIdentifiers)
@@ -260,7 +265,35 @@ class Document: NSDocument {
                         }
                     }
 
-                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
+                    let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { (keyPath, resolvedType) in
+                        switch resolvedType {
+                        case .fun(arguments: let arguments, returnType: _):
+                            return LogicSuggestionItem(
+                                title: keyPath,
+                                category: "FUNCTIONS",
+                                node: .expression(
+                                    .functionCallExpression(
+                                        id: UUID(),
+                                        expression: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: keyPath)),
+                                        arguments: LGCList<LGCFunctionCallArgument>(
+                                            arguments.map { arg in
+                                                LGCFunctionCallArgument(
+                                                    id: UUID(),
+                                                    label: nil,
+                                                    expression: .identifierExpression(
+                                                        id: UUID(),
+                                                        identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        default:
+                            return LGCExpression.Suggestion.identifier(name: keyPath)
+                        }
+                    }
 
                     let literals = suggestions(for: type, query: query)
 
