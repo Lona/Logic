@@ -12,20 +12,39 @@ public extension LGCSyntaxNode {
     func redirectSelection(_ nodeId: UUID) -> UUID? {
         guard let path = self.pathTo(id: nodeId), let last = path.last else { return nil }
 
-        switch last {
-        case .expression(.memberExpression), .expression(.identifierExpression):
-            if let parent = path.dropLast().last {
-                switch parent {
-                case .expression(.functionCallExpression):
-                    return parent.uuid
-                default:
-                    break
+        func redirect(current: LGCSyntaxNode, remaining: [LGCSyntaxNode]) -> UUID {
+            switch current {
+            case .identifier:
+                if let parent = remaining.last {
+                    switch parent {
+                    case .expression(.identifierExpression):
+                        return redirect(current: parent, remaining: remaining.dropLast())
+                    default:
+                        break
+                    }
                 }
+            case .expression(.memberExpression), .expression(.identifierExpression):
+                if let parent = remaining.last {
+                    switch parent {
+                    case .expression(.functionCallExpression(let value)):
+                        if value.arguments.contains(where: { arg in
+                            current.uuid == arg.expression.uuid
+                        }) {
+                            break
+                        }
+
+                        return redirect(current: parent, remaining: remaining.dropLast())
+                    default:
+                        break
+                    }
+                }
+            default:
+                break
             }
-        default:
-            break
+
+            return current.uuid
         }
 
-        return last.uuid
+        return redirect(current: last, remaining: path.dropLast())
     }
 }

@@ -288,8 +288,8 @@ extension LogicEditor {
         }
     }
 
-    private func select(nodeByID syntaxNodeId: UUID?) {
-        let syntaxNodeId = willSelectNode?(syntaxNodeId) ?? syntaxNodeId
+    private func select(nodeByID originalId: UUID?) {
+        let syntaxNodeId = willSelectNode?(originalId) ?? originalId
 
         self.canvasView.selectedLine = nil
         self.suggestionText = ""
