@@ -32,51 +32,17 @@ extension LGCSyntaxNode {
         initialResult context: Result,
         f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) -> Result
         ) -> Result {
+
         switch self {
-        case .program(let program):
-            return program.block.reduce(context, { result, statement in
-                return statement.node.reduce(config: &config, initialResult: result, f: f)
-            })
-        case .statement(.declaration(id: _, content: let declaration)):
-            return declaration.node.reduce(config: &config, initialResult: context, f: f)
         case .statement(.branch(id: _, condition: let condition, block: let block)):
             let context2 = condition.node.reduce(config: &config, initialResult: context, f: f)
 
             if config.ignoreChildren { return context2 }
 
             return block.map { $0.node }.reduce(config: &config, initialResult: context2, f: f)
-        case .declaration(.function(id: _, name: let pattern, returnType: let returnType, genericParameters: _, parameters: let parameters, block: let block)):
-            return ([pattern.node, returnType.node] + parameters.map { $0.node } + block.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
-        case .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: let initializer)):
-            var context2: Result
-
-            if let initializer = initializer {
-                context2 = initializer.node.reduce(config: &config, initialResult: context, f: f)
-            } else {
-                context2 = context
-            }
-
-            context2 = pattern.node.reduce(config: &config, initialResult: context2, f: f)
-
-            return context2
-        case .declaration(.record(id: _, name: let pattern, declarations: let declarations)):
-            return ([pattern.node] + declarations.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
-        case .declaration(.namespace(id: _, name: let pattern, declarations: let declarations)):
-            return ([pattern.node] + declarations.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
-        case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
-            let argumentNodes = arguments.map { $0.expression.node }
-            return ([expression.node] + argumentNodes).reduce(config: &config, initialResult: context, f: f)
-        case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
-            return [left.node, right.node, op.node].reduce(config: &config, initialResult: context, f: f)
-        case .expression(.identifierExpression(id: _, identifier: let identifier)):
-            return identifier.node.reduce(config: &config, initialResult: context, f: f)
-        case .expression(.literalExpression(id: _, literal: let literal)):
-            return literal.node.reduce(config: &config, initialResult: context, f: f)
         default:
-            break
+            return self.subnodes.reduce(config: &config, initialResult: context, f: f)
         }
-
-        return context
     }
 
     public func reduce<Result>(

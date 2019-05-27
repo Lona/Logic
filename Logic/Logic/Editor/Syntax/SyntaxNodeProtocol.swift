@@ -1152,6 +1152,10 @@ extension LGCSyntaxNode {
         return contents.pathTo(id: id)
     }
 
+    public var subnodes: [LGCSyntaxNode] {
+        return contents.subnodes
+    }
+
     public var uuid: UUID {
         return contents.uuid
     }

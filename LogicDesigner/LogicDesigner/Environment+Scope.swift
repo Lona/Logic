@@ -135,6 +135,11 @@ public extension Environment {
             config.needsRevisitAfterTraversingChildren = true
 
             switch (config.isRevisit, node) {
+            case (false, .typeAnnotation):
+                config.ignoreChildren = true
+                config.needsRevisitAfterTraversingChildren = false
+
+                return context
             case (true, .identifier(let identifier)):
                 if identifier.isPlaceholder { return context }
 
