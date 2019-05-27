@@ -78,7 +78,11 @@ public class SuggestionListView: NSBox {
         didSet {
             if let selectedIndex = selectedIndex {
                 tableView.selectRowIndexes(IndexSet(integer: selectedIndex), byExtendingSelection: false)
-                tableView.scrollRowToVisible(selectedIndex)
+
+                // Check that the view is currently visible, otherwise it will scroll to the bottom
+                if visibleRect != .zero {
+                    tableView.scrollRowToVisible(selectedIndex)
+                }
 
                 var reloadIndexSet = IndexSet(integer: selectedIndex)
 
