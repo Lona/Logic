@@ -98,6 +98,7 @@ public extension Environment {
         // Values in these are never removed, even if a variable is out of scope
         var patternToName: [UUID: String] = [:]
         var identifierToPattern: [UUID: UUID] = [:]
+        var patternToTypeName: [UUID: String] = [:]
 
         // This keeps track of the current scope
         fileprivate var patternNames = ScopeStack<String, LGCPattern>()
@@ -191,6 +192,10 @@ public extension Environment {
                 return context
             case (true, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: _, block: _))):
                 context.patternNames = context.patternNames.pop()
+
+                return context
+            case (false, .declaration(.record(id: _, name: let pattern, declarations: _))):
+                context.patternToTypeName[pattern.id] = pattern.name
 
                 return context
             case (false, .declaration(.namespace(id: _, name: let pattern, declarations: _))):

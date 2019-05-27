@@ -63,7 +63,31 @@ public enum StandardLibrary {
 
     public static let include = LGCProgram(id: UUID(), block: LGCList<LGCStatement>(
         [
-            .declaration(id: UUID(), content: math)
+            .declaration(
+                id: UUID(),
+                content: LGCDeclaration.record(
+                    id: UUID(),
+                    name: .init(id: UUID(), name: "Boolean"),
+                    declarations: .empty
+                )
+            ),
+            .declaration(
+                id: UUID(),
+                content: LGCDeclaration.record(
+                    id: UUID(),
+                    name: .init(id: UUID(), name: "Number"),
+                    declarations: .empty
+                )
+            ),
+            .declaration(
+                id: UUID(),
+                content: LGCDeclaration.record(
+                    id: UUID(),
+                    name: .init(id: UUID(), name: "String"),
+                    declarations: .empty
+                )
+            ),
+            .declaration(id: UUID(), content: math),
         ]
     ))
 }

@@ -59,6 +59,8 @@ extension LGCSyntaxNode {
             context2 = pattern.node.reduce(config: &config, initialResult: context2, f: f)
 
             return context2
+        case .declaration(.record(id: _, name: let pattern, declarations: let declarations)):
+            return ([pattern.node] + declarations.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
         case .declaration(.namespace(id: _, name: let pattern, declarations: let declarations)):
             return ([pattern.node] + declarations.map { $0.node }).reduce(config: &config, initialResult: context, f: f)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):

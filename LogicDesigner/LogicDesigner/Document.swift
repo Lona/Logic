@@ -88,6 +88,12 @@ class Document: NSDocument {
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals
+            case .cons(name: "String", parameters: []):
+                let literals: [LogicSuggestionItem] = [
+                    LGCLiteral.Suggestion.string(for: query)
+                    ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                return literals
             case .cons(name: "Optional", parameters: let parameters) where parameters.count == 1:
                 let innerSuggestions = suggestions(for: parameters[0], query: query)
 
@@ -137,34 +143,40 @@ class Document: NSDocument {
 
             Swift.print(Environment.scopeContext(rootNode).namespace)
 
+            let baseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
+            let baseUnificationContext = LGCSyntaxNode.program(StandardLibrary.include).makeUnificationContext(scopeContext: baseScopeContext)
+
+            let scopeContext = Environment.scopeContext(rootNode, initialContext: baseScopeContext)
+            let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
+
+            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
+
+            guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+                Swift.print("Unification failed", Unification.unify(constraints: unificationContext.constraints))
+                return []
+            }
+
+            Swift.print("Substitution", substitution)
+
+            let currentBaseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
+            let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
+
+            Swift.print("Current scope", currentScopeContext.namesInScope)
+
             switch node {
-            case .expression(let expression):
-                let baseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
-                let baseUnificationContext = LGCSyntaxNode.program(StandardLibrary.include).makeUnificationContext(scopeContext: baseScopeContext)
+            case .typeAnnotation(let typeAnnotation):
+                let typeNames = currentScopeContext.patternToTypeName.values
 
-                let scopeContext = Environment.scopeContext(rootNode, initialContext: baseScopeContext)
-                let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
-
-                Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
-
-                guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
-                    Swift.print("Unification failed", Unification.unify(constraints: unificationContext.constraints))
-                    return []
+                return typeNames.map { name in
+                    return LGCTypeAnnotation.Suggestion.from(type: .cons(name: name, parameters: []))
                 }
-
-                Swift.print("Substitution", substitution)
-
+            case .expression(let expression):
                 guard let unificationType = unificationContext.nodes[expression.uuid] else {
                     Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
                     return []
                 }
 
                 let type = Unification.substitute(substitution, in: unificationType)
-
-                let currentBaseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
-                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
-
-                Swift.print("Current scope", currentScopeContext.namesInScope)
 
                 let common: [LogicSuggestionItem] = [
                     LGCExpression.Suggestion.comparison,

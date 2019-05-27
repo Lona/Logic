@@ -123,6 +123,15 @@ public extension LGCLiteral {
             )
         }
 
+        public static func string(for prefix: String) -> LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: prefix.isEmpty ? "Empty" : "\"\(prefix)\"",
+                badge: "String",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(.string(id: UUID(), value: prefix))
+            )
+        }
+
         public static let categoryTitle = "Literals".uppercased()
     }
 
@@ -185,6 +194,28 @@ public extension LGCFunctionParameterDefaultValue {
 }
 
 public extension LGCTypeAnnotation {
+    enum Suggestion {
+        public static func from(type: Unification.T) -> LogicSuggestionItem {
+            switch type {
+            case .cons(name: let name, parameters: _):
+                return LogicSuggestionItem(
+                    title: name,
+                    badge: "Type",
+                    category: "Types".uppercased(),
+                    node: LGCSyntaxNode.typeAnnotation(
+                        LGCTypeAnnotation.typeIdentifier(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: name),
+                            genericArguments: .empty
+                        )
+                    )
+                )
+            default:
+                fatalError("Not supported")
+            }
+        }
+    }
+
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
