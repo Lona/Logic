@@ -49,6 +49,9 @@
     <Record name="enumeration">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="genericParameters" type="List">
+        <Record.Substitution generic="T" instance="GenericParameter"/>
+      </Record.Param>
       <Record.Param name="cases" type="List">
         <Record.Substitution generic="T" instance="EnumerationCase"/>
       </Record.Param>

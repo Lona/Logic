@@ -100,14 +100,14 @@
 				6BD44E59228CCA830025A3C8 /* Environment.swift */,
 				6BBD0BF62290CA9F00EB87A9 /* Environment+Scope.swift */,
 				6BD44E63228F31950025A3C8 /* Immutable.swift */,
-				6BBD0C0C2296211400EB87A9 /* LGCTypeAnnotation+Type.swift */,
 				6BBD0C0A229620DB00EB87A9 /* LGCSyntax+Unification.swift */,
+				6BBD0C0C2296211400EB87A9 /* LGCTypeAnnotation+Type.swift */,
 				6BD44E5F228E53A30025A3C8 /* ScopeStack.swift */,
+				6BBD0C142299D8AF00EB87A9 /* StandardLibrary.swift */,
 				6BD44E67228F86B70025A3C8 /* Unify.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
 				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
-				6BBD0C142299D8AF00EB87A9 /* StandardLibrary.swift */,
 			);
 			path = LogicDesigner;
 			sourceTree = "<group>";

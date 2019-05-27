@@ -47,7 +47,7 @@ public struct LGCIdentifier: Codable & Equatable {
 public indirect enum LGCDeclaration: Codable & Equatable {
   case variable(id: UUID, name: LGCPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>)
   case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, genericParameters: LGCList<LGCGenericParameter>, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>)
-  case enumeration(id: UUID, name: LGCPattern, cases: LGCList<LGCEnumerationCase>)
+  case enumeration(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, cases: LGCList<LGCEnumerationCase>)
   case namespace(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
   case placeholder(id: UUID)
   case record(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
@@ -99,6 +99,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
           .enumeration(
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
+            genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
             cases: try data.decode(LGCList.self, forKey: .cases))
       case "namespace":
         self =
@@ -142,6 +143,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try container.encode("enumeration", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
+        try data.encode(value.genericParameters, forKey: .genericParameters)
         try data.encode(value.cases, forKey: .cases)
       case .namespace(let value):
         try container.encode("namespace", forKey: .type)

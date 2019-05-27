@@ -957,6 +957,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return .enumeration(
                 id: UUID(),
                 name: value.name.delete(id: id),
+                genericParameters: value.genericParameters.delete(id: id),
                 cases: LGCList(value.cases.filter {
                     switch $0 {
                     case .placeholder:
@@ -1032,6 +1033,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 return LGCDeclaration.enumeration(
                     id: UUID(),
                     name: value.name.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
                     cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
             case .record(let value):
@@ -1070,6 +1072,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 ?? value.block.pathTo(id: id)
         case .enumeration(let value):
             found = value.name.pathTo(id: id)
+                ?? value.genericParameters.pathTo(id: id)
                 ?? value.cases.pathTo(id: id)
         case .record(let value):
             found = value.name.pathTo(id: id)

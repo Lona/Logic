@@ -595,7 +595,7 @@ public extension LGCDeclaration {
         static var genericFunction: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Generic Function",
-                category: categoryTitle,
+                category: "GENERIC \(categoryTitle)",
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.function(
                         id: UUID(),
@@ -621,6 +621,22 @@ public extension LGCDeclaration {
                     LGCDeclaration.enumeration(
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
+                        genericParameters: .empty,
+                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+                    )
+                )
+            )
+        }
+
+        static var genericEnum: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Generic Enumeration",
+                category: "GENERIC \(categoryTitle)",
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.enumeration(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        genericParameters: .next(.makePlaceholder(), .empty),
                         cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
                     )
                 )
@@ -662,10 +678,11 @@ public extension LGCDeclaration {
         let items = [
             Suggestion.variable,
             Suggestion.function,
-            Suggestion.genericFunction,
             Suggestion.enum,
             Suggestion.record,
-            Suggestion.namespace
+            Suggestion.namespace,
+            Suggestion.genericFunction,
+            Suggestion.genericEnum
         ]
 
         return items.titleContains(prefix: prefix)

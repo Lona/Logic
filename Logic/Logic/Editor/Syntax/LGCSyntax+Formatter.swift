@@ -296,8 +296,9 @@ public extension LGCDeclaration {
     var formatted: FormatterCommand<LogicElement> {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
-            case .function(let value):
-                if value.genericParameters.isEmpty {
+            case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _),
+                 .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _):
+                if genericParameters.isEmpty {
                     return .concat { [] }
                 } else {
                     return .concat {
@@ -305,12 +306,12 @@ public extension LGCDeclaration {
                             .hardLine,
                             .element(.text("Generic type parameters:")),
                             .join(with: .concat {[.element(.text(",")), .line]}) {
-                                value.genericParameters.map { param in param.formatted }
+                                genericParameters.map { param in param.formatted }
                             }
                         ]
                     }
                 }
-            case .variable, .enumeration, .namespace, .placeholder:
+            case .variable, .namespace, .placeholder:
                 fatalError("TODO")
             }
         }
@@ -405,10 +406,8 @@ public extension LGCDeclaration {
                 ]
             }
         case .enumeration(let value):
-            return .concat {
+            let contents: FormatterCommand<LogicElement> = .concat {
                 [
-                    .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
-                    value.name.formatted,
                     .element(.text("with cases:")),
                     .indent {
                         .concat {
@@ -420,6 +419,22 @@ public extension LGCDeclaration {
                             ]
                         }
                     }
+                ]
+            }
+
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
+                    value.name.formatted,
+                    (value.genericParameters.isEmpty ? contents : .indent {
+                        .concat {
+                            [
+                                genericParameters(),
+                                .hardLine,
+                                contents
+                            ]
+                        }
+                    })
                 ]
             }
         case .record(let value):
