@@ -44,6 +44,32 @@ extension LGCSyntaxNode {
                 result.nodes[condition.uuid] = .cons(name: "Boolean")
 
                 return result
+            case (false, .declaration(.record(id: _, name: let functionName, declarations: let declarations))):
+
+                var parameterTypes: [Unification.T] = []
+
+                declarations.forEach { declaration in
+                    switch declaration {
+                    case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _):
+                        guard let annotation = annotation else { break }
+
+                        let annotationType = annotation.unificationType { result.makeGenericName() }
+
+                        parameterTypes.append(annotationType)
+
+                        result.nodes[pattern.uuid] = annotationType
+//                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
+                        result.patternTypes[pattern.uuid] = annotationType
+                    default:
+                        break
+                    }
+                }
+
+                let returnType: Unification.T = .cons(name: functionName.name, parameters: [])
+                let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
+
+                result.nodes[functionName.uuid] = functionType
+                result.patternTypes[functionName.uuid] = functionType
             case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: _, parameters: let parameters, block: _))):
 
                 var parameterTypes: [Unification.T] = []

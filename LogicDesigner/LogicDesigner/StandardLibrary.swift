@@ -68,7 +68,16 @@ public enum StandardLibrary {
                 content: LGCDeclaration.record(
                     id: UUID(),
                     name: .init(id: UUID(), name: "Boolean"),
-                    declarations: .empty
+                    declarations: .init(
+                        [
+                            .variable(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "value"),
+                                annotation: .some(.typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Boolean"), genericArguments: .empty)),
+                                initializer: .some(.literalExpression(id: UUID(), literal: .boolean(id: UUID(), value: false)))
+                            )
+                        ]
+                    )
                 )
             ),
             .declaration(

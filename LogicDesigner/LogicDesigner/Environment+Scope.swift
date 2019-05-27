@@ -197,7 +197,19 @@ public extension Environment {
             case (false, .declaration(.record(id: _, name: let pattern, declarations: _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
+                // We don't want to introduce the record's member variables into scope
+                config.ignoreChildren = true
+
                 return context
+            case (true, .declaration(.record(id: _, name: let pattern, declarations: _))):
+                // Built-ins should be constructed using literals
+                if ["Boolean", "Number", "String"].contains(pattern.name) { return context }
+
+                // Create constructor function
+                context.patternToName[pattern.uuid] = pattern.name
+                context.patternNames.set(pattern, for: pattern.name)
+
+                context.setInCurrentNamespace(key: pattern.name, value: .pattern(pattern.id))
             case (false, .declaration(.enumeration(id: _, name: let pattern, genericParameters: _, cases: _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
