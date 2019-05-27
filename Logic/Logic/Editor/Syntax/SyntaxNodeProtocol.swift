@@ -45,11 +45,13 @@ public extension SyntaxNodeProtocol {
     func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         if id == uuid { return [node] }
 
-        if let found = subnodes.first(where: { $0.uuid == id }) {
-            return [node, found]
-        } else {
-            return nil
+        for subnode in subnodes {
+            if let found = subnode.pathTo(id: id) {
+                return [node] + found
+            }
         }
+
+        return nil
     }
 
     func delete(id: UUID) -> Self {
@@ -83,10 +85,6 @@ extension LGCIdentifier: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        return id == uuid ? [node] : nil
-    }
-
     public var uuid: UUID { return id }
 
     public var movementAfterInsertion: Movement {
@@ -115,11 +113,7 @@ extension LGCPattern: SyntaxNodeProtocol {
             return LGCPattern(id: UUID(), name: name)
         }
     }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        return id == uuid ? [node] : nil
-    }
-
+    
     public var uuid: UUID { return id }
 
     public var movementAfterInsertion: Movement {
@@ -200,47 +194,6 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         }
     }
 
-    public func find(id: UUID) -> LGCSyntaxNode? {
-        if id == uuid { return node }
-
-        switch self {
-        case .functionType(let value):
-            return value.argumentTypes.find(id: id) ?? value.returnType.find(id: id)
-        case .typeIdentifier(let value):
-            return value.identifier.find(id: id) ?? value.genericArguments.find(id: id)
-        case .placeholder:
-            return nil
-        }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        var found: [LGCSyntaxNode]?
-
-        switch self {
-        case .functionType(let value):
-            found = value.argumentTypes.pathTo(id: id) ?? value.returnType.pathTo(id: id)
-        case .typeIdentifier(let value):
-            found = value.identifier.pathTo(id: id)
-
-            // If we match the identifier, we still want to show the picker for the whole annotation
-            if let _ = found {
-                return [self.node]
-            }
-
-            found = value.genericArguments.pathTo(id: id)
-        case .placeholder:
-            break
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
-        }
-    }
-
     public var uuid: UUID {
         switch self {
         case .typeIdentifier(let value):
@@ -309,12 +262,6 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        return nil
-    }
-
     public var uuid: UUID {
         switch self {
         case .boolean(let value):
@@ -367,25 +314,6 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
                     expression: value.expression.replace(id: id, with: syntaxNode)
                 )
             }
-        }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        var found: [LGCSyntaxNode]?
-
-        switch self {
-        case .none:
-            return nil
-        case .value(let value):
-            found = value.expression.pathTo(id: id)
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
         }
     }
 
@@ -456,27 +384,6 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        let found: [LGCSyntaxNode]?
-
-        switch self {
-        case .placeholder:
-            found = nil
-        case .parameter(let value):
-            found = value.localName.pathTo(id: id)
-                ?? value.annotation.pathTo(id: id)
-                ?? value.defaultValue.pathTo(id: id)
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
-        }
-    }
-
     public var uuid: UUID {
         switch self {
         case .parameter(let value):
@@ -535,25 +442,6 @@ extension LGCGenericParameter: SyntaxNodeProtocol {
                     name: value.name.replace(id: UUID(), with: syntaxNode)
                 )
             }
-        }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        let found: [LGCSyntaxNode]?
-
-        switch self {
-        case .placeholder:
-            found = nil
-        case .parameter(let value):
-            found = value.name.pathTo(id: id)
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
         }
     }
 
@@ -624,25 +512,6 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        let found: [LGCSyntaxNode]?
-
-        switch self {
-        case .placeholder:
-            found = nil
-        case .enumerationCase(let value):
-            found = value.name.pathTo(id: id) ?? value.associatedValueTypes.pathTo(id: id)
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
-        }
-    }
-
     public var uuid: UUID {
         switch self {
         case .enumerationCase(let value):
@@ -692,10 +561,6 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
                 return LGCBinaryOperator.setEqualTo(id: UUID())
             }
         }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        return id == uuid ? [node] : nil
     }
 
     public var uuid: UUID {
@@ -782,37 +647,6 @@ extension LGCExpression: SyntaxNodeProtocol {
                 expression: value.expression.replace(id: id, with: syntaxNode),
                 memberName: value.memberName.replace(id: id, with: syntaxNode)
             )
-        }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid {
-            return [.expression(self)]
-        }
-
-        var found: [LGCSyntaxNode]?
-
-        switch self {
-        case .binaryExpression(let value):
-            found = value.left.pathTo(id: id) ?? value.op.pathTo(id: id) ?? value.right.pathTo(id: id)
-        case .identifierExpression(let value):
-            found = value.identifier.pathTo(id: id)
-        case .functionCallExpression(let value):
-            // TODO: Should LGCFunctionCallArgument conform to SyntaxNodeProtocol?
-            let foundInArguments: [LGCSyntaxNode]? = value.arguments.reduce(nil, { result, node in
-                return result ?? node.pathTo(id: id)
-            })
-            found = value.expression.pathTo(id: id) ?? foundInArguments
-        case .literalExpression(let value):
-            found = value.literal.pathTo(id: id)
-        case .memberExpression(let value):
-            found = value.expression.pathTo(id: id) ?? value.memberName.pathTo(id: id)
-        }
-
-        if let found = found {
-            return [.expression(self)] + found
-        } else {
-            return nil
         }
     }
 
@@ -923,37 +757,6 @@ extension LGCStatement: SyntaxNodeProtocol {
             case .placeholderStatement(_):
                 return self
             }
-        }
-    }
-
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid {
-            return [.statement(self)]
-        }
-
-        var found: [LGCSyntaxNode]?
-
-        switch self {
-        case .branch(let value):
-            let foundInBlock: [LGCSyntaxNode]? = value.block.reduce(nil, { result, node in
-                if result != nil { return result }
-                return node.pathTo(id: id)
-            })
-            found = value.condition.pathTo(id: id) ?? foundInBlock
-        case .declaration(let value):
-            found = value.content.pathTo(id: id)
-        case .loop(let value):
-            found = value.expression.pathTo(id: id) ?? value.pattern.pathTo(id: id)
-        case .expressionStatement(let value):
-            found = value.expression.pathTo(id: id)
-        case .placeholderStatement:
-            return nil
-        }
-
-        if let found = found {
-            return [.statement(self)] + found
-        } else {
-            return nil
         }
     }
 
@@ -1109,43 +912,6 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
-
-        let found: [LGCSyntaxNode]?
-
-        switch self {
-        case .variable(let value):
-            found = value.name.pathTo(id: id)
-                ?? value.annotation?.pathTo(id: id)
-                ?? value.initializer?.pathTo(id: id)
-        case .function(let value):
-            found = value.name.pathTo(id: id)
-                ?? value.returnType.pathTo(id: id)
-                ?? value.genericParameters.pathTo(id: id)
-                ?? value.parameters.pathTo(id: id)
-                ?? value.block.pathTo(id: id)
-        case .enumeration(let value):
-            found = value.name.pathTo(id: id)
-                ?? value.genericParameters.pathTo(id: id)
-                ?? value.cases.pathTo(id: id)
-        case .record(let value):
-            found = value.name.pathTo(id: id)
-                ?? value.declarations.pathTo(id: id)
-        case .namespace(let value):
-            found = value.name.pathTo(id: id)
-                ?? value.declarations.pathTo(id: id)
-        case .placeholder:
-            found = nil
-        }
-
-        if let found = found {
-            return [self.node] + found
-        } else {
-            return nil
-        }
-    }
-
     public var uuid: UUID {
         switch self {
         case .variable(let value):
@@ -1197,12 +963,6 @@ extension LGCProgram: SyntaxNodeProtocol {
             id: UUID(),
             block: block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
         )
-    }
-
-    public func find(id: UUID) -> LGCSyntaxNode? {
-        if id == uuid { return node }
-
-        return block.find(id: id)
     }
 
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
@@ -1289,12 +1049,6 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         )
     }
 
-    public func find(id: UUID) -> LGCSyntaxNode? {
-        if id == uuid { return node }
-
-        return parameters.find(id: id)
-    }
-
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         if id == uuid { return [node] }
 
@@ -1318,7 +1072,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
 }
 
 extension LGCFunctionCallArgument {
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
         return LGCFunctionCallArgument(
             id: UUID(),
             label: label,
@@ -1327,19 +1081,19 @@ extension LGCFunctionCallArgument {
     }
 
     // Implementation needed, since we don't conform to SyntaxNodeProtocol
-    func find(id: UUID) -> LGCSyntaxNode? {
+    public func find(id: UUID) -> LGCSyntaxNode? {
         return expression.find(id: id)
     }
 
-    func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         return expression.pathTo(id: id)
     }
 
-    var uuid: UUID {
+    public var uuid: UUID {
         return id
     }
 
-    var movementAfterInsertion: Movement {
+    public var movementAfterInsertion: Movement {
         return .next
     }
 }
