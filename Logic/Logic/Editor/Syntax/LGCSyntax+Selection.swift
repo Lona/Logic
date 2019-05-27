@@ -19,6 +19,10 @@ public extension LGCSyntaxNode {
                     switch parent {
                     case .expression(.identifierExpression):
                         return redirect(current: parent, remaining: remaining.dropLast())
+                    case .typeAnnotation(.typeIdentifier(_, identifier: let identifier, _)):
+                        if identifier.uuid == current.uuid {
+                            return redirect(current: parent, remaining: remaining.dropLast())
+                        }
                     default:
                         break
                     }
