@@ -14,7 +14,6 @@ public enum Movement {
 
 public protocol SyntaxNodeProtocol {
     var uuid: UUID { get }
-    var lastNode: LGCSyntaxNode { get }
     var movementAfterInsertion: Movement { get }
     var node: LGCSyntaxNode { get }
     var nodeTypeDescription: String { get }
@@ -88,10 +87,6 @@ extension LGCIdentifier: SyntaxNodeProtocol {
         return id == uuid ? [node] : nil
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return node
-    }
-
     public var uuid: UUID { return id }
 
     public var movementAfterInsertion: Movement {
@@ -123,10 +118,6 @@ extension LGCPattern: SyntaxNodeProtocol {
 
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         return id == uuid ? [node] : nil
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return node
     }
 
     public var uuid: UUID { return id }
@@ -250,10 +241,6 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return node
-    }
-
     public var uuid: UUID {
         switch self {
         case .typeIdentifier(let value):
@@ -328,10 +315,6 @@ extension LGCLiteral: SyntaxNodeProtocol {
         return nil
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return node
-    }
-
     public var uuid: UUID {
         switch self {
         case .boolean(let value):
@@ -404,10 +387,6 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
         } else {
             return nil
         }
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return node
     }
 
     public var uuid: UUID {
@@ -498,10 +477,6 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return node
-    }
-
     public var uuid: UUID {
         switch self {
         case .parameter(let value):
@@ -580,10 +555,6 @@ extension LGCGenericParameter: SyntaxNodeProtocol {
         } else {
             return nil
         }
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return node
     }
 
     public var uuid: UUID {
@@ -672,10 +643,6 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return node
-    }
-
     public var uuid: UUID {
         switch self {
         case .enumerationCase(let value):
@@ -729,10 +696,6 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
 
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         return id == uuid ? [node] : nil
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return node
     }
 
     public var uuid: UUID {
@@ -850,21 +813,6 @@ extension LGCExpression: SyntaxNodeProtocol {
             return [.expression(self)] + found
         } else {
             return nil
-        }
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        switch self {
-        case .binaryExpression(let value):
-            return value.right.lastNode
-        case .identifierExpression(let value):
-            return value.identifier.lastNode
-        case .functionCallExpression(let value):
-            return value.arguments.isEmpty ? value.expression.lastNode : value.arguments[value.arguments.count - 1].lastNode
-        case .literalExpression(let value):
-            return value.literal.lastNode
-        case .memberExpression(let value):
-            return value.memberName.lastNode
         }
     }
 
@@ -1006,21 +954,6 @@ extension LGCStatement: SyntaxNodeProtocol {
             return [.statement(self)] + found
         } else {
             return nil
-        }
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        switch self {
-        case .branch(let value):
-            return value.block.map { $0 }.last?.lastNode ?? value.condition.lastNode
-        case .declaration:
-            fatalError("Not implemented")
-        case .loop(let value):
-            return value.expression.lastNode
-        case .expressionStatement(let value):
-            return value.expression.lastNode
-        case .placeholderStatement:
-            return .statement(self)
         }
     }
 
@@ -1213,23 +1146,6 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public var lastNode: LGCSyntaxNode {
-        switch self {
-        case .variable:
-            return node
-        case .function(let value):
-            return value.block.map { $0 }.last?.lastNode ?? node
-        case .enumeration(let value):
-            return value.cases.map { $0 }.last?.lastNode ?? node
-        case .record(let value):
-            return value.declarations.map { $0 }.last?.lastNode ?? node
-        case .namespace(let value):
-            return value.declarations.map { $0 }.last?.lastNode ?? node
-        case .placeholder:
-            return node
-        }
-    }
-
     public var uuid: UUID {
         switch self {
         case .variable(let value):
@@ -1300,10 +1216,6 @@ extension LGCProgram: SyntaxNodeProtocol {
         // We don't include the Program node in the path, since we never want
         // to directly select it or show it in any menus
         return found
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return block.map { $0 }.last?.lastNode ?? node
     }
 
     public var uuid: UUID {
@@ -1396,10 +1308,6 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         return found
     }
 
-    public var lastNode: LGCSyntaxNode {
-        return parameters.map { $0 }.last?.lastNode ?? node
-    }
-
     public var uuid: UUID {
         return id
     }
@@ -1425,10 +1333,6 @@ extension LGCFunctionCallArgument {
 
     func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         return expression.pathTo(id: id)
-    }
-
-    var lastNode: LGCSyntaxNode {
-        return expression.lastNode
     }
 
     var uuid: UUID {
@@ -1492,10 +1396,6 @@ extension LGCSyntaxNode {
 
     public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
         return contents.pathTo(id: id)
-    }
-
-    public var lastNode: LGCSyntaxNode {
-        return contents.lastNode
     }
 
     public var uuid: UUID {
