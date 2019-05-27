@@ -253,10 +253,10 @@ extension LogicEditor {
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
-            let sourceId = elements[sourceRange].first?.syntaxNodeID,
-            let targetId = elements[destinationRange].first?.syntaxNodeID {
+            let sourceNode = rootNode.topNodeWithEqualRange(as: sourceRange),
+            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange) {
 
-            _ = onChangeRootNode?(rootNode.swap(sourceId: sourceId, targetId: targetId))
+            _ = onChangeRootNode?(rootNode.swap(sourceId: sourceNode.uuid, targetId: targetNode.uuid))
         }
     }
 

@@ -978,6 +978,32 @@ extension LGCProgram: SyntaxNodeProtocol {
         return found
     }
 
+    public func swap(sourceId: UUID, targetId: UUID) -> LGCProgram {
+        var updated = block.map { $0 }
+
+        guard let sourceIndex = updated.firstIndex(where: { param in param.uuid == sourceId }),
+            let targetIndex = updated.lastIndex(where: { param in param.uuid == targetId }) else { return self }
+
+        let sourceNode = updated[sourceIndex]
+
+        updated.remove(at: sourceIndex)
+        updated.insert(sourceNode, at: targetIndex)
+        updated = updated.filter { param in
+            switch param {
+            case .placeholderStatement:
+                return false
+            default:
+                return true
+            }
+        }
+        updated.append(.makePlaceholder())
+
+        return LGCProgram(
+            id: UUID(),
+            block: LGCList(updated)
+        )
+    }
+
     public var uuid: UUID {
         return id
     }
