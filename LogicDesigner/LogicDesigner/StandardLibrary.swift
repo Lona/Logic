@@ -87,7 +87,22 @@ public enum StandardLibrary {
                     declarations: .empty
                 )
             ),
+            .declaration(
+                id: UUID(),
+                content: .enumeration(
+                    id: UUID(),
+                    name: .init(id: UUID(), name: "Optional"),
+                    genericParameters: .init(
+                        [
+                            .parameter(id: UUID(), name: .init(id: UUID(), name: "Wrapped"))
+                        ]
+                    ),
+                    cases: .empty
+                )
+            ),
             .declaration(id: UUID(), content: math),
         ]
     ))
+
+    public static let program: LGCSyntaxNode = .program(StandardLibrary.include)
 }

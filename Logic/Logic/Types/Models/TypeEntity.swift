@@ -89,7 +89,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
             return genericType.name
         case .nativeType(let nativeType):
             return nativeType.name
-        case .functionType(let functionType):
+        case .functionType:
             return "function"
         }
     }

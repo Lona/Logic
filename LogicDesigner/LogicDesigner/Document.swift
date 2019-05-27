@@ -143,8 +143,10 @@ class Document: NSDocument {
 
             Swift.print(Environment.scopeContext(rootNode).namespace)
 
-            let baseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
-            let baseUnificationContext = LGCSyntaxNode.program(StandardLibrary.include).makeUnificationContext(scopeContext: baseScopeContext)
+            let baseProgram = StandardLibrary.program
+
+            let baseScopeContext = Environment.scopeContext(baseProgram)
+            let baseUnificationContext = baseProgram.makeUnificationContext(scopeContext: baseScopeContext)
 
             let scopeContext = Environment.scopeContext(rootNode, initialContext: baseScopeContext)
             let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
@@ -158,15 +160,22 @@ class Document: NSDocument {
 
             Swift.print("Substitution", substitution)
 
-            let currentBaseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
+            let currentBaseScopeContext = Environment.scopeContext(baseProgram)
             let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
 
             Swift.print("Current scope", currentScopeContext.namesInScope)
 
             switch node {
-            case .typeAnnotation(let typeAnnotation):
+            case .typeAnnotation:
                 return currentScopeContext.patternToTypeName.map { key, value in
                     let node = rootNode.pathTo(id: key)?.last(where: { item in
+                        switch item {
+                        case .declaration:
+                            return true
+                        default:
+                            return false
+                        }
+                    }) ?? baseProgram.pathTo(id: key)?.last(where: { item in
                         switch item {
                         case .declaration:
                             return true
