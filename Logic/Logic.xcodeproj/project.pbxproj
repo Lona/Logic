@@ -11,7 +11,6 @@
 		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
 		6B34149322554A5500CC65D1 /* LGCSyntax+Init.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149222554A5500CC65D1 /* LGCSyntax+Init.swift */; };
-		6B3414952256591600CC65D1 /* TypeInference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414942256591600CC65D1 /* TypeInference.swift */; };
 		6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B3414982256ECD900CC65D1 /* Assets.xcassets */; };
 		6B34149B2256EF2F00CC65D1 /* BundleLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */; };
 		6B3414A02258154500CC65D1 /* SyntaxNodePlaceholdable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */; };
@@ -88,7 +87,6 @@
 		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
 		6B34149222554A5500CC65D1 /* LGCSyntax+Init.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Init.swift"; sourceTree = "<group>"; };
-		6B3414942256591600CC65D1 /* TypeInference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeInference.swift; sourceTree = "<group>"; };
 		6B3414982256ECD900CC65D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocator.swift; sourceTree = "<group>"; };
 		6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodePlaceholdable.swift; sourceTree = "<group>"; };
@@ -286,7 +284,6 @@
 				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
 				6B44E182223B40C900740318 /* SyntaxNodeProtocol.swift */,
 				6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */,
-				6B3414942256591600CC65D1 /* TypeInference.swift */,
 			);
 			path = Syntax;
 			sourceTree = "<group>";
@@ -540,7 +537,6 @@
 				6B44E159223B3DD000740318 /* TextStyles.swift in Sources */,
 				6B44E152223B3DD000740318 /* CGSize+Resizing.swift in Sources */,
 				6B44E164223B3E3C00740318 /* ControlledSearchInput.swift in Sources */,
-				6B3414952256591600CC65D1 /* TypeInference.swift in Sources */,
 				6B44E143223B3D8E00740318 /* RichText.swift in Sources */,
 				6B5B7561215B1ABE00CDC9C6 /* TypeListItem.swift in Sources */,
 				6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */,
