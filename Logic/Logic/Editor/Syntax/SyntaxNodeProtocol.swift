@@ -18,6 +18,7 @@ public protocol SyntaxNodeProtocol {
     var movementAfterInsertion: Movement { get }
     var node: LGCSyntaxNode { get }
     var nodeTypeDescription: String { get }
+    var subnodes: [LGCSyntaxNode] { get }
 
     func find(id: UUID) -> LGCSyntaxNode?
     func pathTo(id: UUID) -> [LGCSyntaxNode]?
@@ -52,6 +53,10 @@ public extension SyntaxNodeProtocol {
 }
 
 extension LGCIdentifier: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return []
+    }
+
     public var nodeTypeDescription: String {
         return "Identifier"
     }
@@ -85,6 +90,10 @@ extension LGCIdentifier: SyntaxNodeProtocol {
 }
 
 extension LGCPattern: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return []
+    }
+
     public var nodeTypeDescription: String {
         return "Pattern"
     }
@@ -118,6 +127,17 @@ extension LGCPattern: SyntaxNodeProtocol {
 }
 
 extension LGCTypeAnnotation: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .typeIdentifier(let value):
+            return [value.identifier.node] + value.genericArguments.map { $0.node }
+        case .functionType(let value):
+            return [value.returnType.node] + value.argumentTypes.map { $0.node }
+        case .placeholder:
+            return []
+        }
+    }
+
     public var nodeTypeDescription: String {
         switch self {
         case .typeIdentifier, .placeholder:
@@ -248,6 +268,10 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
 }
 
 extension LGCLiteral: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return []
+    }
+
     public var nodeTypeDescription: String {
         return "Literal Value"
     }
@@ -319,6 +343,15 @@ extension LGCLiteral: SyntaxNodeProtocol {
 }
 
 extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .none:
+            return []
+        case .value(let value):
+            return [value.expression.node]
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Default Value"
     }
@@ -382,6 +415,15 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
 }
 
 extension LGCFunctionParameter: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .placeholder:
+            return []
+        case .parameter(let value):
+            return [value.localName.node, value.annotation.node, value.defaultValue.node]
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Parameter"
     }
@@ -465,6 +507,15 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
 }
 
 extension LGCGenericParameter: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .placeholder:
+            return []
+        case .parameter(let value):
+            return [value.name.node]
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Generic Parameter"
     }
@@ -540,6 +591,15 @@ extension LGCGenericParameter: SyntaxNodeProtocol {
 }
 
 extension LGCEnumerationCase: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .placeholder:
+            return []
+        case .enumerationCase(let value):
+            return [value.name.node] + value.associatedValueTypes.map { $0.node }
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Enum Case"
     }
@@ -621,6 +681,10 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
 }
 
 extension LGCBinaryOperator: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return []
+    }
+
     public var nodeTypeDescription: String {
         return "Binary Operator"
     }
@@ -686,6 +750,21 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
 }
 
 extension LGCExpression: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .binaryExpression(let value):
+            return [value.left.node, value.op.node, value.right.node]
+        case .identifierExpression(let value):
+            return [value.identifier.node]
+        case .functionCallExpression(let value):
+            return [value.expression.node] + value.arguments.map { $0.expression.node }
+        case .literalExpression(let value):
+            return [value.literal.node]
+        case .memberExpression(let value):
+            return [value.expression.node, value.memberName.node]
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Expression"
     }
@@ -811,6 +890,21 @@ extension LGCExpression: SyntaxNodeProtocol {
 }
 
 extension LGCStatement: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .branch(let value):
+            return [value.condition.node] + value.block.map { $0.node }
+        case .declaration(let value):
+            return [value.content.node]
+        case .loop(let value):
+            return [value.expression.node, value.pattern.node]
+        case .expressionStatement(let value):
+            return [value.expression.node]
+        case .placeholderStatement:
+            return []
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Statement"
     }
@@ -941,6 +1035,24 @@ extension LGCStatement: SyntaxNodeProtocol {
 }
 
 extension LGCDeclaration: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .variable(let value):
+            return [value.name.node, value.annotation?.node, value.initializer?.node].compactMap { $0 }
+        case .function(let value):
+            return [value.name.node] + value.genericParameters.map { $0.node } + [value.returnType.node] +
+                value.parameters.map { $0.node } + value.block.map { $0.node }
+        case .enumeration(let value):
+            return [value.name.node] + value.genericParameters.map { $0.node } + value.cases.map { $0.node }
+        case .record(let value):
+            return [value.name.node] + value.declarations.map { $0.node }
+        case .namespace(let value):
+            return [value.name.node] + value.declarations.map { $0.node }
+        case .placeholder:
+            return []
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Declaration"
     }
@@ -1131,6 +1243,10 @@ extension LGCDeclaration: SyntaxNodeProtocol {
 }
 
 extension LGCProgram: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return block.map { $0.node }
+    }
+
     public var nodeTypeDescription: String {
         return "Program"
     }
@@ -1190,6 +1306,10 @@ extension LGCProgram: SyntaxNodeProtocol {
 }
 
 extension LGCTopLevelParameters: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return parameters.map { $0.node }
+    }
+
     public var nodeTypeDescription: String {
         return "Top-level Parameters"
     }
