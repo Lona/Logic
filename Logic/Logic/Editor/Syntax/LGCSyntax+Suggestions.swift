@@ -196,23 +196,31 @@ public extension LGCFunctionParameterDefaultValue {
 public extension LGCTypeAnnotation {
     enum Suggestion {
         public static func from(type: Unification.T) -> LogicSuggestionItem {
-            switch type {
-            case .cons(name: let name, parameters: _):
-                return LogicSuggestionItem(
-                    title: name,
-                    badge: "Type",
-                    category: "Types".uppercased(),
-                    node: LGCSyntaxNode.typeAnnotation(
-                        LGCTypeAnnotation.typeIdentifier(
-                            id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: name),
-                            genericArguments: .empty
-                        )
+            func makeTypeAnnotation(type: Unification.T) -> LGCTypeAnnotation {
+                switch type {
+                case .cons(name: let name, parameters: let parameters):
+                    return LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: name),
+                        genericArguments: .init(parameters.map(makeTypeAnnotation(type:)))
                     )
-                )
-            default:
-                fatalError("Not supported")
+                case .evar(let name):
+                    return LGCTypeAnnotation.typeIdentifier(
+                        id: UUID(),
+                        identifier: LGCIdentifier(id: UUID(), string: name),
+                        genericArguments: .empty
+                    )
+                case .fun:
+                    fatalError("Not supported")
+                }
             }
+
+            return LogicSuggestionItem(
+                title: type.name,
+                badge: "Type",
+                category: "Types".uppercased(),
+                node: LGCSyntaxNode.typeAnnotation(makeTypeAnnotation(type: type))
+            )
         }
     }
 

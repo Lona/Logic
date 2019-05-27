@@ -18,6 +18,8 @@ extension LGCTypeAnnotation {
             let parameters = arguments.map { $0.unificationType(getName: getName) }
 
             return .cons(name: identifier.string, parameters: parameters)
+        case .placeholder(id: _):
+            return .evar(getName())
         default:
             fatalError("Not supported")
         }

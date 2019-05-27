@@ -198,6 +198,10 @@ public extension Environment {
                 context.patternToTypeName[pattern.id] = pattern.name
 
                 return context
+            case (false, .declaration(.enumeration(id: _, name: let pattern, genericParameters: _, cases: _))):
+                context.patternToTypeName[pattern.id] = pattern.name
+
+                return context
             case (false, .declaration(.namespace(id: _, name: let pattern, declarations: _))):
                 context.patternNames = context.patternNames.push()
 

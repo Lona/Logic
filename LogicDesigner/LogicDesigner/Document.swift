@@ -165,10 +165,32 @@ class Document: NSDocument {
 
             switch node {
             case .typeAnnotation(let typeAnnotation):
-                let typeNames = currentScopeContext.patternToTypeName.values
+                return currentScopeContext.patternToTypeName.map { key, value in
+                    let node = rootNode.pathTo(id: key)?.last(where: { item in
+                        switch item {
+                        case .declaration:
+                            return true
+                        default:
+                            return false
+                        }
+                    })
 
-                return typeNames.map { name in
-                    return LGCTypeAnnotation.Suggestion.from(type: .cons(name: name, parameters: []))
+                    switch node {
+                    case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _))):
+                        let params: [Unification.T] = genericParameters.compactMap { param in
+                            switch param {
+                            case .parameter(id: _, name: let pattern):
+                                return .evar(pattern.name)
+                            case .placeholder:
+                                return nil
+                            }
+                        }
+                        return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
+                    default:
+                        break
+                    }
+
+                    return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: []))
                 }
             case .expression(let expression):
                 guard let unificationType = unificationContext.nodes[expression.uuid] else {
