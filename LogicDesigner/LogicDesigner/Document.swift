@@ -161,9 +161,10 @@ class Document: NSDocument {
 
                 let type = Unification.substitute(substitution, in: unificationType)
 
-                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: baseScopeContext)
+                let currentBaseScopeContext = Environment.scopeContext(.program(StandardLibrary.include))
+                let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
 
-                Swift.print("Scope", currentScopeContext)
+                Swift.print("Current scope", currentScopeContext.namesInScope)
 
                 let common: [LogicSuggestionItem] = [
                     LGCExpression.Suggestion.comparison,

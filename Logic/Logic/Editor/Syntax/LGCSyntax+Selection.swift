@@ -13,7 +13,7 @@ public extension LGCSyntaxNode {
         guard let path = self.pathTo(id: nodeId), let last = path.last else { return nil }
 
         switch last {
-        case .expression(.memberExpression):
+        case .expression(.memberExpression), .expression(.identifierExpression):
             if let parent = path.dropLast().last {
                 switch parent {
                 case .expression(.functionCallExpression):
