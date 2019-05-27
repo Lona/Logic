@@ -249,7 +249,6 @@ extension LogicEditor {
         Swift.print(sourceLineIndex, "=>", destinationLineIndex)
 
         let formattedContent = rootNode.formatted
-        let elements = formattedContent.elements
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),

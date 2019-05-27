@@ -70,6 +70,32 @@ extension LGCSyntaxNode {
 
                 result.nodes[functionName.uuid] = functionType
                 result.patternTypes[functionName.uuid] = functionType
+            case (false, .declaration(.enumeration(_, name: let functionName, genericParameters: let genericParameters, cases: let enumCases))):
+                // TODO: Generic parameters
+                if !genericParameters.isEmpty { return result }
+
+                let returnType: Unification.T = .cons(name: functionName.name, parameters: [])
+
+                enumCases.forEach { enumCase in
+                    switch enumCase {
+                    case .placeholder:
+                        break
+                    case .enumerationCase(_, name: let pattern, associatedValueTypes: let associatedValueTypes):
+                        let parameterTypes: [Unification.T] = associatedValueTypes.compactMap { annotation in
+                            switch annotation {
+                            case .placeholder:
+                                return nil
+                            default:
+                                return annotation.unificationType { result.makeGenericName() }
+                            }
+                        }
+
+                        let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
+
+                        result.nodes[pattern.uuid] = functionType
+                        result.patternTypes[pattern.uuid] = functionType
+                    }
+                }
             case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: _, parameters: let parameters, block: _))):
 
                 var parameterTypes: [Unification.T] = []

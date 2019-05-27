@@ -219,6 +219,23 @@ public extension Environment {
                 context.patternToTypeName[pattern.id] = pattern.name
 
                 return context
+            case (true, .declaration(.enumeration(_, name: let pattern, _, cases: let cases))):
+                context.currentNamespacePath = context.currentNamespacePath + [pattern.name]
+                context.namespace = context.namespace.with(context.currentNamespacePath, setTo: .namespace(Namespace()))
+
+                // Add initializers for each case into the namespace
+                cases.forEach { enumCase in
+                    switch enumCase {
+                    case .placeholder:
+                        break
+                    case .enumerationCase(_, name: let caseName, associatedValueTypes: _):
+                        context.setInCurrentNamespace(key: caseName.name, value: .pattern(caseName.id))
+                    }
+                }
+
+                context.currentNamespacePath = context.currentNamespacePath.dropLast()
+
+                return context
             case (false, .declaration(.namespace(id: _, name: let pattern, declarations: _))):
                 context.patternNames = context.patternNames.push()
 
