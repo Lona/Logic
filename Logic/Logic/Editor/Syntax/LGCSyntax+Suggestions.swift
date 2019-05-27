@@ -596,7 +596,21 @@ public extension LGCDeclaration {
             )
         }
 
-        static var `namespace`: LogicSuggestionItem {
+        static var record: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Record",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.record(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                    )
+                )
+            )
+        }
+
+        static var namespace: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Namespace",
                 category: categoryTitle,
@@ -619,6 +633,7 @@ public extension LGCDeclaration {
             Suggestion.function,
             Suggestion.genericFunction,
             Suggestion.enum,
+            Suggestion.record,
             Suggestion.namespace
         ]
 

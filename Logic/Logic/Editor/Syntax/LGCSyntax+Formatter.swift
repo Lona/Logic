@@ -422,6 +422,24 @@ public extension LGCDeclaration {
                     }
                 ]
             }
+        case .record(let value):
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Record", .source)),
+                    value.name.formatted,
+                    .element(.text("with properties:")),
+                    .indent {
+                        .concat {
+                            [
+                                .hardLine,
+                                .join(with: .hardLine) {
+                                    value.declarations.map { $0.formatted }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
         case .namespace(let value):
             return .concat {
                 [

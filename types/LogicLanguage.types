@@ -63,6 +63,13 @@
     <Record name="placeholder">
       <Record.Param name="id" type="UUID"/>
     </Record>
+    <Record name="record">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="declarations" type="List">
+        <Record.Substitution generic="T" instance="Declaration"/>
+      </Record.Param>
+    </Record>
   </Type>
   <Type name="EnumerationCase">
     <Record name="placeholder">

@@ -966,6 +966,19 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     }
                     }.map { $0.delete(id: id) })
             )
+        case .record(let value):
+            return .record(
+                id: UUID(),
+                name: value.name.delete(id: id),
+                declarations: LGCList(value.declarations.filter {
+                    switch $0 {
+                    case .placeholder:
+                        return true
+                    default:
+                        return $0.uuid != id
+                    }
+                    }.map { $0.delete(id: id) })
+            )
         case .namespace(let value):
             return .namespace(
                 id: UUID(),
@@ -1021,6 +1034,12 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     name: value.name.replace(id: id, with: syntaxNode),
                     cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
+            case .record(let value):
+                return LGCDeclaration.record(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode),
+                    declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                )
             case .namespace(let value):
                 return LGCDeclaration.namespace(
                     id: UUID(),
@@ -1052,6 +1071,9 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .enumeration(let value):
             found = value.name.pathTo(id: id)
                 ?? value.cases.pathTo(id: id)
+        case .record(let value):
+            found = value.name.pathTo(id: id)
+                ?? value.declarations.pathTo(id: id)
         case .namespace(let value):
             found = value.name.pathTo(id: id)
                 ?? value.declarations.pathTo(id: id)
@@ -1074,6 +1096,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return value.block.map { $0 }.last?.lastNode ?? node
         case .enumeration(let value):
             return value.cases.map { $0 }.last?.lastNode ?? node
+        case .record(let value):
+            return value.declarations.map { $0 }.last?.lastNode ?? node
         case .namespace(let value):
             return value.declarations.map { $0 }.last?.lastNode ?? node
         case .placeholder:
@@ -1088,6 +1112,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .function(let value):
             return value.id
         case .enumeration(let value):
+            return value.id
+        case .record(let value):
             return value.id
         case .namespace(let value):
             return value.id
