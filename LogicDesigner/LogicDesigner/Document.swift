@@ -200,7 +200,7 @@ class Document: NSDocument {
                     }
 
                     return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: []))
-                }
+                }.titleContains(prefix: query)
             case .expression(let expression):
                 guard let unificationType = unificationContext.nodes[expression.uuid] else {
                     Swift.print("Can't determine suggestions - no type for expression", expression.uuid)
