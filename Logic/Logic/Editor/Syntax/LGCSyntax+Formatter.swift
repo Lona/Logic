@@ -244,9 +244,11 @@ public extension LGCExpression {
         case .literalExpression(let value):
             return value.literal.formatted
         case .memberExpression(let value):
-            let joined = FormatterCommand<LogicElement>.concat {
-                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
-            }
+//            let joined = FormatterCommand<LogicElement>.concat {
+//                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
+//            }
+
+            let joined = value.memberName.formatted
 
             return .element(.dropdown(value.id, joined.stringContents, .variable))
         }
