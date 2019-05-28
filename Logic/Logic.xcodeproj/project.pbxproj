@@ -409,12 +409,12 @@
 			isa = PBXGroup;
 			children = (
 				6B858C22229DB19200DE6216 /* Compiler.swift */,
+				6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */,
+				6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */,
 				6B858C24229DB23400DE6216 /* Namespace.swift */,
 				6B858C26229DB29900DE6216 /* ScopeContext.swift */,
 				6B858C20229DB13A00DE6216 /* ScopeStack.swift */,
 				6BBD0BFE2294D92B00EB87A9 /* Unification.swift */,
-				6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */,
-				6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */,
 			);
 			path = Compiler;
 			sourceTree = "<group>";
