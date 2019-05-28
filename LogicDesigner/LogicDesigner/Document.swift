@@ -141,14 +141,14 @@ class Document: NSDocument {
 
             let rootNode = self.logicEditor.rootNode
 
-            Swift.print(Environment.scopeContext(rootNode).namespace)
+            Swift.print(Compiler.scopeContext(rootNode).namespace)
 
             let baseProgram = StandardLibrary.program
 
-            let baseScopeContext = Environment.scopeContext(baseProgram)
+            let baseScopeContext = Compiler.scopeContext(baseProgram)
             let baseUnificationContext = baseProgram.makeUnificationContext(scopeContext: baseScopeContext)
 
-            let scopeContext = Environment.scopeContext(rootNode, initialContext: baseScopeContext)
+            let scopeContext = Compiler.scopeContext(rootNode, initialContext: baseScopeContext)
             let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
 
             Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
@@ -160,8 +160,8 @@ class Document: NSDocument {
 
             Swift.print("Substitution", substitution)
 
-            let currentBaseScopeContext = Environment.scopeContext(baseProgram)
-            let currentScopeContext = Environment.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
+            let currentBaseScopeContext = Compiler.scopeContext(baseProgram)
+            let currentScopeContext = Compiler.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
 
             Swift.print("Current scope", currentScopeContext.namesInScope)
 

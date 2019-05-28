@@ -1,16 +1,15 @@
 //
-//  LGCTypeAnnotation+Type.swift
-//  LogicDesigner
+//  LGCTypeAnnotation+Unification.swift
+//  Logic
 //
-//  Created by Devin Abbott on 5/22/19.
+//  Created by Devin Abbott on 5/28/19.
 //  Copyright © 2019 BitDisco, Inc. All rights reserved.
 //
 
 import Foundation
-import Logic
 
-extension LGCTypeAnnotation {
-    public func unificationType(getName: () -> String) -> Unification.T {
+public extension LGCTypeAnnotation {
+    func unificationType(getName: () -> String) -> Unification.T {
         switch self {
         case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
             if identifier.isPlaceholder { return .evar(getName()) }

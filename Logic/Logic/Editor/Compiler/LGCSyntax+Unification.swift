@@ -1,19 +1,18 @@
 //
-//  LGCSyntax+Constraints.swift
-//  LogicDesigner
+//  LGCSyntax+Unification.swift
+//  Logic
 //
-//  Created by Devin Abbott on 5/22/19.
+//  Created by Devin Abbott on 5/28/19.
 //  Copyright © 2019 BitDisco, Inc. All rights reserved.
 //
 
 import Foundation
-import Logic
 
 extension LGCSyntaxNode {
     public class UnificationContext {
-        var constraints: [Unification.Constraint] = []
-        var nodes: [UUID: Unification.T] = [:]
-        var patternTypes: [UUID: Unification.T] = [:]
+        public var constraints: [Unification.Constraint] = []
+        public var nodes: [UUID: Unification.T] = [:]
+        public var patternTypes: [UUID: Unification.T] = [:]
 
         public init() {}
 
@@ -29,13 +28,13 @@ extension LGCSyntaxNode {
     }
 
     public func makeUnificationContext(
-        scopeContext: Environment.ScopeContext,
+        scopeContext: Compiler.ScopeContext,
         initialContext: UnificationContext = UnificationContext()
         ) -> UnificationContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
         return self.reduce(config: &traversalConfig, initialResult: initialContext) { (result, node, config) in
-//            Swift.print("pre", node.nodeTypeDescription)
+            //            Swift.print("pre", node.nodeTypeDescription)
 
             config.needsRevisitAfterTraversingChildren = true
 
@@ -58,7 +57,7 @@ extension LGCSyntaxNode {
                         parameterTypes.append(annotationType)
 
                         result.nodes[pattern.uuid] = annotationType
-//                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
+                        //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
                         result.patternTypes[pattern.uuid] = annotationType
                     default:
                         break
@@ -108,7 +107,7 @@ extension LGCSyntaxNode {
                         parameterTypes.append(annotationType)
 
                         result.nodes[pattern.uuid] = annotationType
-//                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
+                        //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
                         result.patternTypes[pattern.uuid] = annotationType
                     default:
                         break
