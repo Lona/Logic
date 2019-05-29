@@ -64,3 +64,9 @@ extension KeyValueList: Collection {
 extension KeyValueList: BidirectionalCollection {
     public func index(before i: Index) -> Index { return pairs.index(before: i) }
 }
+
+extension KeyValueList: ExpressibleByDictionaryLiteral {
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        self.pairs = elements
+    }
+}

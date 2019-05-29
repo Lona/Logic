@@ -27,6 +27,18 @@ extension LGCSyntaxNode {
         }
     }
 
+    private func specificIdentifierType(
+        scopeContext: Compiler.ScopeContext,
+        unificationContext: UnificationContext,
+        identifierId: UUID
+        ) -> Unification.T {
+        if let patternId = scopeContext.identifierToPattern[identifierId], let scopedType = unificationContext.patternTypes[patternId] {
+            return scopedType.replacingGenericsWithEvars(getName: unificationContext.makeGenericName)
+        } else {
+            return unificationContext.makeEvar()
+        }
+    }
+
     public func makeUnificationContext(
         scopeContext: Compiler.ScopeContext,
         initialContext: UnificationContext = UnificationContext()
@@ -52,7 +64,7 @@ extension LGCSyntaxNode {
                     case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _):
                         guard let annotation = annotation else { break }
 
-                        let annotationType = annotation.unificationType { result.makeGenericName() }
+                        let annotationType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
 
                         parameterTypes.append(annotationType)
 
@@ -70,10 +82,23 @@ extension LGCSyntaxNode {
                 result.nodes[functionName.uuid] = functionType
                 result.patternTypes[functionName.uuid] = functionType
             case (false, .declaration(.enumeration(_, name: let functionName, genericParameters: let genericParameters, cases: let enumCases))):
-                // TODO: Generic parameters
-                if !genericParameters.isEmpty { return result }
+                let genericNames: [String] = genericParameters.compactMap { param in
+                    switch param {
+                    case .parameter(_, name: let pattern):
+                        return pattern.name
+                    case .placeholder:
+                        return nil
+                    }
+                }
 
-                let returnType: Unification.T = .cons(name: functionName.name, parameters: [])
+                var genericInScope: [String: String] = [:]
+                genericNames.forEach { name in
+                    genericInScope[name] = result.makeGenericName()
+                }
+
+                let universalTypes = genericNames.map { name in Unification.T.gen(genericInScope[name]!) }
+
+                let returnType: Unification.T = .cons(name: functionName.name, parameters: universalTypes)
 
                 enumCases.forEach { enumCase in
                     switch enumCase {
@@ -85,7 +110,7 @@ extension LGCSyntaxNode {
                             case .placeholder:
                                 return nil
                             default:
-                                return annotation.unificationType { result.makeGenericName() }
+                                return annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
                             }
                         }
 
@@ -95,14 +120,28 @@ extension LGCSyntaxNode {
                         result.patternTypes[pattern.uuid] = functionType
                     }
                 }
-            case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: _, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: let genericParameters, parameters: let parameters, block: _))):
+
+                let genericNames: [String] = genericParameters.compactMap { param in
+                    switch param {
+                    case .parameter(_, name: let pattern):
+                        return pattern.name
+                    case .placeholder:
+                        return nil
+                    }
+                }
+
+                var genericInScope: [String: String] = [:]
+                genericNames.forEach { name in
+                    genericInScope[name] = result.makeGenericName()
+                }
 
                 var parameterTypes: [Unification.T] = []
 
                 parameters.forEach { parameter in
                     switch parameter {
                     case .parameter(id: _, externalName: _, localName: let pattern, annotation: let annotation, defaultValue: _):
-                        let annotationType = annotation.unificationType { result.makeGenericName() }
+                        let annotationType = annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
 
                         parameterTypes.append(annotationType)
 
@@ -114,7 +153,7 @@ extension LGCSyntaxNode {
                     }
                 }
 
-                let returnType = returnTypeAnnotation.unificationType { result.makeGenericName() }
+                let returnType = returnTypeAnnotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
                 let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
 
                 result.nodes[functionName.uuid] = functionType
@@ -130,7 +169,7 @@ extension LGCSyntaxNode {
                     return result
                 }
 
-                let annotationType = annotation.unificationType { result.makeGenericName() }
+                let annotationType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
 
                 result.nodes[pattern.uuid] = annotationType
 
@@ -145,14 +184,10 @@ extension LGCSyntaxNode {
 
                 return result
             case (true, .expression(.identifierExpression(id: _, identifier: let identifier))):
-                let typeVariable = result.makeEvar()
+                let type = self.specificIdentifierType(scopeContext: scopeContext, unificationContext: result, identifierId: identifier.uuid)
 
-                result.nodes[node.uuid] = typeVariable
-                result.nodes[identifier.uuid] = typeVariable
-
-                if let patternId = scopeContext.identifierToPattern[identifier.uuid], let scopedType = result.patternTypes[patternId] {
-                    result.constraints.append(.init(scopedType, typeVariable))
-                }
+                result.nodes[node.uuid] = type
+                result.nodes[identifier.uuid] = type
 
                 return result
             case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
@@ -179,12 +214,10 @@ extension LGCSyntaxNode {
                 config.ignoreChildren = true
 
             case (true, .expression(.memberExpression)):
-                if let patternId = scopeContext.identifierToPattern[node.uuid], let scopedType = result.patternTypes[patternId] {
-                    result.nodes[node.uuid] = scopedType
-                } else {
-                    let typeVariable = result.makeEvar()
-                    result.nodes[node.uuid] = typeVariable
-                }
+                let type = self.specificIdentifierType(scopeContext: scopeContext, unificationContext: result, identifierId: node.uuid)
+
+                result.nodes[node.uuid] = type
+
                 return result
             case (true, .expression(.literalExpression(id: _, literal: let literal))):
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!

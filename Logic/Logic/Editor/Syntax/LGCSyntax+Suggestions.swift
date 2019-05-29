@@ -204,7 +204,7 @@ public extension LGCTypeAnnotation {
                         identifier: LGCIdentifier(id: UUID(), string: name),
                         genericArguments: .init(parameters.map(makeTypeAnnotation(type:)))
                     )
-                case .evar(let name):
+                case .evar(let name), .gen(let name):
                     return LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
                         identifier: LGCIdentifier(id: UUID(), string: name),

@@ -12,6 +12,7 @@ public enum Unification {
     public enum T: Equatable, CustomDebugStringConvertible {
         case evar(String)
         case cons(name: String, parameters: [T])
+        case gen(String)
         indirect case fun(arguments: [T], returnType: T)
 
         public static func cons(name: String) -> T {
@@ -26,6 +27,8 @@ public enum Unification {
                 return false
             case .fun:
                 return false
+            case .gen:
+                return false
             }
         }
 
@@ -35,8 +38,23 @@ public enum Unification {
                 return name
             case .cons(name: let name, parameters: _):
                 return name
+            case .gen(let name):
+                return name
             case .fun:
                 fatalError("Function types have no name")
+            }
+        }
+
+        public var genericNames: [String] {
+            switch self {
+            case .evar:
+                return []
+            case .cons(_, parameters: let parameters):
+                return Array(parameters.map { $0.genericNames }.joined())
+            case .gen(let name):
+                return [name]
+            case .fun(let arguments, let returnType):
+                return Array(arguments.map { $0.genericNames }.joined()) + returnType.genericNames
             }
         }
 
@@ -52,7 +70,18 @@ public enum Unification {
                 }
             case .fun(arguments: let arguments, returnType: let returnType):
                 return "(\(arguments.map { $0.debugDescription }.joined(separator: ", "))) -> \(returnType)"
+            case .gen(let generic):
+                return generic
             }
+        }
+
+        public func replacingGenericsWithEvars(getName: () -> String) -> Unification.T {
+            let replacedNames = Unification.Substitution(
+                self.genericNames.map { name in
+                    return (.gen(name), .evar(getName()))
+                }
+            )
+            return Unification.substitute(replacedNames, in: self)
         }
     }
 
@@ -124,6 +153,10 @@ public enum Unification {
                 zip(headParameters, tailParameters).forEach { a, b in
                     constraints.append(Constraint(a, b))
                 }
+            // TODO: What about evars?
+            case (.gen, _), (_, .gen):
+                Swift.print("Unify generics", head, tail)
+                break
             case (.evar, _):
                 substitution = substitution.with(tail, for: head)
             case (_, .evar):
@@ -150,7 +183,7 @@ public enum Unification {
         }
 
         switch type {
-        case .evar:
+        case .evar, .gen:
             return type
         case .cons(name: let name, parameters: let parameters):
             return .cons(name: name, parameters: parameters.map { substitute(substitution, in: $0) })

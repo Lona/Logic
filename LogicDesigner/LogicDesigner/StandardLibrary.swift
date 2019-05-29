@@ -106,7 +106,20 @@ public enum StandardLibrary {
                             .parameter(id: UUID(), name: .init(id: UUID(), name: "Wrapped"))
                         ]
                     ),
-                    cases: .empty
+                    cases: .init(
+                        [
+                            .enumerationCase(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "value"),
+                                associatedValueTypes: .init(
+                                    [
+                                        .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Wrapped"), genericArguments: .empty)
+                                    ]
+                                )
+                            ),
+                            .enumerationCase(id: UUID(), name: .init(id: UUID(), name: "none"), associatedValueTypes: .empty)
+                        ]
+                    )
                 )
             ),
             .declaration(id: UUID(), content: math),

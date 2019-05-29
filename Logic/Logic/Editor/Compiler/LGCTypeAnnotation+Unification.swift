@@ -9,12 +9,16 @@
 import Foundation
 
 public extension LGCTypeAnnotation {
-    func unificationType(getName: () -> String) -> Unification.T {
+    func unificationType(genericsInScope: [String: String], getName: () -> String) -> Unification.T {
         switch self {
         case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
             if identifier.isPlaceholder { return .evar(getName()) }
 
-            let parameters = arguments.map { $0.unificationType(getName: getName) }
+            if let renamed = genericsInScope[identifier.string] {
+                return .gen(renamed)
+            }
+
+            let parameters = arguments.map { $0.unificationType(genericsInScope: genericsInScope, getName: getName) }
 
             return .cons(name: identifier.string, parameters: parameters)
         case .placeholder(id: _):

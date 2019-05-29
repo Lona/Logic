@@ -69,8 +69,8 @@
 		6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */; };
 		6B858C21229DB13A00DE6216 /* ScopeStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C20229DB13A00DE6216 /* ScopeStack.swift */; };
 		6B858C23229DB19200DE6216 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C22229DB19200DE6216 /* Compiler.swift */; };
-		6B858C25229DB23400DE6216 /* Namespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C24229DB23400DE6216 /* Namespace.swift */; };
-		6B858C27229DB29900DE6216 /* ScopeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C26229DB29900DE6216 /* ScopeContext.swift */; };
+		6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */; };
+		6B858C27229DB29900DE6216 /* Compiler+ScopeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C26229DB29900DE6216 /* Compiler+ScopeContext.swift */; };
 		6B858C29229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */; };
 		6B858C2B229DB35B00DE6216 /* LGCSyntax+Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */; };
 		6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Traversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */; };
@@ -152,8 +152,8 @@
 		6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTypeParameterSubstitution.swift; sourceTree = "<group>"; };
 		6B858C20229DB13A00DE6216 /* ScopeStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeStack.swift; sourceTree = "<group>"; };
 		6B858C22229DB19200DE6216 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
-		6B858C24229DB23400DE6216 /* Namespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Namespace.swift; sourceTree = "<group>"; };
-		6B858C26229DB29900DE6216 /* ScopeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeContext.swift; sourceTree = "<group>"; };
+		6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+Namespace.swift"; sourceTree = "<group>"; };
+		6B858C26229DB29900DE6216 /* Compiler+ScopeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+ScopeContext.swift"; sourceTree = "<group>"; };
 		6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCTypeAnnotation+Unification.swift"; sourceTree = "<group>"; };
 		6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Unification.swift"; sourceTree = "<group>"; };
 		6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Traversal.swift"; sourceTree = "<group>"; };
@@ -409,10 +409,10 @@
 			isa = PBXGroup;
 			children = (
 				6B858C22229DB19200DE6216 /* Compiler.swift */,
+				6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */,
+				6B858C26229DB29900DE6216 /* Compiler+ScopeContext.swift */,
 				6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */,
 				6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */,
-				6B858C24229DB23400DE6216 /* Namespace.swift */,
-				6B858C26229DB29900DE6216 /* ScopeContext.swift */,
 				6B858C20229DB13A00DE6216 /* ScopeStack.swift */,
 				6BBD0BFE2294D92B00EB87A9 /* Unification.swift */,
 			);
@@ -547,7 +547,7 @@
 				6B3414A02258154500CC65D1 /* SyntaxNodePlaceholdable.swift in Sources */,
 				6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */,
 				6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */,
-				6B858C27229DB29900DE6216 /* ScopeContext.swift in Sources */,
+				6B858C27229DB29900DE6216 /* Compiler+ScopeContext.swift in Sources */,
 				6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */,
 				6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */,
 				6B44E157223B3DD000740318 /* NSImage+Resizing.swift in Sources */,
@@ -558,7 +558,7 @@
 				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
 				6BBD0BFF2294D92B00EB87A9 /* Unification.swift in Sources */,
-				6B858C25229DB23400DE6216 /* Namespace.swift in Sources */,
+				6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */,
 				6BBD0C0F2298759F00EB87A9 /* LGCExpression+Builders.swift in Sources */,
 				6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */,
 				6BD44E5C228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift in Sources */,

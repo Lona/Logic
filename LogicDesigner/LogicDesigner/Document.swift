@@ -94,43 +94,6 @@ class Document: NSDocument {
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals
-            case .cons(name: "Optional", parameters: let parameters) where parameters.count == 1:
-                let innerSuggestions = suggestions(for: parameters[0], query: query)
-
-                let wrappedSuggestions: [LogicSuggestionItem] = innerSuggestions.compactMap { item in
-                    guard case .expression(let contents) = item.node else { return nil }
-
-                    return LogicSuggestionItem(
-                        title: ".value(\(item.title))",
-                        badge: "Optional",
-                        category: LGCExpression.Suggestion.categoryTitle,
-                        node: .expression(
-                            .functionCallExpression(
-                                id: UUID(),
-                                expression: .makeMemberExpression(names: ["Optional", "value"]),
-                                arguments: .next(
-                                    .init(id: UUID(), label: nil, expression: contents),
-                                    .empty
-                                )
-                            )
-                        )
-                    )
-                }
-
-                let noneSuggestion = LogicSuggestionItem(
-                    title: ".none",
-                    badge: "Optional",
-                    category: LGCExpression.Suggestion.categoryTitle,
-                    node: .expression(
-                        .functionCallExpression(
-                            id: UUID(),
-                            expression: .makeMemberExpression(names: ["Optional", "none"]),
-                            arguments: .empty
-                        )
-                    )
-                )
-
-                return wrappedSuggestions + [noneSuggestion]
             default:
                 return []
             }
@@ -186,6 +149,19 @@ class Document: NSDocument {
 
                     switch node {
                     case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _))):
+                        let parameterNames: [String] = genericParameters.compactMap { param in
+                            switch param {
+                            case .parameter(_, name: let pattern):
+                                return pattern.name
+                            case .placeholder:
+                                return nil
+                            }
+                        }
+
+                        if parameterNames.contains(value) {
+                            return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value))
+                        }
+
                         let params: [Unification.T] = genericParameters.compactMap { param in
                             switch param {
                             case .parameter(id: _, name: let pattern):
@@ -214,6 +190,8 @@ class Document: NSDocument {
                 ]
 
                 switch type {
+                case .gen:
+                    return []
                 case .fun:
                     // TODO: Suggestion functions?
                     return []
@@ -234,6 +212,35 @@ class Document: NSDocument {
                 case .cons:
                     Swift.print("Resolved type: \(type)")
 
+                    func validSuggestionType(expressionType: Unification.T, suggestionType: Unification.T) -> Unification.T? {
+                        if expressionType == suggestionType {
+                            return suggestionType
+                        }
+
+                        switch suggestionType {
+                        case .fun(arguments: _, returnType: let returnType):
+                            if expressionType == returnType {
+                                return suggestionType
+                            }
+
+                            let specificReturnType = returnType.replacingGenericsWithEvars(getName: NameGenerator(prefix: "&").next)
+                            let unified = Unification.unify(
+                                constraints: [Unification.Constraint(specificReturnType, type)]
+                            )
+
+                            switch unified {
+                            case .success(let substitution):
+                                let substitutedType = Unification.substitute(substitution, in: suggestionType)
+                                Swift.print("Specific instance of generic type", suggestionType, "=>", substitutedType)
+                                return substitutedType
+                            case .failure:
+                                return nil
+                            }
+                        default:
+                            return nil
+                        }
+                    }
+
                     let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
                         // Variables in scope are listed elsewhere
                         if keyPath.count == 1 { return nil }
@@ -242,37 +249,27 @@ class Document: NSDocument {
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print("Resolved type of pattern \(pattern): \(identifierType) == \(resolvedType)")
+                        Swift.print("Resolved type of pattern, \(keyPath.joined(separator: ".")): \(identifierType) == \(resolvedType)")
 
-                        if type == resolvedType {
-                            return (keyPath, resolvedType)
-                        }
-
-                        switch resolvedType {
-                        case .fun(arguments: _, returnType: let returnType) where type == returnType:
-                            return (keyPath, resolvedType)
-                        default:
+                        if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
+                            return (keyPath, suggestionType)
+                        } else {
                             return nil
                         }
                     })
 
-                    Swift.print("namespace identifiers", matchingNamespaceIdentifiers)
+                    Swift.print("Namespace identifiers", matchingNamespaceIdentifiers)
 
                     let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> (String, Unification.T)? in
                         guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print("Resolved type of pattern \(pattern.uuid): \(identifierType) == \(resolvedType)")
+                        Swift.print("Resolved type of pattern, \(pattern.name): \(identifierType) == \(resolvedType)")
 
-                        if type == resolvedType {
-                            return (pattern.name, resolvedType)
-                        }
-
-                        switch resolvedType {
-                        case .fun(arguments: _, returnType: let returnType) where type == returnType:
-                            return (pattern.name, resolvedType)
-                        default:
+                        if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
+                            return (pattern.name, suggestionType)
+                        } else {
                             return nil
                         }
                     })
