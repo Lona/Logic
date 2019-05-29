@@ -105,8 +105,9 @@ class Document: NSDocument {
             let rootNode = self.logicEditor.rootNode
 
             guard case .program(let root) = rootNode else { return [] }
+            guard case .program(let prelude) = Library.load(name: "Prelude") else { return [] }
 
-            let program: LGCSyntaxNode = .program(LGCProgram.join(programs: [StandardLibrary.include, root]))
+            let program: LGCSyntaxNode = .program(LGCProgram.join(programs: [prelude, root]))
 
 
             let scopeContext = Compiler.scopeContext(program)
@@ -328,7 +329,7 @@ class Document: NSDocument {
 
                     let literals = suggestions(for: type, query: query)
 
-                    return (identifiers + namespaceIdentifiers + literals + common).titleContains(prefix: query)
+                    return (literals + identifiers + namespaceIdentifiers + common).titleContains(prefix: query)
                 }
             default:
                 return LogicEditor.defaultSuggestionsForNode(node, program, query)

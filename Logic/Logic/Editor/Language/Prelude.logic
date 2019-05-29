@@ -8,57 +8,302 @@
               "declarations" : [
                 {
                   "data" : {
-                    "annotation" : {
-                      "data" : {
-                        "genericArguments" : [
-
-                        ],
-                        "id" : "EF115E2B-E760-4B6A-92CE-D5F6FF4143C1",
-                        "identifier" : {
-                          "id" : "3967F66A-0A09-4A81-B49B-58D6611A0F41",
-                          "isPlaceholder" : false,
-                          "string" : "String"
-                        }
-                      },
-                      "type" : "typeIdentifier"
-                    },
-                    "id" : "6734B1E1-BE01-4DB9-873E-D1CD47DF7B7B",
-                    "initializer" : {
-                      "data" : {
-                        "id" : "159CEC19-332C-428F-91AC-581BBA1503A3",
-                        "literal" : {
-                          "data" : {
-                            "id" : "96E0DD6F-725A-4622-A0A0-112CC1CC98D0",
-                            "value" : ""
-                          },
-                          "type" : "string"
-                        }
-                      },
-                      "type" : "literalExpression"
-                    },
-                    "name" : {
-                      "id" : "91CA2437-033B-4F0D-9205-AAA655426437",
-                      "name" : "value"
-                    }
-                  },
-                  "type" : "variable"
-                },
-                {
-                  "data" : {
-                    "id" : "FDA37890-7811-4736-9888-48C906D0EAAB"
+                    "id" : "999561F1-DCEA-405B-BD00-4430D408A626"
                   },
                   "type" : "placeholder"
                 }
               ],
-              "id" : "511C6770-A3AE-49F5-ABBF-9CFD7C117B9E",
+              "id" : "14BFF38C-1883-417F-850F-918AA327F747",
               "name" : {
-                "id" : "796D53DC-85EB-4AC7-8EA7-A4F538C621A4",
-                "name" : "CSSColor"
+                "id" : "3F4E333A-FC5E-4250-B969-D2E3B3EBD898",
+                "name" : "Boolean"
               }
             },
             "type" : "record"
           },
-          "id" : "06458930-4AFE-437C-936F-42E6F5E80F7B"
+          "id" : "619A18D9-1DA5-4474-9E9A-44A9D76DFC04"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "declarations" : [
+                {
+                  "data" : {
+                    "block" : [
+                      {
+                        "data" : {
+                          "id" : "B8ABA85A-36D2-459D-96CD-9AD596F40C6C"
+                        },
+                        "type" : "placeholderStatement"
+                      }
+                    ],
+                    "genericParameters" : [
+
+                    ],
+                    "id" : "80734801-902D-463D-AE45-217B3D5B299E",
+                    "name" : {
+                      "id" : "A0482B20-825C-43F9-ABE6-737E8CDCFD67",
+                      "name" : "or"
+                    },
+                    "parameters" : [
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "99103E0A-A004-4455-A782-B3630839364B",
+                              "identifier" : {
+                                "id" : "1209D07F-69AA-4DF0-963B-53478EE5168C",
+                                "isPlaceholder" : false,
+                                "string" : "Boolean"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "59A624CB-22D6-460F-BBAD-A97D93D44554"
+                            },
+                            "type" : "none"
+                          },
+                          "externalName" : null,
+                          "id" : "F23DA81C-02F6-4E63-AD16-7A69165E2320",
+                          "localName" : {
+                            "id" : "949E13AD-C451-4B35-A62F-A0AAF1203CD8",
+                            "name" : "a"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "B7FD51EB-16CC-4364-9147-39BCD7150E5B",
+                              "identifier" : {
+                                "id" : "83E1FAA2-0B36-49AB-8E8A-FFA9B0DEA1B0",
+                                "isPlaceholder" : false,
+                                "string" : "Boolean"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "BAC06CD1-6302-4DF1-8881-C6AB752012C2"
+                            },
+                            "type" : "none"
+                          },
+                          "externalName" : null,
+                          "id" : "129F5C6F-10DC-442B-ABF8-31BA1A2E8169",
+                          "localName" : {
+                            "id" : "F42AF00A-157A-4299-B701-239BDB954FBD",
+                            "name" : "b"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "id" : "52580F76-78D2-4413-8113-7CA7D081F629"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "returnType" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "2631050D-D040-49A0-B03B-69C543883A5F",
+                        "identifier" : {
+                          "id" : "53A55F6C-050E-4BDC-9F25-9D27FE76A3D4",
+                          "isPlaceholder" : false,
+                          "string" : "Boolean"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    }
+                  },
+                  "type" : "function"
+                },
+                {
+                  "data" : {
+                    "block" : [
+                      {
+                        "data" : {
+                          "id" : "930037A8-63DB-4352-9636-F1943E445D31"
+                        },
+                        "type" : "placeholderStatement"
+                      }
+                    ],
+                    "genericParameters" : [
+
+                    ],
+                    "id" : "D11C1996-91AE-4EC7-9A35-D889897AEA51",
+                    "name" : {
+                      "id" : "12A8AFBD-71C6-44AC-8141-F048CF11769B",
+                      "name" : "and"
+                    },
+                    "parameters" : [
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "81984C7B-03A4-4E69-A0FA-89C6EF3CE3AA",
+                              "identifier" : {
+                                "id" : "3372B770-034D-468E-A714-5BAF9D87217E",
+                                "isPlaceholder" : false,
+                                "string" : "Boolean"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "9DEF80A7-0439-49F9-8EBE-24A366AB9206"
+                            },
+                            "type" : "none"
+                          },
+                          "externalName" : null,
+                          "id" : "5FEAF7F3-A2D7-4444-B16A-8AEC0F595361",
+                          "localName" : {
+                            "id" : "1F4C655E-AE49-4E46-8C95-AF584D1FF947",
+                            "name" : "a"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "1CBE3371-2E3C-4444-A3EB-B1A3969B45F0",
+                              "identifier" : {
+                                "id" : "90CE567B-46CD-4C7E-AA04-3ADE841FB1EC",
+                                "isPlaceholder" : false,
+                                "string" : "Boolean"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "4633AD51-D3F6-41A2-9C72-3B22161CE877"
+                            },
+                            "type" : "none"
+                          },
+                          "externalName" : null,
+                          "id" : "DA653622-E130-4733-8668-78E403FBA298",
+                          "localName" : {
+                            "id" : "6C3AEFA2-C9E6-4DDD-B812-8C3626C3383E",
+                            "name" : "b"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "id" : "9C19C3B7-FEA9-4453-87C5-894F072EBA3D"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "returnType" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "FADB8BEB-A0AA-4C10-8D11-17EF382B4685",
+                        "identifier" : {
+                          "id" : "B63CD19A-37EA-4E4B-8366-567F6F3C3BB8",
+                          "isPlaceholder" : false,
+                          "string" : "Boolean"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    }
+                  },
+                  "type" : "function"
+                },
+                {
+                  "data" : {
+                    "id" : "9FB384BF-CA1B-4DED-98CE-AB80A457535D"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "id" : "051D6087-EA13-42A1-B88A-5AE3B752935F",
+              "name" : {
+                "id" : "2C6AF13C-18D7-4031-B028-A0642D612987",
+                "name" : "Boolean"
+              }
+            },
+            "type" : "namespace"
+          },
+          "id" : "092DF4EA-F0E8-44A8-8094-E45D535831F1"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "declarations" : [
+                {
+                  "data" : {
+                    "id" : "E878C133-1663-438B-A272-792C8C169629"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "id" : "958B2CCD-5B11-4A0C-98D6-D675BA320775",
+              "name" : {
+                "id" : "05B7BFEB-DABE-4009-A43B-3802C4D77CCA",
+                "name" : "Number"
+              }
+            },
+            "type" : "record"
+          },
+          "id" : "77BD0A30-F68E-42D9-BA40-A6969F3A8B2E"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "declarations" : [
+                {
+                  "data" : {
+                    "id" : "DDD9FE29-B42A-422B-A1EF-569560F35FB4"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "id" : "D3CDCDC4-FF73-4275-B81E-3A90D71F1423",
+              "name" : {
+                "id" : "C852B7D1-C227-4D64-AF99-DBD05C3EED9B",
+                "name" : "String"
+              }
+            },
+            "type" : "record"
+          },
+          "id" : "4FB17539-A934-4E20-9835-72E4D7D29E3B"
         },
         "type" : "declaration"
       },
@@ -75,9 +320,156 @@
                           "genericArguments" : [
 
                           ],
-                          "id" : "00E5D2E2-C017-4901-B0CD-3591CC39FB02",
+                          "id" : "8E08A153-0835-4A93-86CD-A7593FBCCE24",
                           "identifier" : {
-                            "id" : "3C301E38-DB81-44E3-9D51-EF6A3725B27D",
+                            "id" : "97FE7912-2D60-4A8A-8B9C-DC026A4772E0",
+                            "isPlaceholder" : false,
+                            "string" : "Wrapped"
+                          }
+                        },
+                        "type" : "typeIdentifier"
+                      },
+                      {
+                        "data" : {
+                          "id" : "B580A88D-3877-409A-B114-F6F9C725CAA4"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "id" : "1A5FD612-ED1A-4990-8C32-6AEFED0B8720",
+                    "name" : {
+                      "id" : "387923CD-9A5F-4FC5-8E46-C06373F8BD56",
+                      "name" : "value"
+                    }
+                  },
+                  "type" : "enumerationCase"
+                },
+                {
+                  "data" : {
+                    "associatedValueTypes" : [
+                      {
+                        "data" : {
+                          "id" : "EC16C1A2-D5ED-4994-9824-2963F381AF99"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "id" : "A1FAEAAA-01DB-4A57-A85C-B1C71F9B211F",
+                    "name" : {
+                      "id" : "9D6151F5-A1B6-4E4B-8872-1EB0F6D6FC49",
+                      "name" : "none"
+                    }
+                  },
+                  "type" : "enumerationCase"
+                },
+                {
+                  "data" : {
+                    "id" : "A267F383-84EC-4658-A4B0-2B30B176A216"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "genericParameters" : [
+                {
+                  "data" : {
+                    "id" : "17D0AC47-9C9D-43D7-866A-13CCA3F06D22",
+                    "name" : {
+                      "id" : "1B52B636-0901-48D8-AE77-00D3E9323DF7",
+                      "name" : "Wrapped"
+                    }
+                  },
+                  "type" : "parameter"
+                }
+              ],
+              "id" : "9637DFE9-38DC-4727-8DBA-ECC30E95F1AA",
+              "name" : {
+                "id" : "25282758-0CFE-496C-A54B-67670BF58FBD",
+                "name" : "Optional"
+              }
+            },
+            "type" : "enumeration"
+          },
+          "id" : "2C7AC2A9-3603-46A8-A083-A18D6325C72C"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "declarations" : [
+                {
+                  "data" : {
+                    "annotation" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "6BAC6801-7C84-4AB5-8E2D-AE472E26969A",
+                        "identifier" : {
+                          "id" : "C69C6FF8-21E1-41E8-B082-1CB64239D2EE",
+                          "isPlaceholder" : false,
+                          "string" : "String"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    },
+                    "id" : "7A73DB3F-61EF-487F-A8AE-ECF7900BD0D4",
+                    "initializer" : {
+                      "data" : {
+                        "id" : "41EC9444-2862-49BB-82B2-BF8EB63B8E01",
+                        "literal" : {
+                          "data" : {
+                            "id" : "966AB434-0287-45A0-9472-6C80F8554BB6",
+                            "value" : ""
+                          },
+                          "type" : "string"
+                        }
+                      },
+                      "type" : "literalExpression"
+                    },
+                    "name" : {
+                      "id" : "5A2BCA15-6144-4335-BE70-C549EA3C4D69",
+                      "name" : "value"
+                    }
+                  },
+                  "type" : "variable"
+                },
+                {
+                  "data" : {
+                    "id" : "B48129E3-3538-40F4-AB48-4F311337652C"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "id" : "64154984-3E06-4E0B-841B-60832CE779E2",
+              "name" : {
+                "id" : "1FC5BF2C-BCA6-404E-B2C2-D307EDE82FE1",
+                "name" : "CSSColor"
+              }
+            },
+            "type" : "record"
+          },
+          "id" : "A7387BD6-E608-4D99-B694-A0A11CE2360F"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "cases" : [
+                {
+                  "data" : {
+                    "associatedValueTypes" : [
+                      {
+                        "data" : {
+                          "genericArguments" : [
+
+                          ],
+                          "id" : "3D531F01-CD3C-4ECB-B6AD-723768A2DC7B",
+                          "identifier" : {
+                            "id" : "CBCB3279-AFD0-4637-9884-49D416409B6E",
                             "isPlaceholder" : false,
                             "string" : "String"
                           }
@@ -89,9 +481,9 @@
                           "genericArguments" : [
 
                           ],
-                          "id" : "AAF32D55-937C-4301-BBCF-6D4A42F98C70",
+                          "id" : "F935730D-2F3E-4939-A9DF-838A51EA5A63",
                           "identifier" : {
-                            "id" : "4E13ADFA-5CDB-4D43-BDB4-1BA6379089C5",
+                            "id" : "DCD77CAF-914C-41C7-BE06-7B01ECC27DDF",
                             "isPlaceholder" : false,
                             "string" : "CSSColor"
                           }
@@ -106,9 +498,9 @@
                                 "genericArguments" : [
 
                                 ],
-                                "id" : "7B3213F4-FF19-4DED-B1F3-F0F0033856A8",
+                                "id" : "5378EE03-16BC-420B-B9DD-F70E18B4F7FC",
                                 "identifier" : {
-                                  "id" : "8086C4AE-C8C8-40AE-B35B-B35DA3A01F6F",
+                                  "id" : "295D9DBA-CA16-4DE7-AE8A-0225452E85AC",
                                   "isPlaceholder" : false,
                                   "string" : "String"
                                 }
@@ -116,9 +508,9 @@
                               "type" : "typeIdentifier"
                             }
                           ],
-                          "id" : "A65956C2-8B03-4D7F-87F7-87A2BBA03179",
+                          "id" : "7DC91E6A-7622-4BBB-BD17-DC0D1531FFDA",
                           "identifier" : {
-                            "id" : "FD736E97-43C3-4706-920C-6F80697980AC",
+                            "id" : "975EF6FA-0528-49A3-BE9D-B9B42F99478D",
                             "isPlaceholder" : false,
                             "string" : "Optional"
                           }
@@ -127,14 +519,14 @@
                       },
                       {
                         "data" : {
-                          "id" : "ECBB6168-40E3-41D5-8183-019FB1D33D53"
+                          "id" : "9FE71C6B-922A-475C-AE4D-2FEA994F6A38"
                         },
                         "type" : "placeholder"
                       }
                     ],
-                    "id" : "D40D189F-9DFB-4BF6-BF31-1D0E8B9FB567",
+                    "id" : "E76122C5-CCAF-47DA-B9FA-63085DA2B0C5",
                     "name" : {
-                      "id" : "955E2616-3F2A-4297-8933-13FE5D230FB9",
+                      "id" : "CB1218E1-3878-4D74-A4BC-30D4292C3F8E",
                       "name" : "system"
                     }
                   },
@@ -148,9 +540,9 @@
                           "genericArguments" : [
 
                           ],
-                          "id" : "057AF9D1-21FA-4A9A-B993-9A194294F701",
+                          "id" : "00D2401F-9037-4103-97EF-C7C93AF2D555",
                           "identifier" : {
-                            "id" : "DA4364A9-1702-4028-8FB3-14769FD2EE92",
+                            "id" : "FFB2217D-E35F-4D2C-862F-39D903BC867F",
                             "isPlaceholder" : false,
                             "string" : "CSSColor"
                           }
@@ -159,14 +551,14 @@
                       },
                       {
                         "data" : {
-                          "id" : "F18C9325-B211-409A-9809-FE921F353965"
+                          "id" : "404BC730-492B-4567-8784-F05CE1165DA7"
                         },
                         "type" : "placeholder"
                       }
                     ],
-                    "id" : "86678E24-426F-4F54-AF7F-A61875AC3FD6",
+                    "id" : "31C69F07-22CA-4C26-A714-85A6D30D452D",
                     "name" : {
-                      "id" : "7C02D716-6201-4FEA-B632-544C6B2E2DEB",
+                      "id" : "4BCCBB26-E1BD-46BE-9041-A0260B25183E",
                       "name" : "custom"
                     }
                   },
@@ -174,7 +566,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "3FFAE618-F012-4EA4-8F4B-AB37A6E29A2A"
+                    "id" : "1AA9B2F7-5610-4563-9EE7-1916FECCF640"
                   },
                   "type" : "placeholder"
                 }
@@ -182,26 +574,26 @@
               "genericParameters" : [
 
               ],
-              "id" : "BD1465A3-113F-43CC-BF86-D4EBB737A057",
+              "id" : "259B4108-91A0-43CF-92FE-9975BC904CCE",
               "name" : {
-                "id" : "22512EC2-1546-40DE-9352-CE0DBAC33EF8",
+                "id" : "35576D19-2BB1-4622-B39D-ED36E11EFB22",
                 "name" : "Color"
               }
             },
             "type" : "enumeration"
           },
-          "id" : "CDADAD1F-102B-4FA7-92FB-73F088FD3F47"
+          "id" : "D0F1BCBF-6098-46CF-9434-CF31876BCC29"
         },
         "type" : "declaration"
       },
       {
         "data" : {
-          "id" : "57863FD8-8DE2-4A32-BD14-854E437B890D"
+          "id" : "3162A872-5924-4980-85FA-76D49AB9044C"
         },
         "type" : "placeholderStatement"
       }
     ],
-    "id" : "7EB00B8C-8A3D-4AEF-86EB-96529A53C421"
+    "id" : "552593A3-312A-486C-9AAD-CB0B648F2BEE"
   },
   "type" : "program"
 }

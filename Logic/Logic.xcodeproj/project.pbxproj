@@ -75,6 +75,7 @@
 		6B858C2B229DB35B00DE6216 /* LGCSyntax+Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */; };
 		6B858C2E229EEEAD00DE6216 /* Prelude.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B858C2D229EEEAD00DE6216 /* Prelude.logic */; };
 		6B858C30229EEEEB00DE6216 /* LGCProgram+Builders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C2F229EEEEB00DE6216 /* LGCProgram+Builders.swift */; };
+		6B858C32229EF3A300DE6216 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C31229EF3A300DE6216 /* Library.swift */; };
 		6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Traversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */; };
 		6BBD0BFB2292134700EB87A9 /* EnumType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFA2292134700EB87A9 /* EnumType.swift */; };
 		6BBD0BFF2294D92B00EB87A9 /* Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFE2294D92B00EB87A9 /* Unification.swift */; };
@@ -160,6 +161,7 @@
 		6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Unification.swift"; sourceTree = "<group>"; };
 		6B858C2D229EEEAD00DE6216 /* Prelude.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Prelude.logic; sourceTree = "<group>"; };
 		6B858C2F229EEEEB00DE6216 /* LGCProgram+Builders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCProgram+Builders.swift"; sourceTree = "<group>"; };
+		6B858C31229EF3A300DE6216 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Traversal.swift"; sourceTree = "<group>"; };
 		6BBD0BFA2292134700EB87A9 /* EnumType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumType.swift; sourceTree = "<group>"; };
 		6BBD0BFE2294D92B00EB87A9 /* Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unification.swift; sourceTree = "<group>"; };
@@ -429,6 +431,7 @@
 			isa = PBXGroup;
 			children = (
 				6B858C2D229EEEAD00DE6216 /* Prelude.logic */,
+				6B858C31229EF3A300DE6216 /* Library.swift */,
 			);
 			path = Language;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */,
 				6BD44E5C228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift in Sources */,
 				6BBD0C022294DA1200EB87A9 /* KeyValueCollection.swift in Sources */,
+				6B858C32229EF3A300DE6216 /* Library.swift in Sources */,
 				6B44E159223B3DD000740318 /* TextStyles.swift in Sources */,
 				6B44E152223B3DD000740318 /* CGSize+Resizing.swift in Sources */,
 				6B44E164223B3E3C00740318 /* ControlledSearchInput.swift in Sources */,
