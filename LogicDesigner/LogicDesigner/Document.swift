@@ -104,15 +104,13 @@ class Document: NSDocument {
 
             let rootNode = self.logicEditor.rootNode
 
-            Swift.print(Compiler.scopeContext(rootNode).namespace)
+            guard case .program(let root) = rootNode else { return [] }
 
-            let baseProgram = StandardLibrary.program
+            let program: LGCSyntaxNode = .program(LGCProgram.join(programs: [StandardLibrary.include, root]))
 
-            let baseScopeContext = Compiler.scopeContext(baseProgram)
-            let baseUnificationContext = baseProgram.makeUnificationContext(scopeContext: baseScopeContext)
 
-            let scopeContext = Compiler.scopeContext(rootNode, initialContext: baseScopeContext)
-            let unificationContext = rootNode.makeUnificationContext(scopeContext: scopeContext, initialContext: baseUnificationContext)
+            let scopeContext = Compiler.scopeContext(program)
+            let unificationContext = program.makeUnificationContext(scopeContext: scopeContext)
 
             Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
@@ -123,22 +121,14 @@ class Document: NSDocument {
 
             Swift.print("Substitution", substitution)
 
-            let currentBaseScopeContext = Compiler.scopeContext(baseProgram)
-            let currentScopeContext = Compiler.scopeContext(rootNode, targetId: node.uuid, initialContext: currentBaseScopeContext)
+            let currentScopeContext = Compiler.scopeContext(program, targetId: node.uuid)
 
             Swift.print("Current scope", currentScopeContext.namesInScope)
 
             switch node {
             case .typeAnnotation:
                 return currentScopeContext.patternToTypeName.map { key, value in
-                    let node = rootNode.pathTo(id: key)?.last(where: { item in
-                        switch item {
-                        case .declaration:
-                            return true
-                        default:
-                            return false
-                        }
-                    }) ?? baseProgram.pathTo(id: key)?.last(where: { item in
+                    let node = program.pathTo(id: key)?.last(where: { item in
                         switch item {
                         case .declaration:
                             return true
@@ -341,7 +331,7 @@ class Document: NSDocument {
                     return (identifiers + namespaceIdentifiers + literals + common).titleContains(prefix: query)
                 }
             default:
-                return LogicEditor.defaultSuggestionsForNode(node, self.logicEditor.rootNode, query)
+                return LogicEditor.defaultSuggestionsForNode(node, program, query)
             }
         }
 
