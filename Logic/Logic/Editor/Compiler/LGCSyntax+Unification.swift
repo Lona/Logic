@@ -244,6 +244,10 @@ extension LGCSyntaxNode {
                 result.nodes[node.uuid] = .cons(name: "String")
 
                 return result
+            case (true, .literal(.color)):
+                result.nodes[node.uuid] = .cons(name: "CSSColor")
+
+                return result
             default:
                 break
             }

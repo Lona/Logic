@@ -132,6 +132,19 @@ public extension LGCLiteral {
             )
         }
 
+        public static func color(for prefix: String) -> LogicSuggestionItem {
+            let color = NSColor.parse(css: prefix)
+
+            return LogicSuggestionItem(
+                title: "Color",
+                badge: "CSSColor",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(.color(id: UUID(), value: prefix)),
+                disabled: color == nil,
+                style: color == nil ? .normal : .colorPreview(code: prefix, color ?? NSColor.black)
+            )
+        }
+
         public static let categoryTitle = "Literals".uppercased()
     }
 

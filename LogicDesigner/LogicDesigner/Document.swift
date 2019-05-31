@@ -77,8 +77,8 @@ class Document: NSDocument {
             }
 
             switch node {
-            case .literal(.color(id: _, value: _)):
-                return .color(.red)
+            case .literal(.color(id: _, value: let color)):
+                return .color(NSColor.parse(css: color) ?? NSColor.black)
             case .identifier(let identifier) where identifier.string.starts(with: "TextStyles."):
                 return .character(TextStyle(size: 18, color: .purple).apply(to: "S"), .purple)
             default:
@@ -96,17 +96,23 @@ class Document: NSDocument {
                     LGCLiteral.Suggestion.false
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-                return literals
+                return literals.titleContains(prefix: query)
             case .cons(name: "Number", parameters: []):
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.rationalNumber(for: query)
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-                return literals
+                return literals.titleContains(prefix: query)
             case .cons(name: "String", parameters: []):
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.string(for: query)
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                return literals.titleContains(prefix: query)
+            case .cons(name: "CSSColor", parameters: []):
+                let literals: [LogicSuggestionItem] = [
+                    LGCLiteral.Suggestion.color(for: query)
+                ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals
             default:
@@ -342,7 +348,7 @@ class Document: NSDocument {
 
                     let literals = suggestions(for: type, query: query)
 
-                    return (literals + identifiers + namespaceIdentifiers + common).titleContains(prefix: query)
+                    return literals + (identifiers + namespaceIdentifiers + common).titleContains(prefix: query)
                 }
             default:
                 return LogicEditor.defaultSuggestionsForNode(node, program, query)
