@@ -73,6 +73,10 @@
         <Record.Substitution generic="T" instance="Declaration"/>
       </Record.Param>
     </Record>
+    <Record name="importDeclaration">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="name" type="Pattern"/>
+    </Record>
   </Type>
   <Type name="EnumerationCase">
     <Record name="placeholder">

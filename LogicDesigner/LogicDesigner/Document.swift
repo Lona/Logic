@@ -105,10 +105,8 @@ class Document: NSDocument {
             let rootNode = self.logicEditor.rootNode
 
             guard case .program(let root) = rootNode else { return [] }
-            guard case .program(let prelude) = Library.load(name: "Prelude") else { return [] }
 
-            let program: LGCSyntaxNode = .program(LGCProgram.join(programs: [prelude, root]))
-
+            let program: LGCSyntaxNode = .program(root.expandImports())
 
             let scopeContext = Compiler.scopeContext(program)
             let unificationContext = program.makeUnificationContext(scopeContext: scopeContext)

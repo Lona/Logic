@@ -51,6 +51,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
   case namespace(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
   case placeholder(id: UUID)
   case record(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
+  case importDeclaration(id: UUID, name: LGCPattern)
 
   // MARK: Codable
 
@@ -115,6 +116,11 @@ public indirect enum LGCDeclaration: Codable & Equatable {
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
             declarations: try data.decode(LGCList.self, forKey: .declarations))
+      case "importDeclaration":
+        self =
+          .importDeclaration(
+            id: try data.decode(UUID.self, forKey: .id),
+            name: try data.decode(LGCPattern.self, forKey: .name))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -158,6 +164,10 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
         try data.encode(value.declarations, forKey: .declarations)
+      case .importDeclaration(let value):
+        try container.encode("importDeclaration", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.name, forKey: .name)
     }
   }
 }

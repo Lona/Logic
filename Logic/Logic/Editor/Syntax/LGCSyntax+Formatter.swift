@@ -474,6 +474,13 @@ public extension LGCDeclaration {
                     }
                 ]
             }
+        case .importDeclaration(let value):
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Import", .source)),
+                    value.name.formatted
+                ]
+            }
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         }

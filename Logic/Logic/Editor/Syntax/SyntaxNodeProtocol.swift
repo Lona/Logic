@@ -796,6 +796,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return [value.name.node] + value.declarations.map { $0.node }
         case .placeholder:
             return []
+        case .importDeclaration(let value):
+            return [value.name.node]
         }
     }
 
@@ -860,6 +862,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 parameters: value.parameters.delete(id: id),
                 block: value.block.delete(id: id)
             )
+        case .importDeclaration(let value):
+            return .importDeclaration(id: UUID(), name: value.name.delete(id: id))
         case .placeholder:
             return .placeholder(id: UUID())
         }
@@ -906,6 +910,11 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     name: value.name.replace(id: id, with: syntaxNode),
                     declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
+            case .importDeclaration(let value):
+                return .importDeclaration(
+                    id: UUID(),
+                    name: value.name.replace(id: id, with: syntaxNode)
+                )
             case .placeholder:
                 return LGCDeclaration.placeholder(id: UUID())
             }
@@ -923,6 +932,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .record(let value):
             return value.id
         case .namespace(let value):
+            return value.id
+        case .importDeclaration(let value):
             return value.id
         case .placeholder(let value):
             return value

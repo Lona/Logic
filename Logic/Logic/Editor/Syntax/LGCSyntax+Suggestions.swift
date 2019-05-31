@@ -679,6 +679,19 @@ public extension LGCDeclaration {
             )
         }
 
+        static var `import`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Import",
+                category: categoryTitle,
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.importDeclaration(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "Name")
+                    )
+                )
+            )
+        }
+
         static let categoryTitle = "Declarations".uppercased()
     }
 
@@ -690,7 +703,8 @@ public extension LGCDeclaration {
             Suggestion.record,
             Suggestion.namespace,
             Suggestion.genericFunction,
-            Suggestion.genericEnum
+            Suggestion.genericEnum,
+            Suggestion.import
         ]
 
         return items.titleContains(prefix: prefix)

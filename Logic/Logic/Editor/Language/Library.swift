@@ -11,7 +11,7 @@ import Foundation
 public enum Library {
     private static var cache: [String: LGCSyntaxNode] = [:]
 
-    public static func load(name: String) -> LGCSyntaxNode {
+    public static func load(name: String) -> LGCSyntaxNode? {
         if let cached = cache[name] {
             return cached
         }
@@ -22,7 +22,7 @@ public enum Library {
             let libraryScript = try? Data(contentsOf: libraryUrl),
             let decoded = try? JSONDecoder().decode(LGCSyntaxNode.self, from: libraryScript)
         else {
-            fatalError("Failed to load library: \(name)")
+            return nil
         }
 
         cache[name] = decoded
