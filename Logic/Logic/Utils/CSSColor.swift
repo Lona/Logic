@@ -192,8 +192,8 @@ func parseCSSColor(_ css_str: String) -> CSSColor? {
         return nil
     }
 
-    let op = str.index(of: "(")
-    let ep = str.index(of: ")")
+    let op = str.firstIndex(of: "(")
+    let ep = str.firstIndex(of: ")")
 
     if let op = op, ep == str.index(before: str.endIndex), let ep = ep {
         let fname = String(str[..<op])
