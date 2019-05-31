@@ -426,6 +426,7 @@
 				6B858C26229DB29900DE6216 /* Compiler+ScopeContext.swift */,
 				6B858C2A229DB35B00DE6216 /* LGCSyntax+Unification.swift */,
 				6B858C28229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift */,
+				6B9528D222A0B35B0094D9C7 /* LGCProgram+Imports.swift */,
 				6B858C20229DB13A00DE6216 /* ScopeStack.swift */,
 				6BBD0BFE2294D92B00EB87A9 /* Unification.swift */,
 			);
@@ -437,7 +438,6 @@
 			children = (
 				6B858C2D229EEEAD00DE6216 /* Prelude.logic */,
 				6B858C31229EF3A300DE6216 /* Library.swift */,
-				6B9528D222A0B35B0094D9C7 /* LGCProgram+Imports.swift */,
 			);
 			path = Language;
 			sourceTree = "<group>";
