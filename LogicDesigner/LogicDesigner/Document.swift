@@ -13,6 +13,20 @@ class Document: NSDocument {
 
     override init() {
         super.init()
+
+        logicEditor.rootNode = .program(
+            .init(
+                id: UUID(),
+                block: .init(
+                    [
+                        .declaration(id: UUID(), content:
+                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
+                        ),
+                        .makePlaceholder()
+                    ]
+                )
+            )
+        )
     }
 
     override class var autosavesInPlace: Bool {
@@ -46,20 +60,6 @@ class Document: NSDocument {
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
         logicEditor.showsDropdown = true
-
-        logicEditor.rootNode = .program(
-            .init(
-                id: UUID(),
-                block: .init(
-                    [
-                        .declaration(id: UUID(), content:
-                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
-                        ),
-                        .makePlaceholder()
-                    ]
-                )
-            )
-        )
 
 //        logicEditor.rootNode = .topLevelParameters(
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
@@ -130,20 +130,20 @@ class Document: NSDocument {
             let program: LGCSyntaxNode = .program(root.expandImports())
 
             let scopeContext = Compiler.scopeContext(program)
-            let unificationContext = program.makeUnificationContext(scopeContext: scopeContext)
+            let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
 
-            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
+//            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
 
             guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
                 Swift.print("Unification failed", Unification.unify(constraints: unificationContext.constraints))
                 return []
             }
 
-            Swift.print("Substitution", substitution)
+//            Swift.print("Substitution", substitution)
 
             let currentScopeContext = Compiler.scopeContext(program, targetId: node.uuid)
 
-            Swift.print("Current scope", currentScopeContext.namesInScope)
+//            Swift.print("Current scope", currentScopeContext.namesInScope)
 
             switch node {
             case .typeAnnotation:
@@ -206,7 +206,7 @@ class Document: NSDocument {
                     // TODO: Suggestion functions?
                     return []
                 case .evar:
-                    Swift.print("Resolved type: \(type)")
+//                    Swift.print("Resolved type: \(type)")
 
                     let matchingIdentifiers = currentScopeContext.namesInScope
 
@@ -220,7 +220,7 @@ class Document: NSDocument {
 
                     return (literals + identifiers + common).titleContains(prefix: query)
                 case .cons:
-                    Swift.print("Resolved type: \(type)")
+//                    Swift.print("Resolved type: \(type)")
 
                     func validSuggestionType(expressionType: Unification.T, suggestionType: Unification.T) -> Unification.T? {
                         if expressionType == suggestionType {
@@ -259,7 +259,7 @@ class Document: NSDocument {
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print("Resolved type of pattern, \(keyPath.joined(separator: ".")): \(identifierType) == \(resolvedType)")
+//                        Swift.print("Resolved type of pattern, \(keyPath.joined(separator: ".")): \(identifierType) == \(resolvedType)")
 
                         if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
                             return (keyPath, suggestionType)
@@ -268,14 +268,14 @@ class Document: NSDocument {
                         }
                     })
 
-                    Swift.print("Namespace identifiers", matchingNamespaceIdentifiers)
+//                    Swift.print("Namespace identifiers", matchingNamespaceIdentifiers)
 
                     let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> (String, Unification.T)? in
                         guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print("Resolved type of pattern, \(pattern.name): \(identifierType) == \(resolvedType)")
+//                        Swift.print("Resolved type of pattern, \(pattern.name): \(identifierType) == \(resolvedType)")
 
                         if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
                             return (pattern.name, suggestionType)
@@ -284,7 +284,7 @@ class Document: NSDocument {
                         }
                     })
 
-                    Swift.print("Matching ids", matchingIdentifiers)
+//                    Swift.print("Matching ids", matchingIdentifiers)
 
                     let namespaceIdentifiers: [LogicSuggestionItem] = matchingNamespaceIdentifiers.map { (keyPath, resolvedType) in
                         switch resolvedType {
@@ -357,6 +357,35 @@ class Document: NSDocument {
 
         logicEditor.onChangeRootNode = { [unowned self] rootNode in
             self.logicEditor.rootNode = rootNode
+
+            let rootNode = self.logicEditor.rootNode
+
+            guard case .program(let root) = rootNode else { return true }
+
+            let program: LGCSyntaxNode = .program(root.expandImports())
+
+            let scopeContext = Compiler.scopeContext(program)
+            let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
+
+            guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+                return true
+            }
+
+            // TODO: Evaluate program, not just rootNode
+            let result = Compiler.evaluate(rootNode, scopeContext: scopeContext, unificationContext: unificationContext, substitution: substitution, context: .init())
+
+            annotations.removeAll(keepingCapacity: true)
+
+            switch result {
+            case .success(let evaluationContext):
+                Swift.print("Result", evaluationContext.values)
+
+                evaluationContext.values.forEach { id, value in
+                    annotations[id] = "\(value.memory)"
+                }
+            case .failure(let error):
+                Swift.print("Eval failure", error)
+            }
 
             return true
 
