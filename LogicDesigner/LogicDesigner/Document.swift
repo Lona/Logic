@@ -46,6 +46,21 @@ class Document: NSDocument {
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
         logicEditor.showsDropdown = true
+
+        logicEditor.rootNode = .program(
+            .init(
+                id: UUID(),
+                block: .init(
+                    [
+                        .declaration(id: UUID(), content:
+                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
+                        ),
+                        .makePlaceholder()
+                    ]
+                )
+            )
+        )
+
 //        logicEditor.rootNode = .topLevelParameters(
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
 //        )
