@@ -170,6 +170,7 @@ extension Compiler {
         case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
             Swift.print("binary expr", left, right, op)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
+            guard let functionType = unificationContext.nodes[expression.uuid] else { break }
             guard let functionValue = context.values[expression.uuid] else { break }
 
             let args = arguments.map { context.values[$0.expression.uuid] }
@@ -185,14 +186,18 @@ extension Compiler {
 
                     Swift.print(f, "Args", args)
                     context.values[node.uuid] = concat(a: args[0], b: args[1])
-                case .enumInit(let type, _, let patternName):
-                    Swift.print("init enum", type, patternName)
+                case .enumInit(_, _, let patternName):
+                    let resolvedType = Unification.substitute(substitution, in: functionType)
+
+                    guard case .fun(_, let returnType) = resolvedType else { break }
+
+                    Swift.print("init enum", returnType, patternName)
 
                     let filtered = args.compactMap { $0 }
 
                     if filtered.count != args.count { break }
 
-                    context.values[node.uuid] = LogicValue(type, .enumInstance(caseName: patternName, associatedValues: filtered))
+                    context.values[node.uuid] = LogicValue(returnType, .enumInstance(caseName: patternName, associatedValues: filtered))
 
                     break
                 case .recordInit(let type, let members):
