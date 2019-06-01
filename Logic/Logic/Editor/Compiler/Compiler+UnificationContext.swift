@@ -121,6 +121,10 @@ extension Compiler {
                         result.patternTypes[pattern.uuid] = functionType
                     }
                 }
+
+                // Not used for unification, but used for convenience in evaluation
+                result.nodes[functionName.uuid] = returnType
+                result.patternTypes[functionName.uuid] = returnType
             case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: let genericParameters, parameters: let parameters, block: _))):
 
                 let genericNames: [String] = genericParameters.compactMap { param in

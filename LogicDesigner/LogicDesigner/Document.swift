@@ -68,9 +68,14 @@ class Document: NSDocument {
         let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
 
         var annotations: [UUID: String] = [:]
+        var colorValues: [UUID: String] = [:]
 
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
+
+            if let colorValue = colorValues[node.uuid] {
+                return .color(NSColor.parse(css: colorValue) ?? NSColor.black)
+            }
 
             if let annotation = annotations[node.uuid] {
                 return .label(labelFont, annotation)
@@ -372,16 +377,31 @@ class Document: NSDocument {
             }
 
             // TODO: Evaluate program, not just rootNode
-            let result = Compiler.evaluate(rootNode, scopeContext: scopeContext, unificationContext: unificationContext, substitution: substitution, context: .init())
+            let result = Compiler.evaluate(program, rootNode: program, scopeContext: scopeContext, unificationContext: unificationContext, substitution: substitution, context: .init())
 
             annotations.removeAll(keepingCapacity: true)
+            colorValues.removeAll(keepingCapacity: true)
 
             switch result {
             case .success(let evaluationContext):
                 Swift.print("Result", evaluationContext.values)
 
                 evaluationContext.values.forEach { id, value in
-                    annotations[id] = "\(value.memory)"
+//                    annotations[id] = "\(value.memory)"
+
+//                    Swift.print(id, value.type, value.memory)
+
+                    if value.type == .cons(name: "CSSColor"), let value = value.memory.anyValue as? String {
+                        colorValues[id] = value
+                    }
+
+                    if value.type == .cons(name: "Color"), case .enumInstance(let caseName, let values) = value.memory {
+                        if caseName == "custom", let value = values.first?.memory.anyValue as? String {
+                            colorValues[id] = value
+                        } else if caseName == "system", let value = values.dropFirst().first?.memory.anyValue as? String {
+                            colorValues[id] = value
+                        }
+                    }
                 }
             case .failure(let error):
                 Swift.print("Eval failure", error)
