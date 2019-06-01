@@ -170,7 +170,13 @@ extension Compiler {
         case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
             Swift.print("binary expr", left, right, op)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
+
+            // Determine type based on return value of constructor function
             guard let functionType = unificationContext.nodes[expression.uuid] else { break }
+            let resolvedType = Unification.substitute(substitution, in: functionType)
+            guard case .fun(_, let returnType) = resolvedType else { break }
+
+            // The function value to call
             guard let functionValue = context.values[expression.uuid] else { break }
 
             let args = arguments.map { context.values[$0.expression.uuid] }
@@ -187,9 +193,6 @@ extension Compiler {
                     Swift.print(f, "Args", args)
                     context.values[node.uuid] = concat(a: args[0], b: args[1])
                 case .enumInit(_, _, let patternName):
-                    let resolvedType = Unification.substitute(substitution, in: functionType)
-
-                    guard case .fun(_, let returnType) = resolvedType else { break }
 
                     Swift.print("init enum", returnType, patternName)
 
@@ -200,12 +203,12 @@ extension Compiler {
                     context.values[node.uuid] = LogicValue(returnType, .enumInstance(caseName: patternName, associatedValues: filtered))
 
                     break
-                case .recordInit(let type, let members):
+                case .recordInit(_, let members):
                     let values: [(String, LogicValue?)] = zip(members, args).map { pair, arg in
                         return (pair.0, arg)
                     }
 
-                    context.values[node.uuid] = LogicValue(type, .recordInstance(values: KeyValueList(values)))
+                    context.values[node.uuid] = LogicValue(returnType, .recordInstance(values: KeyValueList(values)))
                     break
                 }
             }
