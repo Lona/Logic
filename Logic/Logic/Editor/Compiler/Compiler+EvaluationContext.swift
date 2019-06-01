@@ -11,8 +11,8 @@ import Foundation
 extension Compiler {
     enum Function {
         case stringConcat
-        case enumInit(enumType: Unification.T, constructorType: Unification.T, caseName: String)
-        case recordInit(type: Unification.T, members: KeyValueList<String, Unification.T>)
+        case enumInit(caseName: String)
+        case recordInit(members: KeyValueList<String, Unification.T>)
     }
 
     public indirect enum Memory: CustomDebugStringConvertible {
@@ -133,7 +133,8 @@ extension Compiler {
         case .literal(.string(id: _, value: let value)):
             context.values[node.uuid] = LogicValue(.cons(name: "String"), .any(value))
         case .literal(.color(id: _, value: let value)):
-            context.values[node.uuid] = LogicValue(.cons(name: "CSSColor"), .any(value))
+            let cssValue: Memory = .recordInstance(values: ["value": .init(.cons(name: "String"), .any(value))])
+            context.values[node.uuid] = LogicValue(.cons(name: "CSSColor"), cssValue)
         case .expression(.literalExpression(id: _, literal: let literal)):
             if let value = context.values[literal.uuid] {
                 context.values[node.uuid] = value
@@ -192,7 +193,7 @@ extension Compiler {
 
                     Swift.print(f, "Args", args)
                     context.values[node.uuid] = concat(a: args[0], b: args[1])
-                case .enumInit(_, _, let patternName):
+                case .enumInit(let patternName):
 
                     Swift.print("init enum", returnType, patternName)
 
@@ -203,7 +204,7 @@ extension Compiler {
                     context.values[node.uuid] = LogicValue(returnType, .enumInstance(caseName: patternName, associatedValues: filtered))
 
                     break
-                case .recordInit(_, let members):
+                case .recordInit(let members):
                     let values: [(String, LogicValue?)] = zip(members, args).map { pair, arg in
                         return (pair.0, arg)
                     }
@@ -237,7 +238,7 @@ extension Compiler {
 
             declarations.forEach { declaration in
                 switch declaration {
-                case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _):
+                case .variable(id: _, name: let pattern, annotation: _, initializer: _):
                     guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
 
                     parameterTypes.set(parameterType, for: pattern.name)
@@ -246,11 +247,9 @@ extension Compiler {
                 }
             }
 
-            context.values[functionName.uuid] = Compiler.LogicValue(type, .any(Function.recordInit(type: resolvedType, members: parameterTypes)))
+            context.values[functionName.uuid] = Compiler.LogicValue(resolvedType, .any(Function.recordInit(members: parameterTypes)))
         case .declaration(.enumeration(id: _, name: let functionName, genericParameters: _, cases: let enumCases)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
-
-            let resolvedType = Unification.substitute(substitution, in: type)
 
             enumCases.forEach { enumCase in
                 switch enumCase {
@@ -263,7 +262,7 @@ extension Compiler {
 
                     Swift.print("enum case", pattern, resolvedConsType)
 
-                    context.values[pattern.uuid] = Compiler.LogicValue(consType, .any(Function.enumInit(enumType: resolvedType, constructorType: resolvedConsType, caseName: pattern.name)))
+                    context.values[pattern.uuid] = Compiler.LogicValue(consType, .any(Function.enumInit(caseName: pattern.name)))
                 }
             }
         default:
