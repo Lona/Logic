@@ -9,6 +9,8 @@
 import Foundation
 
 public enum Library {
+    public typealias Loader = (String) -> LGCSyntaxNode?
+
     private static var cache: [String: LGCSyntaxNode] = [:]
 
     public static func load(name: String) -> LGCSyntaxNode? {
@@ -28,5 +30,9 @@ public enum Library {
         cache[name] = decoded
 
         return decoded
+    }
+
+    public static func clearCache() {
+        cache.removeAll()
     }
 }

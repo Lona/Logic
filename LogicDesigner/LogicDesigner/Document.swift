@@ -132,7 +132,7 @@ class Document: NSDocument {
 
             guard case .program(let root) = rootNode else { return [] }
 
-            let program: LGCSyntaxNode = .program(root.expandImports())
+            let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
             let scopeContext = Compiler.scopeContext(program)
             let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
@@ -367,7 +367,7 @@ class Document: NSDocument {
 
             guard case .program(let root) = rootNode else { return true }
 
-            let program: LGCSyntaxNode = .program(root.expandImports())
+            let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
             let scopeContext = Compiler.scopeContext(program)
             let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
@@ -391,28 +391,8 @@ class Document: NSDocument {
 
                     Swift.print(id, value.type, value.memory)
 
-                    func getColorStringFromCSSColor(value: Compiler.LogicValue) -> String? {
-                        guard value.type == .cons(name: "CSSColor") else { return nil }
-                        guard case .record(let members) = value.memory else { return nil }
-                        guard let colorValue = members["value"] else { return nil }
-                        guard case .string(let stringValue)? = colorValue?.memory else { return nil }
-                        return stringValue
-                    }
-
-                    if let colorString = getColorStringFromCSSColor(value: value) {
+                    if let colorString = value.colorString {
                         colorValues[id] = colorString
-                    }
-
-                    if value.type == .cons(name: "Color"), case .enum(let caseName, let values) = value.memory {
-                        if caseName == "custom", let value = values.first {
-                            if let colorString = getColorStringFromCSSColor(value: value) {
-                                colorValues[id] = colorString
-                            }
-                        } else if caseName == "system", let value = values.dropFirst().first {
-                            if let colorString = getColorStringFromCSSColor(value: value) {
-                                colorValues[id] = colorString
-                            }
-                        }
                     }
                 }
             case .failure(let error):

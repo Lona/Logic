@@ -9,57 +9,6 @@
 import Foundation
 
 extension Compiler {
-    public enum Function {
-        case stringConcat
-        case enumInit(caseName: String)
-        case recordInit(members: KeyValueList<String, Unification.T>)
-    }
-
-    public indirect enum Memory: CustomDebugStringConvertible {
-        case unit
-        case bool(Bool)
-        case number(CGFloat)
-        case string(String)
-        case `enum`(caseName: String, associatedValues: [LogicValue])
-        case record(values: KeyValueList<String, LogicValue?>)
-        case function(Function)
-
-        public var debugDescription: String {
-            switch self {
-            case .unit:
-                return "unit"
-            case .bool(let value):
-                return "\(value)"
-            case .number(let value):
-                return "\(value)"
-            case .string(let value):
-                return "\(value)"
-            case .enum(let caseName, let values):
-                return ".\(caseName)(\(values.map { "\($0)" }.joined(separator: ", ")))"
-            case .record(let values):
-                return "\(values)"
-            case .function(let function):
-                return "\(function)"
-            }
-        }
-    }
-
-    public struct LogicValue: CustomDebugStringConvertible {
-        public var debugDescription: String {
-            return "\(memory)"
-        }
-
-        public let type: Unification.T
-        public let memory: Memory
-
-        public init(_ type: Unification.T, _ memory: Memory) {
-            self.type = type
-            self.memory = memory
-        }
-
-        static let unit = LogicValue(.cons(name: "Void"), .unit)
-    }
-
     public class EvaluationContext {
         public init(values: [UUID: LogicValue] = [:]) {
             self.values = values
@@ -136,7 +85,7 @@ extension Compiler {
         case .literal(.string(id: _, value: let value)):
             context.values[node.uuid] = LogicValue(.cons(name: "String"), .string(value))
         case .literal(.color(id: _, value: let value)):
-            let cssValue: Memory = .record(values: ["value": .init(.cons(name: "String"), .string(value))])
+            let cssValue: LogicValue.Memory = .record(values: ["value": .init(.cons(name: "String"), .string(value))])
             context.values[node.uuid] = LogicValue(.cons(name: "CSSColor"), cssValue)
         case .expression(.literalExpression(id: _, literal: let literal)):
             if let value = context.values[literal.uuid] {
@@ -227,7 +176,7 @@ extension Compiler {
 
             switch fullPath {
             case ["String", "concat"]:
-                context.values[pattern.uuid] = Compiler.LogicValue(type, .function(Function.stringConcat))
+                context.values[pattern.uuid] = LogicValue(type, .function(.stringConcat))
                 break
             default:
                 break
@@ -250,7 +199,7 @@ extension Compiler {
                 }
             }
 
-            context.values[functionName.uuid] = Compiler.LogicValue(resolvedType, .function(Function.recordInit(members: parameterTypes)))
+            context.values[functionName.uuid] = LogicValue(resolvedType, .function(.recordInit(members: parameterTypes)))
         case .declaration(.enumeration(id: _, name: let functionName, genericParameters: _, cases: let enumCases)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
@@ -265,7 +214,7 @@ extension Compiler {
 
                     Swift.print("enum case", pattern, resolvedConsType)
 
-                    context.values[pattern.uuid] = Compiler.LogicValue(consType, .function(Function.enumInit(caseName: pattern.name)))
+                    context.values[pattern.uuid] = LogicValue(consType, .function(.enumInit(caseName: pattern.name)))
                 }
             }
         default:

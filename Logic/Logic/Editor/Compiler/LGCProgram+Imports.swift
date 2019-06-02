@@ -9,11 +9,14 @@
 import Foundation
 
 public extension LGCProgram {
-    func expandImports() -> LGCProgram {
-        return expandImports(existingImports: .init()).program
+    func expandImports(importLoader: Library.Loader) -> LGCProgram {
+        return expandImports(existingImports: .init(), importLoader: importLoader).program
     }
 
-    func expandImports(existingImports: Set<String>) -> (program: LGCProgram, imports: Set<String>) {
+    func expandImports(
+        existingImports: Set<String>,
+        importLoader: Library.Loader
+        ) -> (program: LGCProgram, imports: Set<String>) {
         var imports = existingImports
         var statements: [LGCStatement] = []
 
@@ -24,12 +27,19 @@ public extension LGCProgram {
 
                 if imports.contains(libraryName) { return }
 
-                guard let library = Library.load(name: libraryName) else { return }
-                guard case .program(let libraryProgram) = library else { return }
+                guard let library = importLoader(libraryName) else {
+                    Swift.print("Failed to import `\(libraryName)`")
+                    return
+                }
+
+                guard case .program(let libraryProgram) = library else {
+                    Swift.print("Cannot import non-program file `\(libraryName)`")
+                    return
+                }
 
                 imports.insert(libraryName)
 
-                let expanded = libraryProgram.expandImports(existingImports: imports)
+                let expanded = libraryProgram.expandImports(existingImports: imports, importLoader: importLoader)
 
                 imports = expanded.imports
                 statements.append(contentsOf: expanded.program.block)
