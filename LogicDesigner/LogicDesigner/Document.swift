@@ -393,16 +393,17 @@ class Document: NSDocument {
 
                     func getColorStringFromCSSColor(value: Compiler.LogicValue) -> String? {
                         guard value.type == .cons(name: "CSSColor") else { return nil }
-                        guard case .recordInstance(let members) = value.memory else { return nil }
+                        guard case .record(let members) = value.memory else { return nil }
                         guard let colorValue = members["value"] else { return nil }
-                        return colorValue?.memory.anyValue as? String
+                        guard case .string(let stringValue)? = colorValue?.memory else { return nil }
+                        return stringValue
                     }
 
                     if let colorString = getColorStringFromCSSColor(value: value) {
                         colorValues[id] = colorString
                     }
 
-                    if value.type == .cons(name: "Color"), case .enumInstance(let caseName, let values) = value.memory {
+                    if value.type == .cons(name: "Color"), case .enum(let caseName, let values) = value.memory {
                         if caseName == "custom", let value = values.first {
                             if let colorString = getColorStringFromCSSColor(value: value) {
                                 colorValues[id] = colorString
