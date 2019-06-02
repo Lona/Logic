@@ -79,14 +79,14 @@ extension Compiler {
         // Post
         switch node {
         case .literal(.boolean(id: _, value: let value)):
-            context.values[node.uuid] = LogicValue(.cons(name: "Boolean"), .bool(value))
+            context.values[node.uuid] = .bool(value)
         case .literal(.number(id: _, value: let value)):
-            context.values[node.uuid] = LogicValue(.cons(name: "Number"), .number(value))
+            context.values[node.uuid] = .number(value)
         case .literal(.string(id: _, value: let value)):
-            context.values[node.uuid] = LogicValue(.cons(name: "String"), .string(value))
+            context.values[node.uuid] = .string(value)
         case .literal(.color(id: _, value: let value)):
-            let cssValue: LogicValue.Memory = .record(values: ["value": .init(.cons(name: "String"), .string(value))])
-            context.values[node.uuid] = LogicValue(.cons(name: "CSSColor"), cssValue)
+            let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
+            context.values[node.uuid] = LogicValue(.cssColor, cssValue)
         case .expression(.literalExpression(id: _, literal: let literal)):
             if let value = context.values[literal.uuid] {
                 context.values[node.uuid] = value

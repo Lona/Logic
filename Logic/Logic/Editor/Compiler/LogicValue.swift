@@ -62,8 +62,4 @@ public struct LogicValue: CustomDebugStringConvertible {
     public var debugDescription: String {
         return "\(memory)"
     }
-
-    // MARK: Static
-
-    static let unit = LogicValue(.cons(name: "Void"), .unit)
 }

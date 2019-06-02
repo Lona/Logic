@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		6B10AC1C22A45FD00043E46A /* LogicValue+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1B22A45FD00043E46A /* LogicValue+Color.swift */; };
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
+		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
+		6B10AC2222A462630043E46A /* LogicValue+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC2122A462630043E46A /* LogicValue+Core.swift */; };
 		6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34148C225417F800CC65D1 /* JavaScript.swift */; };
 		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
@@ -98,6 +100,8 @@
 /* Begin PBXFileReference section */
 		6B10AC1B22A45FD00043E46A /* LogicValue+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+Color.swift"; sourceTree = "<group>"; };
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
+		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
+		6B10AC2122A462630043E46A /* LogicValue+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+Core.swift"; sourceTree = "<group>"; };
 		6B34148C225417F800CC65D1 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
 		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
@@ -447,6 +451,8 @@
 				6B858C2D229EEEAD00DE6216 /* Prelude.logic */,
 				6B858C31229EF3A300DE6216 /* Library.swift */,
 				6B10AC1B22A45FD00043E46A /* LogicValue+Color.swift */,
+				6B10AC2122A462630043E46A /* LogicValue+Core.swift */,
+				6B10AC1F22A461B90043E46A /* Unification+Core.swift */,
 			);
 			path = Language;
 			sourceTree = "<group>";
@@ -569,6 +575,7 @@
 				6B44E153223B3DD000740318 /* Colors.swift in Sources */,
 				6B44E192223C0F6000740318 /* SuggestionListItem.swift in Sources */,
 				6B9528D322A0B35B0094D9C7 /* LGCProgram+Imports.swift in Sources */,
+				6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */,
 				6B5B7562215B1ABE00CDC9C6 /* TypeCase.swift in Sources */,
 				6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */,
 				6B44E16B223B3E9E00740318 /* SuggestionListView.swift in Sources */,
@@ -599,6 +606,7 @@
 				6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */,
 				6BBD0C0F2298759F00EB87A9 /* LGCExpression+Builders.swift in Sources */,
 				6B9528D822A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift in Sources */,
+				6B10AC2222A462630043E46A /* LogicValue+Core.swift in Sources */,
 				6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */,
 				6BD44E5C228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift in Sources */,
 				6BBD0C022294DA1200EB87A9 /* KeyValueCollection.swift in Sources */,

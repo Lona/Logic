@@ -11,7 +11,7 @@ import Foundation
 extension LogicValue {
     public var colorString: String? {
         func getColorStringFromCSSColor(value: LogicValue) -> String? {
-            guard value.type == .cons(name: "CSSColor") else { return nil }
+            guard value.type == .cssColor else { return nil }
             guard case .record(let members) = value.memory else { return nil }
             guard let colorValue = members["value"] else { return nil }
             guard case .string(let stringValue)? = colorValue?.memory else { return nil }
@@ -22,7 +22,7 @@ extension LogicValue {
             return colorString
         }
 
-        if self.type == .cons(name: "Color"), case .enum(let caseName, let values) = self.memory {
+        if self.type == .color, case .enum(let caseName, let values) = self.memory {
             if caseName == "custom", let value = values.first {
                 if let colorString = getColorStringFromCSSColor(value: value) {
                     return colorString
