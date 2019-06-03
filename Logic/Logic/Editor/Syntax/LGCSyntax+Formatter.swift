@@ -52,6 +52,18 @@ public extension LGCLiteral {
             return .element(LogicElement.dropdown(value.id, "\"" + value.value + "\"", .variable))
         case .color(let value):
             return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
+        case .array(let value):
+            return .concat {
+                [
+                    .element(.text("[")),
+                    .indent {
+                        .join(with: .concat {[.element(.text(",")), .line]}) {
+                            value.value.map { $0.formatted }
+                        }
+                    },
+                    .element(.text("]")),
+                ]
+            }
         }
     }
 }

@@ -815,6 +815,7 @@ public indirect enum LGCLiteral: Codable & Equatable {
   case number(id: UUID, value: CGFloat)
   case string(id: UUID, value: String)
   case color(id: UUID, value: String)
+  case array(id: UUID, value: LGCList<LGCExpression>)
 
   // MARK: Codable
 
@@ -845,6 +846,8 @@ public indirect enum LGCLiteral: Codable & Equatable {
         self = .string(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(String.self, forKey: .value))
       case "color":
         self = .color(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(String.self, forKey: .value))
+      case "array":
+        self = .array(id: try data.decode(UUID.self, forKey: .id), value: try data.decode(LGCList.self, forKey: .value))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -872,6 +875,10 @@ public indirect enum LGCLiteral: Codable & Equatable {
         try data.encode(value.value, forKey: .value)
       case .color(let value):
         try container.encode("color", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.value, forKey: .value)
+      case .array(let value):
+        try container.encode("array", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.value, forKey: .value)
     }

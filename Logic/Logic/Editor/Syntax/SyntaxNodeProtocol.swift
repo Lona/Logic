@@ -219,7 +219,12 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
 
 extension LGCLiteral: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
-        return []
+        switch self {
+        case .array(let value):
+            return value.value.map { $0.node }
+        case .none, .boolean, .color, .number, .string:
+            return []
+        }
     }
 
     public var nodeTypeDescription: String {
@@ -256,6 +261,11 @@ extension LGCLiteral: SyntaxNodeProtocol {
                     id: UUID(),
                     value: value.value
                 )
+            case .array(let value):
+                return LGCLiteral.array(
+                    id: UUID(),
+                    value: value.value
+                )
             case .none:
                 return LGCLiteral.none(id: UUID())
             }
@@ -271,6 +281,8 @@ extension LGCLiteral: SyntaxNodeProtocol {
         case .string(let value):
             return value.id
         case .color(let value):
+            return value.id
+        case .array(let value):
             return value.id
         case .none(let value):
             return value

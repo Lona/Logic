@@ -298,6 +298,12 @@
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="value" type="String"/>
     </Record>
+    <Record name="array">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="value" type="List">
+        <Record.Substitution generic="T" instance="Expression"/>
+      </Record.Param>
+    </Record>
   </Type>
   <Type name="TopLevelParameters">
     <Record name="topLevelParameters">
