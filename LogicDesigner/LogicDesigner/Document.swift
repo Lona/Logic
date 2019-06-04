@@ -120,7 +120,7 @@ class Document: NSDocument {
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals
-            case .cons(name: "Array", parameters: let parameters):
+            case .cons(name: "Array", _):
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.array(for: query)
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
