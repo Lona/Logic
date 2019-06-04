@@ -69,6 +69,9 @@
     <Record name="record">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="name" type="Pattern"/>
+      <Record.Param name="genericParameters" type="List">
+        <Record.Substitution generic="T" instance="GenericParameter"/>
+      </Record.Param>
       <Record.Param name="declarations" type="List">
         <Record.Substitution generic="T" instance="Declaration"/>
       </Record.Param>
@@ -154,6 +157,9 @@
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="expression" type="Expression"/>
       <Record.Param name="memberName" type="Identifier"/>
+    </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
     </Record>
   </Type>
   <Type name="Statement">

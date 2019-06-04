@@ -55,7 +55,7 @@ public extension LGCLiteral {
         case .array(let value):
             return .concat {
                 [
-                    .element(.text("[")),
+                    .element(.dropdown(value.id, "[", .variable)),
                     .indent {
                         .join(with: .concat {[.element(.text(",")), .line]}) {
                             value.value.map { $0.formatted }
@@ -263,6 +263,8 @@ public extension LGCExpression {
             let joined = value.memberName.formatted
 
             return .element(.dropdown(value.id, joined.stringContents, .variable))
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
         }
     }
 }
@@ -311,7 +313,8 @@ public extension LGCDeclaration {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
             case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _),
-                 .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _):
+                 .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _),
+                 .record(id: _, name: _, genericParameters: let genericParameters, declarations: _):
                 if genericParameters.isEmpty {
                     return .concat { [] }
                 } else {
@@ -325,7 +328,7 @@ public extension LGCDeclaration {
                         ]
                     }
                 }
-            case .variable, .namespace, .placeholder:
+            case .variable, .namespace, .placeholder, .importDeclaration:
                 fatalError("TODO")
             }
         }
@@ -452,10 +455,8 @@ public extension LGCDeclaration {
                 ]
             }
         case .record(let value):
-            return .concat {
+            let contents: FormatterCommand<LogicElement> = .concat {
                 [
-                    .element(LogicElement.dropdown(value.id, "Record", .source)),
-                    value.name.formatted,
                     .element(.text("with properties:")),
                     .indent {
                         .concat {
@@ -467,6 +468,22 @@ public extension LGCDeclaration {
                             ]
                         }
                     }
+                ]
+            }
+
+            return .concat {
+                [
+                    .element(LogicElement.dropdown(value.id, "Record", .source)),
+                    value.name.formatted,
+                    (value.genericParameters.isEmpty ? contents : .indent {
+                        .concat {
+                            [
+                                genericParameters(),
+                                .hardLine,
+                                contents
+                            ]
+                        }
+                    })
                 ]
             }
         case .namespace(let value):

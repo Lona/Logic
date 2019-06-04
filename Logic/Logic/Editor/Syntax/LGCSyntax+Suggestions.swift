@@ -132,6 +132,20 @@ public extension LGCLiteral {
             )
         }
 
+        public static func array(for prefix: String) -> LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Array",
+                badge: "Array",
+                category: categoryTitle,
+                node: LGCSyntaxNode.literal(
+                    .array(
+                        id: UUID(),
+                        value: .next(.makePlaceholder(), .empty)
+                    )
+                )
+            )
+        }
+
         public static func color(for prefix: String) -> LogicSuggestionItem {
             let color = NSColor.parse(css: prefix)
 
@@ -672,6 +686,22 @@ public extension LGCDeclaration {
                     LGCDeclaration.record(
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
+                        genericParameters: .next(.makePlaceholder(), .empty),
+                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                    )
+                )
+            )
+        }
+
+        static var genericRecord: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Generic Record",
+                category: "GENERIC \(categoryTitle)",
+                node: LGCSyntaxNode.declaration(
+                    LGCDeclaration.record(
+                        id: UUID(),
+                        name: LGCPattern(id: UUID(), name: "name"),
+                        genericParameters: .next(.makePlaceholder(), .empty),
                         declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
                     )
                 )
@@ -717,6 +747,7 @@ public extension LGCDeclaration {
             Suggestion.namespace,
             Suggestion.genericFunction,
             Suggestion.genericEnum,
+            Suggestion.genericRecord,
             Suggestion.import
         ]
 

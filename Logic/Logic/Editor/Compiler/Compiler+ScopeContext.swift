@@ -128,14 +128,25 @@ public extension Compiler {
                 context.patternNames = context.patternNames.pop()
 
                 return context
-            case (false, .declaration(.record(id: _, name: let pattern, declarations: _))):
+            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: let genericParameters, declarations: _))):
                 context.patternToTypeName[pattern.id] = pattern.name
+
+                genericParameters.forEach { param in
+                    switch param {
+                    case .placeholder:
+                        break
+                    case .parameter(id: _, name: let paramName):
+                        context.patternToTypeName[paramName.id] = paramName.name
+                    }
+                }
 
                 // We don't want to introduce the record's member variables into scope
                 config.ignoreChildren = true
 
                 return context
-            case (true, .declaration(.record(id: _, name: let pattern, declarations: _))):
+            case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _))):
+                // TODO: Ignore array here?
+
                 // Built-ins should be constructed using literals
                 if ["Boolean", "Number", "String"].contains(pattern.name) { return context }
 

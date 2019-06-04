@@ -264,7 +264,7 @@ extension LGCLiteral: SyntaxNodeProtocol {
             case .array(let value):
                 return LGCLiteral.array(
                     id: UUID(),
-                    value: value.value
+                    value: value.value.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
             case .none:
                 return LGCLiteral.none(id: UUID())
@@ -612,6 +612,8 @@ extension LGCExpression: SyntaxNodeProtocol {
             return [value.literal.node]
         case .memberExpression(let value):
             return [value.expression.node, value.memberName.node]
+        case .placeholder:
+            return []
         }
     }
 
@@ -659,6 +661,8 @@ extension LGCExpression: SyntaxNodeProtocol {
                 expression: value.expression.replace(id: id, with: syntaxNode),
                 memberName: value.memberName.replace(id: id, with: syntaxNode)
             )
+        case (_, .placeholder):
+            return .makePlaceholder()
         }
     }
 
@@ -674,6 +678,8 @@ extension LGCExpression: SyntaxNodeProtocol {
             return value.id
         case .memberExpression(let value):
             return value.id
+        case .placeholder(let value):
+            return value
         }
     }
 
@@ -688,6 +694,8 @@ extension LGCExpression: SyntaxNodeProtocol {
         case .literalExpression:
             return .next
         case .memberExpression:
+            return .next
+        case .placeholder:
             return .next
         }
     }
@@ -803,7 +811,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         case .enumeration(let value):
             return [value.name.node] + value.genericParameters.map { $0.node } + value.cases.map { $0.node }
         case .record(let value):
-            return [value.name.node] + value.declarations.map { $0.node }
+            return [value.name.node] + value.genericParameters.map { $0.node } + value.declarations.map { $0.node }
         case .namespace(let value):
             return [value.name.node] + value.declarations.map { $0.node }
         case .placeholder:
@@ -843,6 +851,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return .record(
                 id: UUID(),
                 name: value.name.delete(id: id),
+                genericParameters: value.genericParameters.delete(id: id),
                 declarations: LGCList(value.declarations.filter {
                     switch $0 {
                     case .placeholder:
@@ -914,6 +923,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 return LGCDeclaration.record(
                     id: UUID(),
                     name: value.name.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
                     declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
                 )
             case .namespace(let value):

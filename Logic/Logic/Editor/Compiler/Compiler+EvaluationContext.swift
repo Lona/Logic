@@ -92,32 +92,32 @@ extension Compiler {
                 context.values[node.uuid] = value
             }
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
-            Swift.print("ident", identifier.string)
+//            Swift.print("ident", identifier.string)
 
             guard let patternId = scopeContext.identifierToPattern[identifier.uuid] else { break }
 
-            Swift.print("pattern id", patternId)
+//            Swift.print("pattern id", patternId)
 
             guard let value = context.values[patternId] else { break }
 
-            Swift.print("value", value)
+//            Swift.print("value", value)
 
             context.values[identifier.uuid] = value
             context.values[node.uuid] = value
         case .expression(.memberExpression):
-            Swift.print("member")
+//            Swift.print("member")
 
             guard let patternId = scopeContext.identifierToPattern[node.uuid] else { break }
 
-            Swift.print("pattern id", patternId)
+//            Swift.print("pattern id", patternId)
 
             guard let type = unificationContext.patternTypes[patternId] else { break }
 
-            Swift.print("type", type)
+//            Swift.print("type", type)
 
             guard let value = context.values[patternId] else { break }
 
-            Swift.print("value", value)
+//            Swift.print("value", value)
 
             context.values[node.uuid] = value
         case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
@@ -181,7 +181,7 @@ extension Compiler {
             default:
                 break
             }
-        case .declaration(.record(id: _, name: let functionName, declarations: let declarations)):
+        case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
             let resolvedType = Unification.substitute(substitution, in: type)
@@ -208,13 +208,13 @@ extension Compiler {
                 case .placeholder:
                     break
                 case .enumerationCase(_, name: let pattern, associatedValueTypes: _):
-                    guard let consType = unificationContext.patternTypes[pattern.uuid] else { break }
+//                    guard let consType = unificationContext.patternTypes[pattern.uuid] else { break }
 
                     let resolvedConsType = Unification.substitute(substitution, in: type)
 
-                    Swift.print("enum case", pattern, resolvedConsType)
+//                    Swift.print("enum case", pattern, resolvedConsType)
 
-                    context.values[pattern.uuid] = LogicValue(consType, .function(.enumInit(caseName: pattern.name)))
+                    context.values[pattern.uuid] = LogicValue(resolvedConsType, .function(.enumInit(caseName: pattern.name)))
                 }
             }
         default:
@@ -250,7 +250,7 @@ extension LGCSyntaxNode {
             switch declaration {
             case .enumeration(_, let pattern, _, _),
                  .namespace(_, let pattern, _),
-                 .record(_, let pattern, _),
+                 .record(_, let pattern, _, _),
                  .variable(_, let pattern, _, _),
                  .function(_, let pattern, _, _, _, _):
                 return pattern

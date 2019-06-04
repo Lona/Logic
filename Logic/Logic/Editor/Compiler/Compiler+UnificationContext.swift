@@ -56,7 +56,22 @@ extension Compiler {
                 result.nodes[condition.uuid] = .cons(name: "Boolean")
 
                 return result
-            case (false, .declaration(.record(id: _, name: let functionName, declarations: let declarations))):
+            case (false, .declaration(.record(id: _, name: let functionName, genericParameters: let genericParameters, declarations: let declarations))):
+                let genericNames: [String] = genericParameters.compactMap { param in
+                    switch param {
+                    case .parameter(_, name: let pattern):
+                        return pattern.name
+                    case .placeholder:
+                        return nil
+                    }
+                }
+
+                var genericInScope: [String: String] = [:]
+                genericNames.forEach { name in
+                    genericInScope[name] = result.makeGenericName()
+                }
+
+                let universalTypes = genericNames.map { name in Unification.T.gen(genericInScope[name]!) }
 
                 var parameterTypes: [Unification.T] = []
 
@@ -77,7 +92,7 @@ extension Compiler {
                     }
                 }
 
-                let returnType: Unification.T = .cons(name: functionName.name, parameters: [])
+                let returnType: Unification.T = .cons(name: functionName.name, parameters: universalTypes)
                 let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
 
                 result.nodes[functionName.uuid] = functionType
@@ -188,6 +203,12 @@ extension Compiler {
                 result.patternTypes[pattern.uuid] = annotationType
 
                 return result
+            case (true, .expression(.placeholder)):
+                let type = result.makeEvar()
+
+                result.nodes[node.uuid] = type
+
+                return result
             case (true, .expression(.identifierExpression(id: _, identifier: let identifier))):
                 let type = self.specificIdentifierType(scopeContext: scopeContext, unificationContext: result, identifierId: identifier.uuid)
 
@@ -253,6 +274,15 @@ extension Compiler {
                 result.nodes[node.uuid] = .cons(name: "CSSColor")
 
                 return result
+            case (true, .literal(.array(id: _, value: let expressions))):
+                let elementType = result.makeEvar()
+                result.nodes[node.uuid] = .cons(name: "Array", parameters: [elementType])
+
+                expressions.forEach { expression in
+                    let expressionType = result.nodes[expression.uuid] ?? result.makeEvar()
+                    Swift.print("Evar for \(expression): \(expressionType)")
+                    result.constraints.append(Unification.Constraint(elementType, expressionType))
+                }
             default:
                 break
             }

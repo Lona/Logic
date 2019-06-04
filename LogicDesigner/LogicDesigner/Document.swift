@@ -95,29 +95,35 @@ class Document: NSDocument {
             switch type {
             case .evar:
                 return []
-            case .cons(name: "Boolean", parameters: []):
+            case .bool:
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.true,
                     LGCLiteral.Suggestion.false
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals.titleContains(prefix: query)
-            case .cons(name: "Number", parameters: []):
+            case .number:
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.rationalNumber(for: query)
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals.titleContains(prefix: query)
-            case .cons(name: "String", parameters: []):
+            case .string:
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.string(for: query)
                     ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals.titleContains(prefix: query)
-            case .cons(name: "CSSColor", parameters: []):
+            case .cssColor:
                 let literals: [LogicSuggestionItem] = [
                     LGCLiteral.Suggestion.color(for: query)
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+                return literals
+            case .cons(name: "Array", parameters: let parameters):
+                let literals: [LogicSuggestionItem] = [
+                    LGCLiteral.Suggestion.array(for: query)
+                    ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
                 return literals
             default:
@@ -163,7 +169,8 @@ class Document: NSDocument {
                     })
 
                     switch node {
-                    case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _))):
+                    case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _))),
+                         .some(.declaration(.record(id: _, name: _, genericParameters: let genericParameters, declarations: _))):
                         let parameterNames: [String] = genericParameters.compactMap { param in
                             switch param {
                             case .parameter(_, name: let pattern):
@@ -389,7 +396,7 @@ class Document: NSDocument {
                 evaluationContext.values.forEach { id, value in
                     annotations[id] = "\(value.memory)"
 
-                    Swift.print(id, value.type, value.memory)
+//                    Swift.print(id, value.type, value.memory)
 
                     if let colorString = value.colorString {
                         colorValues[id] = colorString
