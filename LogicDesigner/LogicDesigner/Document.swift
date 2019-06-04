@@ -131,10 +131,8 @@ class Document: NSDocument {
             }
         }
         
-        logicEditor.suggestionsForNode = { [unowned self] node, query in
+        logicEditor.suggestionsForNode = { rootNode, node, query in
             Swift.print("---------")
-
-            let rootNode = self.logicEditor.rootNode
 
             guard case .program(let root) = rootNode else { return [] }
 
@@ -363,7 +361,7 @@ class Document: NSDocument {
                     return literals + (identifiers + namespaceIdentifiers + common).titleContains(prefix: query)
                 }
             default:
-                return LogicEditor.defaultSuggestionsForNode(node, program, query)
+                return LogicEditor.defaultSuggestionsForNode(program, node, query)
             }
         }
 

@@ -11,18 +11,6 @@ public class LogicEditor: NSBox {
 
         super.init(frame: .zero)
 
-        self.suggestionsForNode = { [unowned self] node, query in
-            return LogicEditor.defaultSuggestionsForNode(node, self.rootNode, query)
-        }
-
-        self.documentationForNode = { [unowned self] node, query in
-            return LogicEditor.defaultDocumentationForNode(node, self.rootNode, query)
-        }
-
-        self.willSelectNode = { [unowned self] nodeId in
-            return LogicEditor.defaultWillSelectNode(nodeId, self.rootNode)
-        }
-
         setUpViews()
         setUpConstraints()
         setScroll(enabled: true)
@@ -54,7 +42,7 @@ public class LogicEditor: NSBox {
         }
     }
 
-    public var willSelectNode: ((UUID?) -> UUID?)?
+    public var willSelectNode: ((LGCSyntaxNode, UUID?) -> UUID?)? = LogicEditor.defaultWillSelectNode
 
     public var onChangeRootNode: ((LGCSyntaxNode) -> Bool)?
 
@@ -88,13 +76,9 @@ public class LogicEditor: NSBox {
 
     public var showsDropdown: Bool = true
 
-    public var suggestionsForNode: ((LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, _
-        in return []
-    }
+    public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
-    public var documentationForNode: ((LGCSyntaxNode, String) -> RichText) = { _, _ in
-        return RichText(blocks: [])
-    }
+    public var documentationForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> RichText) = LogicEditor.defaultDocumentationForNode
 
     public static let defaultRootNode = LGCSyntaxNode.program(
         LGCProgram(
@@ -109,18 +93,18 @@ public class LogicEditor: NSBox {
     public static let defaultSuggestionsForNode: (
         LGCSyntaxNode,
         LGCSyntaxNode,
-        String) -> [LogicSuggestionItem] = { node, rootNode, query in
+        String) -> [LogicSuggestionItem] = { rootNode, node, query in
         return node.suggestions(within: rootNode, for: query)
     }
 
     public static let defaultDocumentationForNode: (
         LGCSyntaxNode,
         LGCSyntaxNode,
-        String) -> RichText = { node, rootNode, query in
+        String) -> RichText = { rootNode, node, query in
             return node.documentation(within: rootNode, for: query)
     }
 
-    public static let defaultWillSelectNode: (UUID?, LGCSyntaxNode) -> UUID? = { (nodeId: UUID?, rootNode: LGCSyntaxNode) in
+    public static let defaultWillSelectNode: (LGCSyntaxNode, UUID?) -> UUID? = { (rootNode: LGCSyntaxNode, nodeId: UUID?) in
         guard let nodeId = nodeId else { return nil }
 
         return rootNode.redirectSelection(nodeId)
@@ -288,7 +272,7 @@ extension LogicEditor {
     }
 
     private func select(nodeByID originalId: UUID?) {
-        let syntaxNodeId = willSelectNode?(originalId) ?? originalId
+        let syntaxNodeId = willSelectNode?(rootNode, originalId) ?? originalId
 
         self.canvasView.selectedLine = nil
         self.suggestionText = ""
@@ -383,7 +367,7 @@ extension LogicEditor {
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid) == range }) ?? syntaxNode
 
-        return suggestionsForNode(highestMatch, prefix)
+        return suggestionsForNode(rootNode, highestMatch, prefix)
     }
 }
 
@@ -393,7 +377,7 @@ extension LogicEditor {
 
     private func makeDetailView(for syntaxNode: LGCSyntaxNode?, query: String) -> NSView? {
         if let syntaxNode = syntaxNode {
-            return documentationForNode(syntaxNode, query).makeScrollView()
+            return documentationForNode(rootNode, syntaxNode, query).makeScrollView()
         } else {
             return nil
         }
