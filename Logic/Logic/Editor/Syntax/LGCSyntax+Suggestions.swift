@@ -686,7 +686,7 @@ public extension LGCDeclaration {
                     LGCDeclaration.record(
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
-                        genericParameters: .next(.makePlaceholder(), .empty),
+                        genericParameters: .empty,
                         declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
                     )
                 )
