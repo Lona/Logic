@@ -96,7 +96,7 @@ class Document: NSDocument {
 
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
-            if let suggestions = StandardConfiguration.suggestionsForNode(rootNode: program, node: node, query: query) {
+            if let suggestions = StandardConfiguration.suggestions(rootNode: program, node: node, query: query) {
                 return suggestions
             } else {
                 return LogicEditor.defaultSuggestionsForNode(program, node, query)

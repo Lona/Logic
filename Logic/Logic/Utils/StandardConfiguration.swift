@@ -1,5 +1,5 @@
 //
-//  Suggestions.swift
+//  StandardConfiguration.swift
 //  Logic
 //
 //  Created by Devin Abbott on 6/4/19.
@@ -53,38 +53,34 @@ public enum StandardConfiguration {
         }
     }
 
-    public static func suggestionsForNode(
+    public typealias CompilerContext = (
+        scope: Compiler.ScopeContext,
+        unification: Compiler.UnificationContext,
+        substitution: Unification.Substitution
+    )
+
+    public static func compile(_ rootNode: LGCSyntaxNode) -> (
+        scope: Compiler.ScopeContext,
+        unification: Compiler.UnificationContext,
+        substitution: Result<Unification.Substitution, Unification.UnificationError>
+        ) {
+        let scopeContext = Compiler.scopeContext(rootNode)
+        let unificationContext = Compiler.makeUnificationContext(rootNode, scopeContext: scopeContext)
+        let substitutionResult = Unification.unify(constraints: unificationContext.constraints)
+
+        return (scopeContext, unificationContext, substitutionResult)
+    }
+
+    public static func suggestions(
         rootNode: LGCSyntaxNode,
         node: LGCSyntaxNode,
         query: String,
+        currentScopeContext: Compiler.ScopeContext,
+        scopeContext: Compiler.ScopeContext,
+        unificationContext: Compiler.UnificationContext,
+        substitution: Unification.Substitution,
         logLevel: LogLevel = LogLevel.none
         ) -> [LogicSuggestionItem]? {
-
-        if logLevel == .verbose {
-            Swift.print("---------")
-        }
-
-        let scopeContext = Compiler.scopeContext(rootNode)
-        let unificationContext = Compiler.makeUnificationContext(rootNode, scopeContext: scopeContext)
-
-        if logLevel == .verbose {
-            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
-        }
-
-        guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
-            Swift.print("Unification failed", Unification.unify(constraints: unificationContext.constraints))
-            return []
-        }
-
-        if logLevel == .verbose {
-            Swift.print("Substitution", substitution)
-        }
-
-        let currentScopeContext = Compiler.scopeContext(rootNode, targetId: node.uuid)
-
-        if logLevel == .verbose {
-            Swift.print("Current scope", currentScopeContext.namesInScope)
-        }
 
         switch node {
         case .typeAnnotation:
@@ -295,6 +291,51 @@ public enum StandardConfiguration {
         default:
             return nil
         }
+
+    }
+
+    public static func suggestions(
+        rootNode: LGCSyntaxNode,
+        node: LGCSyntaxNode,
+        query: String,
+        logLevel: LogLevel = LogLevel.none
+        ) -> [LogicSuggestionItem]? {
+        let (scopeContext, unificationContext, substitutionResult) = compile(rootNode)
+
+        if logLevel == .verbose {
+            Swift.print("---------")
+            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
+        }
+
+        let substitution: Unification.Substitution
+
+        do {
+            substitution = try substitutionResult.get()
+        } catch let error {
+            Swift.print("Failed to unify, \(error)")
+            return nil
+        }
+
+        if logLevel == .verbose {
+            Swift.print("Substitution", substitution)
+        }
+
+        let currentScopeContext = Compiler.scopeContext(rootNode, targetId: node.uuid)
+
+        if logLevel == .verbose {
+            Swift.print("Current scope", currentScopeContext.namesInScope)
+        }
+
+        return suggestions(
+            rootNode: rootNode,
+            node: node,
+            query: query,
+            currentScopeContext: currentScopeContext,
+            scopeContext: scopeContext,
+            unificationContext: unificationContext,
+            substitution: substitution,
+            logLevel: logLevel
+        )
     }
 }
 
