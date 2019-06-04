@@ -231,6 +231,16 @@ extension LGCExpression: SyntaxNodeFormattable {
                 }
             }
         case .functionCallExpression(let value):
+            if value.expression.flattenedMemberExpression?.map({ $0.string }) == ["Optional", "value"] {
+                return .concat {
+                    [
+                        .join(with: .concat {[.element(.text(",")), .line]}) {
+                            value.arguments.map { $0.formatted }
+                        }
+                    ]
+                }
+            }
+
             if value.arguments.isEmpty {
                 // TODO: We should still show () on non-enum calls, but right now we can't distinguish easily
                 return value.expression.formatted

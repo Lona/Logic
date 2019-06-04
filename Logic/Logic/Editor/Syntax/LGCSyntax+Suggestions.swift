@@ -534,6 +534,22 @@ public extension LGCExpression {
             return from(identifierSuggestion: LGCIdentifier.Suggestion.name(name))!
         }
 
+        public static func functionCall(keyPath: [String], title: String? = nil, arguments: [LGCFunctionCallArgument]) -> LogicSuggestionItem {
+            let title = title ?? keyPath.joined(separator: ".")
+
+            return LogicSuggestionItem(
+                title: title,
+                category: "FUNCTIONS",
+                node: .expression(
+                    .functionCallExpression(
+                        id: UUID(),
+                        expression: LGCExpression.makeMemberExpression(names: keyPath),
+                        arguments: .init(arguments)
+                    )
+                )
+            )
+        }
+
         public static let categoryTitle = "Expressions".uppercased()
     }
 

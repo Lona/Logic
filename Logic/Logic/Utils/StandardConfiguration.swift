@@ -13,6 +13,35 @@ public enum StandardConfiguration {
         case none, verbose
     }
 
+    public static func isValidSuggestionType(expressionType: Unification.T, suggestionType: Unification.T) -> Unification.T? {
+        if expressionType == suggestionType {
+            return suggestionType
+        }
+
+        switch suggestionType {
+        case .fun(arguments: _, returnType: let returnType):
+            if expressionType == returnType {
+                return suggestionType
+            }
+
+            let specificReturnType = returnType.replacingGenericsWithEvars(getName: NameGenerator(prefix: "&").next)
+            let unified = Unification.unify(
+                constraints: [Unification.Constraint(specificReturnType, expressionType)]
+            )
+
+            switch unified {
+            case .success(let substitution):
+                let substitutedType = Unification.substitute(substitution, in: suggestionType)
+                Swift.print("Specific instance of generic type", suggestionType, "=>", substitutedType)
+                return substitutedType
+            case .failure:
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+
     public static func literalSuggestions(for type: Unification.T, query: String) -> [LogicSuggestionItem] {
         switch type {
         case .evar:
@@ -118,6 +147,7 @@ public enum StandardConfiguration {
                             return nil
                         }
                     }
+
                     return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
                 default:
                     break
@@ -160,35 +190,6 @@ public enum StandardConfiguration {
 
                 return (literals + identifiers + common).titleContains(prefix: query)
             case .cons:
-                func validSuggestionType(expressionType: Unification.T, suggestionType: Unification.T) -> Unification.T? {
-                    if expressionType == suggestionType {
-                        return suggestionType
-                    }
-
-                    switch suggestionType {
-                    case .fun(arguments: _, returnType: let returnType):
-                        if expressionType == returnType {
-                            return suggestionType
-                        }
-
-                        let specificReturnType = returnType.replacingGenericsWithEvars(getName: NameGenerator(prefix: "&").next)
-                        let unified = Unification.unify(
-                            constraints: [Unification.Constraint(specificReturnType, type)]
-                        )
-
-                        switch unified {
-                        case .success(let substitution):
-                            let substitutedType = Unification.substitute(substitution, in: suggestionType)
-                            Swift.print("Specific instance of generic type", suggestionType, "=>", substitutedType)
-                            return substitutedType
-                        case .failure:
-                            return nil
-                        }
-                    default:
-                        return nil
-                    }
-                }
-
                 let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
                     // Variables in scope are listed elsewhere
                     if keyPath.count == 1 { return nil }
@@ -197,96 +198,77 @@ public enum StandardConfiguration {
 
                     let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                    //                        Swift.print("Resolved type of pattern, \(keyPath.joined(separator: ".")): \(identifierType) == \(resolvedType)")
-
-                    if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
+                    if let suggestionType = isValidSuggestionType(expressionType: type, suggestionType: resolvedType) {
                         return (keyPath, suggestionType)
                     } else {
                         return nil
                     }
                 })
 
-                //                    Swift.print("Namespace identifiers", matchingNamespaceIdentifiers)
-
-                let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> (String, Unification.T)? in
+                let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> ([String], Unification.T)? in
                     guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
 
                     let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                    //                        Swift.print("Resolved type of pattern, \(pattern.name): \(identifierType) == \(resolvedType)")
-
-                    if let suggestionType = validSuggestionType(expressionType: type, suggestionType: resolvedType) {
-                        return (pattern.name, suggestionType)
+                    if let suggestionType = isValidSuggestionType(expressionType: type, suggestionType: resolvedType) {
+                        return ([pattern.name], suggestionType)
                     } else {
                         return nil
                     }
                 })
 
-                //                    Swift.print("Matching ids", matchingIdentifiers)
-
-                let namespaceIdentifiers: [LogicSuggestionItem] = matchingNamespaceIdentifiers.map { (keyPath, resolvedType) in
+                let matchingSuggestions: [LogicSuggestionItem] = (matchingIdentifiers + matchingNamespaceIdentifiers).map { (keyPath, resolvedType) in
                     switch resolvedType {
                     case .fun(arguments: let arguments, returnType: _):
-                        return LogicSuggestionItem(
-                            title: keyPath.joined(separator: "."),
-                            category: "FUNCTIONS",
-                            node: .expression(
-                                .functionCallExpression(
+                        return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.map { arg in
+                            LGCFunctionCallArgument(
+                                id: UUID(),
+                                label: nil,
+                                expression: .identifierExpression(
                                     id: UUID(),
-                                    expression: LGCExpression.makeMemberExpression(names: keyPath),
-                                    arguments: LGCList<LGCFunctionCallArgument>(
-                                        arguments.map { arg in
-                                            LGCFunctionCallArgument(
-                                                id: UUID(),
-                                                label: nil,
-                                                expression: .identifierExpression(
-                                                    id: UUID(),
-                                                    identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
-                                                )
-                                            )
-                                        }
-                                    )
+                                    identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
                                 )
                             )
-                        )
+                        })
                     default:
                         return LGCExpression.Suggestion.memberExpression(names: keyPath)
                     }
                 }
 
-                let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map { (keyPath, resolvedType) in
-                    switch resolvedType {
-                    case .fun(arguments: let arguments, returnType: _):
-                        return LogicSuggestionItem(
-                            title: keyPath,
-                            category: "FUNCTIONS",
-                            node: .expression(
-                                .functionCallExpression(
-                                    id: UUID(),
-                                    expression: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: keyPath)),
-                                    arguments: LGCList<LGCFunctionCallArgument>(
-                                        arguments.map { arg in
-                                            LGCFunctionCallArgument(
-                                                id: UUID(),
-                                                label: nil,
-                                                expression: .identifierExpression(
-                                                    id: UUID(),
-                                                    identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
-                                                )
-                                            )
-                                        }
-                                    )
+                let literals = literalSuggestions(for: type, query: query)
+
+                var nested: [LogicSuggestionItem] = []
+
+                switch type {
+                case .cons(name: "Optional", parameters: let parameters):
+                    guard let wrappedType = parameters.first else { return [] }
+                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query)
+
+                    let updatedSuggestions: [LogicSuggestionItem] = wrappedSuggestions.compactMap { suggestion in
+                        guard case .expression(let expression) = suggestion.node else { return nil }
+
+                        var copy = suggestion
+
+                        copy.node = .expression(
+                            .functionCallExpression(
+                                id: UUID(),
+                                expression: LGCExpression.makeMemberExpression(names: ["Optional", "value"]),
+                                arguments: .init(
+                                    [
+                                        LGCFunctionCallArgument(id: UUID(), label: nil, expression: expression)
+                                    ]
                                 )
                             )
                         )
-                    default:
-                        return LGCExpression.Suggestion.identifier(name: keyPath)
+                        return copy
                     }
+
+                    nested.append(contentsOf: updatedSuggestions)
+                default:
+                    break
                 }
 
-                let literals = literalSuggestions(for: type, query: query)
-
-                return literals + (identifiers + namespaceIdentifiers + common).titleContains(prefix: query)
+                return literals + nested + (matchingSuggestions + common).titleContains(prefix: query)
             }
         default:
             return nil
