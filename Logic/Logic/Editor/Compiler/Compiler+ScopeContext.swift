@@ -33,7 +33,7 @@ public extension Compiler {
 
         public init() {}
 
-        fileprivate func setInCurrentNamespace(key: String, value: Namespace.Value) {
+        fileprivate func setInCurrentNamespace(key: String, value: UUID) {
             namespace.set(currentNamespacePath + [key], setTo: value)
         }
     }
@@ -79,9 +79,7 @@ public extension Compiler {
 
                     let keyPath = identifiers.map { $0.string }
 
-                    guard let value = context.namespace.get(keyPath) else { return context }
-
-                    guard case .pattern(let patternId) = value else { return context }
+                    guard let patternId = context.namespace.get(keyPath) else { return context }
 
                     context.identifierToPattern[expression.uuid] = patternId
                 default:
@@ -93,7 +91,7 @@ public extension Compiler {
                 context.patternToName[pattern.uuid] = pattern.name
                 context.patternNames.set(pattern, for: pattern.name)
 
-                context.setInCurrentNamespace(key: pattern.name, value: .pattern(pattern.id))
+                context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
 
                 return context
             case (false, .declaration(.function(id: _, name: let functionName, returnType: _, genericParameters: let genericParameters, parameters: let parameters, block: _))):
@@ -102,7 +100,7 @@ public extension Compiler {
 
                 context.patternNames = context.patternNames.push()
 
-                context.setInCurrentNamespace(key: functionName.name, value: .pattern(functionName.id))
+                context.setInCurrentNamespace(key: functionName.name, value: functionName.id)
 
                 parameters.forEach { parameter in
                     switch parameter {
@@ -152,7 +150,7 @@ public extension Compiler {
                 context.patternToName[pattern.uuid] = pattern.name
                 context.patternNames.set(pattern, for: pattern.name)
 
-                context.setInCurrentNamespace(key: pattern.name, value: .pattern(pattern.id))
+                context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
             case (false, .declaration(.enumeration(id: _, name: let pattern, genericParameters: let genericParameters, cases: _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
@@ -168,7 +166,6 @@ public extension Compiler {
                 return context
             case (true, .declaration(.enumeration(_, name: let pattern, let genericParameters, cases: let cases))):
                 context.currentNamespacePath = context.currentNamespacePath + [pattern.name]
-                context.namespace = context.namespace.with(context.currentNamespacePath, setTo: .namespace(Namespace()))
 
                 // Add initializers for each case into the namespace
                 cases.forEach { enumCase in
@@ -176,7 +173,7 @@ public extension Compiler {
                     case .placeholder:
                         break
                     case .enumerationCase(_, name: let caseName, associatedValueTypes: _):
-                        context.setInCurrentNamespace(key: caseName.name, value: .pattern(caseName.id))
+                        context.setInCurrentNamespace(key: caseName.name, value: caseName.id)
                     }
                 }
 
@@ -196,7 +193,6 @@ public extension Compiler {
                 context.patternNames = context.patternNames.push()
 
                 context.currentNamespacePath = context.currentNamespacePath + [pattern.name]
-                context.namespace = context.namespace.with(context.currentNamespacePath, setTo: .namespace(Namespace()))
 
                 return context
             case (true, .declaration(.namespace(id: _, name: _, declarations: _))):

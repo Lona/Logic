@@ -190,7 +190,8 @@ public enum StandardConfiguration {
 
                 return (literals + identifiers + common).titleContains(prefix: query)
             case .cons:
-                let matchingNamespaceIdentifiers = currentScopeContext.namespace.flattened.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
+                let matchingNamespaceIdentifiers = currentScopeContext.namespace.pairs.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
+                    
                     // Variables in scope are listed elsewhere
                     if keyPath.count == 1 { return nil }
 
