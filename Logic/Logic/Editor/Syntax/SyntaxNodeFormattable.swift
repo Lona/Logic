@@ -232,12 +232,15 @@ extension LGCExpression: SyntaxNodeFormattable {
             }
         case .functionCallExpression(let value):
             if value.arguments.isEmpty {
-                return .concat {
-                    [
-                        value.expression.formatted,
-                        .element(.text("()"))
-                    ]
-                }
+                // TODO: We should still show () on non-enum calls, but right now we can't distinguish easily
+                return value.expression.formatted
+
+//                return .concat {
+//                    [
+//                        value.expression.formatted,
+//                        .element(.text("()"))
+//                    ]
+//                }
             }
 
             return .concat {
