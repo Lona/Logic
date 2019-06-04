@@ -87,6 +87,15 @@ extension Compiler {
         case .literal(.color(id: _, value: let value)):
             let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
             context.values[node.uuid] = LogicValue(.cssColor, cssValue)
+        case .literal(.array(id: _, value: let expressions)):
+            guard let type = unificationContext.nodes[node.uuid] else { break }
+            let resolvedType = Unification.substitute(substitution, in: type)
+            
+            let values: [LogicValue] = expressions.compactMap { expression in context.values[expression.uuid] }
+
+            if values.count == expressions.filter({ !$0.isPlaceholder }).count {
+                context.values[node.uuid] = LogicValue(resolvedType, .array(values))
+            }
         case .expression(.literalExpression(id: _, literal: let literal)):
             if let value = context.values[literal.uuid] {
                 context.values[node.uuid] = value

@@ -23,6 +23,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case bool(Bool)
         case number(CGFloat)
         case string(String)
+        case array([LogicValue])
         case `enum`(caseName: String, associatedValues: [LogicValue])
         case record(values: KeyValueList<String, LogicValue?>)
         case function(Function)
@@ -37,6 +38,8 @@ public struct LogicValue: CustomDebugStringConvertible {
                 return "\(value)"
             case .string(let value):
                 return "\(value)"
+            case .array(let values):
+                return "[\(values.map { $0.debugDescription }.joined(separator: ", "))]"
             case .enum(let caseName, let values):
                 return ".\(caseName)(\(values.map { "\($0)" }.joined(separator: ", ")))"
             case .record(let values):
