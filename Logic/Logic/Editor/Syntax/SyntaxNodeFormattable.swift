@@ -1,12 +1,16 @@
 //
-//  SwiftSyntax+TextElements.swift
-//  LogicDesigner
+//  SyntaxNodeFormattable.swift
+//  Logic
 //
-//  Created by Devin Abbott on 2/19/19.
+//  Created by Devin Abbott on 6/4/19.
 //  Copyright © 2019 BitDisco, Inc. All rights reserved.
 //
 
-import AppKit
+import Foundation
+
+protocol SyntaxNodeFormattable {
+    var formatted: FormatterCommand<LogicElement> { get }
+}
 
 fileprivate extension FormatterCommand where Element == LogicElement {
     var stringContents: String {
@@ -16,7 +20,7 @@ fileprivate extension FormatterCommand where Element == LogicElement {
     }
 }
 
-public extension LGCIdentifier {
+extension LGCIdentifier: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         if isPlaceholder {
             return .element(LogicElement.dropdown(id, string, .placeholder))
@@ -26,19 +30,19 @@ public extension LGCIdentifier {
     }
 }
 
-public extension LGCPattern {
+extension LGCPattern: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, name, .variable))
     }
 }
 
-public extension LGCBinaryOperator {
+extension LGCBinaryOperator: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(uuid, displayText, .source))
     }
 }
 
-public extension LGCLiteral {
+extension LGCLiteral: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .none:
@@ -68,7 +72,7 @@ public extension LGCLiteral {
     }
 }
 
-public extension LGCFunctionCallArgument {
+extension LGCFunctionCallArgument: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         if let label = self.label {
             return .concat {
@@ -83,7 +87,7 @@ public extension LGCFunctionCallArgument {
     }
 }
 
-public extension LGCFunctionParameterDefaultValue {
+extension LGCFunctionParameterDefaultValue: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .value(let value):
@@ -99,7 +103,7 @@ public extension LGCFunctionParameterDefaultValue {
     }
 }
 
-public extension LGCFunctionParameter {
+extension LGCFunctionParameter: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
@@ -123,7 +127,7 @@ public extension LGCFunctionParameter {
                 [
                     // Always select the parent node instead of the name
                     .element(LogicElement.dropdown(value.id, value.localName.name, .variable)),
-//                    value.localName.formatted,
+                    //                    value.localName.formatted,
                     .element(.text("of type")),
                     value.annotation.formatted,
                     .element(.text("with")),
@@ -134,7 +138,7 @@ public extension LGCFunctionParameter {
     }
 }
 
-public extension LGCGenericParameter {
+extension LGCGenericParameter: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
@@ -145,7 +149,7 @@ public extension LGCGenericParameter {
     }
 }
 
-public extension LGCEnumerationCase {
+extension LGCEnumerationCase: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
@@ -165,7 +169,7 @@ public extension LGCEnumerationCase {
     }
 }
 
-public extension LGCTypeAnnotation {
+extension LGCTypeAnnotation: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .typeIdentifier(let value):
@@ -202,7 +206,7 @@ public extension LGCTypeAnnotation {
     }
 }
 
-public extension LGCExpression {
+extension LGCExpression: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .identifierExpression(let value):
@@ -243,7 +247,7 @@ public extension LGCExpression {
                     .indent {
                         .concat {
                             [
-//                                .line,
+                                //                                .line,
                                 .join(with: .concat {[.element(.text(",")), .line]}) {
                                     value.arguments.map { $0.formatted }
                                 }
@@ -256,9 +260,9 @@ public extension LGCExpression {
         case .literalExpression(let value):
             return value.literal.formatted
         case .memberExpression(let value):
-//            let joined = FormatterCommand<LogicElement>.concat {
-//                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
-//            }
+            //            let joined = FormatterCommand<LogicElement>.concat {
+            //                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
+            //            }
 
             let joined = value.memberName.formatted
 
@@ -269,7 +273,7 @@ public extension LGCExpression {
     }
 }
 
-public extension LGCStatement {
+extension LGCStatement: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         switch self {
         case .loop(let loop):
@@ -308,7 +312,7 @@ public extension LGCStatement {
     }
 }
 
-public extension LGCDeclaration {
+extension LGCDeclaration: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
@@ -451,7 +455,7 @@ public extension LGCDeclaration {
                                 contents
                             ]
                         }
-                    })
+                        })
                 ]
             }
         case .record(let value):
@@ -483,7 +487,7 @@ public extension LGCDeclaration {
                                 contents
                             ]
                         }
-                    })
+                        })
                 ]
             }
         case .namespace(let value):
@@ -516,7 +520,7 @@ public extension LGCDeclaration {
     }
 }
 
-public extension LGCTopLevelParameters {
+extension LGCTopLevelParameters: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
             self.parameters.map { $0.formatted }
@@ -525,7 +529,7 @@ public extension LGCTopLevelParameters {
 }
 
 
-public extension LGCProgram {
+extension LGCProgram: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
             self.block.map { $0.formatted }
@@ -535,35 +539,9 @@ public extension LGCProgram {
 
 public extension LGCSyntaxNode {
     var formatted: FormatterCommand<LogicElement> {
-        switch self {
-        case .statement(let value):
-            return value.formatted
-        case .declaration(let value):
-            return value.formatted
-        case .identifier(let value):
-            return value.formatted
-        case .pattern(let value):
-            return value.formatted
-        case .binaryOperator(let value):
-            return value.formatted
-        case .expression(let value):
-            return value.formatted
-        case .program(let value):
-            return value.formatted
-        case .functionParameter(let value):
-            return value.formatted
-        case .typeAnnotation(let value):
-            return value.formatted
-        case .functionParameterDefaultValue(let value):
-            return value.formatted
-        case .literal(let value):
-            return value.formatted
-        case .topLevelParameters(let value):
-            return value.formatted
-        case .enumerationCase(let value):
-            return value.formatted
-        case .genericParameter(let value):
-            return value.formatted
+        guard let contents = contents as? SyntaxNodeFormattable else {
+            fatalError("No formatting rules for selected \(nodeTypeDescription)")
         }
+        return contents.formatted
     }
 }
