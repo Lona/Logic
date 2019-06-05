@@ -190,51 +190,84 @@ public enum StandardConfiguration {
 
                 return (literals + identifiers + common).titleContains(prefix: query)
             case .cons:
-                let matchingNamespaceIdentifiers = currentScopeContext.namespace.pairs.compactMap({ keyPath, pattern -> ([String], Unification.T)? in
-                    
-                    // Variables in scope are listed elsewhere
-                    if keyPath.count == 1 { return nil }
+                func getIdentifierPaths(
+                    scopeContext: Compiler.ScopeContext,
+                    unificationContext: Compiler.UnificationContext
+                    ) -> [(keyPath: [String], id: UUID)] {
 
-                    guard let identifierType = unificationContext.patternTypes[pattern] else { return nil }
+                    let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, pattern -> ([String], UUID)? in
 
-                    let resolvedType = Unification.substitute(substitution, in: identifierType)
+                        // Variables in scope are listed elsewhere
+                        if keyPath.count == 1 { return nil }
 
-                    if let suggestionType = isValidSuggestionType(expressionType: type, suggestionType: resolvedType) {
-                        return (keyPath, suggestionType)
-                    } else {
-                        return nil
-                    }
-                })
+                        return (keyPath, pattern)
+                    })
 
-                let matchingIdentifiers = currentScopeContext.patternsInScope.compactMap({ pattern -> ([String], Unification.T)? in
-                    guard let identifierType = unificationContext.patternTypes[pattern.uuid] else { return nil }
+                    let currentScopePaths = currentScopeContext.patternsInScope.map({ pattern -> ([String], UUID) in
+                        return ([pattern.name], pattern.uuid)
+                    })
 
-                    let resolvedType = Unification.substitute(substitution, in: identifierType)
+                    return namespacePaths + currentScopePaths
+                }
 
-                    if let suggestionType = isValidSuggestionType(expressionType: type, suggestionType: resolvedType) {
-                        return ([pattern.name], suggestionType)
-                    } else {
-                        return nil
-                    }
-                })
+                func getValidSuggestionsPaths(
+                    expressionType: Unification.T,
+                    identifierPaths: [(keyPath: [String], id: UUID)],
+                    unificationContext: Compiler.UnificationContext
+                    ) -> [(keyPath: [String], type: Unification.T)] {
+                    return identifierPaths.compactMap({ keyPath, id -> ([String], Unification.T)? in
+                        guard let identifierType = unificationContext.patternTypes[id] else { return nil }
 
-                let matchingSuggestions: [LogicSuggestionItem] = (matchingIdentifiers + matchingNamespaceIdentifiers).map { (keyPath, resolvedType) in
-                    switch resolvedType {
-                    case .fun(arguments: let arguments, returnType: _):
-                        return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.map { arg in
-                            LGCFunctionCallArgument(
-                                id: UUID(),
-                                label: nil,
-                                expression: .identifierExpression(
+                        let resolvedType = Unification.substitute(substitution, in: identifierType)
+
+                        Swift.print(keyPath)
+
+                        if keyPath == ["Optional", "value"] {
+                            return nil
+                        }
+
+                        if let suggestionType = isValidSuggestionType(expressionType: expressionType, suggestionType: resolvedType) {
+                            return (keyPath, suggestionType)
+                        } else {
+                            return nil
+                        }
+                    })
+                }
+
+                func getMatchingSuggestions(
+                    validSuggestionPaths: [(keyPath: [String], type: Unification.T)]
+                    ) -> [LogicSuggestionItem] {
+                    return validSuggestionPaths.map { (keyPath, resolvedType) in
+                        switch resolvedType {
+                        case .fun(arguments: let arguments, returnType: _):
+                            return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.map { arg in
+                                LGCFunctionCallArgument(
                                     id: UUID(),
-                                    identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
+                                    label: nil,
+                                    expression: .identifierExpression(
+                                        id: UUID(),
+                                        identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
+                                    )
                                 )
-                            )
-                        })
-                    default:
-                        return LGCExpression.Suggestion.memberExpression(names: keyPath)
+                            })
+                        default:
+                            return LGCExpression.Suggestion.memberExpression(names: keyPath)
+                        }
                     }
                 }
+
+                let identifierPaths = getIdentifierPaths(
+                    scopeContext: currentScopeContext,
+                    unificationContext: unificationContext
+                )
+
+                let validSuggestionPaths = getValidSuggestionsPaths(
+                    expressionType: type,
+                    identifierPaths: identifierPaths,
+                    unificationContext: unificationContext
+                )
+
+                let matchingSuggestions = getMatchingSuggestions(validSuggestionPaths: validSuggestionPaths)
 
                 let literals = literalSuggestions(for: type, query: query)
 
@@ -243,7 +276,14 @@ public enum StandardConfiguration {
                 switch type {
                 case .cons(name: "Optional", parameters: let parameters):
                     guard let wrappedType = parameters.first else { return [] }
-                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query)
+
+                    let wrappedValidPaths = getValidSuggestionsPaths(
+                        expressionType: wrappedType,
+                        identifierPaths: identifierPaths,
+                        unificationContext: unificationContext
+                    )
+
+                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query) + getMatchingSuggestions(validSuggestionPaths: wrappedValidPaths)
 
                     let updatedSuggestions: [LogicSuggestionItem] = wrappedSuggestions.compactMap { suggestion in
                         guard case .expression(let expression) = suggestion.node else { return nil }
