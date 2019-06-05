@@ -220,8 +220,6 @@ public enum StandardConfiguration {
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
 
-                        Swift.print(keyPath)
-
                         if keyPath == ["Optional", "value"] {
                             return nil
                         }
