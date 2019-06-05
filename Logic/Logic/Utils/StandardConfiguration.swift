@@ -307,7 +307,8 @@ public enum StandardConfiguration {
                         unificationContext: unificationContext
                     )
 
-                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query) + getMatchingSuggestions(validSuggestionPaths: wrappedValidPaths)
+                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query) +
+                        getMatchingSuggestions(validSuggestionPaths: wrappedValidPaths).titleContains(prefix: query)
 
                     let updatedSuggestions: [LogicSuggestionItem] = wrappedSuggestions.compactMap { suggestion in
                         guard case .expression(let expression) = suggestion.node else { return nil }
