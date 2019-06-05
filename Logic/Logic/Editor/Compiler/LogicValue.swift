@@ -37,7 +37,7 @@ public struct LogicValue: CustomDebugStringConvertible {
             case .number(let value):
                 return "\(value)"
             case .string(let value):
-                return "\(value)"
+                return "\"\(value)\""
             case .array(let values):
                 return "[\(values.map { $0.debugDescription }.joined(separator: ", "))]"
             case .enum(let caseName, let values):

@@ -539,6 +539,7 @@ public extension LGCExpression {
 
             return LogicSuggestionItem(
                 title: title,
+                badge: "ƒ",
                 category: "FUNCTIONS",
                 node: .expression(
                     .functionCallExpression(

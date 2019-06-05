@@ -108,6 +108,7 @@ public enum StandardConfiguration {
         scopeContext: Compiler.ScopeContext,
         unificationContext: Compiler.UnificationContext,
         substitution: Unification.Substitution,
+        evaluationContext: Compiler.EvaluationContext?,
         logLevel: LogLevel = LogLevel.none
         ) -> [LogicSuggestionItem]? {
 
@@ -167,9 +168,14 @@ public enum StandardConfiguration {
                 Swift.print("Resolved type: \(type)")
             }
 
-            let common: [LogicSuggestionItem] = [
-                LGCExpression.Suggestion.comparison,
-            ]
+            var common: [LogicSuggestionItem] = []
+
+            switch type {
+            case .bool:
+                common.append(LGCExpression.Suggestion.comparison)
+            default:
+                break
+            }
 
             switch type {
             case .gen:
@@ -214,8 +220,8 @@ public enum StandardConfiguration {
                     expressionType: Unification.T,
                     identifierPaths: [(keyPath: [String], id: UUID)],
                     unificationContext: Compiler.UnificationContext
-                    ) -> [(keyPath: [String], type: Unification.T)] {
-                    return identifierPaths.compactMap({ keyPath, id -> ([String], Unification.T)? in
+                    ) -> [(id: UUID, keyPath: [String], type: Unification.T)] {
+                    return identifierPaths.compactMap({ keyPath, id -> (UUID, [String], Unification.T)? in
                         guard let identifierType = unificationContext.patternTypes[id] else { return nil }
 
                         let resolvedType = Unification.substitute(substitution, in: identifierType)
@@ -225,7 +231,7 @@ public enum StandardConfiguration {
                         }
 
                         if let suggestionType = isValidSuggestionType(expressionType: expressionType, suggestionType: resolvedType) {
-                            return (keyPath, suggestionType)
+                            return (id, keyPath, suggestionType)
                         } else {
                             return nil
                         }
@@ -233,9 +239,9 @@ public enum StandardConfiguration {
                 }
 
                 func getMatchingSuggestions(
-                    validSuggestionPaths: [(keyPath: [String], type: Unification.T)]
+                    validSuggestionPaths: [(id: UUID, keyPath: [String], type: Unification.T)]
                     ) -> [LogicSuggestionItem] {
-                    return validSuggestionPaths.map { (keyPath, resolvedType) in
+                    return validSuggestionPaths.map { (id, keyPath, resolvedType) in
                         switch resolvedType {
                         case .fun(arguments: let arguments, returnType: _):
                             return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.map { arg in
@@ -249,7 +255,27 @@ public enum StandardConfiguration {
                                 )
                             })
                         default:
-                            return LGCExpression.Suggestion.memberExpression(names: keyPath)
+                            var suggestion = LGCExpression.Suggestion.memberExpression(names: keyPath)
+
+                            switch resolvedType {
+                            case Unification.T.cssColor:
+                                guard let colorString = evaluationContext?.values[id]?.colorString else { break }
+                                suggestion.style = .colorPreview(code: colorString, NSColor.parse(css: colorString) ?? .black)
+                                return suggestion
+                            default:
+                                break
+                            }
+
+                            if let memory = evaluationContext?.values[id]?.memory {
+                                switch memory {
+                                case .bool, .number, .string:
+                                    suggestion.badge = evaluationContext?.values[id]?.memory.debugDescription
+                                default:
+                                    suggestion.badge = resolvedType.debugDescription
+                                }
+                            }
+
+                            return suggestion
                         }
                     }
                 }
@@ -307,7 +333,7 @@ public enum StandardConfiguration {
                     break
                 }
 
-                return literals + nested + (matchingSuggestions + common).titleContains(prefix: query)
+                return literals + (nested.titleContains(prefix: query) + matchingSuggestions.sortedByPrefix() + common).titleContains(prefix: query)
             }
         default:
             return nil
@@ -347,6 +373,15 @@ public enum StandardConfiguration {
             Swift.print("Current scope", currentScopeContext.namesInScope)
         }
 
+        let evaluationContext = try? Compiler.evaluate(
+            rootNode,
+            rootNode: rootNode,
+            scopeContext: scopeContext,
+            unificationContext: unificationContext,
+            substitution: substitution,
+            context: .init()
+            ).get()
+
         return suggestions(
             rootNode: rootNode,
             node: node,
@@ -355,6 +390,7 @@ public enum StandardConfiguration {
             scopeContext: scopeContext,
             unificationContext: unificationContext,
             substitution: substitution,
+            evaluationContext: evaluationContext,
             logLevel: logLevel
         )
     }

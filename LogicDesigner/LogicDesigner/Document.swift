@@ -119,7 +119,6 @@ class Document: NSDocument {
                 return true
             }
 
-            // TODO: Evaluate program, not just rootNode
             let result = Compiler.evaluate(program, rootNode: program, scopeContext: scopeContext, unificationContext: unificationContext, substitution: substitution, context: .init())
 
             annotations.removeAll(keepingCapacity: true)
