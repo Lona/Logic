@@ -333,7 +333,7 @@ public enum StandardConfiguration {
                     break
                 }
 
-                return literals + (nested.sortedByPrefix() + matchingSuggestions.sortedByPrefix() + common).titleContains(prefix: query)
+                return literals + nested.sortedByPrefix() + (matchingSuggestions.sortedByPrefix() + common).titleContains(prefix: query)
             }
         default:
             return nil
