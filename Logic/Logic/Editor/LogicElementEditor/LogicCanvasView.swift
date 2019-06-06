@@ -10,6 +10,10 @@ public extension NSPasteboard.PasteboardType {
 
 public class LogicCanvasView: NSView {
 
+    public enum TextAlignment {
+        case left, center, right
+    }
+
     public struct Style {
         public var font = TextStyle(family: "San Francisco", size: 13).nsFont
         public var textPadding = CGSize(width: 4, height: 3)
@@ -19,6 +23,7 @@ public class LogicCanvasView: NSView {
         public var textSpacing: CGFloat = 4.0
         public var lineSpacing: CGFloat = 6.0
         public var minimumLineHeight: CGFloat = 22.0
+        public var textAlignment: TextAlignment = .left
 
         public init() {}
     }
@@ -448,18 +453,23 @@ public class LogicCanvasView: NSView {
             return cached
         }
 
+        let getElementWidth: (LogicElement, Int) -> CGFloat = { [unowned self] element, index in
+            return element.measured(
+                selected: self.selectedIndex == index,
+                offset: .zero,
+                font: self.style.font,
+                padding: self.style.textPadding,
+                decoration: self.cachedDecoration(for: element)
+                ).backgroundRect.width
+        }
+
+        let availableContentWidth = bounds.width - style.textMargin.width * 2
+
         let formattedElementLines = formattedContent.print(
-            width: bounds.width - style.textMargin.width * 2,
+            width: availableContentWidth,
             spaceWidth: style.textSpacing,
             indentWidth: 20,
-            getElementWidth: { [unowned self] element, index in
-                element.measured(
-                    selected: self.selectedIndex == index,
-                    offset: .zero,
-                    font: self.style.font,
-                    padding: self.style.textPadding,
-                    decoration: self.cachedDecoration(for: element)
-                    ).backgroundRect.width }
+            getElementWidth: getElementWidth
         )
 
         let yOffset = style.textMargin.height
@@ -467,6 +477,28 @@ public class LogicCanvasView: NSView {
         var formattedElementIndex = 0
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
+            var xOffset: CGFloat = style.textMargin.width
+
+            switch style.textAlignment {
+            case .left:
+                break
+            // This setting is uncommon, so we avoid this calculation most of the time
+            case .center, .right:
+                guard let first = formattedElementLine.first, let last = formattedElementLine.last else { return }
+
+                let lastElementWidth = getElementWidth(last.element, formattedElementIndex + formattedElementLine.count - 1)
+                let lineWidth = last.position + lastElementWidth
+
+                switch style.textAlignment {
+                case .left:
+                    break
+                case .center:
+                    xOffset = (availableContentWidth - lineWidth - first.position) / 2
+                case .right:
+                    xOffset = availableContentWidth - lineWidth - first.position
+                }
+            }
+
             formattedElementLine.forEach { formattedElement in
                 let decoration: LogicElement.Decoration?
                 if let id = formattedElement.element.syntaxNodeID {
@@ -475,11 +507,13 @@ public class LogicCanvasView: NSView {
                     decoration = nil
                 }
 
+                let offset = CGPoint(
+                    x: xOffset + formattedElement.position + style.textMargin.width,
+                    y: yOffset + CGFloat(rowIndex) * style.minimumLineHeight)
+
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
-                    offset: CGPoint(
-                        x: style.textMargin.width + formattedElement.position,
-                        y: yOffset + CGFloat(rowIndex) * style.minimumLineHeight),
+                    offset: offset,
                     font: style.font,
                     padding: style.textPadding,
                     decoration: decoration

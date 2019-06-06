@@ -88,6 +88,8 @@ extension LogicElement {
         let attributedString = NSMutableAttributedString(string: self.value)
         let range = NSRange(location: 0, length: attributedString.length)
 
+        let offset = CGPoint(x: offset.x + padding.width, y: offset.y + padding.height)
+
         switch self {
         case .text:
             let attributes: [NSAttributedString.Key: Any] = [
