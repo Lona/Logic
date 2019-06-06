@@ -133,11 +133,9 @@ extension ControlledSearchInput: NSTextFieldDelegate {
             onPressCommandDownKey?()
             return true
         } else if (commandSelector == #selector(NSResponder.insertTab(_:))) {
-            Swift.print("Tab")
             onPressTab?()
             return true
         } else if (commandSelector == #selector(NSResponder.insertBacktab(_:))) {
-            Swift.print("Back tab")
             onPressShiftTab?()
             return true
         } else if (commandSelector == #selector(NSResponder.insertNewline(_:))) {

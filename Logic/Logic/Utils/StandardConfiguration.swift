@@ -32,7 +32,7 @@ public enum StandardConfiguration {
             switch unified {
             case .success(let substitution):
                 let substitutedType = Unification.substitute(substitution, in: suggestionType)
-                Swift.print("Specific instance of generic type", suggestionType, "=>", substitutedType)
+//                Swift.print("Specific instance of generic type", suggestionType, "=>", substitutedType)
                 return substitutedType
             case .failure:
                 return nil

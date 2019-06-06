@@ -156,7 +156,7 @@ extension Compiler {
                     context.values[node.uuid] = concat(a: args[0], b: args[1])
                 case .enumInit(let patternName):
 
-                    Swift.print("init enum", returnType, patternName)
+//                    Swift.print("init enum", returnType, patternName)
 
                     let filtered = args.compactMap { $0 }
 
