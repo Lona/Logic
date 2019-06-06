@@ -477,7 +477,7 @@ public class LogicCanvasView: NSView {
         var formattedElementIndex = 0
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
-            var xOffset: CGFloat = style.textMargin.width
+            var xOffset: CGFloat = 0
 
             switch style.textAlignment {
             case .left:
