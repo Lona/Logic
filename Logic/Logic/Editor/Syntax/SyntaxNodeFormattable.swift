@@ -34,6 +34,10 @@ extension LGCPattern: SyntaxNodeFormattable {
     var formatted: FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, name, .variable))
     }
+
+    var formattedAsTitle: FormatterCommand<LogicElement> {
+        return .element(.title(id, name))
+    }
 }
 
 extension LGCBinaryOperator: SyntaxNodeFormattable {
@@ -506,8 +510,11 @@ extension LGCDeclaration: SyntaxNodeFormattable {
         case .namespace(let value):
             return .concat(
                 [
-                    .element(LogicElement.dropdown(value.id, "Namespace", .source)),
-                    value.name.formatted,
+//                    .element(LogicElement.dropdown(value.id, "Namespace", .source)),
+//                    value.name.formatted,
+
+                    //                    .element(LogicElement.title(value.id, value.name.name)),
+                    value.name.formattedAsTitle,
                     .indent(
                         .concat(
                             [

@@ -311,7 +311,18 @@ public class LogicCanvasView: NSView {
             switch (text) {
             case .text, .coloredText:
                 attributedString.draw(at: rect.origin)
-            case .dropdown(_, let value, let dropdownStyle):
+            case .title(_, let value),
+                 .dropdown(_, let value, _):
+
+                let dropdownStyle: LogicElement.DropdownStyle
+
+                switch text {
+                case .dropdown(_, _, let style):
+                    dropdownStyle = style
+                default:
+                    dropdownStyle = .variable
+                }
+
                 let drawSelection = selected && outlinedRange == nil
                 let color = drawSelection ? NSColor.selectedMenuItemColor : dropdownStyle.color
 
@@ -453,14 +464,18 @@ public class LogicCanvasView: NSView {
             return cached
         }
 
-        let getElementWidth: (LogicElement, Int) -> CGFloat = { [unowned self] element, index in
+        let getElementSize: (LogicElement, Int) -> CGSize = { [unowned self] element, index in
             return element.measured(
                 selected: self.selectedIndex == index,
                 offset: .zero,
                 font: self.style.font,
                 padding: self.style.textPadding,
                 decoration: self.cachedDecoration(for: element)
-                ).backgroundRect.width
+                ).backgroundRect.size
+        }
+
+        let getElementWidth: (LogicElement, Int) -> CGFloat = { element, index in
+            return getElementSize(element, index).width
         }
 
         let availableContentWidth = bounds.width - style.textMargin.width * 2
@@ -472,9 +487,9 @@ public class LogicCanvasView: NSView {
             getElementWidth: getElementWidth
         )
 
-        let yOffset = style.textMargin.height
-        var measuredLine: [LogicMeasuredElement] = []
+        var yOffset = style.textMargin.height
         var formattedElementIndex = 0
+        var measuredLine: [LogicMeasuredElement] = []
 
         formattedElementLines.enumerated().forEach { rowIndex, formattedElementLine in
             var xOffset: CGFloat = 0
@@ -509,7 +524,7 @@ public class LogicCanvasView: NSView {
 
                 let offset = CGPoint(
                     x: xOffset + formattedElement.position + style.textMargin.width,
-                    y: yOffset + CGFloat(rowIndex) * style.minimumLineHeight)
+                    y: yOffset)
 
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
@@ -523,6 +538,12 @@ public class LogicCanvasView: NSView {
 
                 formattedElementIndex += 1
             }
+
+            let lineHeight = formattedElementLine.enumerated().map { offset, formattedElement in
+                return getElementSize(formattedElement.element, formattedElementIndex + offset).height
+                }.max() ?? style.minimumLineHeight
+
+            yOffset += lineHeight
         }
 
         _cachedMeasuredElements = measuredLine

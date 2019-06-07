@@ -725,17 +725,24 @@ public extension LGCDeclaration {
             )
         }
 
-        static var namespace: LogicSuggestionItem {
+        static func namespace(query: String) -> LogicSuggestionItem? {
+            if let first = query.first, first.isLowercase {
+                return nil
+            }
+
+            let patternId = UUID()
+
             return LogicSuggestionItem(
-                title: "Namespace",
+                title: "Namespace" + (query.isEmpty ? "" : " " + query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.namespace(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
                     )
-                )
+                ),
+                nextFocusId: patternId
             )
         }
 
@@ -761,12 +768,12 @@ public extension LGCDeclaration {
             Suggestion.function,
             Suggestion.enum,
             Suggestion.record,
-            Suggestion.namespace,
+            Suggestion.namespace(query: ""),
             Suggestion.genericFunction,
             Suggestion.genericEnum,
             Suggestion.genericRecord,
             Suggestion.import
-        ]
+            ].compactMap { $0 }
 
         return items.titleContains(prefix: prefix)
     }

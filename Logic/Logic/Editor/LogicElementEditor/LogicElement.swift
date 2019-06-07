@@ -34,41 +34,43 @@ public enum LogicElement {
     case text(String)
     case coloredText(String, NSColor)
     case dropdown(UUID, String, DropdownStyle)
+    case title(UUID, String)
 
     public var isActivatable: Bool {
         switch self {
-        case .text, .coloredText:
+        case .text,
+             .coloredText:
             return false
-        case .dropdown:
+        case .title,
+             .dropdown:
             return true
         }
     }
 
     public var syntaxNodeID: UUID? {
         switch self {
-        case .text:
+        case .text,
+             .coloredText:
             return nil
-        case .coloredText:
-            return nil
-        case .dropdown(let id, _, _):
+        case .title(let id, _),
+             .dropdown(let id, _, _):
             return id
         }
     }
 
     public var value: String {
         switch self {
-        case .text(let value):
-            return value
-        case .coloredText(let value, _):
-            return value
-        case .dropdown(_, let value, _):
+        case .text(let value),
+             .coloredText(let value, _),
+             .title(_, let value),
+             .dropdown(_, let value, _):
             return value
         }
     }
 
     public var color: NSColor {
         switch self {
-        case .text:
+        case .text, .title:
             return Colors.text
         case .coloredText(_, let color):
             return color
@@ -78,6 +80,8 @@ public enum LogicElement {
     }
 }
 
+let titleTextStyle = TextStyle(size: 22, color: Colors.text)
+
 extension LogicElement {
     func measured(
         selected: Bool,
@@ -85,30 +89,10 @@ extension LogicElement {
         font: NSFont,
         padding: NSSize,
         decoration: Decoration?) -> LogicMeasuredElement {
-        let attributedString = NSMutableAttributedString(string: self.value)
-        let range = NSRange(location: 0, length: attributedString.length)
 
-        let offset = CGPoint(x: offset.x + padding.width, y: offset.y + padding.height)
-
-        switch self {
-        case .text:
-            let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: Colors.textNoneditable,
-                NSAttributedString.Key.font: font
-            ]
-            attributedString.setAttributes(attributes, range: range)
-
-            let attributedStringSize = attributedString.size()
-            let rect = CGRect(origin: offset, size: attributedStringSize)
-            let backgroundRect = rect.insetBy(dx: -padding.width, dy: -padding.height)
-
-            return LogicMeasuredElement(
-                element: self,
-                attributedString: attributedString,
-                attributedStringRect: rect,
-                backgroundRect: backgroundRect)
-        case .coloredText(_, let color):
-            let color = selected ? NSColor.systemGreen : color
+        func textComponents(color: NSColor, font: NSFont) -> (string: NSAttributedString, rect: CGRect, backgroundRect: CGRect) {
+            let attributedString = NSMutableAttributedString(string: self.value)
+            let range = NSRange(location: 0, length: attributedString.length)
 
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
@@ -117,24 +101,43 @@ extension LogicElement {
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
+            let offset = CGPoint(x: offset.x + padding.width, y: offset.y + padding.height)
             let rect = CGRect(origin: offset, size: attributedStringSize)
             let backgroundRect = rect.insetBy(dx: -padding.width, dy: -padding.height)
+
+            return (attributedString, rect, backgroundRect)
+        }
+
+        func textElement(color: NSColor, font: NSFont) -> LogicMeasuredElement {
+            let (attributedString, rect, backgroundRect) = textComponents(color: color, font: font)
 
             return LogicMeasuredElement(
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
-        case .dropdown(_, _, let dropdownStyle):
-            let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: dropdownStyle.color,
-                NSAttributedString.Key.font: font,
-            ]
-            attributedString.setAttributes(attributes, range: range)
+        }
 
-            let attributedStringSize = attributedString.size()
-            var rect = CGRect(origin: offset, size: attributedStringSize)
-            var backgroundRect = rect.insetBy(dx: -padding.width, dy: -padding.height)
+        switch self {
+        case .text:
+            return textElement(color: Colors.textNoneditable, font: font)
+        case .title:
+            var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: titleTextStyle.nsFont)
+
+            if LogicCanvasView.dropdownCarets || value.isEmpty {
+                backgroundRect.size.width += value.isEmpty ? 5 : 11
+            }
+
+            return LogicMeasuredElement(
+                element: self,
+                attributedString: attributedString,
+                attributedStringRect: rect,
+                backgroundRect: backgroundRect)
+        case .coloredText(_, let color):
+            fatalError("Unused")
+//            return textElement(color: selected ? NSColor.systemGreen : color, font: titleTextStyle.nsFont)
+        case .dropdown(_, _, let dropdownStyle):
+            var (attributedString, rect, backgroundRect) = textComponents(color: dropdownStyle.color, font: font)
 
             if LogicCanvasView.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
