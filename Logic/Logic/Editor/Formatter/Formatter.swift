@@ -22,7 +22,13 @@ public indirect enum FormatterCommand<Element> {
 
     public struct FormattedElement {
         var element: Element
-        var position: CGFloat
+        var origin: CGPoint
+        var size: CGSize
+
+        var x: CGFloat { return origin.x }
+        var y: CGFloat { return origin.y }
+        var height: CGFloat { return size.height }
+        var width: CGFloat { return size.width }
     }
 
     public var elements: [Element] {
@@ -95,27 +101,33 @@ public indirect enum FormatterCommand<Element> {
 
     func print(
         width maxLineWidth: CGFloat,
+        minimumLineHeight: CGFloat = 22,
         spaceWidth: CGFloat,
         indentWidth: CGFloat,
-        getElementWidth: @escaping (Element, Int) -> CGFloat
+        getElementSize: @escaping (Element, Int) -> CGSize
         ) -> [[FormattedElement]] {
 
         var rows: [[FormattedElement]] = []
 
         var currentRow: [FormattedElement] = []
-        var currentOffset: CGFloat = 0
+        var currentXOffset: CGFloat = 0
+        var currentYOffset: CGFloat = 0
+        var currentMaxElementHeight: CGFloat = 0
         var currentIndentLevel: Int = 0
         var currentElementIndex: Int = 0
 
         func append(element: FormattedElement) {
             currentRow.append(element)
+            currentMaxElementHeight = max(currentMaxElementHeight, element.size.height)
             currentElementIndex += 1
         }
 
         func moveToNextRow(wrapping: Bool) {
             rows.append(currentRow)
             currentRow = []
-            currentOffset = CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
+            currentXOffset = CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
+            currentYOffset += currentMaxElementHeight
+            currentMaxElementHeight = minimumLineHeight
         }
 
         func process(command: FormatterCommand) {
@@ -125,24 +137,25 @@ public indirect enum FormatterCommand<Element> {
                 process(command: child())
                 currentIndentLevel -= 1
             case .line:
-                if currentOffset + spaceWidth >= maxLineWidth {
+                if currentXOffset + spaceWidth >= maxLineWidth {
                     moveToNextRow(wrapping: false)
                 }
 
-                currentOffset += spaceWidth
+                currentXOffset += spaceWidth
             case .hardLine:
                 moveToNextRow(wrapping: false)
             case .element(let element):
-                let elementWidth = getElementWidth(element, currentElementIndex)
+                let elementSize = getElementSize(element, currentElementIndex)
 
-                if currentOffset + elementWidth >= maxLineWidth && !currentRow.isEmpty {
+                if currentXOffset + elementSize.width >= maxLineWidth && !currentRow.isEmpty {
                     moveToNextRow(wrapping: true)
                 }
 
-                let formattedElement = FormatterCommand<Element>.FormattedElement(element: element, position: currentOffset)
+                let formattedElement = FormatterCommand<Element>.FormattedElement(
+                    element: element, origin: CGPoint(x: currentXOffset, y: currentYOffset), size: elementSize)
                 append(element: formattedElement)
 
-                currentOffset += elementWidth
+                currentXOffset += elementSize.width
             case .concat(let commands):
                 commands().forEach(process)
             case .join(with: let separator, let commands):

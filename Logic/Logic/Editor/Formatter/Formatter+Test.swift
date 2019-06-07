@@ -28,7 +28,9 @@ func testFormatter() {
         ]
     )
 
-    let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4, getElementWidth: { string, _ in CGFloat(string.count) })
+    let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4, getElementSize: { string, _ in
+        CGSize(width: CGFloat(string.count), height: 1)
+    })
 
     Swift.print(lines)
 }

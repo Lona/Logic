@@ -85,7 +85,7 @@ let titleTextStyle = TextStyle(size: 22, color: Colors.text)
 extension LogicElement {
     func measured(
         selected: Bool,
-        offset: CGPoint,
+        origin: CGPoint,
         font: NSFont,
         padding: NSSize,
         decoration: Decoration?) -> LogicMeasuredElement {
@@ -101,7 +101,7 @@ extension LogicElement {
             attributedString.setAttributes(attributes, range: range)
 
             let attributedStringSize = attributedString.size()
-            let offset = CGPoint(x: offset.x + padding.width, y: offset.y + padding.height)
+            let offset = CGPoint(x: origin.x + padding.width, y: origin.y + padding.height)
             let rect = CGRect(origin: offset, size: attributedStringSize)
             let backgroundRect = rect.insetBy(dx: -padding.width, dy: -padding.height)
 

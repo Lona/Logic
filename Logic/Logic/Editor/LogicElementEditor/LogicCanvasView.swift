@@ -467,15 +467,11 @@ public class LogicCanvasView: NSView {
         let getElementSize: (LogicElement, Int) -> CGSize = { [unowned self] element, index in
             return element.measured(
                 selected: self.selectedIndex == index,
-                offset: .zero,
+                origin: .zero,
                 font: self.style.font,
                 padding: self.style.textPadding,
                 decoration: self.cachedDecoration(for: element)
                 ).backgroundRect.size
-        }
-
-        let getElementWidth: (LogicElement, Int) -> CGFloat = { element, index in
-            return getElementSize(element, index).width
         }
 
         let availableContentWidth = bounds.width - style.textMargin.width * 2
@@ -484,10 +480,10 @@ public class LogicCanvasView: NSView {
             width: availableContentWidth,
             spaceWidth: style.textSpacing,
             indentWidth: 20,
-            getElementWidth: getElementWidth
+            getElementSize: getElementSize
         )
 
-        var yOffset = style.textMargin.height
+        let yOffset = style.textMargin.height
         var formattedElementIndex = 0
         var measuredLine: [LogicMeasuredElement] = []
 
@@ -500,17 +496,15 @@ public class LogicCanvasView: NSView {
             // This setting is uncommon, so we avoid this calculation most of the time
             case .center, .right:
                 guard let first = formattedElementLine.first, let last = formattedElementLine.last else { return }
-
-                let lastElementWidth = getElementWidth(last.element, formattedElementIndex + formattedElementLine.count - 1)
-                let lineWidth = last.position + lastElementWidth
+                let lineWidth = last.x + last.width
 
                 switch style.textAlignment {
                 case .left:
                     break
                 case .center:
-                    xOffset = (availableContentWidth - lineWidth - first.position) / 2
+                    xOffset = (availableContentWidth - lineWidth - first.x) / 2
                 case .right:
-                    xOffset = availableContentWidth - lineWidth - first.position
+                    xOffset = availableContentWidth - lineWidth - first.x
                 }
             }
 
@@ -523,12 +517,12 @@ public class LogicCanvasView: NSView {
                 }
 
                 let offset = CGPoint(
-                    x: xOffset + formattedElement.position + style.textMargin.width,
-                    y: yOffset)
+                    x: xOffset + formattedElement.x + style.textMargin.width,
+                    y: yOffset + formattedElement.y)
 
                 let measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
-                    offset: offset,
+                    origin: offset,
                     font: style.font,
                     padding: style.textPadding,
                     decoration: decoration
@@ -538,12 +532,6 @@ public class LogicCanvasView: NSView {
 
                 formattedElementIndex += 1
             }
-
-            let lineHeight = formattedElementLine.enumerated().map { offset, formattedElement in
-                return getElementSize(formattedElement.element, formattedElementIndex + offset).height
-                }.max() ?? style.minimumLineHeight
-
-            yOffset += lineHeight
         }
 
         _cachedMeasuredElements = measuredLine
