@@ -9,13 +9,13 @@
 import Foundation
 
 public extension LGCSyntaxNode {
-    func elementRange(for targetID: UUID) -> Range<Int>? {
-        let topNode = topNodeWithEqualElements(as: targetID)
-        let topNodeFormattedElements = topNode.formatted.elements
+    func elementRange(for targetID: UUID, options: LogicFormattingOptions) -> Range<Int>? {
+        let topNode = topNodeWithEqualElements(as: targetID, options: options)
+        let topNodeFormattedElements = topNode.formatted(using: options).elements
 
         guard let topFirstFocusableIndex = topNodeFormattedElements.firstIndex(where: { $0.syntaxNodeID != nil }) else { return nil }
 
-        guard let firstIndex = formatted.elements.firstIndex(where: { formattedElement in
+        guard let firstIndex = formatted(using: options).elements.firstIndex(where: { formattedElement in
             guard let id = formattedElement.syntaxNodeID else { return false }
             return id == topNodeFormattedElements[topFirstFocusableIndex].syntaxNodeID
         }) else { return nil }
@@ -25,8 +25,8 @@ public extension LGCSyntaxNode {
         return firstIndex..<lastIndex + 1
     }
 
-    func topNodeWithEqualElements(as targetID: UUID) -> LGCSyntaxNode {
-        let elementPath = uniqueElementPathTo(id: targetID)
+    func topNodeWithEqualElements(as targetID: UUID, options: LogicFormattingOptions) -> LGCSyntaxNode {
+        let elementPath = uniqueElementPathTo(id: targetID, options: options)
 
         return elementPath[elementPath.count - 1]
     }
@@ -36,17 +36,17 @@ public extension LGCSyntaxNode {
     // Returns nil if a non-focusable node selected. This is most likely due to temporarily
     // invalid selection range after a modification, e.g. after a deletion but before the selection range
     // has been updated
-    func topNodeWithEqualRange(as range: Range<Int>) -> LGCSyntaxNode? {
-        let elements = formatted.elements
+    func topNodeWithEqualRange(as range: Range<Int>, options: LogicFormattingOptions) -> LGCSyntaxNode? {
+        let elements = formatted(using: options).elements
         let clampedRange = range.clamped(to: elements.startIndex..<elements.endIndex)
         guard let firstId = elements[clampedRange].first?.syntaxNodeID else {
             return nil
         }
 
-        let uniquePath = uniqueElementPathTo(id: firstId).reversed()
+        let uniquePath = uniqueElementPathTo(id: firstId, options: options).reversed()
 
         for node in uniquePath {
-            if node.formatted.elements.count >= range.count {
+            if node.formatted(using: options).elements.count >= range.count {
                 return node
             }
         }
@@ -54,14 +54,14 @@ public extension LGCSyntaxNode {
         return nil
     }
 
-    func uniqueElementPathTo(id targetID: UUID) -> [LGCSyntaxNode] {
+    func uniqueElementPathTo(id targetID: UUID, options: LogicFormattingOptions) -> [LGCSyntaxNode] {
         guard let pathToTarget = pathTo(id: targetID), pathToTarget.count > 0 else {
             fatalError("Node not found")
         }
 
         let (_, uniquePath): (min: Int, path: [LGCSyntaxNode]) = pathToTarget
             .reduce((min: Int.max, path: []), { result, next in
-                let formattedElements = next.formatted.elements
+                let formattedElements = next.formatted(using: options).elements
                 if formattedElements.count < result.min {
                     return (formattedElements.count, result.path + [next])
                 } else {

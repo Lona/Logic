@@ -120,7 +120,7 @@ public extension LGCStatement {
                         .text(.none, "to accomplish this:")
                     ]
                 ),
-                .custom(example.makeCodeView()),
+                .custom(example.makeCodeView(using: .normal)),
 //                .paragraph(
 //                    [
 //                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
@@ -153,7 +153,7 @@ public extension LGCSyntaxNode {
         return contents.documentation(within: rootNode, for: prefix)
     }
 
-    func makeCodeView() -> NSView {
+    func makeCodeView(using options: LogicFormattingOptions) -> NSView {
         let container = NSBox()
         container.boxType = .custom
         container.borderType = .lineBorder
@@ -163,7 +163,7 @@ public extension LGCSyntaxNode {
         container.cornerRadius = 4
 
         let editor = LogicCanvasView()
-        editor.formattedContent = formatted
+        editor.formattedContent = formatted(using: options)
 
         container.addSubview(editor)
 

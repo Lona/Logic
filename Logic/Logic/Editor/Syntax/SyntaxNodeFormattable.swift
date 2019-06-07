@@ -9,7 +9,22 @@
 import Foundation
 
 protocol SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> { get }
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement>
+}
+
+public class LogicFormattingOptions {
+    public enum Style {
+        case normal, visual
+    }
+
+    public init(style: Style = .normal) {
+        self.style = style
+    }
+
+    public var style: Style
+
+    public static var normal = LogicFormattingOptions()
+    public static var visual = LogicFormattingOptions()
 }
 
 fileprivate extension FormatterCommand where Element == LogicElement {
@@ -21,7 +36,7 @@ fileprivate extension FormatterCommand where Element == LogicElement {
 }
 
 extension LGCIdentifier: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         if isPlaceholder {
             return .element(LogicElement.dropdown(id, string, .placeholder))
         }
@@ -31,7 +46,7 @@ extension LGCIdentifier: SyntaxNodeFormattable {
 }
 
 extension LGCPattern: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(id, name, .variable))
     }
 
@@ -41,13 +56,13 @@ extension LGCPattern: SyntaxNodeFormattable {
 }
 
 extension LGCBinaryOperator: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         return .element(LogicElement.dropdown(uuid, displayText, .source))
     }
 }
 
 extension LGCLiteral: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .none:
             return .element(.text("none"))
@@ -66,7 +81,7 @@ extension LGCLiteral: SyntaxNodeFormattable {
                     .element(.dropdown(value.id, "[", .variable)),
                     .indent(
                         .join(with: .concat([.element(.text(",")), .line])) {
-                            value.value.map { $0.formatted }
+                            value.value.map { $0.formatted(using: options) }
                         }
                     ),
                     .element(.text("]")),
@@ -77,28 +92,28 @@ extension LGCLiteral: SyntaxNodeFormattable {
 }
 
 extension LGCFunctionCallArgument: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         if let label = self.label {
             return .concat(
                 [
                     .element(.text(label + " :")),
-                    self.expression.formatted
+                    self.expression.formatted(using: options)
                 ]
             )
         } else {
-            return self.expression.formatted
+            return self.expression.formatted(using: options)
         }
     }
 }
 
 extension LGCFunctionParameterDefaultValue: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .value(let value):
             return .concat(
                 [
                     .element(LogicElement.dropdown(value.id, "default value", .source)),
-                    value.expression.formatted
+                    value.expression.formatted(using: options)
                 ]
             )
         case .none(let value):
@@ -108,7 +123,7 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeFormattable {
 }
 
 extension LGCFunctionParameter: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
@@ -119,9 +134,9 @@ extension LGCFunctionParameter: SyntaxNodeFormattable {
                     if annotation.identifier.isPlaceholder {
                         return .element(.text("no default"))
                     }
-                    return value.defaultValue.formatted
+                    return value.defaultValue.formatted(using: options)
                 case .functionType:
-                    return value.defaultValue.formatted
+                    return value.defaultValue.formatted(using: options)
                 case .placeholder:
                     return .element(.text("no default"))
                 }
@@ -131,9 +146,9 @@ extension LGCFunctionParameter: SyntaxNodeFormattable {
                 [
                     // Always select the parent node instead of the name
                     .element(LogicElement.dropdown(value.id, value.localName.name, .variable)),
-                    //                    value.localName.formatted,
+                    //                    value.localName.formatted(using: options),
                     .element(.text("of type")),
-                    value.annotation.formatted,
+                    value.annotation.formatted(using: options),
                     .element(.text("with")),
                     defaultValue()
                 ]
@@ -143,18 +158,18 @@ extension LGCFunctionParameter: SyntaxNodeFormattable {
 }
 
 extension LGCGenericParameter: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         case .parameter(let value):
-            return value.name.formatted
+            return value.name.formatted(using: options)
         }
     }
 }
 
 extension LGCEnumerationCase: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
@@ -165,7 +180,7 @@ extension LGCEnumerationCase: SyntaxNodeFormattable {
                     .element(LogicElement.dropdown(value.id, value.name.name, .variable)),
                     .element(.text("with data")),
                     .join(with: .concat([.element(.text(",")), .line])) {
-                        value.associatedValueTypes.map { $0.formatted }
+                        value.associatedValueTypes.map { $0.formatted(using: options) }
                     }
                 ]
             )
@@ -174,21 +189,21 @@ extension LGCEnumerationCase: SyntaxNodeFormattable {
 }
 
 extension LGCTypeAnnotation: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .typeIdentifier(let value):
             switch value.genericArguments {
             case .empty:
-                return value.identifier.formatted
+                return value.identifier.formatted(using: options)
             case .next(.placeholder, _):
-                return value.identifier.formatted
+                return value.identifier.formatted(using: options)
             case .next:
                 return .concat(
                     [
-                        value.identifier.formatted,
+                        value.identifier.formatted(using: options),
                         .element(.text("(")),
                         .join(with: .concat([.element(.text(",")), .line])) {
-                            value.genericArguments.map { $0.formatted }
+                            value.genericArguments.map { $0.formatted(using: options) }
                         },
                         .element(.text(")")),
                     ]
@@ -198,10 +213,10 @@ extension LGCTypeAnnotation: SyntaxNodeFormattable {
             return .concat(
                 [
                     .join(with: .concat([.element(.text(",")), .line])) {
-                        value.argumentTypes.map { $0.formatted }
+                        value.argumentTypes.map { $0.formatted(using: options) }
                     },
                     .element(.text("→")),
-                    value.returnType.formatted
+                    value.returnType.formatted(using: options)
                 ]
             )
         case .placeholder(let value):
@@ -211,26 +226,26 @@ extension LGCTypeAnnotation: SyntaxNodeFormattable {
 }
 
 extension LGCExpression: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .identifierExpression(let value):
-            return value.identifier.formatted
+            return value.identifier.formatted(using: options)
         case .binaryExpression(let value):
             switch value.op {
             case .setEqualTo:
                 return .concat(
                     [
-                        value.left.formatted,
+                        value.left.formatted(using: options),
                         .element(.text("=")),
-                        value.right.formatted
+                        value.right.formatted(using: options)
                     ]
                 )
             default:
                 return .concat(
                     [
-                        value.left.formatted,
-                        value.op.formatted,
-                        value.right.formatted
+                        value.left.formatted(using: options),
+                        value.op.formatted(using: options),
+                        value.right.formatted(using: options)
                     ]
                 )
             }
@@ -239,7 +254,7 @@ extension LGCExpression: SyntaxNodeFormattable {
                 return .concat(
                     [
                         .join(with: .concat([.element(.text(",")), .line])) {
-                            value.arguments.map { $0.formatted }
+                            value.arguments.map { $0.formatted(using: options) }
                         }
                     ]
                 )
@@ -247,11 +262,11 @@ extension LGCExpression: SyntaxNodeFormattable {
 
             if value.arguments.isEmpty {
                 // TODO: We should still show () on non-enum calls, but right now we can't distinguish easily
-                return value.expression.formatted
+                return value.expression.formatted(using: options)
 
 //                return .concat {
 //                    [
-//                        value.expression.formatted,
+//                        value.expression.formatted(using: options),
 //                        .element(.text("()"))
 //                    ]
 //                }
@@ -259,14 +274,14 @@ extension LGCExpression: SyntaxNodeFormattable {
 
             return .concat(
                 [
-                    value.expression.formatted,
+                    value.expression.formatted(using: options),
                     .element(.text("(")),
                     .indent(
                         .concat(
                             [
                                 //                                .line,
                                 .join(with: .concat([.element(.text(",")), .line])) {
-                                    value.arguments.map { $0.formatted }
+                                    value.arguments.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
@@ -275,13 +290,13 @@ extension LGCExpression: SyntaxNodeFormattable {
                 ]
             )
         case .literalExpression(let value):
-            return value.literal.formatted
+            return value.literal.formatted(using: options)
         case .memberExpression(let value):
             //            let joined = FormatterCommand<LogicElement>.concat {
-            //                [value.expression.formatted, .element(.text(".")), value.memberName.formatted]
+            //                [value.expression.formatted(using: options), .element(.text(".")), value.memberName.formatted(using: options)]
             //            }
 
-            let joined = value.memberName.formatted
+            let joined = value.memberName.formatted(using: options)
 
             return .element(.dropdown(value.id, joined.stringContents, .variable))
         case .placeholder(let value):
@@ -291,28 +306,28 @@ extension LGCExpression: SyntaxNodeFormattable {
 }
 
 extension LGCStatement: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
         case .loop(let loop):
             return .concat(
                 [
                     .element(LogicElement.dropdown(loop.id, "For each", .source)),
-                    loop.pattern.formatted,
+                    loop.pattern.formatted(using: options),
                     .element(LogicElement.text("in")),
-                    loop.expression.formatted,
+                    loop.expression.formatted(using: options),
                 ]
             )
         case .branch(let branch):
             return .concat(
                 [
                     .element(LogicElement.dropdown(branch.id, "If", .source)),
-                    branch.condition.formatted,
+                    branch.condition.formatted(using: options),
                     .indent(
                         .concat(
                             [
                                 .hardLine,
                                 .join(with: .hardLine) {
-                                    branch.block.map { $0.formatted }
+                                    branch.block.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
@@ -322,15 +337,15 @@ extension LGCStatement: SyntaxNodeFormattable {
         case .placeholderStatement(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         case .expressionStatement(let value):
-            return value.expression.formatted
+            return value.expression.formatted(using: options)
         case .declaration(let value):
-            return value.content.formatted
+            return value.content.formatted(using: options)
         }
     }
 }
 
 extension LGCDeclaration: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
             case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _),
@@ -344,7 +359,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             .hardLine,
                             .element(.text("Generic type parameters:")),
                             .join(with: .concat([.element(.text(",")), .line])) {
-                                genericParameters.map { param in param.formatted }
+                                genericParameters.map { param in param.formatted(using: options) }
                             }
                         ]
                     )
@@ -374,7 +389,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                     [
                                         .hardLine,
                                         .join(with: .concat([.hardLine])) {
-                                            value.parameters.map { param in param.formatted }
+                                            value.parameters.map { param in param.formatted(using: options) }
                                         }
                                     ]
                                 )
@@ -392,12 +407,12 @@ extension LGCDeclaration: SyntaxNodeFormattable {
         case .variable(let value):
             var contents: [FormatterCommand<LogicElement>] = [
                 .element(LogicElement.dropdown(value.id, "Let", .source)),
-                value.name.formatted
+                value.name.formatted(using: options)
             ]
 
             if let annotation = value.annotation {
                 contents.append(.element(.text(":")))
-                contents.append(annotation.formatted)
+                contents.append(annotation.formatted(using: options))
 
                 if let initializer = value.initializer {
                     switch annotation {
@@ -405,7 +420,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         break
                     default:
                         contents.append(.element(.text("=")))
-                        contents.append(initializer.formatted)
+                        contents.append(initializer.formatted(using: options))
                     }
                 }
             }
@@ -415,7 +430,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             return .concat(
                 [
                     .element(LogicElement.dropdown(value.id, "Function", .source)),
-                    value.name.formatted,
+                    value.name.formatted(using: options),
                     .indent(
                         .concat(
                             [
@@ -425,7 +440,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 .hardLine,
                                 .element(.text("Returning")),
                                 .line,
-                                value.returnType.formatted,
+                                value.returnType.formatted(using: options),
                                 .hardLine,
                                 .element(.text("Body:")),
                                 .indent(
@@ -433,7 +448,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                         [
                                             .hardLine,
                                             .join(with: .hardLine) {
-                                                value.block.map { $0.formatted }
+                                                value.block.map { $0.formatted(using: options) }
                                             }
                                         ]
                                     )
@@ -452,7 +467,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             [
                                 .hardLine,
                                 .join(with: .hardLine) {
-                                    value.cases.map { $0.formatted }
+                                    value.cases.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
@@ -463,7 +478,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             return .concat(
                 [
                     .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
-                    value.name.formatted,
+                    value.name.formatted(using: options),
                     (value.genericParameters.isEmpty ? contents : .indent(
                         .concat(
                             [
@@ -484,7 +499,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             [
                                 .hardLine,
                                 .join(with: .hardLine) {
-                                    value.declarations.map { $0.formatted }
+                                    value.declarations.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
@@ -495,7 +510,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             return .concat(
                 [
                     .element(LogicElement.dropdown(value.id, "Record", .source)),
-                    value.name.formatted,
+                    value.name.formatted(using: options),
                     (value.genericParameters.isEmpty ? contents : .indent(
                         .concat(
                             [
@@ -508,19 +523,29 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .namespace(let value):
+            let title: FormatterCommand<LogicElement>
+
+            switch options.style {
+            case .normal:
+                title = .concat(
+                    [
+                        .element(LogicElement.dropdown(value.id, "Namespace", .source)),
+                        value.name.formatted(using: options),
+                    ]
+                )
+            case .visual:
+                title = .element(LogicElement.title(value.id, value.name.name))
+            }
+
             return .concat(
                 [
-//                    .element(LogicElement.dropdown(value.id, "Namespace", .source)),
-//                    value.name.formatted,
-
-                    //                    .element(LogicElement.title(value.id, value.name.name)),
-                    value.name.formattedAsTitle,
+                    title,
                     .indent(
                         .concat(
                             [
                                 .hardLine,
                                 .join(with: .hardLine) {
-                                    value.declarations.map { $0.formatted }
+                                    value.declarations.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
@@ -531,7 +556,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             return .concat(
                 [
                     .element(LogicElement.dropdown(value.id, "Import", .source)),
-                    value.name.formatted
+                    value.name.formatted(using: options)
                 ]
             )
         case .placeholder(let value):
@@ -541,27 +566,27 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 }
 
 extension LGCTopLevelParameters: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
-            self.parameters.map { $0.formatted }
+            self.parameters.map { $0.formatted(using: options) }
         }
     }
 }
 
 
 extension LGCProgram: SyntaxNodeFormattable {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         return .join(with: .hardLine) {
-            self.block.map { $0.formatted }
+            self.block.map { $0.formatted(using: options) }
         }
     }
 }
 
 public extension LGCSyntaxNode {
-    var formatted: FormatterCommand<LogicElement> {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         guard let contents = contents as? SyntaxNodeFormattable else {
             fatalError("No formatting rules for selected \(nodeTypeDescription)")
         }
-        return contents.formatted
+        return contents.formatted(using: options)
     }
 }
