@@ -15,6 +15,7 @@ public indirect enum FormatterCommand<Element> {
     case hardLine
     case join(with: FormatterCommand, () -> [FormatterCommand])
     case concat(@autoclosure () -> [FormatterCommand])
+    case horizontalFloat(decoration: Element, FormatterCommand)
 
     public static var empty: FormatterCommand<Element> {
         return .concat([])
@@ -59,6 +60,9 @@ public indirect enum FormatterCommand<Element> {
                 commands().forEach(process)
             case .join(with: let separator, let commands):
                 process(command: FormatterCommand.performJoin(with: separator, commands))
+            case .horizontalFloat(let element, let command):
+                currentRow.append(element)
+                process(command: command)
             }
         }
 
@@ -115,6 +119,7 @@ public indirect enum FormatterCommand<Element> {
         var currentMaxElementHeight: CGFloat = 0
         var currentIndentLevel: Int = 0
         var currentElementIndex: Int = 0
+        var currentDecorationIndent: CGFloat = 0
 
         func append(element: FormattedElement) {
             currentRow.append(element)
@@ -122,10 +127,15 @@ public indirect enum FormatterCommand<Element> {
             currentElementIndex += 1
         }
 
+        func append(decoration: FormattedElement) {
+            currentRow.append(decoration)
+            currentElementIndex += 1
+        }
+
         func moveToNextRow(wrapping: Bool) {
             rows.append(currentRow)
             currentRow = []
-            currentXOffset = CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
+            currentXOffset = currentDecorationIndent + CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
             currentYOffset += currentMaxElementHeight
             currentMaxElementHeight = minimumLineHeight
         }
@@ -160,6 +170,27 @@ public indirect enum FormatterCommand<Element> {
                 commands().forEach(process)
             case .join(with: let separator, let commands):
                 process(command: FormatterCommand.performJoin(with: separator, commands))
+            case .horizontalFloat(decoration: let decoration, let command):
+                let decorationSize = getElementSize(decoration, currentElementIndex)
+
+                let formattedDecoration = FormatterCommand<Element>.FormattedElement(
+                    element: decoration,
+                    origin: CGPoint(x: currentXOffset, y: currentYOffset),
+                    size: decorationSize
+                )
+
+                append(decoration: formattedDecoration)
+
+                let initialYOffset = currentYOffset
+                currentXOffset += decorationSize.width
+
+                currentDecorationIndent += decorationSize.width
+                process(command: command)
+                currentDecorationIndent -= decorationSize.width
+
+                Swift.print(currentYOffset, initialYOffset, decorationSize.height)
+
+//                currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height)
             }
         }
 

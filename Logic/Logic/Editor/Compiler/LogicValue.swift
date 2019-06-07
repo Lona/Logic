@@ -13,6 +13,7 @@ public struct LogicValue: CustomDebugStringConvertible {
     // MARK: Types
 
     public enum Function {
+        case colorSaturate
         case stringConcat
         case enumInit(caseName: String)
         case recordInit(members: KeyValueList<String, Unification.T>)

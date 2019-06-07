@@ -17,11 +17,13 @@ public class LogicFormattingOptions {
         case normal, visual
     }
 
-    public init(style: Style = .normal) {
+    public init(style: Style = .normal, getColor: @escaping (UUID) -> NSColor? = {_ in nil}) {
         self.style = style
+        self.getColor = getColor
     }
 
     public var style: Style
+    public var getColor: (UUID) -> NSColor?
 
     public static var normal = LogicFormattingOptions()
     public static var visual = LogicFormattingOptions(style: .visual)
@@ -425,6 +427,21 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
                 if let initializer = value.initializer {
                     switch annotation {
+                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                        where identifier.string == "CSSColor" && options.style == .visual:
+
+                        let decoration: LogicElement = .colorSwatch("test", options.getColor(initializer.uuid) ?? NSColor.clear)
+
+                        return .horizontalFloat(
+                            decoration: decoration,
+                            .concat(
+                                [
+                                    value.name.formatted(using: options),
+                                    .hardLine,
+                                    initializer.formatted(using: options)
+                                ]
+                            )
+                        )
                     case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty) where identifier.isPlaceholder:
                         break
                     default:
@@ -554,15 +571,12 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         .hardLine,
                         .element(LogicElement.title(value.name.id, value.name.name)),
                         .concat(
-                            [
-                                .hardLine,
-                                .join(with: .hardLine) {
-                                    value.declarations.map {
-                                        let decl = $0.formatted(using: options)
-                                        return $0.shouldIndentInNamespace ? .indent(decl) : decl
-                                    }
-                                }
-                            ]
+                            value.declarations.map {
+                                let decl: FormatterCommand<LogicElement> = .concat(
+                                    [.hardLine, $0.formatted(using: options)]
+                                )
+                                return $0.shouldIndentInNamespace ? .indent(decl) : decl
+                            }
                         ),
                         .hardLine
                     ]

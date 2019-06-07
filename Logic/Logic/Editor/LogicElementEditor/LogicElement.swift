@@ -35,11 +35,13 @@ public enum LogicElement {
     case coloredText(String, NSColor)
     case dropdown(UUID, String, DropdownStyle)
     case title(UUID, String)
+    case colorSwatch(String, NSColor)
 
     public var isActivatable: Bool {
         switch self {
         case .text,
-             .coloredText:
+             .coloredText,
+             .colorSwatch:
             return false
         case .title,
              .dropdown:
@@ -50,7 +52,8 @@ public enum LogicElement {
     public var syntaxNodeID: UUID? {
         switch self {
         case .text,
-             .coloredText:
+             .coloredText,
+             .colorSwatch:
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _):
@@ -63,7 +66,8 @@ public enum LogicElement {
         case .text(let value),
              .coloredText(let value, _),
              .title(_, let value),
-             .dropdown(_, let value, _):
+             .dropdown(_, let value, _),
+             .colorSwatch(let value, _):
             return value
         }
     }
@@ -72,7 +76,7 @@ public enum LogicElement {
         switch self {
         case .text, .title:
             return Colors.text
-        case .coloredText(_, let color):
+        case .coloredText(_, let color), .colorSwatch(_, let color):
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color
@@ -133,6 +137,14 @@ extension LogicElement {
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
+        case .colorSwatch(_, _):
+            let rect: CGRect = .init(origin: origin, size: .init(width: 46, height: 46))
+
+            return LogicMeasuredElement(
+                element: self,
+                attributedString: .init(),
+                attributedStringRect: rect,
+                backgroundRect: rect)
         case .coloredText(_, let color):
             fatalError("Unused")
 //            return textElement(color: selected ? NSColor.systemGreen : color, font: titleTextStyle.nsFont)

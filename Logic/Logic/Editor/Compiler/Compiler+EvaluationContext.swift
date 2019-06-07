@@ -8,6 +8,30 @@
 
 import Foundation
 
+private extension NSColor {
+    var hexString: String {
+        guard let rgbColor = usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
+            return "#FFFFFF"
+        }
+        let red = Int(round(rgbColor.redComponent * 0xFF))
+        let green = Int(round(rgbColor.greenComponent * 0xFF))
+        let blue = Int(round(rgbColor.blueComponent * 0xFF))
+        let hexString = NSString(format: "#%02X%02X%02X", red, green, blue)
+        return hexString as String
+    }
+
+    var rgbaString: String {
+        guard let rgbColor = usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
+            return "rgba(255,255,255,1)"
+        }
+        let red = Int(round(rgbColor.redComponent * 255))
+        let green = Int(round(rgbColor.greenComponent * 255))
+        let blue = Int(round(rgbColor.blueComponent * 255))
+        let rgbaString = NSString(format: "rgba(%d,%d,%d,%f)", red, green, blue, alphaComponent)
+        return rgbaString as String
+    }
+}
+
 extension Compiler {
     public class EvaluationContext {
         public init(values: [UUID: LogicValue] = [:]) {
@@ -145,6 +169,21 @@ extension Compiler {
 
             if case .function(let f) = functionValue.memory {
                 switch f {
+                case .colorSaturate:
+                    func saturate(color: LogicValue?, percent: LogicValue?) -> LogicValue {
+                        let defaultColor = LogicValue.cssColor("black")
+                        guard let colorString = color?.colorString else { return defaultColor }
+                        guard case .number(let number)? = percent?.memory else { return defaultColor }
+
+                        guard let nsColor = NSColor.parse(css: colorString) else { return defaultColor }
+
+                        let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
+
+                        return LogicValue.cssColor(newColor.rgbaString)
+                    }
+
+//                    Swift.print(f, "Args", args)
+                    context.values[node.uuid] = saturate(color: args[0], percent: args[1])
                 case .stringConcat:
                     func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
                         guard case .string(let a)? = a?.memory else { return .unit }
@@ -152,7 +191,7 @@ extension Compiler {
                         return .init(.cons(name: "String"), .string(a + b))
                     }
 
-                    Swift.print(f, "Args", args)
+//                    Swift.print(f, "Args", args)
                     context.values[node.uuid] = concat(a: args[0], b: args[1])
                 case .enumInit(let patternName):
 
@@ -186,6 +225,9 @@ extension Compiler {
             switch fullPath {
             case ["String", "concat"]:
                 context.values[pattern.uuid] = LogicValue(type, .function(.stringConcat))
+                break
+            case ["CSSColor", "saturate"]:
+                context.values[pattern.uuid] = LogicValue(type, .function(.colorSaturate))
                 break
             default:
                 break

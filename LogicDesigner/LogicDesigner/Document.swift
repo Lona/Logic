@@ -59,8 +59,6 @@ class Document: NSDocument {
         logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
-        logicEditor.formattingOptions = .visual
-
         logicEditor.showsDropdown = true
 
 //        logicEditor.rootNode = .topLevelParameters(
@@ -72,14 +70,50 @@ class Document: NSDocument {
         var annotations: [UUID: String] = [:]
         var colorValues: [UUID: String] = [:]
 
+        logicEditor.formattingOptions = LogicFormattingOptions(
+            style: .visual,
+            getColor: { id in
+                guard let colorString = colorValues[id] else { return nil }
+                return NSColor.parse(css: colorString)
+            }
+        )
+
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
 
             if let colorValue = colorValues[node.uuid] {
+                if self.logicEditor.formattingOptions.style == .visual,
+                    let path = self.logicEditor.rootNode.pathTo(id: id),
+                    let parent = path.dropLast().last {
+
+                    switch parent {
+                    case .declaration(.variable):
+                        return nil
+                    default:
+                        break
+                    }
+
+                    if let grandParent = path.dropLast().dropLast().last {
+                        switch (grandParent, parent, node) {
+                        case (.declaration(.variable), .expression(.literalExpression), .literal(.color)):
+                            return nil
+                        default:
+                            break
+                        }
+                    }
+                }
+
                 return .color(NSColor.parse(css: colorValue) ?? NSColor.black)
             }
 
             if let annotation = annotations[node.uuid] {
+                switch node {
+                case .literal:
+                    return nil
+                default:
+                    break
+                }
+
                 return .label(labelFont, annotation)
             }
 
@@ -131,7 +165,12 @@ class Document: NSDocument {
 //                Swift.print("Result", evaluationContext.values)
 
                 evaluationContext.values.forEach { id, value in
-                    annotations[id] = "\(value.memory)"
+                    switch value.memory {
+                    case .unit, .bool, .number, .string, .enum, .array:
+                        annotations[id] = "\(value.memory)"
+                    case .record, .function:
+                        break
+                    }
 
 //                    Swift.print(id, value.type, value.memory)
 
