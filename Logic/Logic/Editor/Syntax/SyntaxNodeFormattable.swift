@@ -347,7 +347,7 @@ extension LGCStatement: SyntaxNodeFormattable {
 extension LGCDeclaration: SyntaxNodeFormattable {
     private var shouldIndentInNamespace: Bool {
         switch self {
-        case .namespace:
+        case .namespace, .placeholder:
             return true
         default:
             return false
