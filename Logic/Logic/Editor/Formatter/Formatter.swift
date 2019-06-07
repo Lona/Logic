@@ -11,10 +11,14 @@ import Foundation
 public indirect enum FormatterCommand<Element> {
     case element(Element)
     case line
-    case indent(() -> FormatterCommand)
+    case indent(@autoclosure () -> FormatterCommand)
     case hardLine
     case join(with: FormatterCommand, () -> [FormatterCommand])
-    case concat(() -> [FormatterCommand])
+    case concat(@autoclosure () -> [FormatterCommand])
+
+    public static var empty: FormatterCommand<Element> {
+        return .concat([])
+    }
 
     public struct FormattedElement {
         var element: Element
@@ -167,6 +171,6 @@ public indirect enum FormatterCommand<Element> {
             }
         }
 
-        return .concat { joinedCommands }
+        return .concat(joinedCommands)
     }
 }

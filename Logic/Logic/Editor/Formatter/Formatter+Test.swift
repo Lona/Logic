@@ -9,13 +9,13 @@
 import Foundation
 
 func testFormatter() {
-    let command: FormatterCommand<String> = .concat {
+    let command: FormatterCommand<String> = .concat(
         [
             .element("Hello"),
             .line,
             .hardLine,
-            .indent {
-                .concat {
+            .indent(
+                .concat(
                     [
                         .element("test"),
                         .line,
@@ -23,10 +23,10 @@ func testFormatter() {
                         .line,
                         .element("again")
                     ]
-                }
-            }
+                )
+            )
         ]
-    }
+    )
 
     let lines = command.print(width: 20, spaceWidth: 1, indentWidth: 4, getElementWidth: { string, _ in CGFloat(string.count) })
 
