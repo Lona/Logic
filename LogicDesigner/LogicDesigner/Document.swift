@@ -59,6 +59,8 @@ class Document: NSDocument {
         logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
+        logicEditor.formattingOptions = .visual
+
         logicEditor.showsDropdown = true
 
 //        logicEditor.rootNode = .topLevelParameters(

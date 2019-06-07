@@ -24,7 +24,7 @@ public class LogicFormattingOptions {
     public var style: Style
 
     public static var normal = LogicFormattingOptions()
-    public static var visual = LogicFormattingOptions()
+    public static var visual = LogicFormattingOptions(style: .visual)
 }
 
 fileprivate extension FormatterCommand where Element == LogicElement {
@@ -345,6 +345,15 @@ extension LGCStatement: SyntaxNodeFormattable {
 }
 
 extension LGCDeclaration: SyntaxNodeFormattable {
+    private var shouldIndentInNamespace: Bool {
+        switch self {
+        case .namespace:
+            return true
+        default:
+            return false
+        }
+    }
+
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
@@ -523,24 +532,12 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .namespace(let value):
-            let title: FormatterCommand<LogicElement>
-
             switch options.style {
             case .normal:
-                title = .concat(
+                return .concat(
                     [
                         .element(LogicElement.dropdown(value.id, "Namespace", .source)),
                         value.name.formatted(using: options),
-                    ]
-                )
-            case .visual:
-                title = .element(LogicElement.title(value.id, value.name.name))
-            }
-
-            return .concat(
-                [
-                    title,
-                    .indent(
                         .concat(
                             [
                                 .hardLine,
@@ -549,9 +546,28 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 }
                             ]
                         )
-                    )
-                ]
-            )
+                    ]
+                )
+            case .visual:
+                return .concat(
+                    [
+                        .hardLine,
+                        .element(LogicElement.title(value.name.id, value.name.name)),
+                        .concat(
+                            [
+                                .hardLine,
+                                .join(with: .hardLine) {
+                                    value.declarations.map {
+                                        let decl = $0.formatted(using: options)
+                                        return $0.shouldIndentInNamespace ? .indent(decl) : decl
+                                    }
+                                }
+                            ]
+                        ),
+                        .hardLine
+                    ]
+                )
+            }
         case .importDeclaration(let value):
             return .concat(
                 [
