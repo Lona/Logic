@@ -72,6 +72,7 @@ class Document: NSDocument {
 
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
+//            locale: .es_ES,
             getColor: { id in
                 guard let colorString = colorValues[id] else { return nil }
                 return NSColor.parse(css: colorString)

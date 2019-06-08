@@ -14,15 +14,70 @@ protocol SyntaxNodeFormattable {
 
 public class LogicFormattingOptions {
     public enum Style {
-        case normal, visual
+        case natural, visual, js
     }
 
-    public init(style: Style = .normal, getColor: @escaping (UUID) -> NSColor? = {_ in nil}) {
+    public enum Locale {
+        case en_US, es_ES
+
+        public var `true`: String {
+            switch self {
+            case .en_US:
+                return "true"
+            case .es_ES:
+                return "cierto"
+            }
+        }
+
+        public var `false`: String {
+            switch self {
+            case .en_US:
+                return "false"
+            case .es_ES:
+                return "falso"
+            }
+        }
+
+        public var `if`: String {
+            switch self {
+            case .en_US:
+                return "If"
+            case .es_ES:
+                return "Si"
+            }
+        }
+
+        public var `in`: String {
+            switch self {
+            case .en_US:
+                return "in"
+            case .es_ES:
+                return "en"
+            }
+        }
+
+        public var `forEach`: String {
+            switch self {
+            case .en_US:
+                return "For each"
+            case .es_ES:
+                return "Por cada"
+            }
+        }
+    }
+
+    public init(
+        style: Style = .natural,
+        locale: Locale = .en_US,
+        getColor: @escaping (UUID) -> NSColor? = {_ in nil}
+        ) {
         self.style = style
+        self.locale = locale
         self.getColor = getColor
     }
 
     public var style: Style
+    public var locale: Locale
     public var getColor: (UUID) -> NSColor?
 
     public static var normal = LogicFormattingOptions()
@@ -69,7 +124,7 @@ extension LGCLiteral: SyntaxNodeFormattable {
         case .none:
             return .element(.text("none"))
         case .boolean(let value):
-            return .element(LogicElement.dropdown(value.id, value.value.description, .variable))
+            return .element(LogicElement.dropdown(value.id, value.value ? options.locale.true : options.locale.false, .variable))
         case .number(let value):
             let formatted = value.value.description.replacingOccurrences(of: ".0", with: "")
             return .element(LogicElement.dropdown(value.id, formatted, .variable))
@@ -313,16 +368,16 @@ extension LGCStatement: SyntaxNodeFormattable {
         case .loop(let loop):
             return .concat(
                 [
-                    .element(LogicElement.dropdown(loop.id, "For each", .source)),
+                    .element(LogicElement.dropdown(loop.id, options.locale.forEach, .source)),
                     loop.pattern.formatted(using: options),
-                    .element(LogicElement.text("in")),
+                    .element(LogicElement.text(options.locale.in)),
                     loop.expression.formatted(using: options),
                 ]
             )
         case .branch(let branch):
             return .concat(
                 [
-                    .element(LogicElement.dropdown(branch.id, "If", .source)),
+                    .element(LogicElement.dropdown(branch.id, options.locale.if, .source)),
                     branch.condition.formatted(using: options),
                     .indent(
                         .concat(
@@ -416,10 +471,16 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
         switch self {
         case .variable(let value):
-            var contents: [FormatterCommand<LogicElement>] = [
-                .element(LogicElement.dropdown(value.id, "Let", .source)),
-                value.name.formatted(using: options)
-            ]
+            var contents: [FormatterCommand<LogicElement>] = []
+
+            switch options.style {
+            case .js:
+                break
+            case .natural, .visual:
+                contents.append(.element(LogicElement.dropdown(value.id, "Let", .source)))
+            }
+
+            contents.append(value.name.formatted(using: options))
 
             if let annotation = value.annotation {
                 contents.append(.element(.text(":")))
@@ -550,18 +611,40 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             )
         case .namespace(let value):
             switch options.style {
-            case .normal:
+            case .js:
+                return .concat(
+                    [
+                        .element(LogicElement.dropdown(value.id, "export const", .source)),
+                        value.name.formatted(using: options),
+                        .element(LogicElement.text("= {")),
+                        .indent(
+                            .concat(
+                                [
+                                    .hardLine,
+                                    .join(with: .hardLine) {
+                                        value.declarations.map { $0.formatted(using: options) }
+                                    }
+                                ]
+                            )
+                        ),
+                        .hardLine,
+                        .element(LogicElement.text("}")),
+                    ]
+                )
+            case .natural:
                 return .concat(
                     [
                         .element(LogicElement.dropdown(value.id, "Namespace", .source)),
                         value.name.formatted(using: options),
-                        .concat(
-                            [
-                                .hardLine,
-                                .join(with: .hardLine) {
-                                    value.declarations.map { $0.formatted(using: options) }
-                                }
-                            ]
+                        .indent(
+                            .concat(
+                                [
+                                    .hardLine,
+                                    .join(with: .hardLine) {
+                                        value.declarations.map { $0.formatted(using: options) }
+                                    }
+                                ]
+                            )
                         )
                     ]
                 )
