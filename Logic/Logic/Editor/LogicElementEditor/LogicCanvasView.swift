@@ -16,6 +16,7 @@ public class LogicCanvasView: NSView {
 
     public struct Style {
         public var font = TextStyle(family: "San Francisco", size: 13).nsFont
+        public var boldFont = TextStyle(family: "San Francisco", weight: NSFont.Weight.semibold, size: 13).nsFont
         public var textPadding = CGSize(width: 4, height: 3)
         public var textMargin = CGSize(width: 6, height: 6)
         public var textBackgroundRadius = CGSize(width: 2, height: 2)
@@ -483,6 +484,7 @@ public class LogicCanvasView: NSView {
                 selected: self.selectedIndex == index,
                 origin: .zero,
                 font: self.style.font,
+                boldFont: self.style.boldFont,
                 padding: self.style.textPadding,
                 decoration: self.cachedDecoration(for: element)
                 ).backgroundRect.size
@@ -538,6 +540,7 @@ public class LogicCanvasView: NSView {
                     selected: self.selectedIndex == formattedElementIndex,
                     origin: offset,
                     font: style.font,
+                    boldFont: style.boldFont,
                     padding: style.textPadding,
                     decoration: decoration
                 )

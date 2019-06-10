@@ -153,7 +153,7 @@ public extension LGCLiteral {
                 title: "Color",
                 badge: "CSSColor",
                 category: categoryTitle,
-                node: LGCSyntaxNode.literal(.color(id: UUID(), value: prefix)),
+                node: LGCSyntaxNode.literal(.color(id: UUID(), value: prefix.starts(with: "#") ? prefix.uppercased() : prefix)),
                 disabled: color == nil,
                 style: color == nil ? .normal : .colorPreview(code: prefix, color ?? NSColor.black)
             )

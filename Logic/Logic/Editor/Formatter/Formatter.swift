@@ -16,6 +16,7 @@ public indirect enum FormatterCommand<Element> {
     case join(with: FormatterCommand, () -> [FormatterCommand])
     case concat(@autoclosure () -> [FormatterCommand])
     case horizontalFloat(decoration: Element, FormatterCommand)
+    case spacer(CGFloat)
 
     public static var empty: FormatterCommand<Element> {
         return .concat([])
@@ -63,6 +64,8 @@ public indirect enum FormatterCommand<Element> {
             case .horizontalFloat(let element, let command):
                 currentRow.append(element)
                 process(command: command)
+            case .spacer:
+                break
             }
         }
 
@@ -191,6 +194,8 @@ public indirect enum FormatterCommand<Element> {
                 Swift.print(currentYOffset, initialYOffset, decorationSize.height)
 
 //                currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height)
+            case .spacer(let size):
+                currentYOffset += size
             }
         }
 

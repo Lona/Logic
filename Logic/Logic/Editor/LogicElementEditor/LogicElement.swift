@@ -17,13 +17,13 @@ public enum LogicElement {
     }
 
     public enum DropdownStyle {
-        case source, variable, placeholder
+        case source, variable, placeholder, boldVariable
 
         var color: NSColor {
             switch self {
             case .source:
                 return Colors.text
-            case .variable:
+            case .variable, .boldVariable:
                 return Colors.editableText
             case .placeholder:
                 return NSColor.systemYellow
@@ -91,6 +91,7 @@ extension LogicElement {
         selected: Bool,
         origin: CGPoint,
         font: NSFont,
+        boldFont: NSFont,
         padding: NSSize,
         decoration: Decoration?) -> LogicMeasuredElement {
 
@@ -100,7 +101,7 @@ extension LogicElement {
 
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: font
+                NSAttributedString.Key.font: font,
             ]
             attributedString.setAttributes(attributes, range: range)
 
@@ -138,18 +139,21 @@ extension LogicElement {
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
         case .colorSwatch(_, _):
-            let rect: CGRect = .init(origin: origin, size: .init(width: 46, height: 46))
+            let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
 
             return LogicMeasuredElement(
                 element: self,
                 attributedString: .init(),
                 attributedStringRect: rect,
                 backgroundRect: rect)
-        case .coloredText(_, let color):
+        case .coloredText:
             fatalError("Unused")
 //            return textElement(color: selected ? NSColor.systemGreen : color, font: titleTextStyle.nsFont)
         case .dropdown(_, _, let dropdownStyle):
-            var (attributedString, rect, backgroundRect) = textComponents(color: dropdownStyle.color, font: font)
+            var (attributedString, rect, backgroundRect) = textComponents(
+                color: dropdownStyle.color,
+                font: dropdownStyle == .boldVariable ? boldFont : font
+            )
 
             if LogicCanvasView.dropdownCarets || value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11

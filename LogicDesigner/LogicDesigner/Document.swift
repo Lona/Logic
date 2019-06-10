@@ -74,8 +74,8 @@ class Document: NSDocument {
             style: .visual,
 //            locale: .es_ES,
             getColor: { id in
-                guard let colorString = colorValues[id] else { return nil }
-                return NSColor.parse(css: colorString)
+                guard let colorString = colorValues[id], let color = NSColor.parse(css: colorString) else { return nil }
+                return (colorString, color)
             }
         )
 
@@ -140,7 +140,7 @@ class Document: NSDocument {
             }
         }
 
-        logicEditor.onChangeRootNode = { [unowned self] rootNode in
+        func evaluate(rootNode: LGCSyntaxNode) -> Bool {
             self.logicEditor.rootNode = rootNode
 
             let rootNode = self.logicEditor.rootNode
@@ -163,7 +163,7 @@ class Document: NSDocument {
 
             switch result {
             case .success(let evaluationContext):
-//                Swift.print("Result", evaluationContext.values)
+                //                Swift.print("Result", evaluationContext.values)
 
                 evaluationContext.values.forEach { id, value in
                     switch value.memory {
@@ -173,7 +173,7 @@ class Document: NSDocument {
                         break
                     }
 
-//                    Swift.print(id, value.type, value.memory)
+                    //                    Swift.print(id, value.type, value.memory)
 
                     if let colorString = value.colorString {
                         colorValues[id] = colorString
@@ -184,37 +184,13 @@ class Document: NSDocument {
             }
 
             return true
-
-//            do {
-////                let compilerContext = try Environment.compile(rootNode, in: .standard)
-//
-////                Swift.print(compilerContext.nodeType, compilerContext.scopes)
-//
-//                let context = try Environment.evaluate(rootNode, in: .standard).1
-//
-////                Swift.print(context.scopes)
-//
-//                annotations = context.annotations
-//
-//                self.logicEditor.underlinedId = nil
-//            } catch let error {
-//                if let error = error as? CompilerError {
-////                    Swift.print("Compiler error", error)
-//
-//                    // TODO:
-////                    self.logicEditor.underlinedId = error.nodeId
-//                }
-//
-//                if let error = error as? LogicError {
-//                    annotations = error.context.annotations
-//
-//                    // TODO:
-////                    self.logicEditor.underlinedId = error.nodeId
-//                }
-//            }
-//
-//            return true
         }
+
+        logicEditor.onChangeRootNode = { rootNode in
+            return evaluate(rootNode: rootNode)
+        }
+
+        _ = evaluate(rootNode: logicEditor.rootNode)
 
         window.backgroundColor = Colors.background
         window.center()

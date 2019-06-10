@@ -27,8 +27,15 @@ private extension NSColor {
         let red = Int(round(rgbColor.redComponent * 255))
         let green = Int(round(rgbColor.greenComponent * 255))
         let blue = Int(round(rgbColor.blueComponent * 255))
-        let rgbaString = NSString(format: "rgba(%d,%d,%d,%f)", red, green, blue, alphaComponent)
+        let rgbaString = "rgba(\(red),\(green),\(blue),\(alphaComponent))"
         return rgbaString as String
+    }
+
+    var cssString: String {
+        guard let rgbColor = usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
+            return "#FFFFFF"
+        }
+        return alphaComponent < 1 ? rgbaString : hexString
     }
 }
 
@@ -179,7 +186,7 @@ extension Compiler {
 
                         let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
 
-                        return LogicValue.cssColor(newColor.rgbaString)
+                        return LogicValue.cssColor(newColor.cssString)
                     }
 
 //                    Swift.print(f, "Args", args)

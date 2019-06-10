@@ -69,7 +69,7 @@ public class LogicFormattingOptions {
     public init(
         style: Style = .natural,
         locale: Locale = .en_US,
-        getColor: @escaping (UUID) -> NSColor? = {_ in nil}
+        getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil}
         ) {
         self.style = style
         self.locale = locale
@@ -78,7 +78,7 @@ public class LogicFormattingOptions {
 
     public var style: Style
     public var locale: Locale
-    public var getColor: (UUID) -> NSColor?
+    public var getColor: (UUID) -> (String, NSColor)?
 
     public static var normal = LogicFormattingOptions()
     public static var visual = LogicFormattingOptions(style: .visual)
@@ -491,15 +491,21 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                     case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
                         where identifier.string == "CSSColor" && options.style == .visual:
 
-                        let decoration: LogicElement = .colorSwatch("test", options.getColor(initializer.uuid) ?? NSColor.clear)
+                        let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
+                        let decoration: LogicElement = .colorSwatch(colorInfo.0, colorInfo.1)
+
+                        let formattedInitializer = initializer.formatted(using: options)
 
                         return .horizontalFloat(
                             decoration: decoration,
                             .concat(
                                 [
-                                    value.name.formatted(using: options),
+                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
                                     .hardLine,
-                                    initializer.formatted(using: options)
+                                    formattedInitializer,
+                                    .hardLine,
+                                    .element(.text(formattedInitializer.stringContents == colorInfo.0 ? "" : colorInfo.0)),
+                                    .spacer(4)
                                 ]
                             )
                         )
@@ -661,7 +667,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 return $0.shouldIndentInNamespace ? .indent(decl) : decl
                             }
                         ),
-                        .hardLine
+                        //.hardLine
                     ]
                 )
             }
