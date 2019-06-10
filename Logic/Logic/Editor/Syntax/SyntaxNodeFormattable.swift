@@ -13,8 +13,19 @@ protocol SyntaxNodeFormattable {
 }
 
 public class LogicFormattingOptions {
-    public enum Style {
+    public enum Style: String {
         case natural, visual, js
+
+        public var displayName: String {
+            switch self {
+            case .natural:
+                return "Natural language"
+            case .visual:
+                return "Visual language"
+            case .js:
+                return "JavaScript-like"
+            }
+        }
     }
 
     public enum Locale {

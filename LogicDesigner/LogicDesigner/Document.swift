@@ -36,7 +36,11 @@ class Document: NSDocument {
     var window: NSWindow?
 
     let logicEditor = LogicEditor()
+    let infoBar = InfoBar()
+    let divider = Divider()
     let containerView = NSBox()
+
+    let editorDisplayStyles: [LogicFormattingOptions.Style] = [.visual, .natural, .js]
 
     override func makeWindowControllers() {
         let window = NSWindow(
@@ -50,14 +54,37 @@ class Document: NSDocument {
         containerView.contentViewMargins = .zero
 
         containerView.addSubview(logicEditor)
+        containerView.addSubview(infoBar)
+        containerView.addSubview(divider)
 
         containerView.translatesAutoresizingMaskIntoConstraints = false
         logicEditor.translatesAutoresizingMaskIntoConstraints = false
+        infoBar.translatesAutoresizingMaskIntoConstraints = false
+        divider.translatesAutoresizingMaskIntoConstraints = false
 
         logicEditor.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
-        logicEditor.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         logicEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         logicEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+
+        logicEditor.bottomAnchor.constraint(equalTo: divider.topAnchor).isActive = true
+
+        divider.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        divider.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        divider.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+
+        divider.bottomAnchor.constraint(equalTo: infoBar.topAnchor).isActive = true
+
+        infoBar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        infoBar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        infoBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+
+        infoBar.dropdownValues = editorDisplayStyles.map { $0.displayName }
+        infoBar.onChangeDropdownIndex = { [unowned self] index in
+            var newFormattingOptions = self.logicEditor.formattingOptions
+            newFormattingOptions.style = self.editorDisplayStyles[index]
+            self.logicEditor.formattingOptions = newFormattingOptions
+            self.infoBar.dropdownIndex = index
+        }
 
         logicEditor.showsDropdown = true
 
@@ -70,6 +97,7 @@ class Document: NSDocument {
         var annotations: [UUID: String] = [:]
         var colorValues: [UUID: String] = [:]
 
+        infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
 //            locale: .es_ES,

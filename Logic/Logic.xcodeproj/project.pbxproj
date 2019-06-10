@@ -23,6 +23,8 @@
 		6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */; };
 		6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */; };
 		6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */; };
+		6B44759D22AED136009AE087 /* InfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44759C22AED136009AE087 /* InfoBar.swift */; };
+		6B44759F22AED58E009AE087 /* Divider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44759E22AED58E009AE087 /* Divider.swift */; };
 		6B44E143223B3D8E00740318 /* RichText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E140223B3D2200740318 /* RichText.swift */; };
 		6B44E144223B3D9000740318 /* RichText+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E141223B3D2200740318 /* RichText+AppKit.swift */; };
 		6B44E152223B3DD000740318 /* CGSize+Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E145223B3DB700740318 /* CGSize+Resizing.swift */; };
@@ -116,6 +118,8 @@
 		6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+LogicElement.swift"; sourceTree = "<group>"; };
 		6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSOutlineView+Dragging.swift"; sourceTree = "<group>"; };
 		6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCList+SyntaxNode.swift"; sourceTree = "<group>"; };
+		6B44759C22AED136009AE087 /* InfoBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoBar.swift; sourceTree = "<group>"; };
+		6B44759E22AED58E009AE087 /* Divider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Divider.swift; sourceTree = "<group>"; };
 		6B44E140223B3D2200740318 /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
 		6B44E141223B3D2200740318 /* RichText+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichText+AppKit.swift"; sourceTree = "<group>"; };
 		6B44E145223B3DB700740318 /* CGSize+Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGSize+Resizing.swift"; sourceTree = "<group>"; };
@@ -237,6 +241,8 @@
 			isa = PBXGroup;
 			children = (
 				6B3414B5225D68E000CC65D1 /* ColorRow.swift */,
+				6B44759E22AED58E009AE087 /* Divider.swift */,
+				6B44759C22AED136009AE087 /* InfoBar.swift */,
 				6B44E14E223B3DB700740318 /* ResultRow.swift */,
 				6B44E14F223B3DB700740318 /* ResultSectionHeader.swift */,
 				6B44E14D223B3DB700740318 /* SuggestionView.swift */,
@@ -584,6 +590,7 @@
 				6B9528D322A0B35B0094D9C7 /* LGCProgram+Imports.swift in Sources */,
 				6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */,
 				6B5B7562215B1ABE00CDC9C6 /* TypeCase.swift in Sources */,
+				6B44759F22AED58E009AE087 /* Divider.swift in Sources */,
 				6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */,
 				6B44E16B223B3E9E00740318 /* SuggestionListView.swift in Sources */,
 				6B44E186223B40CF00740318 /* LGCSyntax+Documentation.swift in Sources */,
@@ -601,6 +608,7 @@
 				6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */,
 				6B9528D522A0C2710094D9C7 /* CSSColor.swift in Sources */,
 				6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */,
+				6B44759D22AED136009AE087 /* InfoBar.swift in Sources */,
 				6B44E157223B3DD000740318 /* NSImage+Resizing.swift in Sources */,
 				6B5B7566215B1ABE00CDC9C6 /* TypeListEditor.swift in Sources */,
 				6B44E16D223B3E9E00740318 /* SuggestionDetailView.swift in Sources */,

@@ -1,0 +1,126 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+
+      }
+    }
+  ],
+  "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "selectedIndex"
+      ],
+      "content" : [
+        "parameters",
+        "dropdownIndex"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "values"
+      ],
+      "content" : [
+        "parameters",
+        "dropdownValues"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
+        "onChangeIndex"
+      ],
+      "content" : [
+        "parameters",
+        "onChangeDropdownIndex"
+      ],
+      "type" : "AssignExpr"
+    }
+  ],
+  "params" : [
+    {
+      "name" : "dropdownValues",
+      "type" : {
+        "name" : "Array",
+        "of" : "String"
+      }
+    },
+    {
+      "name" : "dropdownIndex",
+      "type" : "WholeNumber"
+    },
+    {
+      "name" : "onChangeDropdownIndex",
+      "type" : {
+        "name" : "Function",
+        "parameters" : [
+          {
+            "label" : "_",
+            "type" : "WholeNumber"
+          }
+        ]
+      }
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "id" : "Spacer",
+        "params" : {
+          "alignSelf" : "stretch",
+          "flex" : 1
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "children" : [
+          {
+            "id" : "ControlledDropdown",
+            "params" : {
+              "selectedIndex" : 0,
+              "values" : [
+
+              ]
+            },
+            "type" : "ControlledDropdown"
+          }
+        ],
+        "id" : "ControlledDropdownContainer",
+        "params" : {
+          "alignItems" : "center",
+          "alignSelf" : "stretch",
+          "flexDirection" : "row",
+          "paddingLeft" : 5,
+          "paddingRight" : 5
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "View",
+    "params" : {
+      "alignSelf" : "stretch",
+      "flexDirection" : "row",
+      "height" : 32
+    },
+    "type" : "Lona:View"
+  }
+}
