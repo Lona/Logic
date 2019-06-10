@@ -49,6 +49,18 @@ public enum LogicElement {
         }
     }
 
+    public var allowsLineSelection: Bool {
+        switch self {
+        case .colorSwatch:
+            return false
+        case .title,
+             .dropdown,
+             .coloredText,
+             .text:
+            return true
+        }
+    }
+
     public var syntaxNodeID: UUID? {
         switch self {
         case .text,

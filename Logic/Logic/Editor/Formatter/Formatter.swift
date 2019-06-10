@@ -184,14 +184,14 @@ public indirect enum FormatterCommand<Element> {
 
                 append(decoration: formattedDecoration)
 
-                let initialYOffset = currentYOffset
+//                let initialYOffset = currentYOffset
                 currentXOffset += decorationSize.width
 
                 currentDecorationIndent += decorationSize.width
                 process(command: command)
                 currentDecorationIndent -= decorationSize.width
 
-                Swift.print(currentYOffset, initialYOffset, decorationSize.height)
+//                Swift.print(currentYOffset, initialYOffset, decorationSize.height)
 
 //                currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height)
             case .spacer(let size):

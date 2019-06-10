@@ -689,8 +689,10 @@ extension LogicCanvasView {
     private func item(at point: CGPoint) -> Item? {
         if let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) }) {
             return .range(index..<index + 1)
-        } else if let lineElementIndex = measuredElements.firstIndex(where: {
-            point.y < $0.backgroundRect.maxY
+        }
+
+        if let lineElementIndex = measuredElements.firstIndex(where: { measuredElement in
+            return measuredElement.element.allowsLineSelection && point.y < measuredElement.backgroundRect.maxY
         }) {
             return .line(formattedContent.lineIndex(for: lineElementIndex))
         }
@@ -699,8 +701,8 @@ extension LogicCanvasView {
     }
 
     private func logicalLineIndex(at point: CGPoint) -> Int {
-        if let lineElementIndex = measuredElements.firstIndex(where: {
-            point.y < $0.backgroundRect.midY
+        if let lineElementIndex = measuredElements.firstIndex(where: { measuredElement in
+            measuredElement.element.allowsLineSelection && point.y < measuredElement.backgroundRect.midY
         }) {
             return formattedContent.lineIndex(for: lineElementIndex)
         }
