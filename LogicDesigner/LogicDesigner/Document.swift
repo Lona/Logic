@@ -231,15 +231,36 @@ class Document: NSDocument {
         addWindowController(windowController)
     }
 
+//    override func data(ofType typeName: String) throws -> Data {
+//        let encoder = JSONEncoder()
+//        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+//
+//        return try encoder.encode(logicEditor.rootNode)
+//    }
+//
+//    override func read(from data: Data, ofType typeName: String) throws {
+//        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
+//    }
+
     override func data(ofType typeName: String) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
-        return try encoder.encode(logicEditor.rootNode)
+        let jsonData = try encoder.encode(logicEditor.rootNode)
+
+        guard let xmlData = LogicFile.convert(jsonData, kind: .logic, to: .xml) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        return xmlData
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
+        guard let jsonData = LogicFile.convert(data, kind: .logic, to: .json) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
     }
 }
 

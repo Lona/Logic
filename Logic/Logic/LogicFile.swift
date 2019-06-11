@@ -13,17 +13,17 @@ public enum LogicFile {
         case xml, json
     }
 
-    public static func convert(_ contents: String, to targetFormat: DataSerializationFormat) -> String? {
-        return JavaScript.convert(contents: contents, to: targetFormat)
+    public static func convert(_ contents: String, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat) -> String? {
+        return JavaScript.convert(contents: contents, kind: kind, to: targetFormat)
     }
 
-    public static func convert(_ data: Data, to targetFormat: DataSerializationFormat) -> Data? {
+    public static func convert(_ data: Data, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat) -> Data? {
         guard let contents = String(data: data, encoding: .utf8) else {
             Swift.print("Failed to convert Logic file Data to String")
             return nil
         }
 
-        guard let converted = JavaScript.convert(contents: contents, to: targetFormat) else {
+        guard let converted = JavaScript.convert(contents: contents, kind: kind, to: targetFormat) else {
             return nil
         }
 

@@ -35,8 +35,19 @@ public enum JavaScript {
         return context
     }()
 
-    static func convert(contents: String, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
-        let script = "global.lonaSerialization.convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
-        return context.evaluateScript(script)?.toString()
+    static func convert(contents: String, kind: EncodingConversionKind, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
+        switch kind {
+        case .logic:
+            let script = "global.lonaSerialization.convertLogic(`\(contents)`, '\(targetEncoding.rawValue)')"
+            return context.evaluateScript(script)?.toString()
+        case .types:
+            let script = "global.lonaSerialization.convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
+            return context.evaluateScript(script)?.toString()
+        }
     }
+}
+
+public enum EncodingConversionKind: String {
+    case logic
+    case types
 }

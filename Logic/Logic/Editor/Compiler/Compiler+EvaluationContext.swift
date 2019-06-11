@@ -32,7 +32,7 @@ private extension NSColor {
     }
 
     var cssString: String {
-        guard let rgbColor = usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
+        guard let _ = usingColorSpaceName(NSColorSpaceName.calibratedRGB) else {
             return "#FFFFFF"
         }
         return alphaComponent < 1 ? rgbaString : hexString
