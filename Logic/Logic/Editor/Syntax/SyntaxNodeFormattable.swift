@@ -402,7 +402,7 @@ extension LGCStatement: SyntaxNodeFormattable {
                     )
                 ]
             )
-        case .placeholderStatement(let value):
+        case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         case .expressionStatement(let value):
             return value.expression.formatted(using: options)

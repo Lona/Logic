@@ -638,7 +638,7 @@ public extension LGCDeclaration {
                         ),
                         genericParameters: .empty,
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                        block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
+                        block: .next(LGCStatement.placeholder(id: UUID()), .empty)
                     )
                 )
             )
@@ -659,7 +659,7 @@ public extension LGCDeclaration {
                         ),
                         genericParameters: .next(LGCGenericParameter.makePlaceholder(), .empty),
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                        block: .next(LGCStatement.placeholderStatement(id: UUID()), .empty)
+                        block: .next(LGCStatement.placeholder(id: UUID()), .empty)
                     )
                 )
             )
@@ -791,7 +791,7 @@ public extension LGCStatement {
                     identifier: LGCIdentifier(id: UUID(), string: "condition", isPlaceholder: true)
                 ),
                 block: LGCList<LGCStatement>.next(
-                    LGCStatement.placeholderStatement(id: UUID()),
+                    LGCStatement.placeholder(id: UUID()),
                     .empty
                 )
             )

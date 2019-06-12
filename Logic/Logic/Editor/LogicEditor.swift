@@ -90,7 +90,7 @@ public class LogicEditor: NSBox {
         LGCProgram(
             id: UUID(),
             block: LGCList<LGCStatement>.next(
-                LGCStatement.placeholderStatement(id: UUID()),
+                LGCStatement.placeholder(id: UUID()),
                 .empty
             )
         )

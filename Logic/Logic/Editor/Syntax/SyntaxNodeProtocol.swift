@@ -712,7 +712,7 @@ extension LGCStatement: SyntaxNodeProtocol {
             return [value.expression.node, value.pattern.node]
         case .expressionStatement(let value):
             return [value.expression.node]
-        case .placeholderStatement:
+        case .placeholder:
             return []
         }
     }
@@ -774,7 +774,7 @@ extension LGCStatement: SyntaxNodeProtocol {
                     id: UUID(),
                     expression: value.expression.replace(id: id, with: syntaxNode)
                 )
-            case .placeholderStatement(_):
+            case .placeholder(_):
                 return self
             }
         }
@@ -790,7 +790,7 @@ extension LGCStatement: SyntaxNodeProtocol {
             return value.id
         case .expressionStatement(let value):
             return value.id
-        case .placeholderStatement(let value):
+        case .placeholder(let value):
             return value
         }
     }
@@ -1023,7 +1023,7 @@ extension LGCProgram: SyntaxNodeProtocol {
         updated.insert(sourceNode, at: targetIndex)
         updated = updated.filter { param in
             switch param {
-            case .placeholderStatement:
+            case .placeholder:
                 return false
             default:
                 return true

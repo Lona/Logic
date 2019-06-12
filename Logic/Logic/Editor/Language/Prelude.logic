@@ -40,7 +40,7 @@
                         "data" : {
                           "id" : "74BB4279-0CE3-4DD2-8BC3-DC07D5CE892A"
                         },
-                        "type" : "placeholderStatement"
+                        "type" : "placeholder"
                       }
                     ],
                     "genericParameters" : [
@@ -145,7 +145,7 @@
                         "data" : {
                           "id" : "B400D54D-49D7-4075-826A-3B8B502EAE48"
                         },
-                        "type" : "placeholderStatement"
+                        "type" : "placeholder"
                       }
                     ],
                     "genericParameters" : [
@@ -328,7 +328,7 @@
                         "data" : {
                           "id" : "717CD1C8-9453-4CFB-8B4F-828EDB6955CA"
                         },
-                        "type" : "placeholderStatement"
+                        "type" : "placeholder"
                       }
                     ],
                     "genericParameters" : [
@@ -775,7 +775,7 @@
                         "data" : {
                           "id" : "528F1F67-E9C8-491F-852A-75A8E683A6A9"
                         },
-                        "type" : "placeholderStatement"
+                        "type" : "placeholder"
                       }
                     ],
                     "genericParameters" : [
@@ -896,7 +896,7 @@
         "data" : {
           "id" : "9A3BA298-6C04-42C9-9751-7DD54F0CB8C5"
         },
-        "type" : "placeholderStatement"
+        "type" : "placeholder"
       }
     ],
     "id" : "AE916242-395D-411C-A7E9-5C1FF9E91AAD"

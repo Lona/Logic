@@ -434,7 +434,7 @@ public indirect enum LGCStatement: Codable & Equatable {
   case branch(id: UUID, condition: LGCExpression, block: LGCList<LGCStatement>)
   case declaration(id: UUID, content: LGCDeclaration)
   case expressionStatement(id: UUID, expression: LGCExpression)
-  case placeholderStatement(id: UUID)
+  case placeholder(id: UUID)
 
   // MARK: Codable
 
@@ -481,8 +481,8 @@ public indirect enum LGCStatement: Codable & Equatable {
           .expressionStatement(
             id: try data.decode(UUID.self, forKey: .id),
             expression: try data.decode(LGCExpression.self, forKey: .expression))
-      case "placeholderStatement":
-        self = .placeholderStatement(id: try data.decode(UUID.self, forKey: .id))
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -512,8 +512,8 @@ public indirect enum LGCStatement: Codable & Equatable {
         try container.encode("expressionStatement", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.expression, forKey: .expression)
-      case .placeholderStatement(let value):
-        try container.encode("placeholderStatement", forKey: .type)
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
         try data.encode(value, forKey: .id)
     }
   }

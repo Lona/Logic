@@ -186,7 +186,7 @@
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="expression" type="Expression"/>
     </Record>
-    <Record name="placeholderStatement">
+    <Record name="placeholder">
       <Record.Param name="id" type="UUID"/>
     </Record>
   </Type>

@@ -29,7 +29,7 @@ extension LGCList where T: SyntaxNodeProtocol, T: SyntaxNodePlaceholdable {
 extension LGCStatement: SyntaxNodePlaceholdable {
     public var isPlaceholder: Bool {
         switch self {
-        case .placeholderStatement:
+        case .placeholder:
             return true
         default:
             return false
@@ -37,7 +37,7 @@ extension LGCStatement: SyntaxNodePlaceholdable {
     }
 
     public static func makePlaceholder() -> LGCStatement {
-        return .placeholderStatement(id: UUID())
+        return .placeholder(id: UUID())
     }
 }
 
