@@ -29,19 +29,6 @@ class Document: NSDocument {
     var typeListEditor = TypeList()
 
     func setUpViews() -> NSView {
-        let testConstraints: [Unification.Constraint] = [
-            .init(Unification.T.evar("b"), Unification.T.evar("a")),
-            .init(Unification.T.evar("a"), Unification.T.cons(name: "Boolean")),
-            .init(Unification.T.evar("c"), Unification.T.cons(name: "Array", parameters: [.cons(name: "Boolean")])),
-            .init(Unification.T.cons(name: "Array", parameters: [.evar("e")]), Unification.T.cons(name: "Array", parameters: [.cons(name: "Boolean")])),
-            .init(Unification.T.evar("d"), Unification.T.cons(name: "Array", parameters: [.evar("Boolean")])),
-            .init(Unification.T.evar("d"), Unification.T.evar("c")),
-        ]
-
-        let results = Unification.unify(constraints: testConstraints)
-
-        Swift.print("Unification", results)
-
         typeListEditor.fillColor = Colors.suggestionWindowBackground
 
         typeListEditor.onChange = { list in

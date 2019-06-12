@@ -23,12 +23,8 @@ extension LogicValue {
         return LogicValue(.string, .string(value))
     }
 
-    public static func cssColor(_ value: String) -> LogicValue {
-        return LogicValue(.cssColor, .record(values: ["value": .string(value)]))
-    }
-
     public static func color(_ value: String) -> LogicValue {
-        return LogicValue(.color, .enum(caseName: "custom", associatedValues: [cssColor(value)]))
+        return LogicValue(.color, .record(values: ["value": .string(value)]))
     }
 
     public static func optional(_ value: LogicValue) -> LogicValue {

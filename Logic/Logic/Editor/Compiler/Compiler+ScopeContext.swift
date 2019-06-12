@@ -144,7 +144,7 @@ public extension Compiler {
                 return context
             case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _))):
                 // Built-ins should be constructed using literals
-                if ["Boolean", "Number", "String", "Array", "CSSColor"].contains(pattern.name) { return context }
+                if ["Boolean", "Number", "String", "Array", "Color"].contains(pattern.name) { return context }
 
                 // Create constructor function
                 context.patternToName[pattern.uuid] = pattern.name

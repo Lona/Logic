@@ -65,7 +65,7 @@ public enum StandardConfiguration {
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
             return literals.titleContains(prefix: query)
-        case .cssColor:
+        case .color:
             let literals: [LogicSuggestionItem] = [
                 LGCLiteral.Suggestion.color(for: query)
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
@@ -258,7 +258,7 @@ public enum StandardConfiguration {
                             var suggestion = LGCExpression.Suggestion.memberExpression(names: keyPath)
 
                             switch resolvedType {
-                            case Unification.T.cssColor:
+                            case Unification.T.color:
                                 guard let colorString = evaluationContext?.values[id]?.colorString else { break }
                                 suggestion.style = .colorPreview(code: colorString, NSColor.parse(css: colorString) ?? .black)
                                 return suggestion

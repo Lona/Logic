@@ -151,7 +151,7 @@ public extension LGCLiteral {
 
             return LogicSuggestionItem(
                 title: "Color",
-                badge: "CSSColor",
+                badge: "Color",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.color(id: UUID(), value: prefix.starts(with: "#") ? prefix.uppercased() : prefix)),
                 disabled: color == nil,

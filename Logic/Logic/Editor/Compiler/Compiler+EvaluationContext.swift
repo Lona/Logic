@@ -94,7 +94,7 @@ extension Compiler {
                 ).flatMap { context -> EvaluationResult in
                     if let value = context.values[condition.uuid],
                         case .bool(let memory) = value.memory, memory == true,
-                        value.type == .cons(name: "Boolean") {
+                        value.type == .bool {
 
                         return processChildren(result: .success(context))
                     } else {
@@ -117,7 +117,7 @@ extension Compiler {
             context.values[node.uuid] = .string(value)
         case .literal(.color(id: _, value: let value)):
             let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
-            context.values[node.uuid] = LogicValue(.cssColor, cssValue)
+            context.values[node.uuid] = LogicValue(.color, cssValue)
         case .literal(.array(id: _, value: let expressions)):
             guard let type = unificationContext.nodes[node.uuid] else { break }
             let resolvedType = Unification.substitute(substitution, in: type)
@@ -178,7 +178,7 @@ extension Compiler {
                 switch f {
                 case .colorSaturate:
                     func saturate(color: LogicValue?, percent: LogicValue?) -> LogicValue {
-                        let defaultColor = LogicValue.cssColor("black")
+                        let defaultColor = LogicValue.color("black")
                         guard let colorString = color?.colorString else { return defaultColor }
                         guard case .number(let number)? = percent?.memory else { return defaultColor }
 
@@ -186,7 +186,7 @@ extension Compiler {
 
                         let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
 
-                        return LogicValue.cssColor(newColor.cssString)
+                        return LogicValue.color(newColor.cssString)
                     }
 
 //                    Swift.print(f, "Args", args)
@@ -195,7 +195,7 @@ extension Compiler {
                     func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
                         guard case .string(let a)? = a?.memory else { return .unit }
                         guard case .string(let b)? = b?.memory else { return .unit }
-                        return .init(.cons(name: "String"), .string(a + b))
+                        return .init(.string, .string(a + b))
                     }
 
 //                    Swift.print(f, "Args", args)
@@ -233,7 +233,7 @@ extension Compiler {
             case ["String", "concat"]:
                 context.values[pattern.uuid] = LogicValue(type, .function(.stringConcat))
                 break
-            case ["CSSColor", "saturate"]:
+            case ["Color", "saturate"]:
                 context.values[pattern.uuid] = LogicValue(type, .function(.colorSaturate))
                 break
             default:

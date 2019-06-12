@@ -500,7 +500,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 if let initializer = value.initializer {
                     switch annotation {
                     case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
-                        where identifier.string == "CSSColor" && options.style == .visual:
+                        where identifier.string == Unification.T.color.name && options.style == .visual:
 
                         let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
                         let decoration: LogicElement = .colorSwatch(colorInfo.0, colorInfo.1)

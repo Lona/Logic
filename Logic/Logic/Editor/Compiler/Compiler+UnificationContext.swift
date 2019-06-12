@@ -53,7 +53,7 @@ extension Compiler {
 
             switch (config.isRevisit, node) {
             case (true, .statement(.branch(id: _, condition: let condition, block: _))):
-                result.nodes[condition.uuid] = .cons(name: "Boolean")
+                result.nodes[condition.uuid] = .bool
 
                 return result
             case (false, .declaration(.record(id: _, name: let functionName, genericParameters: let genericParameters, declarations: let declarations))):
@@ -252,31 +252,31 @@ extension Compiler {
             case (true, .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _))):
                 switch op {
                 case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                    result.nodes[node.uuid] = .cons(name: "Boolean")
+                    result.nodes[node.uuid] = Unification.T.bool
                     result.constraints.append(Unification.Constraint(result.nodes[left.uuid]!, result.nodes[right.uuid]!))
                     return result
                 case .setEqualTo: // TODO
                     break
                 }
             case (true, .literal(.boolean)):
-                result.nodes[node.uuid] = .cons(name: "Boolean")
+                result.nodes[node.uuid] = Unification.T.bool
 
                 return result
             case (true, .literal(.number)):
-                result.nodes[node.uuid] = .cons(name: "Number")
+                result.nodes[node.uuid] = Unification.T.number
 
                 return result
             case (true, .literal(.string)):
-                result.nodes[node.uuid] = .cons(name: "String")
+                result.nodes[node.uuid] = Unification.T.string
 
                 return result
             case (true, .literal(.color)):
-                result.nodes[node.uuid] = .cons(name: "CSSColor")
+                result.nodes[node.uuid] = Unification.T.color
 
                 return result
             case (true, .literal(.array(id: _, value: let expressions))):
                 let elementType = result.makeEvar()
-                result.nodes[node.uuid] = .cons(name: "Array", parameters: [elementType])
+                result.nodes[node.uuid] = .array(elementType)
 
                 expressions.forEach { expression in
                     let expressionType = result.nodes[expression.uuid] ?? result.makeEvar()
