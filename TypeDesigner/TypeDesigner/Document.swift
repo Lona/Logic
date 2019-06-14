@@ -103,7 +103,7 @@ class Document: NSDocument {
         let encoder = JSONEncoder()
         let jsonData = try encoder.encode(content)
 
-        guard let xmlData = LogicFile.convert(jsonData, to: .xml) else {
+        guard let xmlData = LogicFile.convert(jsonData, kind: .types, to: .xml) else {
             throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
         }
 
@@ -111,7 +111,7 @@ class Document: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        guard let jsonData = LogicFile.convert(data, to: .json) else {
+        guard let jsonData = LogicFile.convert(data, kind: .types, to: .json) else {
             throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
         }
 
