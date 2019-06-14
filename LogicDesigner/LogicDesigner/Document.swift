@@ -239,7 +239,11 @@ class Document: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: data)
+        guard let jsonData = LogicFile.convert(data, kind: .logic, to: .json) else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
+        }
+
+        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
     }
 
 //    override func data(ofType typeName: String) throws -> Data {
@@ -254,13 +258,6 @@ class Document: NSDocument {
 //
 //        return xmlData
 //    }
-//
-//    override func read(from data: Data, ofType typeName: String) throws {
-//        guard let jsonData = LogicFile.convert(data, kind: .logic, to: .json) else {
-//            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
-//        }
-//
-//        logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
-//    }
+
 }
 
