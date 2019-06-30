@@ -703,6 +703,13 @@ extension LGCTopLevelParameters: SyntaxNodeFormattable {
     }
 }
 
+extension LGCTopLevelDeclarations: SyntaxNodeFormattable {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
+        return .join(with: .hardLine) {
+            self.declarations.map { $0.formatted(using: options) }
+        }
+    }
+}
 
 extension LGCProgram: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {

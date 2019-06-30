@@ -858,6 +858,8 @@ public extension LGCSyntaxNode {
             return []
         case .enumerationCase:
             return contents.suggestions(within: root, for: prefix)
+        case .topLevelDeclarations:
+            return []
         }
     }
 }

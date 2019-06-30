@@ -544,6 +544,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
   case topLevelParameters(LGCTopLevelParameters)
   case enumerationCase(LGCEnumerationCase)
   case genericParameter(LGCGenericParameter)
+  case topLevelDeclarations(LGCTopLevelDeclarations)
 
   // MARK: Codable
 
@@ -586,6 +587,8 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         self = .enumerationCase(try container.decode(LGCEnumerationCase.self, forKey: .data))
       case "genericParameter":
         self = .genericParameter(try container.decode(LGCGenericParameter.self, forKey: .data))
+      case "topLevelDeclarations":
+        self = .topLevelDeclarations(try container.decode(LGCTopLevelDeclarations.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -636,6 +639,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .genericParameter(let value):
         try container.encode("genericParameter", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .topLevelDeclarations(let value):
+        try container.encode("topLevelDeclarations", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
@@ -949,4 +955,14 @@ public indirect enum LGCGenericParameter: Codable & Equatable {
         try data.encode(value, forKey: .id)
     }
   }
+}
+
+public struct LGCTopLevelDeclarations: Codable & Equatable {
+  public init(id: UUID, declarations: LGCList<LGCDeclaration>) {
+    self.id = id
+    self.declarations = declarations
+  }
+
+  public var id: UUID
+  public var declarations: LGCList<LGCDeclaration>
 }

@@ -88,6 +88,10 @@ class Document: NSDocument {
 
         logicEditor.showsDropdown = true
 
+        logicEditor.rootNode = .topLevelDeclarations(
+            .init(id: UUID(), declarations: .init([.makePlaceholder()]))
+        )
+
 //        logicEditor.rootNode = .topLevelParameters(
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
 //        )
@@ -157,7 +161,7 @@ class Document: NSDocument {
         }
         
         logicEditor.suggestionsForNode = { rootNode, node, query in
-            guard case .program(let root) = rootNode else { return [] }
+            guard let root = LGCProgram.make(from: rootNode) else { return [] }
 
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
@@ -173,7 +177,7 @@ class Document: NSDocument {
 
             let rootNode = self.logicEditor.rootNode
 
-            guard case .program(let root) = rootNode else { return true }
+            guard let root = LGCProgram.make(from: rootNode) else { return true }
 
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 

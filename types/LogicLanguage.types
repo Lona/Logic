@@ -241,6 +241,9 @@
     <Case name="genericParameter">
       <Case.Param type="GenericParameter"/>
     </Case>
+    <Case name="topLevelDeclarations">
+      <Case.Param type="TopLevelDeclarations"/>
+    </Case>
   </Type>
   <Type name="FunctionParameter">
     <Record name="parameter">
@@ -326,6 +329,14 @@
     </Record>
     <Record name="placeholder">
       <Record.Param name="id" type="UUID"/>
+    </Record>
+  </Type>
+  <Type name="TopLevelDeclarations">
+    <Record name="topLevelDeclarations">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="declarations" type="List">
+        <Record.Substitution generic="T" instance="Declaration"/>
+      </Record.Param>
     </Record>
   </Type>
 </root>

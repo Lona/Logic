@@ -1130,6 +1130,90 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
     }
 }
 
+extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
+    public var subnodes: [LGCSyntaxNode] {
+        return declarations.map { $0.node }
+    }
+
+    public var nodeTypeDescription: String {
+        return "Top-level Declarations"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .topLevelDeclarations(self)
+    }
+
+    public func delete(id: UUID) -> LGCTopLevelDeclarations {
+        let updated = declarations.filter { param in
+            switch param {
+            case .placeholder:
+                return true
+            default:
+                return param.uuid != id
+            }
+            }.map { $0.delete(id: id) }
+
+        return LGCTopLevelDeclarations(
+            id: UUID(),
+            declarations: LGCList(updated)
+        )
+    }
+
+    public func swap(sourceId: UUID, targetId: UUID) -> LGCTopLevelDeclarations {
+        var updated = declarations.map { $0 }
+
+        guard let sourceIndex = updated.firstIndex(where: { param in param.uuid == sourceId }),
+            let targetIndex = updated.lastIndex(where: { param in param.uuid == targetId }) else { return self }
+
+        let sourceNode = updated[sourceIndex]
+
+        updated.remove(at: sourceIndex)
+        updated.insert(sourceNode, at: targetIndex)
+        updated = updated.filter { param in
+            switch param {
+            case .placeholder:
+                return false
+            default:
+                return true
+            }
+        }
+        updated.append(LGCDeclaration.placeholder(id: UUID()))
+
+        return LGCTopLevelDeclarations(
+            id: UUID(),
+            declarations: LGCList(updated)
+        )
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTopLevelDeclarations {
+        return LGCTopLevelDeclarations(
+            id: UUID(),
+            declarations: declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+        )
+    }
+
+    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+        if id == uuid { return [node] }
+
+        let found: [LGCSyntaxNode]? = declarations.reduce(nil, { result, node in
+            if result != nil { return result }
+            return node.pathTo(id: id)
+        })
+
+        // We don't include the Program node in the path, since we never want
+        // to directly select it or show it in any menus
+        return found
+    }
+
+    public var uuid: UUID {
+        return id
+    }
+
+    public var movementAfterInsertion: Movement {
+        return .next
+    }
+}
+
 extension LGCFunctionCallArgument {
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
         return LGCFunctionCallArgument(
@@ -1187,6 +1271,8 @@ extension LGCSyntaxNode {
         case .enumerationCase(let value):
             return value
         case .genericParameter(let value):
+            return value
+        case .topLevelDeclarations(let value):
             return value
         }
     }

@@ -14,4 +14,24 @@ public extension LGCProgram {
 
         return LGCProgram(id: UUID(), block: .init(blocks))
     }
+
+    init(declarations: [LGCDeclaration]) {
+        let statements = declarations.map { LGCStatement.declaration(id: UUID(), content: $0) }
+        self = .init(id: UUID(), block: .init(statements))
+    }
+
+    static func make(from syntaxNode: LGCSyntaxNode) -> LGCProgram? {
+        switch syntaxNode {
+        case .program(let value):
+            return value
+        case .statement(let value):
+            return .init(id: UUID(), block: .init([value]))
+        case .declaration(let value):
+            return .init(declarations: [value])
+        case .topLevelDeclarations(let value):
+            return LGCProgram(declarations: value.declarations.map { $0 })
+        default:
+            return nil
+        }
+    }
 }
