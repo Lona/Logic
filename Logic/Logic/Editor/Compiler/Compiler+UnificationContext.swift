@@ -13,6 +13,7 @@ extension Compiler {
         public var constraints: [Unification.Constraint] = []
         public var nodes: [UUID: Unification.T] = [:]
         public var patternTypes: [UUID: Unification.T] = [:]
+        public var functionArgumentLabels: [UUID: [String]] = [:]
 
         public init() {}
 
@@ -75,10 +76,14 @@ extension Compiler {
 
                 var parameterTypes: [Unification.T] = []
 
+                var labels: [String] = []
+
                 declarations.forEach { declaration in
                     switch declaration {
                     case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _):
                         guard let annotation = annotation else { break }
+
+                        labels.append(pattern.name)
 
                         let annotationType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
 
@@ -97,6 +102,7 @@ extension Compiler {
 
                 result.nodes[functionName.uuid] = functionType
                 result.patternTypes[functionName.uuid] = functionType
+                result.functionArgumentLabels[functionName.uuid] = labels
             case (false, .declaration(.enumeration(_, name: let functionName, genericParameters: let genericParameters, cases: let enumCases))):
                 let genericNames: [String] = genericParameters.compactMap { param in
                     switch param {

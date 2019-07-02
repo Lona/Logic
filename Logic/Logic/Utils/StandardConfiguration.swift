@@ -244,10 +244,12 @@ public enum StandardConfiguration {
                     return validSuggestionPaths.map { (id, keyPath, resolvedType) in
                         switch resolvedType {
                         case .fun(arguments: let arguments, returnType: _):
-                            return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.map { arg in
+                            let labels = unificationContext.functionArgumentLabels[id]
+
+                            return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.enumerated().map { index, arg in
                                 LGCFunctionCallArgument(
                                     id: UUID(),
-                                    label: nil,
+                                    label: labels?[index],
                                     expression: .identifierExpression(
                                         id: UUID(),
                                         identifier: .init(id: UUID(), string: "value", isPlaceholder: true)

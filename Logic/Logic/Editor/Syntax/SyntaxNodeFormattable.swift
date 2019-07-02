@@ -164,7 +164,7 @@ extension LGCFunctionCallArgument: SyntaxNodeFormattable {
         if let label = self.label {
             return .concat(
                 [
-                    .element(.text(label + " :")),
+                    .element(.text(label + ":")),
                     self.expression.formatted(using: options)
                 ]
             )
