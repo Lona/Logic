@@ -88,9 +88,9 @@ class Document: NSDocument {
 
         logicEditor.showsDropdown = true
 
-        logicEditor.rootNode = .topLevelDeclarations(
-            .init(id: UUID(), declarations: .init([.makePlaceholder()]))
-        )
+//        logicEditor.rootNode = .topLevelDeclarations(
+//            .init(id: UUID(), declarations: .init([.makePlaceholder()]))
+//        )
 
 //        logicEditor.rootNode = .topLevelParameters(
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
