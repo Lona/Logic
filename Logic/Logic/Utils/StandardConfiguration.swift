@@ -201,16 +201,16 @@ public enum StandardConfiguration {
                     unificationContext: Compiler.UnificationContext
                     ) -> [(keyPath: [String], id: UUID)] {
 
-                    let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, pattern -> ([String], UUID)? in
-
-                        // Variables in scope are listed elsewhere
-                        if keyPath.count == 1 { return nil }
-
-                        return (keyPath, pattern)
-                    })
-
                     let currentScopePaths = currentScopeContext.patternsInScope.map({ pattern -> ([String], UUID) in
                         return ([pattern.name], pattern.uuid)
+                    })
+
+                    let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
+
+                        // Ignore variables in scope, which are listed by their shortest name
+                        if currentScopePaths.contains(where: { id == $1 }) { return nil }
+
+                        return (keyPath, id)
                     })
 
                     return namespacePaths + currentScopePaths
