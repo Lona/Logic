@@ -9,16 +9,16 @@
 import AppKit
 
 public enum Movement {
-    case none, next
+    case none, next, node(UUID)
 }
 
 public protocol SyntaxNodeProtocol {
     var uuid: UUID { get }
-    var movementAfterInsertion: Movement { get }
     var node: LGCSyntaxNode { get }
     var nodeTypeDescription: String { get }
     var subnodes: [LGCSyntaxNode] { get }
 
+    func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement
     func find(id: UUID) -> LGCSyntaxNode?
     func pathTo(id: UUID) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
@@ -87,7 +87,7 @@ extension LGCIdentifier: SyntaxNodeProtocol {
 
     public var uuid: UUID { return id }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -116,7 +116,7 @@ extension LGCPattern: SyntaxNodeProtocol {
     
     public var uuid: UUID { return id }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -205,7 +205,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         switch self {
         case .typeIdentifier:
             return .next
@@ -289,7 +289,7 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -338,7 +338,7 @@ extension LGCFunctionParameterDefaultValue: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -405,7 +405,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -466,7 +466,7 @@ extension LGCGenericParameter: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -533,7 +533,7 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -594,7 +594,7 @@ extension LGCBinaryOperator: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -683,7 +683,7 @@ extension LGCExpression: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         switch self {
         case .binaryExpression:
             return .none
@@ -795,7 +795,7 @@ extension LGCStatement: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -962,7 +962,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -1041,7 +1041,7 @@ extension LGCProgram: SyntaxNodeProtocol {
         return id
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -1125,7 +1125,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         return id
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -1209,7 +1209,7 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
         return id
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -1236,7 +1236,7 @@ extension LGCFunctionCallArgument {
         return id
     }
 
-    public var movementAfterInsertion: Movement {
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
     }
 }
@@ -1305,8 +1305,8 @@ extension LGCSyntaxNode {
         return contents.uuid
     }
 
-    public var movementAfterInsertion: Movement {
-        return contents.movementAfterInsertion
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
+        return contents.movementAfterInsertion(rootNode: rootNode)
     }
 
     public var nodeTypeDescription: String {

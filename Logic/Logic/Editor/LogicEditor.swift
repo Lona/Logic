@@ -460,10 +460,27 @@ extension LogicEditor {
             if self.onChangeRootNode?(replacement) == true {
                 if let nextFocusId = logicSuggestionItem.nextFocusId {
                     self.select(nodeByID: nextFocusId)
-                } else if suggestedNode.movementAfterInsertion == .next {
-                    self.nextNode()
                 } else {
-                    self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
+                    // Handle the case where the inserted node isn't represented in the formatted output.
+                    // We traverse up the tree to find the nearest parent that is.
+                    if var path = self.rootNode.pathTo(id: suggestedNode.uuid) {
+                        while let selectionNode = path.last {
+                            if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions) {
+                                self.canvasView.selectedRange = range
+                                break
+                            }
+                            path = path.dropLast()
+                        }
+                    }
+
+                    switch suggestedNode.movementAfterInsertion(rootNode: replacement) {
+                    case .node(let nextFocusId):
+                        self.select(nodeByID: nextFocusId)
+                    case .next:
+                        self.nextNode()
+                    case .none:
+                        self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
+                    }
                 }
             }
         }
