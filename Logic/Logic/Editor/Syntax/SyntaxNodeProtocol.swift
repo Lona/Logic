@@ -529,7 +529,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
     }
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
-        return false
+        return true
     }
 }
 
@@ -1329,10 +1329,15 @@ extension LGCProgram: SyntaxNodeProtocol {
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCProgram {
-        return LGCProgram(
-            id: self.uuid,
-            block: block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
-        )
+        switch syntaxNode {
+        case .program(let newNode) where id == uuid:
+            return newNode
+        default:
+            return LGCProgram(
+                id: self.uuid,
+                block: block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+            )
+        }
     }
 
     public func copy(deep: Bool) -> LGCProgram {
@@ -1369,6 +1374,10 @@ extension LGCProgram: SyntaxNodeProtocol {
 
 extension LGCTopLevelParameters: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
+        return parameters.map { $0.node }
+    }
+
+    public var children: [LGCSyntaxNode] {
         return parameters.map { $0.node }
     }
 
@@ -1409,10 +1418,15 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTopLevelParameters {
-        return LGCTopLevelParameters(
-            id: self.uuid,
-            parameters: parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
-        )
+        switch syntaxNode {
+        case .topLevelParameters(let newNode) where id == uuid:
+            return newNode
+        default:
+            return LGCTopLevelParameters(
+                id: self.uuid,
+                parameters: parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+            )
+        }
     }
 
     public func copy(deep: Bool) -> LGCTopLevelParameters {
@@ -1432,6 +1446,15 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+
+    public func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool {
+        switch childNode {
+        case .functionParameter:
+            return true
+        default:
+            return false
+        }
     }
 }
 

@@ -240,7 +240,7 @@ extension LogicEditor {
 
         // Find the smallest node that accepts a line drag
         func findDragSource(node: LGCSyntaxNode) -> LGCSyntaxNode? {
-            var path = rootNode.uniqueElementPathTo(id: node.uuid, options: formattingOptions)
+            guard var path = rootNode.pathTo(id: node.uuid) else { return nil }
 
             while let current = path.last {
                 if current.contents.acceptsLineDrag(rootNode: rootNode) {
