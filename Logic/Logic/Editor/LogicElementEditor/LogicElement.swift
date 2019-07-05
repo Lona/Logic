@@ -35,7 +35,7 @@ public enum LogicElement {
     case coloredText(String, NSColor)
     case dropdown(UUID, String, DropdownStyle)
     case title(UUID, String)
-    case colorSwatch(String, NSColor)
+    case colorSwatch(String, NSColor, UUID)
 
     public var isActivatable: Bool {
         switch self {
@@ -73,13 +73,25 @@ public enum LogicElement {
         }
     }
 
+    public var ownerNodeId: UUID? {
+        switch self {
+        case .text,
+             .coloredText:
+            return nil
+        case .title(let id, _),
+             .dropdown(let id, _, _),
+             .colorSwatch(_, _, let id):
+            return id
+        }
+    }
+
     public var value: String {
         switch self {
         case .text(let value),
              .coloredText(let value, _),
              .title(_, let value),
              .dropdown(_, let value, _),
-             .colorSwatch(let value, _):
+             .colorSwatch(let value, _, _):
             return value
         }
     }
@@ -88,7 +100,7 @@ public enum LogicElement {
         switch self {
         case .text, .title:
             return Colors.text
-        case .coloredText(_, let color), .colorSwatch(_, let color):
+        case .coloredText(_, let color), .colorSwatch(_, let color, _):
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color
@@ -150,7 +162,7 @@ extension LogicElement {
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
-        case .colorSwatch(_, _):
+        case .colorSwatch:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
 
             return LogicMeasuredElement(

@@ -503,7 +503,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         where identifier.string == Unification.T.color.name && options.style == .visual:
 
                         let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
-                        let decoration: LogicElement = .colorSwatch(colorInfo.0, colorInfo.1)
+                        let decoration: LogicElement = .colorSwatch(colorInfo.0, colorInfo.1, value.id)
 
                         let formattedInitializer = initializer.formatted(using: options)
 
@@ -668,7 +668,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             case .visual:
                 return .concat(
                     [
-                        .hardLine,
+                        .spacer(20),
                         .element(LogicElement.title(value.name.id, value.name.name)),
                         .concat(
                             value.declarations.map {

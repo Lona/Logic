@@ -310,7 +310,7 @@ public class LogicCanvasView: NSView {
             let attributedString = measuredText.attributedString
 
             switch (text) {
-            case .colorSwatch(_, let color):
+            case .colorSwatch(_, let color, _):
                 color.setFill()
                 Colors.text.withAlphaComponent(0.1).setStroke()
 
@@ -675,9 +675,9 @@ public class LogicCanvasView: NSView {
             return false
         }
 
-        if destinationLineIndex == sourceLineIndex || destinationLineIndex - 1 == sourceLineIndex { return false }
+        if destinationLineIndex == sourceLineIndex { return false }
 
-        onMoveLine?(sourceLineIndex, destinationLineIndex > sourceLineIndex ? destinationLineIndex - 1 : destinationLineIndex)
+        onMoveLine?(sourceLineIndex, destinationLineIndex)
 
         return true
     }

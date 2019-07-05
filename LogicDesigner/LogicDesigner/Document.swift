@@ -14,19 +14,31 @@ class Document: NSDocument {
     override init() {
         super.init()
 
-        logicEditor.rootNode = .program(
+        logicEditor.rootNode = .topLevelDeclarations(
             .init(
                 id: UUID(),
-                block: .init(
+                declarations: LGCList<LGCDeclaration>.init(
                     [
-                        .declaration(id: UUID(), content:
-                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
-                        ),
+                        .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude")),
                         .makePlaceholder()
                     ]
                 )
             )
         )
+
+//        logicEditor.rootNode = .program(
+//            .init(
+//                id: UUID(),
+//                block: .init(
+//                    [
+//                        .declaration(id: UUID(), content:
+//                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
+//                        ),
+//                        .makePlaceholder()
+//                    ]
+//                )
+//            )
+//        )
     }
 
     override class var autosavesInPlace: Bool {

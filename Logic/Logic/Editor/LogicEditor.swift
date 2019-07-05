@@ -236,16 +236,76 @@ extension LogicEditor {
     }
 
     private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
-        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
+//        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
+
+        // Find the smallest node that accepts a line drag
+        func findDragSource(node: LGCSyntaxNode) -> LGCSyntaxNode? {
+            var path = rootNode.uniqueElementPathTo(id: node.uuid, options: formattingOptions)
+
+            while let current = path.last {
+                if current.contents.acceptsLineDrag(rootNode: rootNode) {
+                    return current
+                }
+
+                path = path.dropLast()
+            }
+
+            return nil
+        }
+
+        // Find the smallest node that accepts a drop
+        func findDropTarget(relativeTo node: LGCSyntaxNode, accepting sourceNode: LGCSyntaxNode) -> LGCSyntaxNode? {
+            guard var path = rootNode.pathTo(id: node.uuid) else { return nil }
+
+            while let parent = path.dropLast().last {
+                if parent.contents.acceptsNode(rootNode: rootNode, childNode: sourceNode) {
+                    return parent
+                }
+
+                path = path.dropLast()
+            }
+
+            return nil
+        }
+
+        // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
+        func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
+            let childRanges = parent.contents.children.map {
+                rootNode.elementRange(for: $0.uuid, options: formattingOptions, useOwnerId: true)
+                }.compactMap { $0 }
+
+            return childRanges.firstIndex(where: { $0.contains(index) })
+        }
 
         let formattedContent = rootNode.formatted(using: formattingOptions)
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
-            let sourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions),
-            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions) {
+            let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, useOwnerId: true),
+            let sourceNode = findDragSource(node: originalSourceNode),
+            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, useOwnerId: true) {
 
-            _ = onChangeRootNode?(rootNode.swap(sourceId: sourceNode.uuid, targetId: targetNode.uuid))
+            // Target is within source
+            if let _ = sourceNode.find(id: targetNode.uuid) { return }
+
+            var initialParent = targetNode
+            while let targetParent = findDropTarget(relativeTo: initialParent, accepting: sourceNode) {
+                initialParent = targetParent
+
+                if let targetIndex = findDropIndex(relativeTo: targetNode, within: targetParent, index: destinationRange.lowerBound) {
+                    let newParent = targetParent.contents
+                        .insert(childNode: sourceNode.copy(), atIndex: targetIndex)
+                        .node
+
+                    let newRoot = rootNode
+                        .replace(id: targetParent.uuid, with: newParent)
+                        .delete(id: sourceNode.uuid)
+
+                    _ = onChangeRootNode?(newRoot.copy(deep: true))
+
+                    break
+                }
+            }
         }
     }
 
@@ -394,7 +454,14 @@ extension LogicEditor {
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window else { return }
 
-        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions)
+        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions).filter { node in
+            switch node {
+            case .topLevelDeclarations, .program, .topLevelParameters:
+                return false
+            default:
+                return true
+            }
+        }
         let dropdownNodes = Array(syntaxNodePath)
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
