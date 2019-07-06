@@ -70,9 +70,9 @@ public class LogicEditor: NSBox {
                 return
             }
 
-            let topNode = self.rootNode.topNodeWithEqualElements(as: underlinedId, options: formattingOptions)
+            let topNode = self.rootNode.topNodeWithEqualElements(as: underlinedId, options: formattingOptions, includeTopLevel: false)
 
-            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions) {
+            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions, includeTopLevel: false) {
                 self.canvasView.underlinedRange = selectedRange
             } else {
                 self.canvasView.underlinedRange = nil
@@ -227,7 +227,8 @@ extension LogicEditor {
             }
         }
 
-        if let selectedRange = range(), let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions) {
+        if let selectedRange = range(),
+            let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
             let shouldActivate = onChangeRootNode?(rootNode.delete(id: selectedNode.uuid))
             if shouldActivate == true {
                 handleActivateElement(nil)
@@ -255,7 +256,7 @@ extension LogicEditor {
 
         // Find the smallest node that accepts a drop
         func findDropTarget(relativeTo node: LGCSyntaxNode, accepting sourceNode: LGCSyntaxNode) -> LGCSyntaxNode? {
-            guard var path = rootNode.pathTo(id: node.uuid) else { return nil }
+            guard var path = rootNode.pathTo(id: node.uuid, includeTopLevel: true) else { return nil }
 
             while let parent = path.dropLast().last {
                 if parent.contents.acceptsNode(rootNode: rootNode, childNode: sourceNode) {
@@ -271,7 +272,7 @@ extension LogicEditor {
         // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
         func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
             let childRanges = parent.contents.children.map {
-                rootNode.elementRange(for: $0.uuid, options: formattingOptions, useOwnerId: true)
+                rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false, useOwnerId: true)
                 }.compactMap { $0 }
 
             return childRanges.firstIndex(where: { $0.contains(index) })
@@ -281,9 +282,9 @@ extension LogicEditor {
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
-            let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, useOwnerId: true),
+            let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
             let sourceNode = findDragSource(node: originalSourceNode),
-            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, useOwnerId: true) {
+            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, includeTopLevel: true, useOwnerId: true) {
 
             // Target is within source
             if let _ = sourceNode.find(id: targetNode.uuid) { return }
@@ -344,9 +345,9 @@ extension LogicEditor {
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
-            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId, options: formattingOptions)
+            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId, options: formattingOptions, includeTopLevel: false)
 
-            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions) {
+            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions, includeTopLevel: false) {
                 self.canvasView.selectedRange = selectedRange
                 self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
             } else {
@@ -428,10 +429,10 @@ extension LogicEditor {
     }
 
     private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
-        guard let range = rootNode.elementRange(for: syntaxNode.uuid, options: formattingOptions),
+        guard let range = rootNode.elementRange(for: syntaxNode.uuid, options: formattingOptions, includeTopLevel: false),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
-        let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid, options: formattingOptions) == range }) ?? syntaxNode
+        let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false) == range }) ?? syntaxNode
 
         return suggestionsForNode(rootNode, highestMatch, prefix)
     }
@@ -454,14 +455,7 @@ extension LogicEditor {
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window else { return }
 
-        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions).filter { node in
-            switch node {
-            case .topLevelDeclarations, .program, .topLevelParameters:
-                return false
-            default:
-                return true
-            }
-        }
+        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions, includeTopLevel: false)
         let dropdownNodes = Array(syntaxNodePath)
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
@@ -499,7 +493,7 @@ extension LogicEditor {
         childWindow.onHighlightDropdownIndex = { [unowned self] highlightedIndex in
             if let highlightedIndex = highlightedIndex {
                 let selected = dropdownNodes[highlightedIndex]
-                let range = self.rootNode.elementRange(for: selected.uuid, options: self.formattingOptions)
+                let range = self.rootNode.elementRange(for: selected.uuid, options: self.formattingOptions, includeTopLevel: false)
 
                 self.canvasView.outlinedRange = range
             } else {
@@ -532,7 +526,7 @@ extension LogicEditor {
                     // We traverse up the tree to find the nearest parent that is.
                     if var path = self.rootNode.pathTo(id: suggestedNode.uuid) {
                         while let selectionNode = path.last {
-                            if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions) {
+                            if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions, includeTopLevel: false) {
                                 self.canvasView.selectedRange = range
                                 break
                             }

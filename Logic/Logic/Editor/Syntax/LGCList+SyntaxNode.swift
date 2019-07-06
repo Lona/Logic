@@ -34,10 +34,10 @@ extension LGCList where T: SyntaxNodeProtocol {
         return output
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
+    public func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]? {
         let found: [LGCSyntaxNode]? = self.reduce(nil, { result, node in
             if result != nil { return result }
-            return node.pathTo(id: id)
+            return node.pathTo(id: id, includeTopLevel: includeTopLevel)
         })
 
         return found

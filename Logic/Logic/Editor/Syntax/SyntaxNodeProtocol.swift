@@ -18,13 +18,14 @@ public protocol SyntaxNodeProtocol {
     var nodeTypeDescription: String { get }
     var subnodes: [LGCSyntaxNode] { get }
     var children: [LGCSyntaxNode] { get }
+    var isSelectable: Bool { get }
 
     func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool
     func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool
     func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement
 
     func find(id: UUID) -> LGCSyntaxNode?
-    func pathTo(id: UUID) -> [LGCSyntaxNode]?
+    func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
     func delete(id: UUID) -> Self
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self
@@ -39,6 +40,8 @@ public extension SyntaxNodeProtocol {
         return []
     }
 
+    var isSelectable: Bool { return true }
+
     func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText {
         return RichText(blocks: [])
     }
@@ -48,15 +51,17 @@ public extension SyntaxNodeProtocol {
     }
 
     func find(id: UUID) -> LGCSyntaxNode? {
-        return pathTo(id: id)?.last
+        return pathTo(id: id, includeTopLevel: true)?.last
     }
 
-    func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        if id == uuid { return [node] }
+    func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]? {
+        let shouldInclude = isSelectable || includeTopLevel
+
+        if id == uuid && shouldInclude { return [node] }
 
         for subnode in subnodes {
             if let found = subnode.pathTo(id: id) {
-                return [node] + found
+                return shouldInclude ? [node] + found : found
             }
         }
 
@@ -1305,6 +1310,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
 }
 
 extension LGCProgram: SyntaxNodeProtocol {
+    public var isSelectable: Bool { return false }
+
     public var subnodes: [LGCSyntaxNode] {
         return block.map { $0.node }
     }
@@ -1373,6 +1380,8 @@ extension LGCProgram: SyntaxNodeProtocol {
 }
 
 extension LGCTopLevelParameters: SyntaxNodeProtocol {
+    public var isSelectable: Bool { return false }
+
     public var subnodes: [LGCSyntaxNode] {
         return parameters.map { $0.node }
     }
@@ -1459,6 +1468,8 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
 }
 
 extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
+    public var isSelectable: Bool { return false }
+
     public var subnodes: [LGCSyntaxNode] {
         return declarations.map { $0.node }
     }
@@ -1566,8 +1577,8 @@ extension LGCFunctionCallArgument {
         return expression.find(id: id)
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        return expression.pathTo(id: id)
+    public func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]? {
+        return expression.pathTo(id: id, includeTopLevel: includeTopLevel)
     }
 
     public var uuid: UUID {
@@ -1631,8 +1642,8 @@ extension LGCSyntaxNode {
         return contents.find(id: id)
     }
 
-    public func pathTo(id: UUID) -> [LGCSyntaxNode]? {
-        return contents.pathTo(id: id)
+    public func pathTo(id: UUID, includeTopLevel: Bool = false) -> [LGCSyntaxNode]? {
+        return contents.pathTo(id: id, includeTopLevel: includeTopLevel)
     }
 
     public var subnodes: [LGCSyntaxNode] {
