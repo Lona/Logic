@@ -130,7 +130,7 @@ public class FilterLabel: NSBox {
   }
 
   private func update() {
-    fillColor = #colorLiteral(red: 0.78431372549, green: 0.78431372549, blue: 0.78431372549, alpha: 1)
+    fillColor = Colors.filterLabelBackground
     textViewTextStyle = TextStyles.sectionHeaderInverse
     textView.attributedStringValue = textViewTextStyle.apply(to: textView.attributedStringValue)
     onPress = handleOnClick

@@ -129,7 +129,7 @@
     "id" : "Container",
     "params" : {
       "alignItems" : "center",
-      "backgroundColor" : "rgb(200,200,200)",
+      "backgroundColor" : "filterLabelBackground",
       "borderRadius" : 4,
       "flexDirection" : "row",
       "paddingBottom" : 2,

@@ -56,6 +56,16 @@
       "value" : "black"
     },
     {
+      "id" : "filterLabelBackground",
+      "metadata" : {
+        "shouldGenerateCode" : {
+          "macos" : false
+        }
+      },
+      "name" : "Filter Label Background",
+      "value" : "rgb(200,200,200)"
+    },
+    {
       "id" : "editableText",
       "name" : "editableText",
       "value" : "#4a90e2"

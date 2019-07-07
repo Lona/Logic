@@ -125,4 +125,17 @@ extension Colors {
 
         return Colors.background
     }()
+
+    public static let filterLabelBackground: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return NSColor.parse(css: "rgb(60,60,60)")!
+            default:
+                break
+            }
+        }
+
+        return NSColor.parse(css: "rgb(200,200,200)")!
+    }()
 }
