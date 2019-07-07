@@ -454,12 +454,12 @@ extension LogicEditor {
 
 extension LogicEditor {
 
-    private func makeDetailView(for syntaxNode: LGCSyntaxNode?, query: String) -> NSView? {
-        if let syntaxNode = syntaxNode {
-            return documentationForNode(rootNode, syntaxNode, query).makeScrollView()
-        } else {
-            return nil
-        }
+    private func makeDetailView(for suggestion: LogicSuggestionItem?, query: String) -> NSView? {
+        guard let suggestion = suggestion else { return nil }
+
+        let richText = suggestion.documentation() ?? documentationForNode(rootNode, suggestion.node, query)
+
+        return richText.makeScrollView()
     }
 
     // The suggestion window is shared between all logic editors, so we need to assign every parameter
@@ -476,7 +476,7 @@ extension LogicEditor {
         childWindow.showsDropdown = showsDropdown
         childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
-        childWindow.detailView = makeDetailView(for: logicSuggestions.first?.node, query: suggestionText)
+        childWindow.detailView = makeDetailView(for: logicSuggestions.first, query: suggestionText)
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
         childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
@@ -492,9 +492,9 @@ extension LogicEditor {
 
             if let index = index {
                 let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
-                let suggestedNode = logicSuggestions[indexedSuggestions[index].offset].node
+                let suggestion = logicSuggestions[indexedSuggestions[index].offset]
 
-                self.childWindow.detailView = self.makeDetailView(for: suggestedNode, query: self.suggestionText)
+                self.childWindow.detailView = self.makeDetailView(for: suggestion, query: self.suggestionText)
             } else {
                 self.childWindow.detailView = nil
             }
@@ -574,9 +574,7 @@ extension LogicEditor {
 
             self.childWindow.suggestionItems = indexedSuggestions.map { $0.item }
             self.childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
-            if let selectedItem = logicSuggestions.first {
-                self.childWindow.detailView = self.makeDetailView(for: selectedItem.node, query: self.suggestionText)
-            }
+            self.childWindow.detailView = self.makeDetailView(for: logicSuggestions.first, query: self.suggestionText)
         }
 
         window.addChildWindow(childWindow, ordered: .above)

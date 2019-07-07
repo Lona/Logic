@@ -23,7 +23,8 @@ public struct LogicSuggestionItem {
         suggestionFilters: [SuggestionView.SuggestionFilter] = [.all],
         nextFocusId: UUID? = nil,
         disabled: Bool = false,
-        style: Style = .normal) {
+        style: Style = .normal,
+        documentation: @autoclosure @escaping () -> RichText? = nil) {
         self.title = title
         self.badge = badge
         self.category = category
@@ -32,6 +33,7 @@ public struct LogicSuggestionItem {
         self.nextFocusId = nextFocusId
         self.disabled = disabled
         self.style = style
+        self.documentation = documentation
     }
 
     public var title: String
@@ -42,6 +44,7 @@ public struct LogicSuggestionItem {
     public var nextFocusId: UUID?
     public var disabled: Bool
     public var style: Style
+    public var documentation: () -> RichText?
 
     public func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
