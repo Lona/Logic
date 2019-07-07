@@ -444,7 +444,9 @@ extension LogicEditor {
 
         let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false) == range }) ?? syntaxNode
 
-        return suggestionsForNode(rootNode, highestMatch, prefix)
+        return suggestionsForNode(rootNode, highestMatch, prefix).filter {
+            !showsFilterBar || ($0.suggestionFilters.isEmpty || $0.suggestionFilters.contains(suggestionFilter))
+        }
     }
 }
 
@@ -480,7 +482,10 @@ extension LogicEditor {
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
         childWindow.dropdownIndex = dropdownNodes.count - 1
         childWindow.suggestionFilter = suggestionFilter
-        childWindow.onChangeSuggestionFilter = onChangeSuggestionFilter
+        childWindow.onChangeSuggestionFilter = { value in
+            self.onChangeSuggestionFilter?(value)
+            self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode)
+        }
 
         childWindow.onSelectIndex = { index in
             self.selectedSuggestionIndex = index

@@ -20,6 +20,7 @@ public struct LogicSuggestionItem {
         badge: String? = nil,
         category: String,
         node: LGCSyntaxNode,
+        suggestionFilters: [SuggestionView.SuggestionFilter] = [.all],
         nextFocusId: UUID? = nil,
         disabled: Bool = false,
         style: Style = .normal) {
@@ -27,6 +28,7 @@ public struct LogicSuggestionItem {
         self.badge = badge
         self.category = category
         self.node = node
+        self.suggestionFilters = suggestionFilters
         self.nextFocusId = nextFocusId
         self.disabled = disabled
         self.style = style
@@ -36,6 +38,7 @@ public struct LogicSuggestionItem {
     public var badge: String?
     public var category: String
     public var node: LGCSyntaxNode
+    public var suggestionFilters: [SuggestionView.SuggestionFilter]
     public var nextFocusId: UUID?
     public var disabled: Bool
     public var style: Style
