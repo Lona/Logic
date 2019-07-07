@@ -104,6 +104,7 @@ class Document: NSDocument {
 
         logicEditor.showsDropdown = true
         logicEditor.showsFilterBar = true
+        logicEditor.suggestionFilter = .all
 
 //        logicEditor.rootNode = .topLevelDeclarations(
 //            .init(id: UUID(), declarations: .init([.makePlaceholder()]))
