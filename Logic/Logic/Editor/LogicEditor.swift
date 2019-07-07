@@ -90,7 +90,7 @@ public class LogicEditor: NSBox {
 
     public var showsDropdown: Bool = true
 
-    public var showsFilterBar: Bool = true
+    public var showsFilterBar: Bool = false
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
