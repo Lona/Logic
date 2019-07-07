@@ -112,6 +112,14 @@ public class SuggestionWindow: NSWindow {
             }
         }
 
+        suggestionView.onPressFilterRecommended = {
+            self.onChangeSuggestionFilter?(.recommended)
+        }
+
+        suggestionView.onPressFilterAll = {
+            self.onChangeSuggestionFilter?(.all)
+        }
+
         window.contentView = view
 
         let notificationTokens = [
@@ -197,6 +205,13 @@ public class SuggestionWindow: NSWindow {
         get { return suggestionView.onChangeSearchText }
         set { suggestionView.onChangeSearchText = newValue }
     }
+
+    public var suggestionFilter: SuggestionView.SuggestionFilter {
+        get { return suggestionView.suggestionFilter }
+        set { suggestionView.suggestionFilter = newValue }
+    }
+
+    public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
 
     // MARK: Dropdown
 

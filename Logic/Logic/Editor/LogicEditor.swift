@@ -80,6 +80,14 @@ public class LogicEditor: NSBox {
         }
     }
 
+    public var suggestionFilter: SuggestionView.SuggestionFilter = .recommended {
+        didSet {
+            childWindow.suggestionFilter = suggestionFilter
+        }
+    }
+
+    public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
+
     public var showsDropdown: Bool = true
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
@@ -468,6 +476,8 @@ extension LogicEditor {
         childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
         childWindow.dropdownIndex = dropdownNodes.count - 1
+        childWindow.suggestionFilter = suggestionFilter
+        childWindow.onChangeSuggestionFilter = onChangeSuggestionFilter
 
         childWindow.onSelectIndex = { index in
             self.selectedSuggestionIndex = index

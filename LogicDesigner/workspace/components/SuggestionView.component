@@ -12,7 +12,7 @@
       "id" : "Default",
       "name" : "Default",
       "params" : {
-
+        "suggestionFilter" : null
       }
     }
   ],
@@ -280,6 +280,120 @@
         "onPressCommandUpKey"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "FilterAll",
+        "onClick"
+      ],
+      "content" : [
+        "parameters",
+        "onPressFilterAll"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "FilterRecommended",
+        "onClick"
+      ],
+      "content" : [
+        "parameters",
+        "onPressFilterRecommended"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "FilterRecommended",
+            "isActive"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "parameters",
+          "suggestionFilter"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : "recommended",
+            "type" : {
+              "alias" : "SuggestionFilter",
+              "name" : "Named",
+              "of" : {
+                "cases" : [
+                  "recommended",
+                  "all"
+                ],
+                "name" : "Enum"
+              }
+            }
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "FilterAll",
+            "isActive"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "parameters",
+          "suggestionFilter"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : "all",
+            "type" : {
+              "alias" : "SuggestionFilter",
+              "name" : "Named",
+              "of" : {
+                "cases" : [
+                  "recommended",
+                  "all"
+                ],
+                "name" : "Enum"
+              }
+            }
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
     }
   ],
   "params" : [
@@ -433,6 +547,32 @@
     {
       "name" : "showsDropdown",
       "type" : "Boolean"
+    },
+    {
+      "name" : "suggestionFilter",
+      "type" : {
+        "alias" : "SuggestionFilter",
+        "name" : "Named",
+        "of" : {
+          "cases" : [
+            "recommended",
+            "all"
+          ],
+          "name" : "Enum"
+        }
+      }
+    },
+    {
+      "name" : "onPressFilterRecommended",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressFilterAll",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {
@@ -555,6 +695,53 @@
           "flexDirection" : "row"
         },
         "type" : "Lona:View"
+      },
+      {
+        "id" : "Divider 1",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "divider",
+          "height" : 1
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "children" : [
+          {
+            "id" : "FilterRecommended",
+            "params" : {
+              "isActive" : false,
+              "titleText" : "Recommended"
+            },
+            "type" : "FilterLabel"
+          },
+          {
+            "id" : "HSpacer",
+            "params" : {
+              "width" : 4
+            },
+            "type" : "Lona:View"
+          },
+          {
+            "id" : "FilterAll",
+            "params" : {
+              "isActive" : false,
+              "titleText" : "All"
+            },
+            "type" : "FilterLabel"
+          }
+        ],
+        "id" : "FilterContainer",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "raisedBackground",
+          "flexDirection" : "row",
+          "paddingBottom" : 4,
+          "paddingLeft" : 4,
+          "paddingRight" : 4,
+          "paddingTop" : 4
+        },
+        "type" : "Lona:View"
       }
     ],
     "id" : "Container",
@@ -562,5 +749,18 @@
       "alignSelf" : "stretch"
     },
     "type" : "Lona:View"
-  }
+  },
+  "types" : [
+    {
+      "alias" : "SuggestionFilter",
+      "name" : "Named",
+      "of" : {
+        "cases" : [
+          "recommended",
+          "all"
+        ],
+        "name" : "Enum"
+      }
+    }
+  ]
 }

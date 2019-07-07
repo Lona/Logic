@@ -25,7 +25,8 @@ public class SuggestionView: NSBox {
     dropdownIndex: Int,
     dropdownValues: [String],
     detailView: CustomDetailView,
-    showsDropdown: Bool)
+    showsDropdown: Bool,
+    suggestionFilter: SuggestionFilter)
   {
     self
       .init(
@@ -36,7 +37,8 @@ public class SuggestionView: NSBox {
           dropdownIndex: dropdownIndex,
           dropdownValues: dropdownValues,
           detailView: detailView,
-          showsDropdown: showsDropdown))
+          showsDropdown: showsDropdown,
+          suggestionFilter: suggestionFilter))
   }
 
   public convenience init() {
@@ -194,6 +196,25 @@ public class SuggestionView: NSBox {
     }
   }
 
+  public var suggestionFilter: SuggestionFilter {
+    get { return parameters.suggestionFilter }
+    set {
+      if parameters.suggestionFilter != newValue {
+        parameters.suggestionFilter = newValue
+      }
+    }
+  }
+
+  public var onPressFilterRecommended: (() -> Void)? {
+    get { return parameters.onPressFilterRecommended }
+    set { parameters.onPressFilterRecommended = newValue }
+  }
+
+  public var onPressFilterAll: (() -> Void)? {
+    get { return parameters.onPressFilterAll }
+    set { parameters.onPressFilterAll = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -216,6 +237,11 @@ public class SuggestionView: NSBox {
   private var vDividerView = NSBox()
   private var detailAreaView = NSBox()
   private var suggestionDetailViewView = SuggestionDetailView()
+  private var divider1View = NSBox()
+  private var filterContainerView = NSBox()
+  private var filterRecommendedView = FilterLabel()
+  private var hSpacerView = NSBox()
+  private var filterAllView = FilterLabel()
 
   private var searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint: NSLayoutConstraint?
   private var controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint: NSLayoutConstraint?
@@ -241,6 +267,12 @@ public class SuggestionView: NSBox {
     suggestionAreaView.boxType = .custom
     suggestionAreaView.borderType = .noBorder
     suggestionAreaView.contentViewMargins = .zero
+    divider1View.boxType = .custom
+    divider1View.borderType = .noBorder
+    divider1View.contentViewMargins = .zero
+    filterContainerView.boxType = .custom
+    filterContainerView.borderType = .noBorder
+    filterContainerView.contentViewMargins = .zero
     searchInputContainerView.boxType = .custom
     searchInputContainerView.borderType = .noBorder
     searchInputContainerView.contentViewMargins = .zero
@@ -256,10 +288,15 @@ public class SuggestionView: NSBox {
     detailAreaView.boxType = .custom
     detailAreaView.borderType = .noBorder
     detailAreaView.contentViewMargins = .zero
+    hSpacerView.boxType = .custom
+    hSpacerView.borderType = .noBorder
+    hSpacerView.contentViewMargins = .zero
 
     addSubview(searchAreaView)
     addSubview(dividerView)
     addSubview(suggestionAreaView)
+    addSubview(divider1View)
+    addSubview(filterContainerView)
     searchAreaView.addSubview(searchInputContainerView)
     searchAreaView.addSubview(controlledDropdownContainerView)
     searchInputContainerView.addSubview(searchInputView)
@@ -269,10 +306,17 @@ public class SuggestionView: NSBox {
     suggestionAreaView.addSubview(detailAreaView)
     suggestionListContainerView.addSubview(suggestionListViewView)
     detailAreaView.addSubview(suggestionDetailViewView)
+    filterContainerView.addSubview(filterRecommendedView)
+    filterContainerView.addSubview(hSpacerView)
+    filterContainerView.addSubview(filterAllView)
 
     dividerView.fillColor = Colors.divider
     vDividerView.fillColor = Colors.divider
     detailAreaView.fillColor = Colors.raisedBackground
+    divider1View.fillColor = Colors.divider
+    filterContainerView.fillColor = Colors.raisedBackground
+    filterRecommendedView.titleText = "Recommended"
+    filterAllView.titleText = "All"
   }
 
   private func setUpConstraints() {
@@ -280,6 +324,8 @@ public class SuggestionView: NSBox {
     searchAreaView.translatesAutoresizingMaskIntoConstraints = false
     dividerView.translatesAutoresizingMaskIntoConstraints = false
     suggestionAreaView.translatesAutoresizingMaskIntoConstraints = false
+    divider1View.translatesAutoresizingMaskIntoConstraints = false
+    filterContainerView.translatesAutoresizingMaskIntoConstraints = false
     searchInputContainerView.translatesAutoresizingMaskIntoConstraints = false
     controlledDropdownContainerView.translatesAutoresizingMaskIntoConstraints = false
     searchInputView.translatesAutoresizingMaskIntoConstraints = false
@@ -289,6 +335,9 @@ public class SuggestionView: NSBox {
     detailAreaView.translatesAutoresizingMaskIntoConstraints = false
     suggestionListViewView.translatesAutoresizingMaskIntoConstraints = false
     suggestionDetailViewView.translatesAutoresizingMaskIntoConstraints = false
+    filterRecommendedView.translatesAutoresizingMaskIntoConstraints = false
+    hSpacerView.translatesAutoresizingMaskIntoConstraints = false
+    filterAllView.translatesAutoresizingMaskIntoConstraints = false
 
     let searchAreaViewTopAnchorConstraint = searchAreaView.topAnchor.constraint(equalTo: topAnchor)
     let searchAreaViewLeadingAnchorConstraint = searchAreaView.leadingAnchor.constraint(equalTo: leadingAnchor)
@@ -296,12 +345,24 @@ public class SuggestionView: NSBox {
     let dividerViewTopAnchorConstraint = dividerView.topAnchor.constraint(equalTo: searchAreaView.bottomAnchor)
     let dividerViewLeadingAnchorConstraint = dividerView.leadingAnchor.constraint(equalTo: leadingAnchor)
     let dividerViewTrailingAnchorConstraint = dividerView.trailingAnchor.constraint(equalTo: trailingAnchor)
-    let suggestionAreaViewBottomAnchorConstraint = suggestionAreaView.bottomAnchor.constraint(equalTo: bottomAnchor)
     let suggestionAreaViewTopAnchorConstraint = suggestionAreaView
       .topAnchor
       .constraint(equalTo: dividerView.bottomAnchor)
     let suggestionAreaViewLeadingAnchorConstraint = suggestionAreaView.leadingAnchor.constraint(equalTo: leadingAnchor)
     let suggestionAreaViewTrailingAnchorConstraint = suggestionAreaView
+      .trailingAnchor
+      .constraint(equalTo: trailingAnchor)
+    let divider1ViewTopAnchorConstraint = divider1View.topAnchor.constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let divider1ViewLeadingAnchorConstraint = divider1View.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let divider1ViewTrailingAnchorConstraint = divider1View.trailingAnchor.constraint(equalTo: trailingAnchor)
+    let filterContainerViewBottomAnchorConstraint = filterContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
+    let filterContainerViewTopAnchorConstraint = filterContainerView
+      .topAnchor
+      .constraint(equalTo: divider1View.bottomAnchor)
+    let filterContainerViewLeadingAnchorConstraint = filterContainerView
+      .leadingAnchor
+      .constraint(equalTo: leadingAnchor)
+    let filterContainerViewTrailingAnchorConstraint = filterContainerView
       .trailingAnchor
       .constraint(equalTo: trailingAnchor)
     let searchAreaViewHeightAnchorConstraint = searchAreaView.heightAnchor.constraint(equalToConstant: 32)
@@ -341,6 +402,43 @@ public class SuggestionView: NSBox {
     let detailAreaViewBottomAnchorConstraint = detailAreaView
       .bottomAnchor
       .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let divider1ViewHeightAnchorConstraint = divider1View.heightAnchor.constraint(equalToConstant: 1)
+    let filterRecommendedViewHeightAnchorParentConstraint = filterRecommendedView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: filterContainerView.heightAnchor, constant: -8)
+    let hSpacerViewHeightAnchorParentConstraint = hSpacerView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: filterContainerView.heightAnchor, constant: -8)
+    let filterAllViewHeightAnchorParentConstraint = filterAllView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: filterContainerView.heightAnchor, constant: -8)
+    let filterRecommendedViewLeadingAnchorConstraint = filterRecommendedView
+      .leadingAnchor
+      .constraint(equalTo: filterContainerView.leadingAnchor, constant: 4)
+    let filterRecommendedViewTopAnchorConstraint = filterRecommendedView
+      .topAnchor
+      .constraint(equalTo: filterContainerView.topAnchor, constant: 4)
+    let filterRecommendedViewBottomAnchorConstraint = filterRecommendedView
+      .bottomAnchor
+      .constraint(equalTo: filterContainerView.bottomAnchor, constant: -4)
+    let hSpacerViewLeadingAnchorConstraint = hSpacerView
+      .leadingAnchor
+      .constraint(equalTo: filterRecommendedView.trailingAnchor)
+    let hSpacerViewTopAnchorConstraint = hSpacerView
+      .topAnchor
+      .constraint(equalTo: filterContainerView.topAnchor, constant: 4)
+    let hSpacerViewBottomAnchorConstraint = hSpacerView
+      .bottomAnchor
+      .constraint(equalTo: filterContainerView.bottomAnchor, constant: -4)
+    let filterAllViewLeadingAnchorConstraint = filterAllView
+      .leadingAnchor
+      .constraint(equalTo: hSpacerView.trailingAnchor)
+    let filterAllViewTopAnchorConstraint = filterAllView
+      .topAnchor
+      .constraint(equalTo: filterContainerView.topAnchor, constant: 4)
+    let filterAllViewBottomAnchorConstraint = filterAllView
+      .bottomAnchor
+      .constraint(equalTo: filterContainerView.bottomAnchor, constant: -4)
     let searchInputViewTopAnchorConstraint = searchInputView
       .topAnchor
       .constraint(equalTo: searchInputContainerView.topAnchor, constant: 5)
@@ -381,6 +479,7 @@ public class SuggestionView: NSBox {
     let suggestionDetailViewViewTrailingAnchorConstraint = suggestionDetailViewView
       .trailingAnchor
       .constraint(equalTo: detailAreaView.trailingAnchor)
+    let hSpacerViewWidthAnchorConstraint = hSpacerView.widthAnchor.constraint(equalToConstant: 4)
     let searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint = searchInputContainerView
       .trailingAnchor
       .constraint(equalTo: searchAreaView.trailingAnchor)
@@ -412,6 +511,10 @@ public class SuggestionView: NSBox {
       .bottomAnchor
       .constraint(lessThanOrEqualTo: controlledDropdownContainerView.bottomAnchor)
 
+    filterRecommendedViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    hSpacerViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    filterAllViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+
     self.searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint =
       searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint
     self.controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint =
@@ -441,10 +544,16 @@ public class SuggestionView: NSBox {
         dividerViewTopAnchorConstraint,
         dividerViewLeadingAnchorConstraint,
         dividerViewTrailingAnchorConstraint,
-        suggestionAreaViewBottomAnchorConstraint,
         suggestionAreaViewTopAnchorConstraint,
         suggestionAreaViewLeadingAnchorConstraint,
         suggestionAreaViewTrailingAnchorConstraint,
+        divider1ViewTopAnchorConstraint,
+        divider1ViewLeadingAnchorConstraint,
+        divider1ViewTrailingAnchorConstraint,
+        filterContainerViewBottomAnchorConstraint,
+        filterContainerViewTopAnchorConstraint,
+        filterContainerViewLeadingAnchorConstraint,
+        filterContainerViewTrailingAnchorConstraint,
         searchAreaViewHeightAnchorConstraint,
         searchInputContainerViewLeadingAnchorConstraint,
         searchInputContainerViewTopAnchorConstraint,
@@ -460,6 +569,19 @@ public class SuggestionView: NSBox {
         detailAreaViewLeadingAnchorConstraint,
         detailAreaViewTopAnchorConstraint,
         detailAreaViewBottomAnchorConstraint,
+        divider1ViewHeightAnchorConstraint,
+        filterRecommendedViewHeightAnchorParentConstraint,
+        hSpacerViewHeightAnchorParentConstraint,
+        filterAllViewHeightAnchorParentConstraint,
+        filterRecommendedViewLeadingAnchorConstraint,
+        filterRecommendedViewTopAnchorConstraint,
+        filterRecommendedViewBottomAnchorConstraint,
+        hSpacerViewLeadingAnchorConstraint,
+        hSpacerViewTopAnchorConstraint,
+        hSpacerViewBottomAnchorConstraint,
+        filterAllViewLeadingAnchorConstraint,
+        filterAllViewTopAnchorConstraint,
+        filterAllViewBottomAnchorConstraint,
         searchInputViewTopAnchorConstraint,
         searchInputViewBottomAnchorConstraint,
         searchInputViewLeadingAnchorConstraint,
@@ -473,7 +595,8 @@ public class SuggestionView: NSBox {
         suggestionDetailViewViewTopAnchorConstraint,
         suggestionDetailViewViewBottomAnchorConstraint,
         suggestionDetailViewViewLeadingAnchorConstraint,
-        suggestionDetailViewViewTrailingAnchorConstraint
+        suggestionDetailViewViewTrailingAnchorConstraint,
+        hSpacerViewWidthAnchorConstraint
       ] +
         conditionalConstraints(controlledDropdownContainerViewIsHidden: controlledDropdownContainerView.isHidden))
   }
@@ -504,6 +627,8 @@ public class SuggestionView: NSBox {
   private func update() {
     let controlledDropdownContainerViewIsHidden = controlledDropdownContainerView.isHidden
 
+    filterAllView.isActive = false
+    filterRecommendedView.isActive = false
     searchInputView.onChangeTextValue = handleOnChangeSearchText
     searchInputView.textValue = searchText
     searchInputView.placeholderText = placeholderText
@@ -526,6 +651,14 @@ public class SuggestionView: NSBox {
     suggestionDetailViewView.detailView = detailView
     searchInputView.onPressCommandDownKey = handleOnPressCommandDownKey
     searchInputView.onPressCommandUpKey = handleOnPressCommandUpKey
+    filterAllView.onClick = handleOnPressFilterAll
+    filterRecommendedView.onClick = handleOnPressFilterRecommended
+    if suggestionFilter == .recommended {
+      filterRecommendedView.isActive = true
+    }
+    if suggestionFilter == .all {
+      filterAllView.isActive = true
+    }
 
     if controlledDropdownContainerView.isHidden != controlledDropdownContainerViewIsHidden {
       NSLayoutConstraint.deactivate(
@@ -594,6 +727,14 @@ public class SuggestionView: NSBox {
   private func handleOnPressCommandDownKey() {
     onPressCommandDownKey?()
   }
+
+  private func handleOnPressFilterRecommended() {
+    onPressFilterRecommended?()
+  }
+
+  private func handleOnPressFilterAll() {
+    onPressFilterAll?()
+  }
 }
 
 // MARK: - Parameters
@@ -607,6 +748,7 @@ extension SuggestionView {
     public var dropdownValues: [String]
     public var detailView: CustomDetailView
     public var showsDropdown: Bool
+    public var suggestionFilter: SuggestionFilter
     public var onChangeSearchText: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
@@ -622,6 +764,8 @@ extension SuggestionView {
     public var onOpenDropdown: (() -> Void)?
     public var onPressCommandUpKey: (() -> Void)?
     public var onPressCommandDownKey: (() -> Void)?
+    public var onPressFilterRecommended: (() -> Void)?
+    public var onPressFilterAll: (() -> Void)?
 
     public init(
       searchText: String,
@@ -631,6 +775,7 @@ extension SuggestionView {
       dropdownValues: [String],
       detailView: CustomDetailView,
       showsDropdown: Bool,
+      suggestionFilter: SuggestionFilter,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -645,7 +790,9 @@ extension SuggestionView {
       onCloseDropdown: (() -> Void)? = nil,
       onOpenDropdown: (() -> Void)? = nil,
       onPressCommandUpKey: (() -> Void)? = nil,
-      onPressCommandDownKey: (() -> Void)? = nil)
+      onPressCommandDownKey: (() -> Void)? = nil,
+      onPressFilterRecommended: (() -> Void)? = nil,
+      onPressFilterAll: (() -> Void)? = nil)
     {
       self.searchText = searchText
       self.placeholderText = placeholderText
@@ -654,6 +801,7 @@ extension SuggestionView {
       self.dropdownValues = dropdownValues
       self.detailView = detailView
       self.showsDropdown = showsDropdown
+      self.suggestionFilter = suggestionFilter
       self.onChangeSearchText = onChangeSearchText
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
@@ -669,6 +817,8 @@ extension SuggestionView {
       self.onOpenDropdown = onOpenDropdown
       self.onPressCommandUpKey = onPressCommandUpKey
       self.onPressCommandDownKey = onPressCommandDownKey
+      self.onPressFilterRecommended = onPressFilterRecommended
+      self.onPressFilterAll = onPressFilterAll
     }
 
     public init() {
@@ -680,7 +830,8 @@ extension SuggestionView {
           dropdownIndex: 0,
           dropdownValues: [],
           detailView: nil,
-          showsDropdown: false)
+          showsDropdown: false,
+          suggestionFilter: .recommended)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
@@ -689,7 +840,8 @@ extension SuggestionView {
           lhs.selectedIndex == rhs.selectedIndex &&
             lhs.dropdownIndex == rhs.dropdownIndex &&
               lhs.dropdownValues == rhs.dropdownValues &&
-                lhs.detailView == rhs.detailView && lhs.showsDropdown == rhs.showsDropdown
+                lhs.detailView == rhs.detailView &&
+                  lhs.showsDropdown == rhs.showsDropdown && lhs.suggestionFilter == rhs.suggestionFilter
     }
   }
 }
@@ -721,6 +873,7 @@ extension SuggestionView {
       dropdownValues: [String],
       detailView: CustomDetailView,
       showsDropdown: Bool,
+      suggestionFilter: SuggestionFilter,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -735,7 +888,9 @@ extension SuggestionView {
       onCloseDropdown: (() -> Void)? = nil,
       onOpenDropdown: (() -> Void)? = nil,
       onPressCommandUpKey: (() -> Void)? = nil,
-      onPressCommandDownKey: (() -> Void)? = nil)
+      onPressCommandDownKey: (() -> Void)? = nil,
+      onPressFilterRecommended: (() -> Void)? = nil,
+      onPressFilterAll: (() -> Void)? = nil)
     {
       self
         .init(
@@ -747,6 +902,7 @@ extension SuggestionView {
             dropdownValues: dropdownValues,
             detailView: detailView,
             showsDropdown: showsDropdown,
+            suggestionFilter: suggestionFilter,
             onChangeSearchText: onChangeSearchText,
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
@@ -761,7 +917,9 @@ extension SuggestionView {
             onCloseDropdown: onCloseDropdown,
             onOpenDropdown: onOpenDropdown,
             onPressCommandUpKey: onPressCommandUpKey,
-            onPressCommandDownKey: onPressCommandDownKey))
+            onPressCommandDownKey: onPressCommandDownKey,
+            onPressFilterRecommended: onPressFilterRecommended,
+            onPressFilterAll: onPressFilterAll))
     }
 
     public init() {
@@ -773,7 +931,42 @@ extension SuggestionView {
           dropdownIndex: 0,
           dropdownValues: [],
           detailView: nil,
-          showsDropdown: false)
+          showsDropdown: false,
+          suggestionFilter: .recommended)
+    }
+  }
+}
+
+// MARK: - SuggestionFilter
+
+extension SuggestionView {
+  public enum SuggestionFilter: Codable, Equatable {
+    case recommended
+    case all
+
+    // MARK: Codable
+
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+      let type = try container.decode(Bool.self)
+
+      switch type {
+        case false:
+          self = .recommended
+        case true:
+          self = .all
+      }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.singleValueContainer()
+
+      switch self {
+        case .recommended:
+          try container.encode(false)
+        case .all:
+          try container.encode(true)
+      }
     }
   }
 }

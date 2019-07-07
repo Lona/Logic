@@ -99,6 +99,7 @@
 		6BEEA13122A6E6EF00905664 /* LGCSyntax+Range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */; };
 		6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */; };
 		6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13522A713FA00905664 /* StandardConfiguration.swift */; };
+		6BF7795922D24EE1009A4119 /* FilterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF7795822D24EE1009A4119 /* FilterLabel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -196,6 +197,7 @@
 		6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Range.swift"; sourceTree = "<group>"; };
 		6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeFormattable.swift; sourceTree = "<group>"; };
 		6BEEA13522A713FA00905664 /* StandardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardConfiguration.swift; sourceTree = "<group>"; };
+		6BF7795822D24EE1009A4119 /* FilterLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterLabel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +244,7 @@
 			children = (
 				6B3414B5225D68E000CC65D1 /* ColorRow.swift */,
 				6B44759E22AED58E009AE087 /* Divider.swift */,
+				6BF7795822D24EE1009A4119 /* FilterLabel.swift */,
 				6B44759C22AED136009AE087 /* InfoBar.swift */,
 				6B44E14E223B3DB700740318 /* ResultRow.swift */,
 				6B44E14F223B3DB700740318 /* ResultSectionHeader.swift */,
@@ -586,6 +589,7 @@
 				6B44E18A223B40CF00740318 /* SyntaxNodeProtocol.swift in Sources */,
 				6B858C30229EEEEB00DE6216 /* LGCProgram+Builders.swift in Sources */,
 				6B44E153223B3DD000740318 /* Colors.swift in Sources */,
+				6BF7795922D24EE1009A4119 /* FilterLabel.swift in Sources */,
 				6B44E192223C0F6000740318 /* SuggestionListItem.swift in Sources */,
 				6B9528D322A0B35B0094D9C7 /* LGCProgram+Imports.swift in Sources */,
 				6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */,

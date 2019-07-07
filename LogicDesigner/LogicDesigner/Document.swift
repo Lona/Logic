@@ -98,6 +98,10 @@ class Document: NSDocument {
             self.infoBar.dropdownIndex = index
         }
 
+        logicEditor.onChangeSuggestionFilter = { [unowned self] value in
+            self.logicEditor.suggestionFilter = value
+        }
+
         logicEditor.showsDropdown = true
 
 //        logicEditor.rootNode = .topLevelDeclarations(
