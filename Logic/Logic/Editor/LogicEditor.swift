@@ -90,6 +90,8 @@ public class LogicEditor: NSBox {
 
     public var showsDropdown: Bool = true
 
+    public var showsFilterBar: Bool = true
+
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
     public var documentationForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> RichText) = LogicEditor.defaultDocumentationForNode
@@ -470,6 +472,7 @@ extension LogicEditor {
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
         childWindow.showsDropdown = showsDropdown
+        childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
         childWindow.detailView = makeDetailView(for: logicSuggestions.first?.node, query: suggestionText)
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }

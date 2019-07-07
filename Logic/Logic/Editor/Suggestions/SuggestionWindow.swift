@@ -206,12 +206,19 @@ public class SuggestionWindow: NSWindow {
         set { suggestionView.onChangeSearchText = newValue }
     }
 
+    // MARK: Filter bar
+
     public var suggestionFilter: SuggestionView.SuggestionFilter {
         get { return suggestionView.suggestionFilter }
         set { suggestionView.suggestionFilter = newValue }
     }
 
     public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
+
+    public var showsFilterBar: Bool {
+        get { return suggestionView.showsFilterBar }
+        set { suggestionView.showsFilterBar = newValue }
+    }
 
     // MARK: Dropdown
 

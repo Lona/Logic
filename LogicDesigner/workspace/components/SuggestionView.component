@@ -12,11 +12,36 @@
       "id" : "Default",
       "name" : "Default",
       "params" : {
+        "showsFilterBar" : true,
         "suggestionFilter" : null
       }
     }
   ],
   "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "FilterContainer",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsFilterBar"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "FilterDivider",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsFilterBar"
+      ],
+      "type" : "AssignExpr"
+    },
     {
       "assignee" : [
         "layers",
@@ -573,6 +598,10 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "showsFilterBar",
+      "type" : "Boolean"
     }
   ],
   "root" : {
@@ -697,7 +726,7 @@
         "type" : "Lona:View"
       },
       {
-        "id" : "Divider 1",
+        "id" : "FilterDivider",
         "params" : {
           "alignSelf" : "stretch",
           "backgroundColor" : "divider",
