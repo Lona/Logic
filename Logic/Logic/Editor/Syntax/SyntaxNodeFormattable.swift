@@ -148,10 +148,16 @@ extension LGCLiteral: SyntaxNodeFormattable {
                 [
                     .element(.dropdown(value.id, "[", .variable)),
                     .indent(
-                        .join(with: .concat([.element(.text(",")), .line])) {
-                            value.value.map { $0.formatted(using: options) }
-                        }
+                        .concat(
+                            [
+                                .hardLine,
+                                .join(with: .concat([.element(.text(",")), .hardLine])) {
+                                    value.value.map { $0.formatted(using: options) }
+                                }
+                            ]
+                        )
                     ),
+                    .hardLine,
                     .element(.text("]")),
                 ]
             )
@@ -347,13 +353,14 @@ extension LGCExpression: SyntaxNodeFormattable {
                     .indent(
                         .concat(
                             [
-                                //                                .line,
-                                .join(with: .concat([.element(.text(",")), .line])) {
+                                .hardLine,
+                                .join(with: .concat([.element(.text(",")), .hardLine])) {
                                     value.arguments.map { $0.formatted(using: options) }
                                 }
                             ]
                         )
                     ),
+                    .hardLine,
                     .element(.text(")"))
                 ]
             )
