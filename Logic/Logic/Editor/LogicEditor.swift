@@ -92,6 +92,8 @@ public class LogicEditor: NSBox {
 
     public var showsFilterBar: Bool = false
 
+    public var contextMenuForNode: ((LGCSyntaxNode, LGCSyntaxNode) -> NSMenu?) = {_, _ in nil}
+
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
     public var documentationForSuggestion: ((LGCSyntaxNode, LogicSuggestionItem, String) -> RichText) = LogicEditor.defaultDocumentationForSuggestion
@@ -189,6 +191,7 @@ public class LogicEditor: NSBox {
         canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
         canvasView.onActivate = handleActivateElement
         canvasView.onActivateLine = handleActivateLine
+        canvasView.onRightClick = handleRightClick
         canvasView.onPressTabKey = nextNode
         canvasView.onPressShiftTabKey = previousNode
         canvasView.onPressDeleteKey = handleDelete
@@ -389,6 +392,40 @@ extension LogicEditor {
         if supportsLineSelection {
             canvasView.selectedLine = activatedLineIndex
         }
+    }
+
+    private func handleRightClick(_ item: LogicCanvasView.Item?, _ point: NSPoint) {
+        guard let item = item else { return }
+
+        switch item {
+        case .line:
+            break
+        case .range(let range):
+            guard let selectedNode = rootNode.topNodeWithEqualRange(
+                as: range,
+                options: formattingOptions,
+                includeTopLevel: false
+                ) else { return }
+
+            guard let menu = contextMenuForNode(rootNode, selectedNode),
+                let firstItem = menu.items.first else { return }
+
+            hideSuggestionWindow()
+
+            canvasView.outlinedRange = range
+
+            menu.delegate = self
+            menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
+        }
+    }
+}
+
+// MARK: - Menu
+
+extension LogicEditor: NSMenuDelegate {
+    public func menuDidClose(_ menu: NSMenu) {
+        canvasView.outlinedRange = nil
+        canvasView.selectedRange = nil
     }
 }
 

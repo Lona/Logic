@@ -177,6 +177,12 @@ class Document: NSDocument {
                 return nil
             }
         }
+
+        logicEditor.contextMenuForNode = { rootNode, node in
+            let menu = NSMenu(title: "Test")
+            menu.addItem(.init(title: "Foo", action: nil, keyEquivalent: ""))
+            return menu
+        }
         
         logicEditor.suggestionsForNode = { rootNode, node, query in
             guard let root = LGCProgram.make(from: rootNode) else { return [] }

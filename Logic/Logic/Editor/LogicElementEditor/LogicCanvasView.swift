@@ -90,6 +90,7 @@ public class LogicCanvasView: NSView {
     }
     public var onActivate: ((Int?) -> Void)?
     public var onActivateLine: ((Int) -> Void)?
+    public var onRightClick: ((Item?, NSPoint) -> Void)?
     public var onPressTabKey: (() -> Void)?
     public var onPressShiftTabKey: (() -> Void)?
     public var onPressDeleteKey: (() -> Void)?
@@ -169,6 +170,16 @@ public class LogicCanvasView: NSView {
         case .some(.line(let index)):
             onActivateLine?(index)
         }
+    }
+
+    public override func rightMouseDown(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+
+        if !bounds.contains(point) { return }
+
+        let clickedItem = item(at: point)
+
+        onRightClick?(clickedItem, point)
     }
 
     public override func mouseUp(with event: NSEvent) {
