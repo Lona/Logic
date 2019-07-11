@@ -1316,6 +1316,10 @@ extension LGCProgram: SyntaxNodeProtocol {
         return block.map { $0.node }
     }
 
+    public var children: [LGCSyntaxNode] {
+        return block.map { $0.node }
+    }
+
     public var nodeTypeDescription: String {
         return "Program"
     }
@@ -1376,6 +1380,15 @@ extension LGCProgram: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+
+    public func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool {
+        switch childNode {
+        case .statement:
+            return true
+        default:
+            return false
+        }
     }
 }
 
