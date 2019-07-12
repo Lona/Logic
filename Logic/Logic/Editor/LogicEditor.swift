@@ -412,7 +412,7 @@ extension LogicEditor {
 
             hideSuggestionWindow()
 
-            canvasView.outlinedRange = range
+            canvasView.outlinedRange = rootNode.elementRange(for: selectedNode.uuid, options: formattingOptions, includeTopLevel: false)
 
             menu.delegate = self
             menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
