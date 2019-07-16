@@ -16,27 +16,20 @@ public struct LogicSuggestionItem {
     }
 
     public struct DynamicSuggestionBuilder {
-        public var initialValue: DynamicSuggestion?
-        public var onSave: (DynamicSuggestion) -> Void
+        public var initialValue: Data?
+        public var onChangeValue: (Data) -> Void
         public var onSubmit: () -> Void
+        public var setNodeBuilder: (@escaping (Data?) -> LGCSyntaxNode) -> Void
 
         public init(
-            initialValue: DynamicSuggestion?,
-            onSave: @escaping (DynamicSuggestion) -> Void,
-            onSubmit: @escaping () -> Void) {
+            initialValue: Data?,
+            onSave: @escaping (Data) -> Void,
+            onSubmit: @escaping () -> Void,
+            makeNode: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void) {
             self.initialValue = initialValue
-            self.onSave = onSave
+            self.onChangeValue = onSave
             self.onSubmit = onSubmit
-        }
-    }
-
-    public struct DynamicSuggestion {
-        var title: String?
-        var node: LGCSyntaxNode
-
-        public init(title: String? = nil, node: LGCSyntaxNode) {
-            self.title = title
-            self.node = node
+            self.setNodeBuilder = makeNode
         }
     }
 
@@ -872,12 +865,15 @@ public extension LGCComment {
             documentation: ({ builder in
                 let textView = ControlledSearchInput()
 
-                if let initialValue = builder.initialValue, let title = initialValue.title {
-                    textView.textValue = title
-                } else {
-                    textView.textValue = self.string
+                let decodeValue: (Data?) -> String = { data in
+                    if let data = data, let title = String(data: data, encoding: .utf8) {
+                        return title
+                    } else {
+                        return self.string
+                    }
                 }
 
+                textView.textValue = decodeValue(builder.initialValue)
                 textView.usesSingleLineMode = false
                 textView.isBordered = false
 
@@ -887,23 +883,22 @@ public extension LGCComment {
                 textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
                 textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
 
-                func handleSave(value: String) {
-                    let dynamicSuggestion = LogicSuggestionItem.DynamicSuggestion(
-                        title: value,
-                        node: .comment(.init(id: UUID(), string: value))
-                    )
-                    builder.onSave(dynamicSuggestion)
-                }
-
                 textView.onChangeTextValue = { value in
                     textView.textValue = value
-                    handleSave(value: value)
+
+                    guard let data = value.data(using: .utf8) else { return }
+
+                    builder.onChangeValue(data)
                 }
 
                 textView.onSubmit = {
-                    handleSave(value: textView.textValue)
                     builder.onSubmit()
                 }
+
+                builder.setNodeBuilder({ data in
+                    let value = decodeValue(data)
+                    return .comment(.init(id: UUID(), string: value))
+                })
 
                 return textView
             })

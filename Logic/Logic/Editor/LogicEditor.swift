@@ -507,6 +507,40 @@ extension LogicEditor {
         return documentationForSuggestion(rootNode, suggestion, query, builder)
     }
 
+    private func handleSubmit(
+        originalNode: LGCSyntaxNode,
+        logicSuggestionItem: LogicSuggestionItem,
+        suggestedNode: LGCSyntaxNode) -> Void {
+        let replacement = self.rootNode.replace(id: originalNode.uuid, with: suggestedNode)
+
+        if self.onChangeRootNode?(replacement) == true {
+            if let nextFocusId = logicSuggestionItem.nextFocusId {
+                self.select(nodeByID: nextFocusId)
+            } else {
+                // Handle the case where the inserted node isn't represented in the formatted output.
+                // We traverse up the tree to find the nearest parent that is.
+                if var path = self.rootNode.pathTo(id: suggestedNode.uuid) {
+                    while let selectionNode = path.last {
+                        if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions, includeTopLevel: false) {
+                            self.canvasView.selectedRange = range
+                            break
+                        }
+                        path = path.dropLast()
+                    }
+                }
+
+                switch suggestedNode.movementAfterInsertion(rootNode: replacement) {
+                case .node(let nextFocusId):
+                    self.select(nodeByID: nextFocusId)
+                case .next:
+                    self.nextNode()
+                case .none:
+                    self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
+                }
+            }
+        }
+    }
+
     // The suggestion window is shared between all logic editors, so we need to assign every parameter
     // to it each time we show it. Otherwise, we may be showing parameters set by another logic editor.
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
@@ -519,9 +553,14 @@ extension LogicEditor {
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
 
-        var dynamicSuggestions: [Int: LogicSuggestionItem.DynamicSuggestion] = [:]
+        // We set this function when we create a suggestion builder so that we can call it later to
+        // instantiate a node with the builder's saved data
+        var createDynamicNode: ((Data?) -> LGCSyntaxNode)?
+
+        var dynamicSuggestions: [Int: Data] = [:]
 
         func makeSuggestionBuilder(index: Int?) -> LogicSuggestionItem.DynamicSuggestionBuilder {
+            createDynamicNode = nil
 
             let savedValue = index != nil ? dynamicSuggestions[index!] : nil
 
@@ -534,6 +573,9 @@ extension LogicEditor {
                 onSubmit: ({ [unowned self] in
                     guard let index = index else { return }
                     self.childWindow.onSubmit?(index)
+                }),
+                makeNode: ({ callback in
+                    createDynamicNode = callback
                 })
             )
         }
@@ -597,50 +639,17 @@ extension LogicEditor {
             self.select(nodeByID: dropdownNodes[selectedIndex].uuid)
         }
 
-        childWindow.onSubmit = { index in
+        childWindow.onSubmit = { [unowned self] index in
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
             let logicSuggestionItem = logicSuggestions[indexedSuggestions[index].offset]
 
             if logicSuggestionItem.disabled { return }
 
-            let suggestedNode: LGCSyntaxNode
-
-            if let dynamicSuggestion = dynamicSuggestions[index] {
-                suggestedNode = dynamicSuggestion.node
-            } else {
-                suggestedNode = logicSuggestionItem.node
-            }
-
-//            Swift.print("Chose suggestion", suggestedNode)
-
-            let replacement = self.rootNode.replace(id: syntaxNode.uuid, with: suggestedNode)
-
-            if self.onChangeRootNode?(replacement) == true {
-                if let nextFocusId = logicSuggestionItem.nextFocusId {
-                    self.select(nodeByID: nextFocusId)
-                } else {
-                    // Handle the case where the inserted node isn't represented in the formatted output.
-                    // We traverse up the tree to find the nearest parent that is.
-                    if var path = self.rootNode.pathTo(id: suggestedNode.uuid) {
-                        while let selectionNode = path.last {
-                            if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions, includeTopLevel: false) {
-                                self.canvasView.selectedRange = range
-                                break
-                            }
-                            path = path.dropLast()
-                        }
-                    }
-
-                    switch suggestedNode.movementAfterInsertion(rootNode: replacement) {
-                    case .node(let nextFocusId):
-                        self.select(nodeByID: nextFocusId)
-                    case .next:
-                        self.nextNode()
-                    case .none:
-                        self.handleActivateElement(self.canvasView.selectedRange?.lowerBound)
-                    }
-                }
-            }
+            self.handleSubmit(
+                originalNode: syntaxNode,
+                logicSuggestionItem: logicSuggestionItem,
+                suggestedNode: createDynamicNode?(dynamicSuggestions[index]) ?? logicSuggestionItem.node
+            )
         }
 
         childWindow.onChangeSuggestionText = { [unowned self] value in
