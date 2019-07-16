@@ -36,12 +36,14 @@ public enum JavaScript {
     }()
 
     static func convert(contents: String, kind: EncodingConversionKind, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
+        context.setObject(contents, forKeyedSubscript: "___contents" as NSString)
+
         switch kind {
         case .logic:
-            let script = "global.lonaSerialization.convertLogic(`\(contents)`, '\(targetEncoding.rawValue)')"
+            let script = "global.lonaSerialization.convertLogic(___contents, '\(targetEncoding.rawValue)')"
             return context.evaluateScript(script)?.toString()
         case .types:
-            let script = "global.lonaSerialization.convertTypes(`\(contents)`, '\(targetEncoding.rawValue)')"
+            let script = "global.lonaSerialization.convertTypes(___contents, '\(targetEncoding.rawValue)')"
             return context.evaluateScript(script)?.toString()
         }
     }
