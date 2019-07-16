@@ -11,6 +11,7 @@
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
 		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
 		6B10AC2222A462630043E46A /* LogicValue+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC2122A462630043E46A /* LogicValue+Core.swift */; };
+		6B1DE40522DAB9BE00FC565E /* LightMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1DE40422DAB9BE00FC565E /* LightMark.swift */; };
 		6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34148C225417F800CC65D1 /* JavaScript.swift */; };
 		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
@@ -25,8 +26,7 @@
 		6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */; };
 		6B44759D22AED136009AE087 /* InfoBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44759C22AED136009AE087 /* InfoBar.swift */; };
 		6B44759F22AED58E009AE087 /* Divider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44759E22AED58E009AE087 /* Divider.swift */; };
-		6B44E143223B3D8E00740318 /* RichText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E140223B3D2200740318 /* RichText.swift */; };
-		6B44E144223B3D9000740318 /* RichText+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E141223B3D2200740318 /* RichText+AppKit.swift */; };
+		6B44E144223B3D9000740318 /* LightMark+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E141223B3D2200740318 /* LightMark+AppKit.swift */; };
 		6B44E152223B3DD000740318 /* CGSize+Resizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E145223B3DB700740318 /* CGSize+Resizing.swift */; };
 		6B44E153223B3DD000740318 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E146223B3DB700740318 /* Colors.swift */; };
 		6B44E154223B3DD000740318 /* LNAImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E147223B3DB700740318 /* LNAImageView.swift */; };
@@ -107,6 +107,7 @@
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
 		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
 		6B10AC2122A462630043E46A /* LogicValue+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+Core.swift"; sourceTree = "<group>"; };
+		6B1DE40422DAB9BE00FC565E /* LightMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightMark.swift; sourceTree = "<group>"; };
 		6B34148C225417F800CC65D1 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
 		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
@@ -121,8 +122,7 @@
 		6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCList+SyntaxNode.swift"; sourceTree = "<group>"; };
 		6B44759C22AED136009AE087 /* InfoBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoBar.swift; sourceTree = "<group>"; };
 		6B44759E22AED58E009AE087 /* Divider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Divider.swift; sourceTree = "<group>"; };
-		6B44E140223B3D2200740318 /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
-		6B44E141223B3D2200740318 /* RichText+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichText+AppKit.swift"; sourceTree = "<group>"; };
+		6B44E141223B3D2200740318 /* LightMark+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LightMark+AppKit.swift"; sourceTree = "<group>"; };
 		6B44E145223B3DB700740318 /* CGSize+Resizing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGSize+Resizing.swift"; sourceTree = "<group>"; };
 		6B44E146223B3DB700740318 /* Colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		6B44E147223B3DB700740318 /* LNAImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LNAImageView.swift; sourceTree = "<group>"; };
@@ -230,15 +230,6 @@
 			path = Types;
 			sourceTree = "<group>";
 		};
-		6B44E142223B3D2200740318 /* RichText */ = {
-			isa = PBXGroup;
-			children = (
-				6B44E140223B3D2200740318 /* RichText.swift */,
-				6B44E141223B3D2200740318 /* RichText+AppKit.swift */,
-			);
-			path = RichText;
-			sourceTree = "<group>";
-		};
 		6B44E150223B3DB700740318 /* components */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,7 +330,6 @@
 				6B44E171223B406800740318 /* Formatter */,
 				6B858C2C229EEEAD00DE6216 /* Language */,
 				6B44E176223B40AF00740318 /* LogicElementEditor */,
-				6B44E142223B3D2200740318 /* RichText */,
 				6B44E166223B3E6000740318 /* Suggestions */,
 				6B44E183223B40C900740318 /* Syntax */,
 			);
@@ -354,6 +344,8 @@
 				6B9528D422A0C2710094D9C7 /* CSSColor.swift */,
 				6BBD0C002294DA1100EB87A9 /* KeyValueCollection.swift */,
 				6BBD0C012294DA1100EB87A9 /* KeyValueList.swift */,
+				6B1DE40422DAB9BE00FC565E /* LightMark.swift */,
+				6B44E141223B3D2200740318 /* LightMark+AppKit.swift */,
 				6BBD0C0622961B9C00EB87A9 /* NameGenerator.swift */,
 				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
 				6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */,
@@ -569,7 +561,7 @@
 				6BBD0BFB2292134700EB87A9 /* EnumType.swift in Sources */,
 				6B3414A222593E2000CC65D1 /* Array+Union.swift in Sources */,
 				6B44E158223B3DD000740318 /* Shadows.swift in Sources */,
-				6B44E144223B3D9000740318 /* RichText+AppKit.swift in Sources */,
+				6B44E144223B3D9000740318 /* LightMark+AppKit.swift in Sources */,
 				6B5B7574215C387E00CDC9C6 /* TypeParameter.swift in Sources */,
 				6B44E154223B3DD000740318 /* LNAImageView.swift in Sources */,
 				6B10AC1C22A45FD00043E46A /* LogicValue+Color.swift in Sources */,
@@ -625,6 +617,7 @@
 				6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */,
 				6BBD0C0F2298759F00EB87A9 /* LGCExpression+Builders.swift in Sources */,
 				6BEEA13122A6E6EF00905664 /* LGCSyntax+Range.swift in Sources */,
+				6B1DE40522DAB9BE00FC565E /* LightMark.swift in Sources */,
 				6B9528D822A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift in Sources */,
 				6B10AC2222A462630043E46A /* LogicValue+Core.swift in Sources */,
 				6B44E165223B3E3C00740318 /* ControlledDropdown.swift in Sources */,
@@ -634,7 +627,6 @@
 				6B44E159223B3DD000740318 /* TextStyles.swift in Sources */,
 				6B44E152223B3DD000740318 /* CGSize+Resizing.swift in Sources */,
 				6B44E164223B3E3C00740318 /* ControlledSearchInput.swift in Sources */,
-				6B44E143223B3D8E00740318 /* RichText.swift in Sources */,
 				6B5B7561215B1ABE00CDC9C6 /* TypeListItem.swift in Sources */,
 				6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */,
 				6BBD0C132298945D00EB87A9 /* LGCSyntax+Selection.swift in Sources */,

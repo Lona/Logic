@@ -588,6 +588,7 @@
                       },
                       "type" : "typeIdentifier"
                     },
+                    "comment" : null,
                     "id" : "47C0D509-297A-48C6-B01B-ECD1DE015860",
                     "initializer" : {
                       "data" : {

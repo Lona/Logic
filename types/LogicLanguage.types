@@ -31,6 +31,9 @@
       <Record.Param name="initializer" type="Optional">
         <Record.Substitution generic="Value" instance="Expression"/>
       </Record.Param>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
+      </Record.Param>
     </Record>
     <Record name="function">
       <Record.Param name="id" type="UUID"/>
@@ -244,6 +247,9 @@
     <Case name="topLevelDeclarations">
       <Case.Param type="TopLevelDeclarations"/>
     </Case>
+    <Case name="comment">
+      <Case.Param type="Comment"/>
+    </Case>
   </Type>
   <Type name="FunctionParameter">
     <Record name="parameter">
@@ -337,6 +343,12 @@
       <Record.Param name="declarations" type="List">
         <Record.Substitution generic="T" instance="Declaration"/>
       </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Comment">
+    <Record name="comment">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="string" type="String"/>
     </Record>
   </Type>
 </root>

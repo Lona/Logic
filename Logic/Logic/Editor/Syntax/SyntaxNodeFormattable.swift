@@ -103,6 +103,12 @@ fileprivate extension FormatterCommand where Element == LogicElement {
     }
 }
 
+extension LGCComment: SyntaxNodeFormattable {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
+        return .element(LogicElement.dropdown(id, string, .comment))
+    }
+}
+
 extension LGCIdentifier: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         if isPlaceholder {
@@ -490,6 +496,11 @@ extension LGCDeclaration: SyntaxNodeFormattable {
         switch self {
         case .variable(let value):
             var contents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                contents.append(comment.formatted(using: options))
+                contents.append(.hardLine)
+            }
 
             switch options.style {
             case .js:

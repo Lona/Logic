@@ -87,7 +87,7 @@ public extension Compiler {
                 }
 
                 return context
-            case (true, .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: _))):
+            case (true, .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: _, _))):
                 context.patternToName[pattern.uuid] = pattern.name
                 context.patternNames.set(pattern, for: pattern.name)
 

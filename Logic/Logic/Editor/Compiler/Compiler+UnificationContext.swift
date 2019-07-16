@@ -80,7 +80,7 @@ extension Compiler {
 
                 declarations.forEach { declaration in
                     switch declaration {
-                    case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _):
+                    case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _, _):
                         guard let annotation = annotation else { break }
 
                         labels.append(pattern.name)
@@ -184,7 +184,7 @@ extension Compiler {
 
                 result.nodes[functionName.uuid] = functionType
                 result.patternTypes[functionName.uuid] = functionType
-            case (true, .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer))):
+            case (true, .declaration(.variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer, _))):
                 guard let initializer = initializer, let annotation = annotation else {
                     config.ignoreChildren = true
                     return result

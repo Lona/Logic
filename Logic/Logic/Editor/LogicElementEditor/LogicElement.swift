@@ -17,7 +17,7 @@ public enum LogicElement {
     }
 
     public enum DropdownStyle {
-        case source, variable, placeholder, boldVariable
+        case source, variable, placeholder, boldVariable, comment
 
         var color: NSColor {
             switch self {
@@ -27,6 +27,8 @@ public enum LogicElement {
                 return Colors.editableText
             case .placeholder:
                 return NSColor.systemYellow
+            case .comment:
+                return Colors.textNoneditable
             }
         }
     }

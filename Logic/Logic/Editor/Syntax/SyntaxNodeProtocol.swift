@@ -31,7 +31,8 @@ public protocol SyntaxNodeProtocol {
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self
     func copy(deep: Bool) -> Self
 
-    func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText
+    func comment(within root: LGCSyntaxNode) -> LGCComment?
+    func documentation(within root: LGCSyntaxNode, for prefix: String) -> NSView
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
 }
 
@@ -40,10 +41,14 @@ public extension SyntaxNodeProtocol {
         return []
     }
 
+    func comment(within root: LGCSyntaxNode) -> LGCComment? {
+        return nil
+    }
+
     var isSelectable: Bool { return true }
 
-    func documentation(within root: LGCSyntaxNode, for prefix: String) -> RichText {
-        return RichText(blocks: [])
+    func documentation(within root: LGCSyntaxNode, for prefix: String) -> NSView {
+        return NSView()
     }
 
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
@@ -152,6 +157,12 @@ extension LGCPattern: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+
+    public func comment(within root: LGCSyntaxNode) -> LGCComment? {
+        guard let path = root.pathTo(id: uuid), let parent = path.dropLast().last else { return nil }
+
+        return parent.comment(within: root)
     }
 }
 
@@ -1062,7 +1073,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
         switch self {
         case .variable(let value):
-            return [value.name.node, value.annotation?.node, value.initializer?.node].compactMap { $0 }
+            return [value.name.node, value.annotation?.node, value.initializer?.node, value.comment?.node].compactMap { $0 }
         case .function(let value):
             return [value.name.node] + value.genericParameters.map { $0.node } + [value.returnType.node] +
                 value.parameters.map { $0.node } + value.block.map { $0.node }
@@ -1159,7 +1170,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
                     annotation: value.annotation?.replace(id: id, with: syntaxNode),
-                    initializer: value.initializer?.replace(id: id, with: syntaxNode)
+                    initializer: value.initializer?.replace(id: id, with: syntaxNode),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             case .function(let value):
                 return LGCDeclaration.function(
@@ -1208,7 +1220,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 id: UUID(),
                 name: value.name.copy(deep: deep),
                 annotation: value.annotation?.copy(deep: deep),
-                initializer: value.initializer?.copy(deep: deep)
+                initializer: value.initializer?.copy(deep: deep),
+                comment: value.comment?.copy(deep: deep)
             )
         case .function(let value):
             return LGCDeclaration.function(
@@ -1305,6 +1318,15 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return true
         default:
             return false
+        }
+    }
+
+    public func comment(within root: LGCSyntaxNode) -> LGCComment? {
+        switch self {
+        case .variable(let value):
+            return value.comment
+        default:
+            return nil
         }
     }
 }
@@ -1603,6 +1625,45 @@ extension LGCFunctionCallArgument {
     }
 }
 
+extension LGCComment: SyntaxNodeProtocol {
+    public var uuid: UUID {
+        return id
+    }
+
+    public var node: LGCSyntaxNode {
+        return .comment(self)
+    }
+
+    public var nodeTypeDescription: String {
+        return "Comment"
+    }
+
+    public var subnodes: [LGCSyntaxNode] {
+        return []
+    }
+
+    public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
+        return false
+    }
+
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
+        return .next
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCComment {
+        switch syntaxNode {
+        case .comment(let newNode) where id == uuid:
+            return newNode
+        default:
+            return self
+        }
+    }
+
+    public func copy(deep: Bool) -> LGCComment {
+        return .init(id: UUID(), string: string)
+    }
+}
+
 extension LGCSyntaxNode {
     public var contents: SyntaxNodeProtocol {
         switch self {
@@ -1635,6 +1696,8 @@ extension LGCSyntaxNode {
         case .genericParameter(let value):
             return value
         case .topLevelDeclarations(let value):
+            return value
+        case .comment(let value):
             return value
         }
     }
@@ -1677,5 +1740,9 @@ extension LGCSyntaxNode {
 
     public func isDraggable(rootNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+
+    func comment(within root: LGCSyntaxNode) -> LGCComment? {
+        return contents.comment(within: root)
     }
 }

@@ -220,7 +220,7 @@ extension Compiler {
                     break
                 }
             }
-        case .declaration(.variable(_, let pattern, _, let initializer)):
+        case .declaration(.variable(_, let pattern, _, let initializer, _)):
             guard let initializer = initializer else { return .success(context) }
 
             context.values[pattern.uuid] = context.values[initializer.uuid]
@@ -248,7 +248,7 @@ extension Compiler {
 
             declarations.forEach { declaration in
                 switch declaration {
-                case .variable(id: _, name: let pattern, annotation: _, initializer: _):
+                case .variable(id: _, name: let pattern, annotation: _, initializer: _, _):
                     guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
 
                     parameterTypes.set(parameterType, for: pattern.name)
@@ -309,7 +309,7 @@ extension LGCSyntaxNode {
             case .enumeration(_, let pattern, _, _),
                  .namespace(_, let pattern, _),
                  .record(_, let pattern, _, _),
-                 .variable(_, let pattern, _, _),
+                 .variable(_, let pattern, _, _, _),
                  .function(_, let pattern, _, _, _, _):
                 return pattern
             default:

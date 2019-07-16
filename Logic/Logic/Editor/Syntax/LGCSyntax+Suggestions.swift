@@ -24,7 +24,7 @@ public struct LogicSuggestionItem {
         nextFocusId: UUID? = nil,
         disabled: Bool = false,
         style: Style = .normal,
-        documentation: @autoclosure @escaping () -> RichText? = nil) {
+        documentation: @autoclosure @escaping () -> NSView? = nil) {
         self.title = title
         self.badge = badge
         self.category = category
@@ -44,7 +44,7 @@ public struct LogicSuggestionItem {
     public var nextFocusId: UUID?
     public var disabled: Bool
     public var style: Style
-    public var documentation: () -> RichText?
+    public var documentation: () -> NSView?
 
     public func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
@@ -623,7 +623,8 @@ public extension LGCDeclaration {
                         initializer: .identifierExpression(
                             id: UUID(),
                             identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
-                        )
+                        ),
+                        comment: nil
                     )
                 )
             )
@@ -865,6 +866,8 @@ public extension LGCSyntaxNode {
         case .enumerationCase:
             return contents.suggestions(within: root, for: prefix)
         case .topLevelDeclarations:
+            return []
+        case .comment:
             return []
         }
     }

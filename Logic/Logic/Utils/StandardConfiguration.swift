@@ -259,6 +259,12 @@ public enum StandardConfiguration {
                         default:
                             var suggestion = LGCExpression.Suggestion.memberExpression(names: keyPath)
 
+                            if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
+                                suggestion.documentation = {
+                                    return LightMark.makeScrollView(LightMark.parse(comment.string))
+                                }
+                            }
+
                             switch resolvedType {
                             case Unification.T.color:
                                 guard let colorString = evaluationContext?.values[id]?.colorString else { break }

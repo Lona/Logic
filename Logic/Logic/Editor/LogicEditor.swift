@@ -96,7 +96,7 @@ public class LogicEditor: NSBox {
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
-    public var documentationForSuggestion: ((LGCSyntaxNode, LogicSuggestionItem, String) -> RichText) = LogicEditor.defaultDocumentationForSuggestion
+    public var documentationForSuggestion: ((LGCSyntaxNode, LogicSuggestionItem, String) -> NSView) = LogicEditor.defaultDocumentationForSuggestion
 
     public static let defaultRootNode = LGCSyntaxNode.program(
         LGCProgram(
@@ -118,7 +118,7 @@ public class LogicEditor: NSBox {
     public static let defaultDocumentationForSuggestion: (
         LGCSyntaxNode,
         LogicSuggestionItem,
-        String) -> RichText = { rootNode, suggestion, query in
+        String) -> NSView = { rootNode, suggestion, query in
         return suggestion.documentation() ?? suggestion.node.documentation(within: rootNode, for: query)
     }
 
@@ -494,7 +494,7 @@ extension LogicEditor {
     private func makeDetailView(for suggestion: LogicSuggestionItem?, query: String) -> NSView? {
         guard let suggestion = suggestion else { return nil }
 
-        return documentationForSuggestion(rootNode, suggestion, query).makeScrollView()
+        return documentationForSuggestion(rootNode, suggestion, query)
     }
 
     // The suggestion window is shared between all logic editors, so we need to assign every parameter

@@ -179,8 +179,17 @@ class Document: NSDocument {
         }
 
         logicEditor.contextMenuForNode = { rootNode, node in
-            let menu = NSMenu(title: "Test")
-            menu.addItem(.init(title: "Foo", action: nil, keyEquivalent: ""))
+            let menu = NSMenu()
+
+            switch node {
+            case .declaration(.variable(let value)):
+                let addCommentItem = NSMenuItem(title: "Add comment", action: #selector(self.addComment), keyEquivalent: "")
+                addCommentItem.representedObject = MenuAction.addComment(value.id)
+                menu.addItem(addCommentItem)
+            default:
+                return nil
+            }
+
             return menu
         }
         
@@ -272,6 +281,41 @@ class Document: NSDocument {
         }
 
         logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
+    }
+
+    private enum MenuAction {
+        case addComment(UUID)
+    }
+
+    @objc func addComment(_ sender: NSMenuItem) {
+        guard let action = sender.representedObject as? MenuAction else { return }
+
+        switch action {
+        case .addComment(let id):
+            guard let node = logicEditor.rootNode.find(id: id) else { return }
+
+            switch node {
+            case .declaration(.variable(_, name: let name, annotation: let annotation, initializer: let initializer, _)):
+                Swift.print("Add comment", sender)
+
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .declaration(
+                        .variable(
+                            id: UUID(),
+                            name: name,
+                            annotation: annotation,
+                            initializer: initializer,
+                            comment: .init(id: UUID(), string: "Here is **some bold text**")
+                        )
+                    )
+                )
+            default:
+                break
+            }
+
+            break
+        }
     }
 
 //    override func data(ofType typeName: String) throws -> Data {

@@ -9,62 +9,41 @@
 import AppKit
 
 public extension LGCExpression {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> NSView {
         switch self {
         case .binaryExpression(let value):
             switch value.op {
             case .setEqualTo:
-                let blocks: [RichText.BlockElement] = [
-                    .heading(.title, "Assignment"),
-                    .paragraph(
-                        [
-                            .text(
-                                .none,
-                                "Use an assignment expression to update the value of an existing variable."
-                            )
-                        ]
-                    )
-                ]
+                return LightMark.makeScrollView(markdown: """
+# Assignment
 
-                return RichText(blocks: blocks)
+Use an assignment expression to update the value of an existing variable.
+""")
             default:
-                let blocks: [RichText.BlockElement] = [
-                    .heading(.title, "Comparison"),
-                    .paragraph(
-                        [
-                            .text(.none, "Compare two variables.")
-                        ]
-                    )
-                ]
+                return LightMark.makeScrollView(markdown: """
+# Comparison
 
-                return RichText(blocks: blocks)
+Compare two variables.
+""")
             }
         default:
-            return RichText(blocks: [])
+            return NSView()
         }
     }
 }
 
 public extension LGCFunctionParameter {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
-        return RichText(
-            blocks: [
-                .alert(
-                    .info,
-                    .paragraph(
-                        [
-                            .text(.none, "Info message")
-                        ]
-                    )
-                ),
-                .heading(.title, "Title")
-            ]
-        )
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String)-> NSView {
+        return LightMark.makeScrollView(markdown: """
+I> Info message
+
+# Title
+""")
     }
 }
 
 public extension LGCStatement {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String)-> NSView {
         switch self {
         case .branch:
             let example = LGCSyntaxNode.statement(
@@ -103,53 +82,33 @@ public extension LGCStatement {
                 )
             )
 
-            let blocks: [RichText.BlockElement] = [
-                .heading(.title, "If condition"),
-                .paragraph(
-                    [
-                        .text(.none, "Conditions let you run different code depending on the current state of your app.")
-                    ]
-                ),
-                .heading(.section, "Example"),
-                .paragraph(
-                    [
-                        .text(.none, "Suppose our program has a variable "),
-                        .text(.bold, "age"),
-                        .text(.none, ", representing the current user's age. We might want to display a specific message depending on the value of age. We could use an "),
-                        .text(.bold, "if condition "),
-                        .text(.none, "to accomplish this:")
-                    ]
-                ),
-                .custom(example.makeCodeView(using: .normal)),
-//                .paragraph(
-//                    [
-//                        .text(.none) { "If we also wanted to print a message for users under 18, we might be better off using an " },
-//                        .text(.link) { "if else statement" },
-//                        .text(.none) { "." }
-//                    ]
-//                )
-            ]
+//                .custom(example.makeCodeView(using: .normal)),
 
-            return RichText(blocks: blocks)
+            return LightMark.makeScrollView(markdown: """
+# If condition
+
+Conditions let you run different code depending on the current state of your app.
+
+## Example
+
+Suppose our program has a variable `age` representing the current user's age. We might want to display a specific message depending on the value of age. We could use an **if condition** to accomplish this:
+
+TODO: Add code block
+""")
         case .loop:
-            let blocks: [RichText.BlockElement] = [
-                .heading(.title, "For loop"),
-                .paragraph(
-                    [
-                        .text(.none, "Loops let you run the same code multiple times, once for each item in a sequence of items.")
-                    ]
-                )
-            ]
+            return LightMark.makeScrollView(markdown: """
+# For loop
 
-            return RichText(blocks: blocks)
+Loops let you run the same code multiple times, once for each item in a sequence of items.
+""")
         default:
-            return RichText(blocks: [])
+            return NSView()
         }
     }
 }
 
 public extension LGCSyntaxNode {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> RichText {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> NSView {
         return contents.documentation(within: rootNode, for: prefix)
     }
 
@@ -174,6 +133,20 @@ public extension LGCSyntaxNode {
         editor.bottomAnchor.constraint(equalTo: container.bottomAnchor).isActive = true
 
         return container
+    }
+
+    init?(data: Data) {
+        guard let jsonData = LogicFile.convert(data, kind: .logic, to: .json) else {
+            Swift.print("Failed to convert LGCSyntaxNode data to json")
+            return nil
+        }
+
+        guard let node = try? JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData) else {
+            Swift.print("Failed to deserialize JSON")
+            return nil
+        }
+
+        self = node
     }
 }
 
