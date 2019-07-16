@@ -207,7 +207,7 @@ extension LightMark.BlockElement {
             case .level3, .level4, .level5, .level6:
                 fatalError("Unhandled heading level")
             }
-        case .paragraph, .block:
+        case .paragraph, .block, .quote:
             return 8
 //        case .custom:
 //            return 12

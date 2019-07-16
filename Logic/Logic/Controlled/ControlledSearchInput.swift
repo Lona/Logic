@@ -28,6 +28,7 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
         super.init(frame: frameRect)
 
         setUpSelectionObserver()
+        usesSingleLineMode = true
         self.delegate = self
     }
 
@@ -35,6 +36,7 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
         super.init(coder: coder)
 
         setUpSelectionObserver()
+        usesSingleLineMode = true
         self.delegate = self
     }
 
@@ -139,8 +141,18 @@ extension ControlledSearchInput: NSTextFieldDelegate {
             onPressShiftTab?()
             return true
         } else if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
-            onSubmit?()
-            return true
+            if usesSingleLineMode {
+                onSubmit?()
+                return true
+            } else {
+                textView.insertNewlineIgnoringFieldEditor(nil)
+                return true
+            }
+        } else if (commandSelector == #selector(NSResponder.insertNewlineIgnoringFieldEditor(_:))) {
+            if !usesSingleLineMode {
+                onSubmit?()
+                return true
+            }
         } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
             onPressEscape?()
             return true

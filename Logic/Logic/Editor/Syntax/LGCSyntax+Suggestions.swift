@@ -15,6 +15,31 @@ public struct LogicSuggestionItem {
         case textStylePreview(TextStyle)
     }
 
+    public struct DynamicSuggestionBuilder {
+        public var initialValue: DynamicSuggestion?
+        public var onSave: (DynamicSuggestion) -> Void
+        public var onSubmit: () -> Void
+
+        public init(
+            initialValue: DynamicSuggestion?,
+            onSave: @escaping (DynamicSuggestion) -> Void,
+            onSubmit: @escaping () -> Void) {
+            self.initialValue = initialValue
+            self.onSave = onSave
+            self.onSubmit = onSubmit
+        }
+    }
+
+    public struct DynamicSuggestion {
+        var title: String?
+        var node: LGCSyntaxNode
+
+        public init(title: String? = nil, node: LGCSyntaxNode) {
+            self.title = title
+            self.node = node
+        }
+    }
+
     public init(
         title: String,
         badge: String? = nil,
@@ -24,7 +49,7 @@ public struct LogicSuggestionItem {
         nextFocusId: UUID? = nil,
         disabled: Bool = false,
         style: Style = .normal,
-        documentation: @autoclosure @escaping () -> NSView? = nil) {
+        documentation: ((DynamicSuggestionBuilder) -> NSView)? = nil) {
         self.title = title
         self.badge = badge
         self.category = category
@@ -44,7 +69,7 @@ public struct LogicSuggestionItem {
     public var nextFocusId: UUID?
     public var disabled: Bool
     public var style: Style
-    public var documentation: () -> NSView?
+    public var documentation: ((DynamicSuggestionBuilder) -> NSView)?
 
     public func titleContains(prefix: String) -> Bool {
         if prefix.isEmpty { return true }
@@ -834,6 +859,60 @@ public extension LGCStatement {
     }
 }
 
+public extension LGCComment {
+    enum Suggestion {
+        static let categoryTitle = "Declarations".uppercased()
+    }
+
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+        let suggestion = LogicSuggestionItem(
+            title: "Comment",
+            category: Suggestion.categoryTitle,
+            node: .comment(LGCComment(id: UUID(), string: prefix)),
+            documentation: ({ builder in
+                let textView = ControlledSearchInput()
+
+                if let initialValue = builder.initialValue, let title = initialValue.title {
+                    textView.textValue = title
+                } else {
+                    textView.textValue = self.string
+                }
+
+                textView.usesSingleLineMode = false
+                textView.isBordered = false
+
+                textView.translatesAutoresizingMaskIntoConstraints = false
+                textView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+                textView.setContentHuggingPriority(.defaultLow, for: .vertical)
+                textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+                textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+
+                func handleSave(value: String) {
+                    let dynamicSuggestion = LogicSuggestionItem.DynamicSuggestion(
+                        title: value,
+                        node: .comment(.init(id: UUID(), string: value))
+                    )
+                    builder.onSave(dynamicSuggestion)
+                }
+
+                textView.onChangeTextValue = { value in
+                    textView.textValue = value
+                    handleSave(value: value)
+                }
+
+                textView.onSubmit = {
+                    handleSave(value: textView.textValue)
+                    builder.onSubmit()
+                }
+
+                return textView
+            })
+        )
+
+        return [suggestion]
+    }
+}
+
 public extension LGCSyntaxNode {
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
         switch self {
@@ -868,7 +947,7 @@ public extension LGCSyntaxNode {
         case .topLevelDeclarations:
             return []
         case .comment:
-            return []
+            return contents.suggestions(within: root, for: prefix)
         }
     }
 }

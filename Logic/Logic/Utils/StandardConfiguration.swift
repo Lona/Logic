@@ -260,7 +260,7 @@ public enum StandardConfiguration {
                             var suggestion = LGCExpression.Suggestion.memberExpression(names: keyPath)
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
-                                suggestion.documentation = {
+                                suggestion.documentation = { _ in
                                     return LightMark.makeScrollView(LightMark.parse(comment.string))
                                 }
                             }

@@ -96,7 +96,12 @@ public class LogicEditor: NSBox {
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
-    public var documentationForSuggestion: ((LGCSyntaxNode, LogicSuggestionItem, String) -> NSView) = LogicEditor.defaultDocumentationForSuggestion
+    public var documentationForSuggestion: (
+        LGCSyntaxNode,
+        LogicSuggestionItem,
+        String,
+        LogicSuggestionItem.DynamicSuggestionBuilder
+        ) -> NSView = LogicEditor.defaultDocumentationForSuggestion
 
     public static let defaultRootNode = LGCSyntaxNode.program(
         LGCProgram(
@@ -118,8 +123,10 @@ public class LogicEditor: NSBox {
     public static let defaultDocumentationForSuggestion: (
         LGCSyntaxNode,
         LogicSuggestionItem,
-        String) -> NSView = { rootNode, suggestion, query in
-        return suggestion.documentation() ?? suggestion.node.documentation(within: rootNode, for: query)
+        String,
+        LogicSuggestionItem.DynamicSuggestionBuilder
+        ) -> NSView = { rootNode, suggestion, query, builder in
+        return suggestion.documentation?(builder) ?? suggestion.node.documentation(within: rootNode, for: query)
     }
 
     public static let defaultWillSelectNode: (LGCSyntaxNode, UUID?) -> UUID? = { (rootNode: LGCSyntaxNode, nodeId: UUID?) in
@@ -491,10 +498,13 @@ extension LogicEditor {
 
 extension LogicEditor {
 
-    private func makeDetailView(for suggestion: LogicSuggestionItem?, query: String) -> NSView? {
+    private func makeDetailView(
+        for suggestion: LogicSuggestionItem?,
+        query: String,
+        builder: LogicSuggestionItem.DynamicSuggestionBuilder) -> NSView? {
         guard let suggestion = suggestion else { return nil }
 
-        return documentationForSuggestion(rootNode, suggestion, query)
+        return documentationForSuggestion(rootNode, suggestion, query, builder)
     }
 
     // The suggestion window is shared between all logic editors, so we need to assign every parameter
@@ -508,10 +518,34 @@ extension LogicEditor {
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
+
+        var dynamicSuggestions: [Int: LogicSuggestionItem.DynamicSuggestion] = [:]
+
+        func makeSuggestionBuilder(index: Int?) -> LogicSuggestionItem.DynamicSuggestionBuilder {
+
+            let savedValue = index != nil ? dynamicSuggestions[index!] : nil
+
+            return LogicSuggestionItem.DynamicSuggestionBuilder(
+                initialValue: savedValue,
+                onSave: ({ dynamicSuggestion in
+                    guard let index = index else { return }
+                    dynamicSuggestions[index] = dynamicSuggestion
+                }),
+                onSubmit: ({ [unowned self] in
+                    guard let index = index else { return }
+                    self.childWindow.onSubmit?(index)
+                })
+            )
+        }
+
         childWindow.showsDropdown = showsDropdown
         childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
-        childWindow.detailView = makeDetailView(for: logicSuggestions.first, query: suggestionText)
+        childWindow.detailView = makeDetailView(
+            for: logicSuggestions.first,
+            query: suggestionText,
+            builder: makeSuggestionBuilder(index: self.childWindow.selectedIndex)
+        )
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
         childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
@@ -529,7 +563,11 @@ extension LogicEditor {
                 let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
                 let suggestion = logicSuggestions[indexedSuggestions[index].offset]
 
-                self.childWindow.detailView = self.makeDetailView(for: suggestion, query: self.suggestionText)
+                self.childWindow.detailView = self.makeDetailView(
+                    for: suggestion,
+                    query: self.suggestionText,
+                    builder: makeSuggestionBuilder(index: index)
+                )
             } else {
                 self.childWindow.detailView = nil
             }
@@ -565,7 +603,13 @@ extension LogicEditor {
 
             if logicSuggestionItem.disabled { return }
 
-            let suggestedNode = logicSuggestionItem.node
+            let suggestedNode: LGCSyntaxNode
+
+            if let dynamicSuggestion = dynamicSuggestions[index] {
+                suggestedNode = dynamicSuggestion.node
+            } else {
+                suggestedNode = logicSuggestionItem.node
+            }
 
 //            Swift.print("Chose suggestion", suggestedNode)
 
@@ -599,17 +643,22 @@ extension LogicEditor {
             }
         }
 
-        childWindow.onChangeSuggestionText = { value in
+        childWindow.onChangeSuggestionText = { [unowned self] value in
             self.suggestionText = value
 
             // Update logicSuggestions
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
 
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
+            let index = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
 
             self.childWindow.suggestionItems = indexedSuggestions.map { $0.item }
-            self.childWindow.selectedIndex = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
-            self.childWindow.detailView = self.makeDetailView(for: logicSuggestions.first, query: self.suggestionText)
+            self.childWindow.selectedIndex = index
+            self.childWindow.detailView = self.makeDetailView(
+                for: logicSuggestions.first,
+                query: self.suggestionText,
+                builder: makeSuggestionBuilder(index: index)
+            )
         }
 
         window.addChildWindow(childWindow, ordered: .above)
