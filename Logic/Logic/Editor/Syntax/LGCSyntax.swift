@@ -85,9 +85,9 @@ public indirect enum LGCDeclaration: Codable & Equatable {
           .variable(
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
-            annotation: try data.decode(Optional.self, forKey: .annotation),
-            initializer: try data.decode(Optional.self, forKey: .initializer),
-            comment: try data.decode(Optional.self, forKey: .comment))
+            annotation: try data.decodeIfPresent(LGCTypeAnnotation.self, forKey: .annotation),
+            initializer: try data.decodeIfPresent(LGCExpression.self, forKey: .initializer),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       case "function":
         self =
           .function(
@@ -138,9 +138,9 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try container.encode("variable", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
-        try data.encode(value.annotation, forKey: .annotation)
-        try data.encode(value.initializer, forKey: .initializer)
-        try data.encode(value.comment, forKey: .comment)
+        try data.encodeIfPresent(value.annotation, forKey: .annotation)
+        try data.encodeIfPresent(value.initializer, forKey: .initializer)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
       case .function(let value):
         try container.encode("function", forKey: .type)
         try data.encode(value.id, forKey: .id)
@@ -685,7 +685,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
         self =
           .parameter(
             id: try data.decode(UUID.self, forKey: .id),
-            externalName: try data.decode(Optional.self, forKey: .externalName),
+            externalName: try data.decodeIfPresent(String.self, forKey: .externalName),
             localName: try data.decode(LGCPattern.self, forKey: .localName),
             annotation: try data.decode(LGCTypeAnnotation.self, forKey: .annotation),
             defaultValue: try data.decode(LGCFunctionParameterDefaultValue.self, forKey: .defaultValue))
@@ -704,7 +704,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
       case .parameter(let value):
         try container.encode("parameter", forKey: .type)
         try data.encode(value.id, forKey: .id)
-        try data.encode(value.externalName, forKey: .externalName)
+        try data.encodeIfPresent(value.externalName, forKey: .externalName)
         try data.encode(value.localName, forKey: .localName)
         try data.encode(value.annotation, forKey: .annotation)
         try data.encode(value.defaultValue, forKey: .defaultValue)
