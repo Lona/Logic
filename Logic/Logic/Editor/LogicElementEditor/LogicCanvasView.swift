@@ -360,6 +360,8 @@ public class LogicCanvasView: NSView {
 
                 if drawSelection {
                     color.setFill()
+                } else if let backgroundColor = text.backgroundColor {
+                    backgroundColor.setFill()
                 } else {
                     NSColor.clear.setFill()
                 }

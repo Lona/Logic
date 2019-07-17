@@ -61,6 +61,19 @@ extension Colors {
         return NSColor.systemGray
     }()
 
+    public static let textComment: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return NSColor.white.withAlphaComponent(0.4)
+            default:
+                break
+            }
+        }
+
+        return NSColor.black.withAlphaComponent(0.4)
+    }()
+
     public static let divider: NSColor = {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {

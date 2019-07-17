@@ -28,7 +28,7 @@ public enum LogicElement {
             case .placeholder:
                 return NSColor.systemYellow
             case .comment:
-                return Colors.textNoneditable
+                return Colors.textComment
             }
         }
     }
@@ -106,6 +106,15 @@ public enum LogicElement {
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color
+        }
+    }
+
+    public var backgroundColor: NSColor? {
+        switch self {
+        case .dropdown(_, _, .comment):
+            return Colors.text.withAlphaComponent(0.05)
+        default:
+            return nil
         }
     }
 }

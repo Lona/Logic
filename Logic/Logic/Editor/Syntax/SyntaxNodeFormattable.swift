@@ -257,6 +257,7 @@ extension LGCEnumerationCase: SyntaxNodeFormattable {
             var commentContents: [FormatterCommand<LogicElement>] = []
 
             if let comment = value.comment {
+                commentContents.append(.spacer(12))
                 commentContents.append(comment.formatted(using: options))
                 commentContents.append(.hardLine)
             }
@@ -505,6 +506,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             var contents: [FormatterCommand<LogicElement>] = []
 
             if let comment = value.comment {
+                contents.append(.spacer(12))
                 contents.append(comment.formatted(using: options))
                 contents.append(.hardLine)
             }
@@ -591,6 +593,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             var commentContents: [FormatterCommand<LogicElement>] = []
 
             if let comment = value.comment {
+                commentContents.append(.spacer(12))
                 commentContents.append(comment.formatted(using: options))
                 commentContents.append(.hardLine)
             }
@@ -630,6 +633,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             var commentContents: [FormatterCommand<LogicElement>] = []
 
             if let comment = value.comment {
+                commentContents.append(.spacer(12))
                 commentContents.append(comment.formatted(using: options))
                 commentContents.append(.hardLine)
             }
