@@ -57,7 +57,7 @@ extension Compiler {
                 result.nodes[condition.uuid] = .bool
 
                 return result
-            case (false, .declaration(.record(id: _, name: let functionName, genericParameters: let genericParameters, declarations: let declarations))):
+            case (false, .declaration(.record(id: _, name: let functionName, genericParameters: let genericParameters, declarations: let declarations, _))):
                 let genericNames: [String] = genericParameters.compactMap { param in
                     switch param {
                     case .parameter(_, name: let pattern):
@@ -103,7 +103,7 @@ extension Compiler {
                 result.nodes[functionName.uuid] = functionType
                 result.patternTypes[functionName.uuid] = functionType
                 result.functionArgumentLabels[functionName.uuid] = labels
-            case (false, .declaration(.enumeration(_, name: let functionName, genericParameters: let genericParameters, cases: let enumCases))):
+            case (false, .declaration(.enumeration(_, name: let functionName, genericParameters: let genericParameters, cases: let enumCases, _))):
                 let genericNames: [String] = genericParameters.compactMap { param in
                     switch param {
                     case .parameter(_, name: let pattern):
@@ -126,7 +126,7 @@ extension Compiler {
                     switch enumCase {
                     case .placeholder:
                         break
-                    case .enumerationCase(_, name: let pattern, associatedValueTypes: let associatedValueTypes):
+                    case .enumerationCase(_, name: let pattern, associatedValueTypes: let associatedValueTypes, _):
                         let parameterTypes: [Unification.T] = associatedValueTypes.compactMap { annotation in
                             switch annotation {
                             case .placeholder:
@@ -146,7 +146,7 @@ extension Compiler {
                 // Not used for unification, but used for convenience in evaluation
                 result.nodes[functionName.uuid] = returnType
                 result.patternTypes[functionName.uuid] = returnType
-            case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: let genericParameters, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: let functionName, returnType: let returnTypeAnnotation, genericParameters: let genericParameters, parameters: let parameters, block: _, _))):
 
                 let genericNames: [String] = genericParameters.compactMap { param in
                     switch param {

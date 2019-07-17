@@ -181,11 +181,28 @@ class Document: NSDocument {
         logicEditor.contextMenuForNode = { rootNode, node in
             let menu = NSMenu()
 
-            switch node {
-            case .declaration(.variable(let value)):
+            func addComment(_ uuid: UUID) {
                 let addCommentItem = NSMenuItem(title: "Add comment", action: #selector(self.addComment), keyEquivalent: "")
-                addCommentItem.representedObject = MenuAction.addComment(value.id)
+                addCommentItem.representedObject = MenuAction.addComment(uuid)
                 menu.addItem(addCommentItem)
+            }
+
+            func menuForDeclaration(declaration: LGCDeclaration) {
+                switch declaration {
+                case .variable, .record, .enumeration, .function:
+                    addComment(declaration.uuid)
+                default:
+                    break
+                }
+            }
+
+            switch node {
+            case .statement(.declaration(id: _, content: let declaration)):
+                menuForDeclaration(declaration: declaration)
+            case .declaration(let declaration):
+                menuForDeclaration(declaration: declaration)
+            case .enumerationCase(.enumerationCase(let value)):
+                addComment(value.id)
             default:
                 return nil
             }
@@ -295,7 +312,7 @@ class Document: NSDocument {
             guard let node = logicEditor.rootNode.find(id: id) else { return }
 
             switch node {
-            case .declaration(.variable(_, name: let name, annotation: let annotation, initializer: let initializer, _)):
+            case .declaration(.variable(let value)):
                 Swift.print("Add comment", sender)
 
                 logicEditor.rootNode = logicEditor.rootNode.replace(
@@ -303,10 +320,48 @@ class Document: NSDocument {
                     with: .declaration(
                         .variable(
                             id: UUID(),
-                            name: name,
-                            annotation: annotation,
-                            initializer: initializer,
-                            comment: .init(id: UUID(), string: "Here is **some bold text**")
+                            name: value.name,
+                            annotation: value.annotation,
+                            initializer: value.initializer,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
+                        )
+                    )
+                )
+            case .declaration(.record(let value)):
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .declaration(
+                        .record(
+                            id: UUID(),
+                            name: value.name,
+                            genericParameters: value.genericParameters,
+                            declarations: value.declarations,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
+                        )
+                    )
+                )
+            case .declaration(.enumeration(let value)):
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .declaration(
+                        .enumeration(
+                            id: UUID(),
+                            name: value.name,
+                            genericParameters: value.genericParameters,
+                            cases: value.cases,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
+                        )
+                    )
+                )
+            case .enumerationCase(.enumerationCase(let value)):
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .enumerationCase(
+                        .enumerationCase(
+                            id: UUID(),
+                            name: value.name,
+                            associatedValueTypes: value.associatedValueTypes,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
                         )
                     )
                 )

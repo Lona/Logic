@@ -46,11 +46,11 @@ public struct LGCIdentifier: Codable & Equatable {
 
 public indirect enum LGCDeclaration: Codable & Equatable {
   case variable(id: UUID, name: LGCPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>, comment: Optional<LGCComment>)
-  case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, genericParameters: LGCList<LGCGenericParameter>, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>)
-  case enumeration(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, cases: LGCList<LGCEnumerationCase>)
+  case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, genericParameters: LGCList<LGCGenericParameter>, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>, comment: Optional<LGCComment>)
+  case enumeration(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, cases: LGCList<LGCEnumerationCase>, comment: Optional<LGCComment>)
   case namespace(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
   case placeholder(id: UUID)
-  case record(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, declarations: LGCList<LGCDeclaration>)
+  case record(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, declarations: LGCList<LGCDeclaration>, comment: Optional<LGCComment>)
   case importDeclaration(id: UUID, name: LGCPattern)
 
   // MARK: Codable
@@ -96,14 +96,16 @@ public indirect enum LGCDeclaration: Codable & Equatable {
             returnType: try data.decode(LGCTypeAnnotation.self, forKey: .returnType),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
             parameters: try data.decode(LGCList.self, forKey: .parameters),
-            block: try data.decode(LGCList.self, forKey: .block))
+            block: try data.decode(LGCList.self, forKey: .block),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       case "enumeration":
         self =
           .enumeration(
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
-            cases: try data.decode(LGCList.self, forKey: .cases))
+            cases: try data.decode(LGCList.self, forKey: .cases),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       case "namespace":
         self =
           .namespace(
@@ -118,7 +120,8 @@ public indirect enum LGCDeclaration: Codable & Equatable {
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
-            declarations: try data.decode(LGCList.self, forKey: .declarations))
+            declarations: try data.decode(LGCList.self, forKey: .declarations),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       case "importDeclaration":
         self =
           .importDeclaration(
@@ -149,12 +152,14 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try data.encode(value.genericParameters, forKey: .genericParameters)
         try data.encode(value.parameters, forKey: .parameters)
         try data.encode(value.block, forKey: .block)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
       case .enumeration(let value):
         try container.encode("enumeration", forKey: .type)
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
         try data.encode(value.genericParameters, forKey: .genericParameters)
         try data.encode(value.cases, forKey: .cases)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
       case .namespace(let value):
         try container.encode("namespace", forKey: .type)
         try data.encode(value.id, forKey: .id)
@@ -169,6 +174,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
         try data.encode(value.name, forKey: .name)
         try data.encode(value.genericParameters, forKey: .genericParameters)
         try data.encode(value.declarations, forKey: .declarations)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
       case .importDeclaration(let value):
         try container.encode("importDeclaration", forKey: .type)
         try data.encode(value.id, forKey: .id)
@@ -179,7 +185,7 @@ public indirect enum LGCDeclaration: Codable & Equatable {
 
 public indirect enum LGCEnumerationCase: Codable & Equatable {
   case placeholder(id: UUID)
-  case enumerationCase(id: UUID, name: LGCPattern, associatedValueTypes: LGCList<LGCTypeAnnotation>)
+  case enumerationCase(id: UUID, name: LGCPattern, associatedValueTypes: LGCList<LGCTypeAnnotation>, comment: Optional<LGCComment>)
 
   // MARK: Codable
 
@@ -192,6 +198,7 @@ public indirect enum LGCEnumerationCase: Codable & Equatable {
     case id
     case name
     case associatedValueTypes
+    case comment
   }
 
   public init(from decoder: Decoder) throws {
@@ -207,7 +214,8 @@ public indirect enum LGCEnumerationCase: Codable & Equatable {
           .enumerationCase(
             id: try data.decode(UUID.self, forKey: .id),
             name: try data.decode(LGCPattern.self, forKey: .name),
-            associatedValueTypes: try data.decode(LGCList.self, forKey: .associatedValueTypes))
+            associatedValueTypes: try data.decode(LGCList.self, forKey: .associatedValueTypes),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -226,6 +234,7 @@ public indirect enum LGCEnumerationCase: Codable & Equatable {
         try data.encode(value.id, forKey: .id)
         try data.encode(value.name, forKey: .name)
         try data.encode(value.associatedValueTypes, forKey: .associatedValueTypes)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
     }
   }
 }

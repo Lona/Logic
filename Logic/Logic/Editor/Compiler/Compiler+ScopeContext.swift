@@ -94,7 +94,7 @@ public extension Compiler {
                 context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
 
                 return context
-            case (false, .declaration(.function(id: _, name: let functionName, returnType: _, genericParameters: let genericParameters, parameters: let parameters, block: _))):
+            case (false, .declaration(.function(id: _, name: let functionName, returnType: _, genericParameters: let genericParameters, parameters: let parameters, block: _, _))):
                 context.patternToName[functionName.uuid] = functionName.name
                 context.patternNames.set(functionName, for: functionName.name)
 
@@ -122,11 +122,11 @@ public extension Compiler {
                 }
 
                 return context
-            case (true, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: _, block: _))):
+            case (true, .declaration(.function(id: _, name: _, returnType: _, genericParameters: _, parameters: _, block: _, _))):
                 context.patternNames = context.patternNames.pop()
 
                 return context
-            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: let genericParameters, declarations: _))):
+            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: let genericParameters, declarations: _, _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
                 genericParameters.forEach { param in
@@ -142,7 +142,7 @@ public extension Compiler {
                 config.ignoreChildren = true
 
                 return context
-            case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _))):
+            case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _, _))):
                 // Built-ins should be constructed using literals
                 if ["Boolean", "Number", "String", "Array", "Color"].contains(pattern.name) { return context }
 
@@ -151,7 +151,7 @@ public extension Compiler {
                 context.patternNames.set(pattern, for: pattern.name)
 
                 context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
-            case (false, .declaration(.enumeration(id: _, name: let pattern, genericParameters: let genericParameters, cases: _))):
+            case (false, .declaration(.enumeration(id: _, name: let pattern, genericParameters: let genericParameters, cases: _, _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
                 genericParameters.forEach { param in
@@ -164,7 +164,7 @@ public extension Compiler {
                 }
 
                 return context
-            case (true, .declaration(.enumeration(_, name: let pattern, let genericParameters, cases: let cases))):
+            case (true, .declaration(.enumeration(_, name: let pattern, let genericParameters, cases: let cases, _))):
                 context.currentNamespacePath = context.currentNamespacePath + [pattern.name]
 
                 // Add initializers for each case into the namespace
@@ -172,7 +172,7 @@ public extension Compiler {
                     switch enumCase {
                     case .placeholder:
                         break
-                    case .enumerationCase(_, name: let caseName, associatedValueTypes: _):
+                    case .enumerationCase(_, name: let caseName, associatedValueTypes: _, _):
                         context.setInCurrentNamespace(key: caseName.name, value: caseName.id)
                     }
                 }

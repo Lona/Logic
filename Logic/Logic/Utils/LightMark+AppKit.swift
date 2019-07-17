@@ -52,7 +52,7 @@ extension LightMark.HeadingLevel {
         case .level1:
             return 18
         case .level2:
-            return 12
+            return 14
         case .level3, .level4, .level5, .level6:
             fatalError("Unhandled heading level")
         }
@@ -102,7 +102,7 @@ extension LightMark.QuoteKind {
     public static var iconError = BundleLocator.getBundle().image(forResource: NSImage.Name("icon-error"))!
 
     public static var iconMargin = NSEdgeInsets(top: 3, left: 4, bottom: 0, right: 4)
-    public static var paragraphMargin = NSEdgeInsets(top: 0, left: 0, bottom: -1, right: 0)
+    public static var paragraphMargin = NSEdgeInsets(top: 0, left: 0, bottom: 1, right: 0)
 }
 
 typealias LogicTextStyle = TextStyle
@@ -126,7 +126,15 @@ extension LightMark.InlineElement {
                 .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
         case .code(content: let content):
             return LightMark.makeTextStyle(isCode: true).apply(to: content)
-        default:
+        case .link(source: let source, content: let content):
+            let attributedString = LightMark.makeTextStyle()
+                .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
+            let string = attributedString.string
+            let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+            let range = NSRange(string.startIndex..<string.endIndex, in: string)
+            mutableAttributedString.addAttribute(.link, value: NSURL(string: source) as Any, range: range)
+            return mutableAttributedString
+        case .image:
             return NSAttributedString()
         }
     }
@@ -138,7 +146,8 @@ extension LightMark.BlockElement {
         case .heading(let headingLevel, let content):
             let attributedString = LightMark.makeTextStyle(headingLevel: headingLevel)
                 .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
-            return NSTextField(labelWithAttributedString: attributedString)
+
+            return LightMark.makeTextField(attributedString: attributedString)
         case .quote(kind: let kind, content: let blocks):
             let container = NSBox()
             container.boxType = .custom
@@ -172,14 +181,14 @@ extension LightMark.BlockElement {
                 constant: iconMargin.right + paragraphMargin.left).isActive = true
 
             blockView.topAnchor.constraint(equalTo: container.topAnchor, constant: paragraphMargin.top).isActive = true
-            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: paragraphMargin.bottom).isActive = true
+            blockView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -paragraphMargin.bottom).isActive = true
             blockView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -paragraphMargin.right).isActive = true
 
             return container
         case .paragraph(let elements):
-            let string = elements.map { $0.attributedString() }.joined(separator: "")
+            let attributedString = elements.map { $0.attributedString() }.joined(separator: "")
 
-            return NSTextField(labelWithAttributedString: string)
+            return LightMark.makeTextField(attributedString: attributedString)
         case .block(language: "logic", content: let content):
             guard let data = content.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
 
@@ -189,6 +198,40 @@ extension LightMark.BlockElement {
             }
 
             return node.makeCodeView(using: .normal)
+        case .block(language: _, content: let content):
+            let container = NSBox()
+            container.boxType = .custom
+            container.borderType = .noBorder
+            container.fillColor = LightMark.QuoteKind.none.backgroundColor
+            container.contentViewMargins = .zero
+            container.cornerRadius = 4
+
+            let paragraphMargin = NSEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+
+            let textStyle = TextStyle(family: "Menlo", size: 12)
+
+            let textField = LightMark.makeTextField(attributedString: textStyle.apply(to: content))
+            textField.translatesAutoresizingMaskIntoConstraints = false
+
+            container.addSubview(textField)
+
+            textField.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: paragraphMargin.left).isActive = true
+            textField.topAnchor.constraint(equalTo: container.topAnchor, constant: paragraphMargin.top).isActive = true
+            textField.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -paragraphMargin.bottom).isActive = true
+            textField.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -paragraphMargin.right).isActive = true
+
+            return container
+        case .horizontalRule:
+            let container = NSBox()
+
+            container.boxType = .custom
+            container.borderType = .noBorder
+            container.fillColor = Colors.divider
+
+            container.translatesAutoresizingMaskIntoConstraints = false
+            container.heightAnchor.constraint(equalToConstant: 1).isActive = true
+
+            return container
         case .lineBreak:
             return NSView()
         default:
@@ -215,6 +258,8 @@ extension LightMark.BlockElement {
 //            return 8
         case .lineBreak:
             return 18
+        case .horizontalRule:
+            return 18
         default:
             fatalError("Unhandled type")
         }
@@ -228,6 +273,15 @@ private class FlippedView: NSView {
 }
 
 extension LightMark {
+    public static func makeTextField(attributedString: NSAttributedString) -> NSTextField {
+        let textField = NSTextField(labelWithAttributedString: attributedString)
+        textField.isEnabled = true
+        textField.isSelectable = true
+        textField.allowsEditingTextAttributes = true
+
+        return textField
+    }
+
     public static func makeContentView(_ blocks: [LightMark.BlockElement], padding: CGFloat) -> NSView {
         let blockViews = blocks.map { $0.view }
 

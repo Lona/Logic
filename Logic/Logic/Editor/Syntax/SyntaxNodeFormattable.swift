@@ -254,8 +254,15 @@ extension LGCEnumerationCase: SyntaxNodeFormattable {
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         case .enumerationCase(let value):
+            var commentContents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                commentContents.append(comment.formatted(using: options))
+                commentContents.append(.hardLine)
+            }
+
             return .concat(
-                [
+                commentContents + [
                     // Always select the parent node instead of the name
                     .element(LogicElement.dropdown(value.id, value.name.name, .variable)),
                     .element(.text("with data")),
@@ -438,9 +445,9 @@ extension LGCDeclaration: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         func genericParameters() -> FormatterCommand<LogicElement> {
             switch self {
-            case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _),
-                 .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _),
-                 .record(id: _, name: _, genericParameters: let genericParameters, declarations: _):
+            case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _, _),
+                 .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _, _),
+                 .record(id: _, name: _, genericParameters: let genericParameters, declarations: _, _):
                 if genericParameters.isEmpty {
                     return .empty
                 } else {
@@ -581,6 +588,13 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .enumeration(let value):
+            var commentContents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                commentContents.append(comment.formatted(using: options))
+                commentContents.append(.hardLine)
+            }
+
             let contents: FormatterCommand<LogicElement> = .concat(
                 [
                     .element(.text("with cases:")),
@@ -598,7 +612,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             )
 
             return .concat(
-                [
+                commentContents + [
                     .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
                     value.name.formatted(using: options),
                     (value.genericParameters.isEmpty ? contents : .indent(
@@ -613,6 +627,13 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .record(let value):
+            var commentContents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                commentContents.append(comment.formatted(using: options))
+                commentContents.append(.hardLine)
+            }
+
             let contents: FormatterCommand<LogicElement> = .concat(
                 [
                     .element(.text("with properties:")),
@@ -630,7 +651,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             )
 
             return .concat(
-                [
+                commentContents + [
                     .element(LogicElement.dropdown(value.id, "Record", .source)),
                     value.name.formatted(using: options),
                     (value.genericParameters.isEmpty ? contents : .indent(

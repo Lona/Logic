@@ -224,7 +224,7 @@ extension Compiler {
             guard let initializer = initializer else { return .success(context) }
 
             context.values[pattern.uuid] = context.values[initializer.uuid]
-        case .declaration(.function(_, name: let pattern, returnType: _, genericParameters: _, parameters: _, block: _)):
+        case .declaration(.function(_, name: let pattern, returnType: _, genericParameters: _, parameters: _, block: _, _)):
             guard let type = unificationContext.patternTypes[pattern.uuid] else { break }
 
             let fullPath = rootNode.declarationPath(id: node.uuid)
@@ -239,7 +239,7 @@ extension Compiler {
             default:
                 break
             }
-        case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations)):
+        case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations, _)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
             let resolvedType = Unification.substitute(substitution, in: type)
@@ -258,14 +258,14 @@ extension Compiler {
             }
 
             context.values[functionName.uuid] = LogicValue(resolvedType, .function(.recordInit(members: parameterTypes)))
-        case .declaration(.enumeration(id: _, name: let functionName, genericParameters: _, cases: let enumCases)):
+        case .declaration(.enumeration(id: _, name: let functionName, genericParameters: _, cases: let enumCases, _)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
             enumCases.forEach { enumCase in
                 switch enumCase {
                 case .placeholder:
                     break
-                case .enumerationCase(_, name: let pattern, associatedValueTypes: _):
+                case .enumerationCase(_, name: let pattern, associatedValueTypes: _, _):
 //                    guard let consType = unificationContext.patternTypes[pattern.uuid] else { break }
 
                     let resolvedConsType = Unification.substitute(substitution, in: type)
@@ -306,11 +306,11 @@ extension LGCSyntaxNode {
 
         let patterns: [LGCPattern] = declarations.compactMap { declaration in
             switch declaration {
-            case .enumeration(_, let pattern, _, _),
+            case .enumeration(_, let pattern, _, _, _),
                  .namespace(_, let pattern, _),
-                 .record(_, let pattern, _, _),
+                 .record(_, let pattern, _, _, _),
                  .variable(_, let pattern, _, _, _),
-                 .function(_, let pattern, _, _, _, _):
+                 .function(_, let pattern, _, _, _, _, _):
                 return pattern
             default:
                 return nil

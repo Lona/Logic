@@ -48,6 +48,9 @@
       <Record.Param name="block" type="List">
         <Record.Substitution generic="T" instance="Statement"/>
       </Record.Param>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
+      </Record.Param>
     </Record>
     <Record name="enumeration">
       <Record.Param name="id" type="UUID"/>
@@ -57,6 +60,9 @@
       </Record.Param>
       <Record.Param name="cases" type="List">
         <Record.Substitution generic="T" instance="EnumerationCase"/>
+      </Record.Param>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
       </Record.Param>
     </Record>
     <Record name="namespace">
@@ -78,6 +84,9 @@
       <Record.Param name="declarations" type="List">
         <Record.Substitution generic="T" instance="Declaration"/>
       </Record.Param>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
+      </Record.Param>
     </Record>
     <Record name="importDeclaration">
       <Record.Param name="id" type="UUID"/>
@@ -93,6 +102,9 @@
       <Record.Param name="name" type="Pattern"/>
       <Record.Param name="associatedValueTypes" type="List">
         <Record.Substitution generic="T" instance="TypeAnnotation"/>
+      </Record.Param>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
       </Record.Param>
     </Record>
   </Type>

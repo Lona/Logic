@@ -435,13 +435,15 @@ public extension LGCEnumerationCase {
                 return LGCEnumerationCase.enumerationCase(
                     id: UUID(),
                     name: LGCPattern(id: UUID(), name: prefix),
-                    associatedValueTypes: .next(LGCTypeAnnotation.makePlaceholder(), .empty)
+                    associatedValueTypes: .next(LGCTypeAnnotation.makePlaceholder(), .empty),
+                    comment: nil
                 )
             case .enumerationCase(let value):
                 return LGCEnumerationCase.enumerationCase(
                     id: UUID(),
                     name: LGCPattern(id: UUID(), name: prefix),
-                    associatedValueTypes: value.associatedValueTypes
+                    associatedValueTypes: value.associatedValueTypes,
+                    comment: nil
                 )
             }
         }
@@ -663,7 +665,8 @@ public extension LGCDeclaration {
                         ),
                         genericParameters: .empty,
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                        block: .next(LGCStatement.placeholder(id: UUID()), .empty)
+                        block: .next(LGCStatement.placeholder(id: UUID()), .empty),
+                        comment: nil
                     )
                 )
             )
@@ -684,7 +687,8 @@ public extension LGCDeclaration {
                         ),
                         genericParameters: .next(LGCGenericParameter.makePlaceholder(), .empty),
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
-                        block: .next(LGCStatement.placeholder(id: UUID()), .empty)
+                        block: .next(LGCStatement.placeholder(id: UUID()), .empty),
+                        comment: nil
                     )
                 )
             )
@@ -699,7 +703,8 @@ public extension LGCDeclaration {
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
                         genericParameters: .empty,
-                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty),
+                        comment: nil
                     )
                 )
             )
@@ -714,7 +719,8 @@ public extension LGCDeclaration {
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
                         genericParameters: .next(.makePlaceholder(), .empty),
-                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty)
+                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty),
+                        comment: nil
                     )
                 )
             )
@@ -729,7 +735,8 @@ public extension LGCDeclaration {
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
                         genericParameters: .empty,
-                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty),
+                        comment: nil
                     )
                 )
             )
@@ -744,7 +751,8 @@ public extension LGCDeclaration {
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
                         genericParameters: .next(.makePlaceholder(), .empty),
-                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty),
+                        comment: nil
                     )
                 )
             )

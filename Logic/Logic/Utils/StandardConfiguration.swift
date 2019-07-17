@@ -125,8 +125,8 @@ public enum StandardConfiguration {
                 })
 
                 switch node {
-                case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _))),
-                     .some(.declaration(.record(id: _, name: _, genericParameters: let genericParameters, declarations: _))):
+                case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _, _))),
+                     .some(.declaration(.record(id: _, name: _, genericParameters: let genericParameters, declarations: _, _))):
                     let parameterNames: [String] = genericParameters.compactMap { param in
                         switch param {
                         case .parameter(_, name: let pattern):
@@ -246,7 +246,7 @@ public enum StandardConfiguration {
                         case .fun(arguments: let arguments, returnType: _):
                             let labels = unificationContext.functionArgumentLabels[id]
 
-                            return LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.enumerated().map { index, arg in
+                            var suggestion = LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.enumerated().map { index, arg in
                                 LGCFunctionCallArgument(
                                     id: UUID(),
                                     label: labels?[index],
@@ -256,12 +256,20 @@ public enum StandardConfiguration {
                                     )
                                 )
                             })
+
+                            if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
+                                suggestion.documentation = { _ in
+                                    return LightMark.makeScrollView(LightMark.parse(comment))
+                                }
+                            }
+
+                            return suggestion
                         default:
                             var suggestion = LGCExpression.Suggestion.memberExpression(names: keyPath)
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
                                 suggestion.documentation = { _ in
-                                    return LightMark.makeScrollView(LightMark.parse(comment.string))
+                                    return LightMark.makeScrollView(LightMark.parse(comment))
                                 }
                             }
 

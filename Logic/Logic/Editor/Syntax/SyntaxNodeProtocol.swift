@@ -31,7 +31,7 @@ public protocol SyntaxNodeProtocol {
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self
     func copy(deep: Bool) -> Self
 
-    func comment(within root: LGCSyntaxNode) -> LGCComment?
+    func comment(within root: LGCSyntaxNode) -> String?
     func documentation(within root: LGCSyntaxNode, for prefix: String) -> NSView
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
 }
@@ -41,7 +41,7 @@ public extension SyntaxNodeProtocol {
         return []
     }
 
-    func comment(within root: LGCSyntaxNode) -> LGCComment? {
+    func comment(within root: LGCSyntaxNode) -> String? {
         return nil
     }
 
@@ -83,6 +83,13 @@ public extension SyntaxNodeProtocol {
 
     func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+}
+
+// Utility, not part of the protocol
+extension SyntaxNodeProtocol {
+    func parentOf(target id: UUID, includeTopLevel: Bool) -> LGCSyntaxNode? {
+        return pathTo(id: id, includeTopLevel: includeTopLevel)?.dropLast().last
     }
 }
 
@@ -159,7 +166,7 @@ extension LGCPattern: SyntaxNodeProtocol {
         return false
     }
 
-    public func comment(within root: LGCSyntaxNode) -> LGCComment? {
+    public func comment(within root: LGCSyntaxNode) -> String? {
         guard let path = root.pathTo(id: uuid), let parent = path.dropLast().last else { return nil }
 
         return parent.comment(within: root)
@@ -632,7 +639,7 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
         case .placeholder:
             return []
         case .enumerationCase(let value):
-            return [value.name.node] + value.associatedValueTypes.map { $0.node }
+            return [value.name.node, value.comment?.node].compactMap { $0 } + value.associatedValueTypes.map { $0.node }
         }
     }
 
@@ -656,7 +663,8 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
             return LGCEnumerationCase.enumerationCase(
                 id: value.id,
                 name: value.name.delete(id: id),
-                associatedValueTypes: LGCList(updated)
+                associatedValueTypes: LGCList(updated),
+                comment: value.comment?.delete(id: id)
             )
         }
     }
@@ -673,7 +681,8 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
                 return LGCEnumerationCase.enumerationCase(
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
-                    associatedValueTypes: value.associatedValueTypes.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                    associatedValueTypes: value.associatedValueTypes.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             }
         }
@@ -687,7 +696,8 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
             return LGCEnumerationCase.enumerationCase(
                 id: UUID(),
                 name: value.name.copy(deep: deep),
-                associatedValueTypes: value.associatedValueTypes.copy(deep: deep).normalizedPlaceholders
+                associatedValueTypes: value.associatedValueTypes.copy(deep: deep).normalizedPlaceholders,
+                comment: value.comment?.copy(deep: deep)
             )
         }
     }
@@ -707,6 +717,27 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return true
+    }
+
+    public func comment(within root: LGCSyntaxNode) -> String? {
+        switch self {
+        case .enumerationCase(let value):
+            let comment = value.comment?.string
+
+            switch root.contents.parentOf(target: uuid, includeTopLevel: false) {
+            case .some(.declaration(.enumeration(let enumValue))):
+                let base = "This is a case of the enumeration: `\(enumValue.name.name)`"
+                if let comment = comment {
+                    return "\(comment)\n\n---\n\n\(base)"
+                } else {
+                    return base
+                }
+            default:
+                return comment
+            }
+        case .placeholder:
+            return nil
+        }
     }
 }
 
@@ -1073,14 +1104,14 @@ extension LGCDeclaration: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
         switch self {
         case .variable(let value):
-            return [value.name.node, value.annotation?.node, value.initializer?.node, value.comment?.node].compactMap { $0 }
+            return [value.name.node, value.comment?.node, value.annotation?.node, value.initializer?.node].compactMap { $0 }
         case .function(let value):
-            return [value.name.node] + value.genericParameters.map { $0.node } + [value.returnType.node] +
+            return [value.name.node, value.comment?.node].compactMap { $0 } + value.genericParameters.map { $0.node } + [value.returnType.node] +
                 value.parameters.map { $0.node } + value.block.map { $0.node }
         case .enumeration(let value):
-            return [value.name.node] + value.genericParameters.map { $0.node } + value.cases.map { $0.node }
+            return [value.name.node, value.comment?.node].compactMap { $0 } + value.genericParameters.map { $0.node } + value.cases.map { $0.node }
         case .record(let value):
-            return [value.name.node] + value.genericParameters.map { $0.node } + value.declarations.map { $0.node }
+            return [value.name.node, value.comment?.node].compactMap { $0 } + value.genericParameters.map { $0.node } + value.declarations.map { $0.node }
         case .namespace(let value):
             return [value.name.node] + value.declarations.map { $0.node }
         case .placeholder:
@@ -1107,28 +1138,30 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 id: value.id,
                 name: value.name.delete(id: id),
                 genericParameters: value.genericParameters.delete(id: id),
-                cases: LGCList(value.cases.filter {
+                cases: LGCList(value.cases.filter({
                     switch $0 {
                     case .placeholder:
                         return true
                     case .enumerationCase(let value):
                         return value.id != id
                     }
-                    }.map { $0.delete(id: id) })
+                }).map { $0.delete(id: id) }),
+                comment: value.comment?.delete(id: id)
             )
         case .record(let value):
             return .record(
                 id: value.id,
                 name: value.name.delete(id: id),
                 genericParameters: value.genericParameters.delete(id: id),
-                declarations: LGCList(value.declarations.filter {
+                declarations: LGCList(value.declarations.filter({
                     switch $0 {
                     case .placeholder:
                         return true
                     default:
                         return $0.uuid != id
                     }
-                    }.map { $0.delete(id: id) })
+                }).map { $0.delete(id: id) }),
+                comment: value.comment?.delete(id: id)
             )
         case .namespace(let value):
             return .namespace(
@@ -1150,7 +1183,8 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 returnType: value.returnType.delete(id: id),
                 genericParameters: value.genericParameters.delete(id: id),
                 parameters: value.parameters.delete(id: id),
-                block: value.block.delete(id: id)
+                block: value.block.delete(id: id),
+                comment: value.comment?.delete(id: id)
             )
         case .importDeclaration(let value):
             return .importDeclaration(id: value.id, name: value.name.delete(id: id))
@@ -1180,21 +1214,24 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
                     genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
                     parameters: value.parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
-                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                    block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             case .enumeration(let value):
                 return LGCDeclaration.enumeration(
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
                     genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
-                    cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                    cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             case .record(let value):
                 return LGCDeclaration.record(
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
                     genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
-                    declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                    declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             case .namespace(let value):
                 return LGCDeclaration.namespace(
@@ -1230,21 +1267,24 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 returnType: value.returnType.copy(deep: deep),
                 genericParameters: value.genericParameters.copy(deep: deep),
                 parameters: value.parameters.copy(deep: deep).normalizedPlaceholders,
-                block: value.block.copy(deep: deep).normalizedPlaceholders
+                block: value.block.copy(deep: deep).normalizedPlaceholders,
+                comment: value.comment?.copy(deep: deep)
             )
         case .enumeration(let value):
             return LGCDeclaration.enumeration(
                 id: UUID(),
                 name: value.name.copy(deep: deep),
                 genericParameters: value.genericParameters.copy(deep: deep),
-                cases: value.cases.copy(deep: deep).normalizedPlaceholders
+                cases: value.cases.copy(deep: deep).normalizedPlaceholders,
+                comment: value.comment?.copy(deep: deep)
             )
         case .record(let value):
             return LGCDeclaration.record(
                 id: UUID(),
                 name: value.name.copy(deep: deep),
                 genericParameters: value.genericParameters.copy(deep: deep),
-                declarations: value.declarations.copy(deep: deep).normalizedPlaceholders
+                declarations: value.declarations.copy(deep: deep).normalizedPlaceholders,
+                comment: value.comment?.copy(deep: deep)
             )
         case .namespace(let value):
             return LGCDeclaration.namespace(
@@ -1321,13 +1361,18 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public func comment(within root: LGCSyntaxNode) -> LGCComment? {
+    public func comment(within root: LGCSyntaxNode) -> String? {
         switch self {
         case .variable(let value):
-            return value.comment
+            return value.comment?.string
+        case .enumeration(let value):
+            return value.comment?.string
+        case .record(let value):
+            return value.comment?.string
         default:
-            return nil
+            break
         }
+        return nil
     }
 }
 
@@ -1742,7 +1787,7 @@ extension LGCSyntaxNode {
         return false
     }
 
-    func comment(within root: LGCSyntaxNode) -> LGCComment? {
+    func comment(within root: LGCSyntaxNode) -> String? {
         return contents.comment(within: root)
     }
 }
