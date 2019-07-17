@@ -76,7 +76,7 @@ extension LightMark.QuoteKind {
         case .none:
             return Colors.dividerBackground
         case .info:
-            return NSColor.systemBlue.withAlphaComponent(0.5)
+            return NSColor.systemBlue.withAlphaComponent(0.3)
         case .warning:
             return NSColor.systemYellow.withAlphaComponent(0.5)
         case .error:

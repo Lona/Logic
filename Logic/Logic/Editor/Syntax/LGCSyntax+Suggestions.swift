@@ -20,16 +20,19 @@ public struct LogicSuggestionItem {
         public var onChangeValue: (Data) -> Void
         public var onSubmit: () -> Void
         public var setNodeBuilder: (@escaping (Data?) -> LGCSyntaxNode) -> Void
+        public var formattingOptions: LogicFormattingOptions
 
         public init(
             initialValue: Data?,
             onSave: @escaping (Data) -> Void,
             onSubmit: @escaping () -> Void,
-            makeNode: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void) {
+            makeNode: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void,
+            formattingOptions: LogicFormattingOptions) {
             self.initialValue = initialValue
             self.onChangeValue = onSave
             self.onSubmit = onSubmit
             self.setNodeBuilder = makeNode
+            self.formattingOptions = formattingOptions
         }
     }
 
@@ -155,7 +158,20 @@ public extension LGCLiteral {
                 title: prefix.isEmpty ? "Empty" : "\"\(prefix)\"",
                 badge: "String",
                 category: categoryTitle,
-                node: LGCSyntaxNode.literal(.string(id: UUID(), value: prefix))
+                node: LGCSyntaxNode.literal(.string(id: UUID(), value: prefix)),
+                documentation: ({ builder in
+                    let alert = prefix.isEmpty ? "I> Type anything to create a string containg those characters, or press enter to create an empty string.\n\n" : ""
+
+                    return LightMark.makeScrollView(markdown: """
+\(alert)# String Literal
+
+Create a new `String`.
+
+## Escaping
+
+There's no need to escape characters in string literals. This will be done automatically by the compiler when converting to code.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
             )
         }
 
@@ -366,7 +382,7 @@ public extension LGCPattern {
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             LogicSuggestionItem(
-                title: "Variable name: \(prefix)",
+                title: "Name: \(prefix)",
                 category: "Pattern".uppercased(),
                 node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: prefix)),
                 disabled: prefix.isEmpty

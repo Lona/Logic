@@ -584,7 +584,8 @@ extension LogicEditor {
                 }),
                 makeNode: ({ callback in
                     createDynamicNode = callback
-                })
+                }),
+                formattingOptions: formattingOptions
             )
         }
 

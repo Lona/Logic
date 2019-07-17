@@ -88,7 +88,7 @@ public extension SyntaxNodeProtocol {
 
 // Utility, not part of the protocol
 extension SyntaxNodeProtocol {
-    func parentOf(target id: UUID, includeTopLevel: Bool) -> LGCSyntaxNode? {
+    public func parentOf(target id: UUID, includeTopLevel: Bool) -> LGCSyntaxNode? {
         return pathTo(id: id, includeTopLevel: includeTopLevel)?.dropLast().last
     }
 }

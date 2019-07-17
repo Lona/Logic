@@ -9,7 +9,7 @@
 import AppKit
 
 public extension LGCExpression {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         switch self {
         case .binaryExpression(let value):
             switch value.op {
@@ -18,13 +18,13 @@ public extension LGCExpression {
 # Assignment
 
 Use an assignment expression to update the value of an existing variable.
-""", renderingOptions: formattingOptions)
+""", renderingOptions: .init(formattingOptions: formattingOptions))
             default:
                 return LightMark.makeScrollView(markdown: """
 # Comparison
 
 Compare two variables.
-""", renderingOptions: formattingOptions)
+""", renderingOptions: .init(formattingOptions: formattingOptions))
             }
         default:
             return NSView()
@@ -33,17 +33,58 @@ Compare two variables.
 }
 
 public extension LGCFunctionParameter {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         return LightMark.makeScrollView(markdown: """
 I> Info message
 
 # Title
-""", renderingOptions: formattingOptions)
+""", renderingOptions: .init(formattingOptions: formattingOptions))
+    }
+}
+
+public extension LGCPattern {
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
+//        let parent = root.contents.parentOf(target: uuid, includeTopLevel: false)
+//
+//        let prefersCamelCase: Bool
+//
+//        switch parent {
+//        case .some(.declaration(.record)), .some(.declaration(.namespace)):
+//            prefersCamelCase = false
+//        default:
+//            prefersCamelCase = true
+//        }
+
+        let alert = prefix.isEmpty
+            ? "I> Type a variable name!\n\n"
+            : prefix.contains(" ")
+            ? "E> Variable names can't contain spaces!\n\n"
+            : prefix.first?.isNumber == true
+            ? "E> Variable names can't start with numbers!\n\n"
+//            : (prefix.first?.isUppercase == true && prefersCamelCase)
+//            ? "W> This variable name should use **camelCase** (start with a lowercase character)\n\n"
+//            : (prefix.first?.isLowercase == true && !prefersCamelCase)
+//            ? "W> This variable name should use **UpperCamelCase** (start with an uppercase character)\n\n"
+            : ""
+
+        return LightMark.makeScrollView(markdown: """
+\(alert)# Name
+
+A valid name starts with an uppercase or lowercase letter (a through z, A through Z) or an underscore character. After the first character, numbers are also allowed.
+
+Examples include: `myVariable`, `MyRecord`, `_private`, `ipv6`
+
+## Naming Conventions
+
+Variable, function, and function parameter names should use **camelCase** (also known as **lowerCamelCase**). These should start with a lowercase letter, and use uppercase at the start of every word.
+
+Record, enumeration, and namespaces names should use **UpperCamelCase** (also known as **PascalCase**. These should start with an uppercase letter, and use uppercase at the start of every word.
+""", renderingOptions: .init(formattingOptions: formattingOptions))
     }
 }
 
 public extension LGCStatement {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         switch self {
         case .branch:
 //            let example = LGCSyntaxNode.statement(
@@ -92,13 +133,13 @@ Conditions let you run different code depending on the current state of your app
 Suppose our program has a variable `age` representing the current user's age. We might want to display a specific message depending on the value of age. We could use an **if condition** to accomplish this:
 
 TODO: Add code block
-""", renderingOptions: formattingOptions)
+""", renderingOptions: .init(formattingOptions: formattingOptions))
         case .loop:
             return LightMark.makeScrollView(markdown: """
 # For loop
 
 Loops let you run the same code multiple times, once for each item in a sequence of items.
-""", renderingOptions: formattingOptions)
+""", renderingOptions: .init(formattingOptions: formattingOptions))
         default:
             return NSView()
         }
@@ -106,8 +147,8 @@ Loops let you run the same code multiple times, once for each item in a sequence
 }
 
 public extension LGCSyntaxNode {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
-        return contents.documentation(within: rootNode, for: prefix, formattingOptions: formattingOptions)
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
+        return contents.documentation(within: root, for: prefix, formattingOptions: formattingOptions)
     }
 
     func makeCodeView(using options: LogicFormattingOptions) -> NSView {
