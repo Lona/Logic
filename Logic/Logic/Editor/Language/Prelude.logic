@@ -5,10 +5,14 @@
         "data" : {
           "content" : {
             "data" : {
+              "comment" : {
+                "id" : "FE9CCC06-F5CC-4C01-92F8-52153D49D5A2",
+                "string" : "# Boolean\n\nA type that represents `true` and `false` values.\n\nBooleans are frequently used to represent things that can be in only 2 states: **on\/off**, **enabled\/disabled**, **yes\/no**, etc."
+              },
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "FD64152E-61B5-4BB3-998A-AD7FE9B020B5"
+                    "id" : "A296B07A-2F99-41A8-B0B4-DF573787E2D3"
                   },
                   "type" : "placeholder"
                 }
@@ -16,7 +20,7 @@
               "genericParameters" : [
 
               ],
-              "id" : "17B10274-8422-4FEA-A226-6E0DE1745211",
+              "id" : "264AE71E-3104-4A8B-B780-D77BA52A1544",
               "name" : {
                 "id" : "257C8E17-0ADB-4269-99DC-9DECF6612E90",
                 "name" : "Boolean"
@@ -38,7 +42,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "74BB4279-0CE3-4DD2-8BC3-DC07D5CE892A"
+                          "id" : "AEE16FE9-B37B-4FB8-B0B0-6AC5786262A6"
                         },
                         "type" : "placeholder"
                       }
@@ -74,7 +78,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "8746BC43-EADB-4A2A-8498-E724EB4D0235",
                           "localName" : {
                             "id" : "638FE62E-8FF1-4D04-BAF7-53287C99F0CD",
@@ -105,7 +108,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "8BB665FC-A526-4002-9865-6853AAC21280",
                           "localName" : {
                             "id" : "1D1919C7-4B05-40EA-A523-6A909E6D468C",
@@ -116,7 +118,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "DECF0C5B-F462-4D5C-86E5-968A943E6708"
+                          "id" : "F9A1CA0C-0B17-4E5E-9D51-FD7C0D549DC2"
                         },
                         "type" : "placeholder"
                       }
@@ -143,7 +145,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "B400D54D-49D7-4075-826A-3B8B502EAE48"
+                          "id" : "364ABDA4-FC9D-4801-9036-40F59B7B0D14"
                         },
                         "type" : "placeholder"
                       }
@@ -179,7 +181,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "FC0EF8BE-961F-4ABA-8551-8D4E19959D2D",
                           "localName" : {
                             "id" : "27DBCA8F-0245-4DAD-A371-F7B1F9772453",
@@ -210,7 +211,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "12BD5005-ACEC-4C7F-8C96-4A5EAFBAFB06",
                           "localName" : {
                             "id" : "D85B58AE-6E1B-4F73-AB32-D06B82703CF5",
@@ -221,7 +221,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "BF8C69C6-C9BE-4D8A-A1E4-547E154FC95F"
+                          "id" : "32AEF1E5-5A2A-4326-AED1-0293AA57ABF1"
                         },
                         "type" : "placeholder"
                       }
@@ -245,7 +245,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "3589C13E-1E13-4101-A075-A93AFA1170DD"
+                    "id" : "BF4612D3-6A41-4A28-8F33-33E98AC0BB2F"
                   },
                   "type" : "placeholder"
                 }
@@ -266,10 +266,14 @@
         "data" : {
           "content" : {
             "data" : {
+              "comment" : {
+                "id" : "BEC45826-FD46-4DBD-B408-FADCBC4B6388",
+                "string" : "# Number\n\nA rational number. This can be a whole number, like `42`, or a decimal number, like `3.14`.\n\nThis number is represented internally as a floating point number.\n\n## Example\n\nWe can declare a number variable to use elsewhere in our app:\n\n```logic\n<Declarations>\n  <Variable name=\"padding\" type=\"Number\" value=\"12\"\/>\n<\/Declarations>\n```\n\n## Generating Code\n\nThis will be converted to a **CGFloat** in Swift."
+              },
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "085C051F-DEF9-4AD8-A7BA-A97D73BD5346"
+                    "id" : "032F9AFD-7993-4174-A73D-0BF9BFD7BE71"
                   },
                   "type" : "placeholder"
                 }
@@ -277,7 +281,7 @@
               "genericParameters" : [
 
               ],
-              "id" : "56C72771-0652-4407-B4F7-FAD99600801E",
+              "id" : "4704ED19-0780-48AB-AAC3-BDDE1F774974",
               "name" : {
                 "id" : "1A737EB4-2146-48AD-8B96-BA34A42F6E3D",
                 "name" : "Number"
@@ -293,10 +297,14 @@
         "data" : {
           "content" : {
             "data" : {
+              "comment" : {
+                "id" : "45635E8E-9A4F-4637-A2D9-7D5F508EE43F",
+                "string" : "# String\n\nA `String` is a sequence of characters, such as `h` or `e`, put together to form text such as `hello`.\n\n## Example\n\nMy might want to declare a greeting variable as a `String`:\n\n```logic\n<Declarations>\n  <Variable name=\"greeting\" type=\"String\" value=\"Hello, world\"\/>\n<\/Declarations>\n```"
+              },
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "A3DFEAF4-28D4-4B99-8F02-E487D41174A8"
+                    "id" : "78450F65-A5A1-4672-9DBF-E530927BF855"
                   },
                   "type" : "placeholder"
                 }
@@ -304,7 +312,7 @@
               "genericParameters" : [
 
               ],
-              "id" : "FEC8F3EF-BAFE-4E32-B724-738A402EFA9B",
+              "id" : "38AF6873-3054-4568-8501-29DA0C031AB0",
               "name" : {
                 "id" : "813DDF07-85B2-4581-BAFB-909FFEE04D2C",
                 "name" : "String"
@@ -326,7 +334,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "717CD1C8-9453-4CFB-8B4F-828EDB6955CA"
+                          "id" : "B61D990E-51C0-4CDE-BD2E-250CB31DFC67"
                         },
                         "type" : "placeholder"
                       }
@@ -362,7 +370,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "0977169B-CFCE-443F-8ABE-6F29FF6978F3",
                           "localName" : {
                             "id" : "BE072E80-0BEF-4E0A-9301-08358FC3CFF5",
@@ -393,7 +400,6 @@
                             },
                             "type" : "none"
                           },
-                          "externalName" : null,
                           "id" : "DD155A7D-6FC1-4BA5-83BC-6E5377CB79F5",
                           "localName" : {
                             "id" : "B5A0648C-67E6-4F31-83AD-C7A0DAEAD8BB",
@@ -404,7 +410,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "A0DD25F4-AD45-4128-9018-C0FD5D159362"
+                          "id" : "A5226542-9DEB-49D6-B7EA-BB36D7E0FF57"
                         },
                         "type" : "placeholder"
                       }
@@ -428,7 +434,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "305339F0-FDDB-402A-8D89-5C0102705133"
+                    "id" : "220760A1-BA0C-4ED8-A5A3-63A483A509C6"
                   },
                   "type" : "placeholder"
                 }
@@ -449,10 +455,14 @@
         "data" : {
           "content" : {
             "data" : {
+              "comment" : {
+                "id" : "C08434EB-0588-4532-B901-28834A8B5829",
+                "string" : "# Array\n\nA generic type representing a sequence of elements. Each element must be the same type."
+              },
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "936D11A6-DB4B-43D7-B611-E4195FD02A01"
+                    "id" : "9112AC0E-DD06-4BA8-9C1B-D884FA44934C"
                   },
                   "type" : "placeholder"
                 }
@@ -469,7 +479,7 @@
                   "type" : "parameter"
                 }
               ],
-              "id" : "AF0AD397-E295-48B8-8BF1-C69F67ADA5E8",
+              "id" : "BB90CBFC-1FA9-4D68-9400-4626E3CEA5E2",
               "name" : {
                 "id" : "7067605B-A5DA-4B7F-8424-62921AACB1C7",
                 "name" : "Array"
@@ -505,7 +515,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "F5DFA048-0146-49A0-8299-C5D62EBBD980"
+                          "id" : "1247E361-C6C4-4170-ADFC-1AD87B09300F"
                         },
                         "type" : "placeholder"
                       }
@@ -523,7 +533,7 @@
                     "associatedValueTypes" : [
                       {
                         "data" : {
-                          "id" : "5A0CCC8E-A216-45E9-97FF-90264A2130B8"
+                          "id" : "C76CB196-882C-4F8E-A617-3E3CCBC7B92E"
                         },
                         "type" : "placeholder"
                       }
@@ -538,11 +548,15 @@
                 },
                 {
                   "data" : {
-                    "id" : "422D6472-6592-4A5D-BAB8-7CB5C88FE50D"
+                    "id" : "665661D8-AD85-470F-BE79-3D03E3303D1F"
                   },
                   "type" : "placeholder"
                 }
               ],
+              "comment" : {
+                "id" : "0517624B-1349-4537-9705-9290CECC7B77",
+                "string" : "# Optional\n\nA generic type representing a value that may or may not exist."
+              },
               "genericParameters" : [
                 {
                   "data" : {
@@ -555,7 +569,7 @@
                   "type" : "parameter"
                 }
               ],
-              "id" : "ADBF5185-C69E-4A1B-AB91-079575819868",
+              "id" : "BFA17096-0F22-4B66-B71E-065E7E1C57BE",
               "name" : {
                 "id" : "4A2E7836-73E5-464E-B75C-EE29C53C1C98",
                 "name" : "Optional"
@@ -571,6 +585,10 @@
         "data" : {
           "content" : {
             "data" : {
+              "comment" : {
+                "id" : "181A11DA-4340-4F74-940C-8491100A87C0",
+                "string" : "# Color\n\nA color value. Colors can be defined using CSS color codes. \n\n## Example\n\nWe might declare a color variable, `ocean` to use throughout our design system to represent the hex code `#69D2E7`:\n\n```logic\n<Declarations>\n  <Variable name=\"ocean\" type=\"Color\" value=\"#69D2E7\"\/>\n<\/Declarations>\n```"
+              },
               "declarations" : [
                 {
                   "data" : {
@@ -588,7 +606,6 @@
                       },
                       "type" : "typeIdentifier"
                     },
-                    "comment" : null,
                     "id" : "47C0D509-297A-48C6-B01B-ECD1DE015860",
                     "initializer" : {
                       "data" : {
@@ -612,7 +629,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "84A271A5-1E4C-4566-AFF6-1189F4F165F0"
+                    "id" : "D4F702C1-AA83-4E1B-BDE4-E194015EB806"
                   },
                   "type" : "placeholder"
                 }
@@ -620,7 +637,7 @@
               "genericParameters" : [
 
               ],
-              "id" : "EC19E85C-BEF1-4B63-9E74-1FC37E12A768",
+              "id" : "7B688357-0045-4186-B8E2-5B70215450F8",
               "name" : {
                 "id" : "6973AF93-7D51-4647-8401-F01E0992DEBB",
                 "name" : "Color"
@@ -639,7 +656,7 @@
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "3F9E20E5-8935-436C-88A1-D2946FB03C18"
+                    "id" : "52E25708-50A5-4612-95D2-598E3BD5A6D1"
                   },
                   "type" : "placeholder"
                 }
@@ -658,7 +675,7 @@
       },
       {
         "data" : {
-          "id" : "9A3BA298-6C04-42C9-9751-7DD54F0CB8C5"
+          "id" : "AD7C92CE-7691-4092-84AD-E5D38857A44A"
         },
         "type" : "placeholder"
       }

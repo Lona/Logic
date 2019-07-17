@@ -9,7 +9,7 @@
 import AppKit
 
 public extension LGCExpression {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> NSView {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
         switch self {
         case .binaryExpression(let value):
             switch value.op {
@@ -18,13 +18,13 @@ public extension LGCExpression {
 # Assignment
 
 Use an assignment expression to update the value of an existing variable.
-""")
+""", renderingOptions: formattingOptions)
             default:
                 return LightMark.makeScrollView(markdown: """
 # Comparison
 
 Compare two variables.
-""")
+""", renderingOptions: formattingOptions)
             }
         default:
             return NSView()
@@ -33,17 +33,17 @@ Compare two variables.
 }
 
 public extension LGCFunctionParameter {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String)-> NSView {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
         return LightMark.makeScrollView(markdown: """
 I> Info message
 
 # Title
-""")
+""", renderingOptions: formattingOptions)
     }
 }
 
 public extension LGCStatement {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String)-> NSView {
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LightMark.RenderingOptions) -> NSView {
         switch self {
         case .branch:
 //            let example = LGCSyntaxNode.statement(
@@ -92,13 +92,13 @@ Conditions let you run different code depending on the current state of your app
 Suppose our program has a variable `age` representing the current user's age. We might want to display a specific message depending on the value of age. We could use an **if condition** to accomplish this:
 
 TODO: Add code block
-""")
+""", renderingOptions: formattingOptions)
         case .loop:
             return LightMark.makeScrollView(markdown: """
 # For loop
 
 Loops let you run the same code multiple times, once for each item in a sequence of items.
-""")
+""", renderingOptions: formattingOptions)
         default:
             return NSView()
         }
@@ -106,8 +106,8 @@ Loops let you run the same code multiple times, once for each item in a sequence
 }
 
 public extension LGCSyntaxNode {
-    func documentation(within rootNode: LGCSyntaxNode, for prefix: String) -> NSView {
-        return contents.documentation(within: rootNode, for: prefix)
+    func documentation(within rootNode: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
+        return contents.documentation(within: rootNode, for: prefix, formattingOptions: formattingOptions)
     }
 
     func makeCodeView(using options: LogicFormattingOptions) -> NSView {

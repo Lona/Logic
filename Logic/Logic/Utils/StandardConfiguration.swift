@@ -109,6 +109,7 @@ public enum StandardConfiguration {
         unificationContext: Compiler.UnificationContext,
         substitution: Unification.Substitution,
         evaluationContext: Compiler.EvaluationContext?,
+        formattingOptions: LogicFormattingOptions,
         logLevel: LogLevel = LogLevel.none
         ) -> [LogicSuggestionItem]? {
 
@@ -153,7 +154,7 @@ public enum StandardConfiguration {
 
                     if let comment = node?.comment(within: rootNode) {
                         suggestion.documentation = { _ in
-                            return LightMark.makeScrollView(LightMark.parse(comment))
+                            return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
                         }
                     }
 
@@ -267,7 +268,7 @@ public enum StandardConfiguration {
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
                                 suggestion.documentation = { _ in
-                                    return LightMark.makeScrollView(LightMark.parse(comment))
+                                    return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
                                 }
                             }
 
@@ -277,7 +278,7 @@ public enum StandardConfiguration {
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
                                 suggestion.documentation = { _ in
-                                    return LightMark.makeScrollView(LightMark.parse(comment))
+                                    return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
                                 }
                             }
 
@@ -370,6 +371,7 @@ public enum StandardConfiguration {
         rootNode: LGCSyntaxNode,
         node: LGCSyntaxNode,
         query: String,
+        formattingOptions: LogicFormattingOptions,
         logLevel: LogLevel = LogLevel.none
         ) -> [LogicSuggestionItem]? {
         let (scopeContext, unificationContext, substitutionResult) = compile(rootNode)
@@ -416,6 +418,7 @@ public enum StandardConfiguration {
             unificationContext: unificationContext,
             substitution: substitution,
             evaluationContext: evaluationContext,
+            formattingOptions: formattingOptions,
             logLevel: logLevel
         )
     }

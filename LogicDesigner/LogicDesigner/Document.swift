@@ -210,12 +210,17 @@ class Document: NSDocument {
             return menu
         }
         
-        logicEditor.suggestionsForNode = { rootNode, node, query in
+        logicEditor.suggestionsForNode = { [unowned self] rootNode, node, query in
             guard let root = LGCProgram.make(from: rootNode) else { return [] }
 
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
-            if let suggestions = StandardConfiguration.suggestions(rootNode: program, node: node, query: query) {
+            if let suggestions = StandardConfiguration.suggestions(
+                rootNode: program,
+                node: node,
+                query: query,
+                formattingOptions: self.logicEditor.formattingOptions
+                ) {
                 return suggestions
             } else {
                 return LogicEditor.defaultSuggestionsForNode(program, node, query)

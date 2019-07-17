@@ -140,8 +140,18 @@ extension LightMark.InlineElement {
     }
 }
 
+extension LightMark {
+    public class RenderingOptions {
+        var formattingOptions: LogicFormattingOptions
+
+        public init(formattingOptions: LogicFormattingOptions) {
+            self.formattingOptions = formattingOptions
+        }
+    }
+}
+
 extension LightMark.BlockElement {
-    var view: NSView {
+    func view(renderingOptions: LightMark.RenderingOptions) -> NSView {
         switch self {
         case .heading(let headingLevel, let content):
             let attributedString = LightMark.makeTextStyle(headingLevel: headingLevel)
@@ -159,7 +169,7 @@ extension LightMark.BlockElement {
             let icon = kind.icon ?? NSImage()
             let iconView = NSImageView(image: icon)
 
-            let blockView = LightMark.makeContentView(blocks, padding: 0)
+            let blockView = LightMark.makeContentView(blocks, padding: 0, renderingOptions: renderingOptions)
 
             container.addSubview(blockView)
             container.addSubview(iconView)
@@ -190,14 +200,16 @@ extension LightMark.BlockElement {
 
             return LightMark.makeTextField(attributedString: attributedString)
         case .block(language: "logic", content: let content):
-            guard let data = content.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
+            let xml = #"<?xml version="1.0"?>"# + content
+
+            guard let data = xml.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
 
             guard let node = LGCSyntaxNode(data: data) else {
                 Swift.print("Failed to create documentation code block from", content)
                 return NSView()
             }
 
-            return node.makeCodeView(using: .normal)
+            return node.makeCodeView(using: renderingOptions.formattingOptions)
         case .block(language: _, content: let content):
             let container = NSBox()
             container.boxType = .custom
@@ -251,13 +263,13 @@ extension LightMark.BlockElement {
                 fatalError("Unhandled heading level")
             }
         case .paragraph, .block, .quote:
-            return 8
+            return 0
 //        case .custom:
 //            return 12
 //        case .alert:
 //            return 8
         case .lineBreak:
-            return 18
+            return 8
         case .horizontalRule:
             return 18
         default:
@@ -282,8 +294,8 @@ extension LightMark {
         return textField
     }
 
-    public static func makeContentView(_ blocks: [LightMark.BlockElement], padding: CGFloat) -> NSView {
-        let blockViews = blocks.map { $0.view }
+    public static func makeContentView(_ blocks: [LightMark.BlockElement], padding: CGFloat, renderingOptions: RenderingOptions) -> NSView {
+        let blockViews = blocks.map { $0.view(renderingOptions: renderingOptions) }
 
         let contentView = FlippedView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
@@ -312,8 +324,8 @@ extension LightMark {
         return contentView
     }
 
-    public static func makeScrollView(_ blocks: [LightMark.BlockElement]) -> NSScrollView {
-        let contentView = self.makeContentView(blocks, padding: 24)
+    public static func makeScrollView(_ blocks: [LightMark.BlockElement], renderingOptions: RenderingOptions) -> NSScrollView {
+        let contentView = self.makeContentView(blocks, padding: 24, renderingOptions: renderingOptions)
 
         let scrollView = NSScrollView()
 
@@ -331,8 +343,8 @@ extension LightMark {
         return scrollView
     }
 
-    public static func makeScrollView(markdown: String) -> NSScrollView {
-        return LightMark.makeScrollView(LightMark.parse(markdown))
+    public static func makeScrollView(markdown: String, renderingOptions: RenderingOptions) -> NSScrollView {
+        return LightMark.makeScrollView(LightMark.parse(markdown), renderingOptions: renderingOptions)
     }
 }
 

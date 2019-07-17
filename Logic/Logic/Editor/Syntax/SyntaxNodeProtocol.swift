@@ -32,7 +32,7 @@ public protocol SyntaxNodeProtocol {
     func copy(deep: Bool) -> Self
 
     func comment(within root: LGCSyntaxNode) -> String?
-    func documentation(within root: LGCSyntaxNode, for prefix: String) -> NSView
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem]
 }
 
@@ -47,7 +47,7 @@ public extension SyntaxNodeProtocol {
 
     var isSelectable: Bool { return true }
 
-    func documentation(within root: LGCSyntaxNode, for prefix: String) -> NSView {
+    func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         return NSView()
     }
 

@@ -100,6 +100,7 @@ public class LogicEditor: NSBox {
         LGCSyntaxNode,
         LogicSuggestionItem,
         String,
+        LogicFormattingOptions,
         LogicSuggestionItem.DynamicSuggestionBuilder
         ) -> NSView = LogicEditor.defaultDocumentationForSuggestion
 
@@ -124,9 +125,10 @@ public class LogicEditor: NSBox {
         LGCSyntaxNode,
         LogicSuggestionItem,
         String,
+        LogicFormattingOptions,
         LogicSuggestionItem.DynamicSuggestionBuilder
-        ) -> NSView = { rootNode, suggestion, query, builder in
-        return suggestion.documentation?(builder) ?? suggestion.node.documentation(within: rootNode, for: query)
+        ) -> NSView = { rootNode, suggestion, query, formattingOptions, builder in
+            return suggestion.documentation?(builder) ?? suggestion.node.documentation(within: rootNode, for: query, formattingOptions: formattingOptions)
     }
 
     public static let defaultWillSelectNode: (LGCSyntaxNode, UUID?) -> UUID? = { (rootNode: LGCSyntaxNode, nodeId: UUID?) in
@@ -509,7 +511,7 @@ extension LogicEditor {
         builder: LogicSuggestionItem.DynamicSuggestionBuilder) -> NSView? {
         guard let suggestion = suggestion else { return nil }
 
-        return documentationForSuggestion(rootNode, suggestion, query, builder)
+        return documentationForSuggestion(rootNode, suggestion, query, formattingOptions, builder)
     }
 
     private func handleSubmit(
