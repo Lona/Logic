@@ -35,6 +35,7 @@ public struct LogicSuggestionItem {
 
     public init(
         title: String,
+        subtitle: String? = nil,
         badge: String? = nil,
         category: String,
         node: LGCSyntaxNode,
@@ -44,6 +45,7 @@ public struct LogicSuggestionItem {
         style: Style = .normal,
         documentation: ((DynamicSuggestionBuilder) -> NSView)? = nil) {
         self.title = title
+        self.subtitle = subtitle
         self.badge = badge
         self.category = category
         self.node = node
@@ -55,6 +57,7 @@ public struct LogicSuggestionItem {
     }
 
     public var title: String
+    public var subtitle: String?
     public var badge: String?
     public var category: String
     public var node: LGCSyntaxNode
@@ -89,7 +92,7 @@ public struct LogicSuggestionCategory {
 
     public var suggestionListItems: [SuggestionListItem] {
         let sectionHeader = SuggestionListItem.sectionHeader(title)
-        let rows = items.map { SuggestionListItem.row($0.title, $0.disabled, $0.badge) }
+        let rows = items.map { SuggestionListItem.row($0.title, $0.subtitle, $0.disabled, $0.badge) }
         return Array([[sectionHeader], rows].joined())
     }
 }
@@ -550,7 +553,8 @@ public extension LGCExpression {
 
         public static func memberExpression(identifiers: [LGCIdentifier]) -> LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: identifiers.map { $0.string }.joined(separator: "."),
+                title: identifiers.last?.string ?? "",
+                subtitle: identifiers.count > 1 ? identifiers.dropLast().map { $0.string }.joined(separator: ".") : nil,
                 category: "Variables".uppercased(),
                 node: .expression(LGCExpression.makeMemberExpression(identifiers: identifiers))
             )
@@ -561,10 +565,11 @@ public extension LGCExpression {
         }
 
         public static func functionCall(keyPath: [String], title: String? = nil, arguments: [LGCFunctionCallArgument]) -> LogicSuggestionItem {
-            let title = title ?? keyPath.joined(separator: ".")
+            let title = title ?? keyPath.last ?? ""
 
             return LogicSuggestionItem(
                 title: title,
+                subtitle: keyPath.count > 1 ? keyPath.dropLast().joined(separator: ".") : nil,
                 badge: "ƒ",
                 category: "FUNCTIONS",
                 node: .expression(

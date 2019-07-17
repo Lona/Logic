@@ -14,7 +14,16 @@
       "id" : "Default",
       "name" : "Default",
       "params" : {
-        "badgeText" : null
+        "badgeText" : null,
+        "subtitleText" : null
+      }
+    },
+    {
+      "id" : "Subtitle",
+      "name" : "Subtitle",
+      "params" : {
+        "badgeText" : null,
+        "subtitleText" : "Subtitle"
       }
     },
     {
@@ -22,7 +31,8 @@
       "name" : "Selected",
       "params" : {
         "badgeText" : null,
-        "selected" : true
+        "selected" : true,
+        "subtitleText" : null
       }
     },
     {
@@ -30,14 +40,16 @@
       "name" : "Disabled",
       "params" : {
         "badgeText" : null,
-        "disabled" : true
+        "disabled" : true,
+        "subtitleText" : null
       }
     },
     {
       "id" : "Badged",
       "name" : "Badged",
       "params" : {
-        "badgeText" : "Text"
+        "badgeText" : "Text",
+        "subtitleText" : null
       }
     }
   ],
@@ -53,6 +65,45 @@
         "titleText"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "SubtitleText",
+            "text"
+          ],
+          "content" : [
+            "subtitle"
+          ],
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "SubtitleText",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "content" : [
+          "parameters",
+          "subtitleText"
+        ],
+        "id" : "subtitle",
+        "type" : "VarDeclExpr"
+      },
+      "type" : "IfExpr"
     },
     {
       "body" : [
@@ -75,6 +126,21 @@
           "assignee" : [
             "layers",
             "BadgeText",
+            "textStyle"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "sectionHeaderInverse",
+              "type" : "TextStyle"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "SubtitleText",
             "textStyle"
           ],
           "content" : {
@@ -230,6 +296,10 @@
       "type" : "String"
     },
     {
+      "name" : "subtitleText",
+      "type" : "String?"
+    },
+    {
       "name" : "selected",
       "type" : "Boolean"
     },
@@ -245,13 +315,30 @@
   "root" : {
     "children" : [
       {
-        "id" : "Text",
+        "children" : [
+          {
+            "id" : "Text",
+            "params" : {
+              "font" : "row",
+              "text" : "Text goes here"
+            },
+            "type" : "Lona:Text"
+          },
+          {
+            "id" : "SubtitleText",
+            "params" : {
+              "font" : "sectionHeader",
+              "text" : "Text goes here",
+              "visible" : false
+            },
+            "type" : "Lona:Text"
+          }
+        ],
+        "id" : "ContentView",
         "params" : {
-          "flex" : 1,
-          "font" : "row",
-          "text" : "Text goes here"
+          "flex" : 1
         },
-        "type" : "Lona:Text"
+        "type" : "Lona:View"
       },
       {
         "children" : [

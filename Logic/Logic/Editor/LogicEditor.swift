@@ -460,7 +460,12 @@ extension LogicEditor {
             category.list.forEach { logicItem in
                 switch logicItem.item.style {
                 case .normal:
-                    suggestionListItems.append((logicItem.offset, .row(logicItem.item.title, logicItem.item.disabled, logicItem.item.badge)))
+                    suggestionListItems.append(
+                        (
+                            logicItem.offset,
+                            .row(logicItem.item.title, logicItem.item.subtitle, logicItem.item.disabled, logicItem.item.badge)
+                        )
+                    )
                 case .colorPreview(code: let code, let color):
                     suggestionListItems.append(
                         (
