@@ -165,7 +165,7 @@ public extension LGCLiteral {
                     return LightMark.makeScrollView(markdown: """
 \(alert)# String Literal
 
-Create a new `String`.
+Create a new `String`: **"\(prefix)"**
 
 ## Escaping
 
