@@ -552,6 +552,7 @@ extension LogicEditor {
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
+        let initialIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
 
         // We set this function when we create a suggestion builder so that we can call it later to
         // instantiate a node with the builder's saved data
@@ -583,13 +584,13 @@ extension LogicEditor {
         childWindow.showsDropdown = showsDropdown
         childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
+        childWindow.selectedIndex = initialIndex
         childWindow.detailView = makeDetailView(
             for: logicSuggestions.first,
             query: suggestionText,
-            builder: makeSuggestionBuilder(index: self.childWindow.selectedIndex)
+            builder: makeSuggestionBuilder(index: initialIndex)
         )
         childWindow.suggestionItems = originalIndexedSuggestions.map { $0.item }
-        childWindow.selectedIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
         childWindow.dropdownValues = dropdownNodes.map { $0.nodeTypeDescription }
         childWindow.dropdownIndex = dropdownNodes.count - 1
         childWindow.suggestionFilter = suggestionFilter
