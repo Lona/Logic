@@ -149,7 +149,15 @@ public enum StandardConfiguration {
                         }
                     }
 
-                    return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
+                    var suggestion = LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
+
+                    if let comment = node?.comment(within: rootNode) {
+                        suggestion.documentation = { _ in
+                            return LightMark.makeScrollView(LightMark.parse(comment))
+                        }
+                    }
+
+                    return suggestion
                 default:
                     break
                 }
