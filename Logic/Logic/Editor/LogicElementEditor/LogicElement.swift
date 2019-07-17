@@ -112,7 +112,7 @@ public enum LogicElement {
     public var backgroundColor: NSColor? {
         switch self {
         case .dropdown(_, _, .comment):
-            return Colors.text.withAlphaComponent(0.05)
+            return Colors.commentBackground
         default:
             return nil
         }
