@@ -42,41 +42,52 @@ public enum StandardConfiguration {
         }
     }
 
-    public static func literalSuggestions(for type: Unification.T, query: String) -> [LogicSuggestionItem] {
+    public static func literalSuggestions(for type: Unification.T, query: String, node: LGCSyntaxNode) -> [LogicSuggestionItem] {
         switch type {
         case .evar:
             return []
         case .bool:
-            let literals: [LogicSuggestionItem] = [
+            let expressions: [LogicSuggestionItem] = [
                 LGCLiteral.Suggestion.true,
                 LGCLiteral.Suggestion.false
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-            return literals.titleContains(prefix: query)
+            return expressions.titleContains(prefix: query)
         case .number:
-            let literals: [LogicSuggestionItem] = [
+            let expressions: [LogicSuggestionItem] = [
                 LGCLiteral.Suggestion.rationalNumber(for: query)
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-            return literals.titleContains(prefix: query)
+            return expressions.titleContains(prefix: query)
         case .string:
-            let literals: [LogicSuggestionItem] = [
+            let expressions: [LogicSuggestionItem] = [
                 LGCLiteral.Suggestion.string(for: query)
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-            return literals.titleContains(prefix: query)
+            return expressions.titleContains(prefix: query)
         case .color:
-            let literals: [LogicSuggestionItem] = [
-                LGCLiteral.Suggestion.color(for: query)
-                ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+            let literals: [LogicSuggestionItem]
 
-            return literals
+            switch (query, node) {
+            case ("", .expression(.literalExpression(_, literal: .color(_, value: let cssString)))):
+                literals = [
+                    LGCLiteral.Suggestion.color(for: cssString)
+                ]
+            default:
+                literals = [
+                    LGCLiteral.Suggestion.color(for: query)
+                ]
+            }
+
+            let expressions = literals.compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
+
+            return expressions
         case .cons(name: "Array", _):
-            let literals: [LogicSuggestionItem] = [
+            let expressions: [LogicSuggestionItem] = [
                 LGCLiteral.Suggestion.array(for: query)
                 ].compactMap(LGCExpression.Suggestion.from(literalSuggestion:))
 
-            return literals
+            return expressions
         default:
             return []
         }
@@ -318,7 +329,7 @@ public enum StandardConfiguration {
 
                 let matchingSuggestions = getMatchingSuggestions(validSuggestionPaths: validSuggestionPaths)
 
-                let literals = literalSuggestions(for: type, query: query)
+                let literals = literalSuggestions(for: type, query: query, node: node)
 
                 var nested: [LogicSuggestionItem] = []
 
@@ -332,7 +343,7 @@ public enum StandardConfiguration {
                         unificationContext: unificationContext
                     )
 
-                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query) +
+                    let wrappedSuggestions = literalSuggestions(for: wrappedType, query: query, node: node) +
                         getMatchingSuggestions(validSuggestionPaths: wrappedValidPaths).titleContains(prefix: query)
 
                     let updatedSuggestions: [LogicSuggestionItem] = wrappedSuggestions.compactMap { suggestion in
