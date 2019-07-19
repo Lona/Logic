@@ -664,6 +664,9 @@ extension LogicEditor {
         childWindow.onChangeSuggestionText = { [unowned self] value in
             self.suggestionText = value
 
+            // Reset dynamic suggestions
+            dynamicSuggestions.removeAll()
+
             // Update logicSuggestions
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
 
