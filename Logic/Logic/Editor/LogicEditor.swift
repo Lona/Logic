@@ -566,6 +566,7 @@ extension LogicEditor {
         var createDynamicNode: ((Data?) -> LGCSyntaxNode)?
 
         var dynamicSuggestions: [Int: Data] = [:]
+        var dynamicListItems: [Int: SuggestionListItem] = [:]
 
         func makeSuggestionBuilder(index: Int?) -> LogicSuggestionItem.DynamicSuggestionBuilder {
             createDynamicNode = nil
@@ -584,6 +585,7 @@ extension LogicEditor {
                 }),
                 setListItem: ({ [unowned self] item in
                     guard let index = index else { return }
+                    dynamicListItems[index] = item
                     self.childWindow.suggestionItems[index] = item ??
                         self.indexedSuggestionListItems(for: logicSuggestions)[index].item
                 }),
@@ -657,7 +659,7 @@ extension LogicEditor {
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
             let logicSuggestionItem = logicSuggestions[indexedSuggestions[index].offset]
 
-            if logicSuggestionItem.disabled { return }
+            if logicSuggestionItem.disabled && dynamicListItems[index] == nil { return }
 
             self.handleSubmit(
                 originalNode: syntaxNode,
@@ -671,6 +673,7 @@ extension LogicEditor {
 
             // Reset dynamic suggestions
             dynamicSuggestions.removeAll()
+            dynamicListItems.removeAll()
 
             // Update logicSuggestions
             logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
