@@ -20,18 +20,21 @@ public struct LogicSuggestionItem {
         public var onChangeValue: (Data?) -> Void
         public var onSubmit: () -> Void
         public var setNodeBuilder: (@escaping (Data?) -> LGCSyntaxNode) -> Void
+        public var setListItem: ((SuggestionListItem?) -> Void)?
         public var formattingOptions: LogicFormattingOptions
 
         public init(
             initialValue: Data?,
             onChangeValue: @escaping (Data?) -> Void,
             onSubmit: @escaping () -> Void,
-            makeNode: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void,
+            setListItem: ((SuggestionListItem?) -> Void)?,
+            setNodeBuilder: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void,
             formattingOptions: LogicFormattingOptions) {
             self.initialValue = initialValue
             self.onChangeValue = onChangeValue
             self.onSubmit = onSubmit
-            self.setNodeBuilder = makeNode
+            self.setListItem = setListItem
+            self.setNodeBuilder = setNodeBuilder
             self.formattingOptions = formattingOptions
         }
     }

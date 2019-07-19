@@ -582,7 +582,12 @@ extension LogicEditor {
                     guard let index = index else { return }
                     self.childWindow.onSubmit?(index)
                 }),
-                makeNode: ({ callback in
+                setListItem: ({ [unowned self] item in
+                    guard let index = index else { return }
+                    self.childWindow.suggestionItems[index] = item ??
+                        self.indexedSuggestionListItems(for: logicSuggestions)[index].item
+                }),
+                setNodeBuilder: ({ callback in
                     createDynamicNode = callback
                 }),
                 formattingOptions: formattingOptions
