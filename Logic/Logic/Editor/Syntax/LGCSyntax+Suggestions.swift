@@ -17,19 +17,19 @@ public struct LogicSuggestionItem {
 
     public struct DynamicSuggestionBuilder {
         public var initialValue: Data?
-        public var onChangeValue: (Data) -> Void
+        public var onChangeValue: (Data?) -> Void
         public var onSubmit: () -> Void
         public var setNodeBuilder: (@escaping (Data?) -> LGCSyntaxNode) -> Void
         public var formattingOptions: LogicFormattingOptions
 
         public init(
             initialValue: Data?,
-            onSave: @escaping (Data) -> Void,
+            onChangeValue: @escaping (Data?) -> Void,
             onSubmit: @escaping () -> Void,
             makeNode: @escaping (@escaping (Data?) -> LGCSyntaxNode) -> Void,
             formattingOptions: LogicFormattingOptions) {
             self.initialValue = initialValue
-            self.onChangeValue = onSave
+            self.onChangeValue = onChangeValue
             self.onSubmit = onSubmit
             self.setNodeBuilder = makeNode
             self.formattingOptions = formattingOptions

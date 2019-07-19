@@ -574,7 +574,7 @@ extension LogicEditor {
 
             return LogicSuggestionItem.DynamicSuggestionBuilder(
                 initialValue: savedValue,
-                onSave: ({ dynamicSuggestion in
+                onChangeValue: ({ dynamicSuggestion in
                     guard let index = index else { return }
                     dynamicSuggestions[index] = dynamicSuggestion
                 }),
