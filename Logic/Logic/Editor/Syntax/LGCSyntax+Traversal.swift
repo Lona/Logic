@@ -72,9 +72,7 @@ extension LGCSyntaxNode {
                 context = self.reduceChildren(config: &config, initialResult: context, f: f)
             }
 
-            if config.stopTraversal { return context }
-
-            if shouldRevisit {
+            if !config.stopTraversal && shouldRevisit {
                 config._isRevisit = true
 
                 context = f(context, self, &config)
