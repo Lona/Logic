@@ -38,12 +38,14 @@ public enum LogicElement {
     case dropdown(UUID, String, DropdownStyle)
     case title(UUID, String)
     case colorSwatch(String, NSColor, UUID)
+    case indentGuide(UUID)
 
     public var isActivatable: Bool {
         switch self {
         case .text,
              .coloredText,
-             .colorSwatch:
+             .colorSwatch,
+             .indentGuide:
             return false
         case .title,
              .dropdown:
@@ -53,7 +55,8 @@ public enum LogicElement {
 
     public var allowsLineSelection: Bool {
         switch self {
-        case .colorSwatch:
+        case .colorSwatch,
+             .indentGuide:
             return false
         case .title,
              .dropdown,
@@ -67,7 +70,8 @@ public enum LogicElement {
         switch self {
         case .text,
              .coloredText,
-             .colorSwatch:
+             .colorSwatch,
+             .indentGuide:
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _):
@@ -78,7 +82,8 @@ public enum LogicElement {
     public var ownerNodeId: UUID? {
         switch self {
         case .text,
-             .coloredText:
+             .coloredText,
+             .indentGuide:
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _),
@@ -87,8 +92,23 @@ public enum LogicElement {
         }
     }
 
+    public var isLogicalNode: Bool {
+        switch self {
+        case .indentGuide:
+            return false
+        case .text,
+             .coloredText,
+             .title,
+             .dropdown,
+             .colorSwatch:
+            return true
+        }
+    }
+
     public var value: String {
         switch self {
+        case .indentGuide:
+            return ""
         case .text(let value),
              .coloredText(let value, _),
              .title(_, let value),
@@ -106,6 +126,8 @@ public enum LogicElement {
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color
+        case .indentGuide:
+            return Colors.indentGuide
         }
     }
 
@@ -175,6 +197,14 @@ extension LogicElement {
                 backgroundRect: backgroundRect)
         case .colorSwatch:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
+
+            return LogicMeasuredElement(
+                element: self,
+                attributedString: .init(),
+                attributedStringRect: rect,
+                backgroundRect: rect)
+        case .indentGuide:
+            let rect: CGRect = .init(origin: origin, size: .init(width: 1, height: 68))
 
             return LogicMeasuredElement(
                 element: self,

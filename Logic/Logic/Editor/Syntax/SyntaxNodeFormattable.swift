@@ -536,6 +536,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
                         return .horizontalFloat(
                             decoration: decoration,
+                            margins: NSEdgeInsets(top: 4, left: 0, bottom: 4, right: 0),
                             .concat(
                                 [
                                     .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
@@ -713,15 +714,13 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                     [
                         .spacer(20),
                         .element(LogicElement.title(value.name.id, value.name.name)),
-                        .concat(
-                            value.declarations.map {
-                                let decl: FormatterCommand<LogicElement> = .concat(
-                                    [.hardLine, $0.formatted(using: options)]
-                                )
-                                return $0.shouldIndentInNamespace ? .indent(decl) : decl
+                        .horizontalFloat(
+                            decoration: .indentGuide(value.id),
+                            margins: NSEdgeInsets(top: 4, left: 4, bottom: 4, right: 8),
+                            .join(with: .hardLine) {
+                                value.declarations.map { $0.formatted(using: options) }
                             }
-                        ),
-                        //.hardLine
+                        )
                     ]
                 )
             }

@@ -9,6 +9,32 @@
 import Foundation
 
 extension FormatterCommand where Element == LogicElement {
+    func elementIndexRange(for lineIndex: Int) -> Range<Int>? {
+        return elementIndexRange(for: lineIndex, where: { $0.isLogicalNode })
+    }
+
+    func elementIndexRange(for lineIndex: Int, where predicate: (Element) -> Bool) -> Range<Int>? {
+        var elementCount = 0
+        for (offset, formattedLine) in logicalRows.enumerated() {
+            let endElementCount = elementCount + formattedLine.count
+
+            if offset == lineIndex {
+                let result = elementCount..<endElementCount
+                let resultElements = elements[result]
+                if let firstIndex = resultElements.firstIndex(where: predicate),
+                    let lastIndex = resultElements.lastIndex(where: predicate) {
+                    return firstIndex..<lastIndex + 1
+                } else {
+                    return nil
+                }
+            }
+
+            elementCount = endElementCount
+        }
+
+        return nil
+    }
+
     public func nextActivatableElementIndex(after currentIndex: Int?) -> Int? {
         let elements = self.elements
 

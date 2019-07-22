@@ -87,6 +87,19 @@ extension Colors {
         return NSColor.black.withAlphaComponent(0.05)
     }()
 
+    public static let indentGuide: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                return NSColor.black.withAlphaComponent(0.18)
+            default:
+                break
+            }
+        }
+
+        return NSColor.black.withAlphaComponent(0.06)
+    }()
+
     public static let divider: NSColor = {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {

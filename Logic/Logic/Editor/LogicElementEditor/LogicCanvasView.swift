@@ -335,6 +335,12 @@ public class LogicCanvasView: NSView {
 
                 backgroundBezier.fill()
                 outlineBezier.stroke()
+            case .indentGuide:
+                text.color.setFill()
+
+                let bezier = NSBezierPath(rect: backgroundRect)
+
+                bezier.fill()
             case .text, .coloredText:
                 attributedString.draw(at: rect.origin)
             case .title(_, let value),
@@ -549,7 +555,7 @@ public class LogicCanvasView: NSView {
                     x: xOffset + formattedElement.x + style.textMargin.width,
                     y: yOffset + formattedElement.y)
 
-                let measured = formattedElement.element.measured(
+                var measured = formattedElement.element.measured(
                     selected: self.selectedIndex == formattedElementIndex,
                     origin: offset,
                     font: style.font,
@@ -558,6 +564,7 @@ public class LogicCanvasView: NSView {
                     decoration: decoration
                 )
 
+                measured.backgroundRect.size = formattedElement.size
                 measuredLine.append(measured)
 
                 formattedElementIndex += 1

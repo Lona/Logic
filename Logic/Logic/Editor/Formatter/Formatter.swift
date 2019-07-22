@@ -15,7 +15,7 @@ public indirect enum FormatterCommand<Element> {
     case hardLine
     case join(with: FormatterCommand, () -> [FormatterCommand])
     case concat(@autoclosure () -> [FormatterCommand])
-    case horizontalFloat(decoration: Element, FormatterCommand)
+    case horizontalFloat(decoration: Element, margins: NSEdgeInsets, FormatterCommand)
     case spacer(CGFloat)
 
     public static var empty: FormatterCommand<Element> {
@@ -41,10 +41,17 @@ public indirect enum FormatterCommand<Element> {
         var rows: [[Element]] = []
 
         var currentRow: [Element] = []
+        var currentRowContainsNonFloatingElement = false
+
+        func append(element: Element) {
+            currentRow.append(element)
+            currentRowContainsNonFloatingElement = true
+        }
 
         func moveToNextRow() {
             rows.append(currentRow)
             currentRow = []
+            currentRowContainsNonFloatingElement = false
         }
 
         func process(command: FormatterCommand) {
@@ -56,14 +63,20 @@ public indirect enum FormatterCommand<Element> {
             case .hardLine:
                 moveToNextRow()
             case .element(let element):
-                currentRow.append(element)
+                append(element: element)
             case .concat(let commands):
                 commands().forEach(process)
             case .join(with: let separator, let commands):
                 process(command: FormatterCommand.performJoin(with: separator, commands))
-            case .horizontalFloat(let element, let command):
-                currentRow.append(element)
+            case .horizontalFloat(let element, _, let command):
+                if !currentRow.isEmpty && currentRowContainsNonFloatingElement {
+                    moveToNextRow()
+                }
+                append(element: element)
                 process(command: command)
+                if !currentRow.isEmpty {
+                    moveToNextRow()
+                }
             case .spacer:
                 break
             }
@@ -123,16 +136,20 @@ public indirect enum FormatterCommand<Element> {
         var currentIndentLevel: Int = 0
         var currentElementIndex: Int = 0
         var currentDecorationIndent: CGFloat = 0
+        var currentRowContainsNonFloatingElement = false
 
         func append(element: FormattedElement) {
             currentRow.append(element)
             currentMaxElementHeight = max(currentMaxElementHeight, element.size.height)
             currentElementIndex += 1
+            currentRowContainsNonFloatingElement = true
         }
 
-        func append(decoration: FormattedElement) {
+        func append(decoration: FormattedElement) -> (row: Int, column: Int) {
+            let result = (rows.count, currentRow.count)
             currentRow.append(decoration)
             currentElementIndex += 1
+            return result
         }
 
         func moveToNextRow(wrapping: Bool) {
@@ -141,6 +158,7 @@ public indirect enum FormatterCommand<Element> {
             currentXOffset = currentDecorationIndent + CGFloat(currentIndentLevel + (wrapping ? 2 : 0)) * indentWidth
             currentYOffset += currentMaxElementHeight
             currentMaxElementHeight = minimumLineHeight
+            currentRowContainsNonFloatingElement = false
         }
 
         func process(command: FormatterCommand) {
@@ -173,23 +191,43 @@ public indirect enum FormatterCommand<Element> {
                 commands().forEach(process)
             case .join(with: let separator, let commands):
                 process(command: FormatterCommand.performJoin(with: separator, commands))
-            case .horizontalFloat(decoration: let decoration, let command):
+            case .horizontalFloat(let decoration, let margins, let command):
+                if !currentRow.isEmpty && currentRowContainsNonFloatingElement {
+                    moveToNextRow(wrapping: false)
+                }
+
+                currentYOffset += margins.top
+
                 let decorationSize = getElementSize(decoration, currentElementIndex)
 
                 let formattedDecoration = FormatterCommand<Element>.FormattedElement(
                     element: decoration,
-                    origin: CGPoint(x: currentXOffset, y: currentYOffset),
+                    origin: CGPoint(x: currentXOffset + margins.left, y: currentYOffset),
                     size: decorationSize
                 )
 
-                append(decoration: formattedDecoration)
+                let position = append(decoration: formattedDecoration)
+                let horizontalMargin = margins.left + margins.right
 
-//                let initialYOffset = currentYOffset
-                currentXOffset += decorationSize.width
+//                Swift.print(position)
 
-                currentDecorationIndent += decorationSize.width
+                let initialYOffset = currentYOffset
+                currentXOffset += decorationSize.width + horizontalMargin
+
+                currentDecorationIndent += decorationSize.width + horizontalMargin
                 process(command: command)
-                currentDecorationIndent -= decorationSize.width
+                currentDecorationIndent -= (decorationSize.width + horizontalMargin)
+
+                if !currentRow.isEmpty {
+                    moveToNextRow(wrapping: false)
+                }
+
+                let deltaY = currentYOffset - initialYOffset
+//                Swift.print(deltaY)
+                rows[position.row][position.column].size.height = deltaY
+
+                currentYOffset -= minimumLineHeight
+                currentYOffset += margins.bottom
 
 //                Swift.print(currentYOffset, initialYOffset, decorationSize.height)
 
