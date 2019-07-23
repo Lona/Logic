@@ -564,7 +564,13 @@ public class LogicCanvasView: NSView {
                     decoration: decoration
                 )
 
-                measured.backgroundRect.size = formattedElement.size
+                switch formattedElement.element {
+                case .indentGuide:
+                    measured.backgroundRect.size = formattedElement.size
+                default:
+                    break
+                }
+
                 measuredLine.append(measured)
 
                 formattedElementIndex += 1
