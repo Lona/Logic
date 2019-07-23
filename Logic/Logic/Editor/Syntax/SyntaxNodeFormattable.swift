@@ -536,7 +536,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
                         return .horizontalFloat(
                             decoration: decoration,
-                            margins: NSEdgeInsets(top: 4, left: 0, bottom: 4, right: 0),
+                            margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
                             .concat(
                                 [
                                     .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
