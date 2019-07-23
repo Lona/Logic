@@ -1,0 +1,106 @@
+{
+  "data" : {
+    "block" : [
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "comment" : {
+                "id" : "181A11DA-4340-4F74-940C-8491100A87C0",
+                "string" : "# Color\n\nA color value. Colors can be defined using CSS color codes. \n\n## Example\n\nWe might declare a color variable, `ocean` to use throughout our design system to represent the hex code `#69D2E7`:\n\n```logic\n<Declarations>\n  <Variable name=\"ocean\" type=\"Color\" value=\"#69D2E7\"\/>\n<\/Declarations>\n```"
+              },
+              "declarations" : [
+                {
+                  "data" : {
+                    "annotation" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "435E9B0F-6418-4591-8DDB-25CE57B059F2",
+                        "identifier" : {
+                          "id" : "47A08665-4F22-41F1-85D8-E8344A479CC4",
+                          "isPlaceholder" : false,
+                          "string" : "String"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    },
+                    "id" : "47C0D509-297A-48C6-B01B-ECD1DE015860",
+                    "initializer" : {
+                      "data" : {
+                        "id" : "E46F7965-D8EE-4183-834D-67759FE4023A",
+                        "literal" : {
+                          "data" : {
+                            "id" : "C21714E4-E25B-482C-A6E4-0621A8859CA0",
+                            "value" : ""
+                          },
+                          "type" : "string"
+                        }
+                      },
+                      "type" : "literalExpression"
+                    },
+                    "name" : {
+                      "id" : "41DC04B2-4A9B-4242-AF8A-3A475D3525B4",
+                      "name" : "value"
+                    }
+                  },
+                  "type" : "variable"
+                },
+                {
+                  "data" : {
+                    "id" : "D4F702C1-AA83-4E1B-BDE4-E194015EB806"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "genericParameters" : [
+
+              ],
+              "id" : "7B688357-0045-4186-B8E2-5B70215450F8",
+              "name" : {
+                "id" : "6973AF93-7D51-4647-8401-F01E0992DEBB",
+                "name" : "Color"
+              }
+            },
+            "type" : "record"
+          },
+          "id" : "45B6655E-2159-4951-9E4B-7BEB6FAD66C6"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
+              "declarations" : [
+                {
+                  "data" : {
+                    "id" : "52E25708-50A5-4612-95D2-598E3BD5A6D1"
+                  },
+                  "type" : "placeholder"
+                }
+              ],
+              "id" : "4AFA9DC1-3FAE-43BE-AAE8-FF96135A7C3A",
+              "name" : {
+                "id" : "AB8866D8-6AF6-4A7B-B079-ECBBD2489F2B",
+                "name" : "Color"
+              }
+            },
+            "type" : "namespace"
+          },
+          "id" : "5574237C-C4EB-493D-A1DD-37B1396D936C"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "id" : "AD7C92CE-7691-4092-84AD-E5D38857A44A"
+        },
+        "type" : "placeholder"
+      }
+    ],
+    "id" : "0AA4ACF6-FBC7-41A1-805D-993DE28BE142"
+  },
+  "type" : "program"
+}

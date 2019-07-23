@@ -20,7 +20,7 @@ public enum Library {
 
         let bundle = BundleLocator.getBundle()
 
-        guard let libraryUrl = bundle.url(forResource: "Prelude", withExtension: "logic"),
+        guard let libraryUrl = bundle.url(forResource: name, withExtension: "logic"),
             let libraryScript = try? Data(contentsOf: libraryUrl),
             let decoded = try? JSONDecoder().decode(LGCSyntaxNode.self, from: libraryScript)
         else {

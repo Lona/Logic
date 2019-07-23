@@ -58,6 +58,9 @@
 		6B44E190223B494600740318 /* LogicEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E18F223B494600740318 /* LogicEditor.swift */; };
 		6B44E192223C0F6000740318 /* SuggestionListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E191223C0F6000740318 /* SuggestionListItem.swift */; };
 		6B44E194223C146400740318 /* Formatter+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B44E193223C146400740318 /* Formatter+Test.swift */; };
+		6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E25FD22E7A55000F0076A /* TextStyle.logic */; };
+		6B4E260022E7B27000F0076A /* Color.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E25FF22E7B27000F0076A /* Color.logic */; };
+		6B4E260222E7B39500F0076A /* Shadow.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E260122E7B39500F0076A /* Shadow.logic */; };
 		6B5B7522215B198400CDC9C6 /* Logic.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B5B7520215B198400CDC9C6 /* Logic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6B5B755E215B1ABE00CDC9C6 /* TypeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7554215B1ABE00CDC9C6 /* TypeListRowView.swift */; };
 		6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7555215B1ABE00CDC9C6 /* TypeListHeaderView.swift */; };
@@ -154,6 +157,9 @@
 		6B44E18F223B494600740318 /* LogicEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicEditor.swift; sourceTree = "<group>"; };
 		6B44E191223C0F6000740318 /* SuggestionListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionListItem.swift; sourceTree = "<group>"; };
 		6B44E193223C146400740318 /* Formatter+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+Test.swift"; sourceTree = "<group>"; };
+		6B4E25FD22E7A55000F0076A /* TextStyle.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TextStyle.logic; sourceTree = "<group>"; };
+		6B4E25FF22E7B27000F0076A /* Color.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Color.logic; sourceTree = "<group>"; };
+		6B4E260122E7B39500F0076A /* Shadow.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shadow.logic; sourceTree = "<group>"; };
 		6B5B751D215B198400CDC9C6 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B5B7520215B198400CDC9C6 /* Logic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logic.h; sourceTree = "<group>"; };
 		6B5B7521215B198400CDC9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -455,7 +461,10 @@
 		6B858C2C229EEEAD00DE6216 /* Language */ = {
 			isa = PBXGroup;
 			children = (
+				6B4E25FF22E7B27000F0076A /* Color.logic */,
 				6B858C2D229EEEAD00DE6216 /* Prelude.logic */,
+				6B4E260122E7B39500F0076A /* Shadow.logic */,
+				6B4E25FD22E7A55000F0076A /* TextStyle.logic */,
 				6B858C31229EF3A300DE6216 /* Library.swift */,
 				6B10AC1B22A45FD00043E46A /* LogicValue+Color.swift */,
 				6B10AC2122A462630043E46A /* LogicValue+Core.swift */,
@@ -534,7 +543,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B858C2E229EEEAD00DE6216 /* Prelude.logic in Resources */,
+				6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */,
+				6B4E260222E7B39500F0076A /* Shadow.logic in Resources */,
 				6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */,
+				6B4E260022E7B27000F0076A /* Color.logic in Resources */,
 				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

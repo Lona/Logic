@@ -32,7 +32,7 @@ public extension LGCProgram {
                     return
                 }
 
-                guard case .program(let libraryProgram) = library else {
+                guard let libraryProgram = LGCProgram.make(from: library) else {
                     Swift.print("Cannot import non-program file `\(libraryName)`")
                     return
                 }
