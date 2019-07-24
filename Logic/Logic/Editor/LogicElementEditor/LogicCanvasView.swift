@@ -238,9 +238,20 @@ public class LogicCanvasView: NSView {
         return NSSize(width: NSView.noIntrinsicMetric, height: minHeight)
     }
 
-    public override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-
+    private static func drawCommon(
+        formattedContent: FormatterCommand<LogicElement>,
+        measuredElements: [LogicMeasuredElement],
+        decorationCache: inout [UUID: LogicElement.Decoration?],
+        getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
+        bounds: NSRect,
+        dragDestinationLineIndex: Int?,
+        selectedIndex: Int?,
+        selectedLine: Int?,
+        selectedRange: Range<Int>?,
+        outlinedRange: Range<Int>?,
+        underlinedRange: Range<Int>?,
+        style: Style
+        ) {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
 
         if let lineIndex = dragDestinationLineIndex {
@@ -314,7 +325,7 @@ public class LogicCanvasView: NSView {
         }
 
         measuredElements.enumerated().forEach { textIndex, measuredText in
-            let selected = textIndex == self.selectedIndex
+            let selected = textIndex == selectedIndex
             let text = measuredText.element
             let rect = measuredText.attributedStringRect
             let backgroundRect = measuredText.backgroundRect
@@ -394,7 +405,7 @@ public class LogicCanvasView: NSView {
                     caret.stroke()
                 }
 
-                switch self.cachedDecoration(for: text) {
+                switch self.cachedDecoration(for: text, cache: &decorationCache, getElementDecoration: getElementDecoration) {
                 case .none:
                     break
                 case .some(.color(let color)):
@@ -476,36 +487,68 @@ public class LogicCanvasView: NSView {
         }
     }
 
+    public override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        LogicCanvasView.drawCommon(
+            formattedContent: formattedContent,
+            measuredElements: measuredElements,
+            decorationCache: &_cachedElementDecorations,
+            getElementDecoration: getElementDecoration,
+            bounds: bounds,
+            dragDestinationLineIndex: dragDestinationLineIndex,
+            selectedIndex: selectedIndex,
+            selectedLine: selectedLine,
+            selectedRange: selectedRange,
+            outlinedRange: outlinedRange,
+            underlinedRange: underlinedRange,
+            style: style
+        )
+    }
+
     private var _cachedMeasuredElements: [LogicMeasuredElement]? = nil
     private var _cachedElementDecorations: [UUID: LogicElement.Decoration?] = [:]
 
-    private func cachedDecoration(for element: LogicElement) -> LogicElement.Decoration? {
+    private static func cachedDecoration(
+        for element: LogicElement,
+        cache: inout [UUID: LogicElement.Decoration?],
+        getElementDecoration: ((UUID) -> LogicElement.Decoration?)?) -> LogicElement.Decoration? {
         guard let id = element.syntaxNodeID else { return nil }
 
-        if let decoration = _cachedElementDecorations[id] {
+        if let decoration = cache[id] {
             return decoration
         }
 
-        let decoration = self.getElementDecoration?(id)
+        let decoration = getElementDecoration?(id)
 
-        _cachedElementDecorations[id] = decoration
+        cache[id] = decoration
 
         return decoration
     }
 
-    private var measuredElements: [LogicMeasuredElement] {
-        if let cached = _cachedMeasuredElements {
-            return cached
-        }
+    private static func makeMeasuredElements(
+        formattedContent: FormatterCommand<LogicElement>,
+        decorationCache: inout [UUID: LogicElement.Decoration?],
+        getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
+        bounds: NSRect,
+        selectedIndex: Int?,
+        style: Style
+        ) -> [LogicMeasuredElement] {
 
-        let getElementSize: (LogicElement, Int) -> CGSize = { [unowned self] element, index in
+        var tempCache = decorationCache
+
+        let getElementSize: (LogicElement, Int) -> CGSize = { element, index in
             return element.measured(
-                selected: self.selectedIndex == index,
+                selected: selectedIndex == index,
                 origin: .zero,
-                font: self.style.font,
-                boldFont: self.style.boldFont,
-                padding: self.style.textPadding,
-                decoration: self.cachedDecoration(for: element)
+                font: style.font,
+                boldFont: style.boldFont,
+                padding: style.textPadding,
+                decoration: LogicCanvasView.cachedDecoration(
+                    for: element,
+                    cache: &tempCache,
+                    getElementDecoration: getElementDecoration
+                )
                 ).backgroundRect.size
         }
 
@@ -546,7 +589,7 @@ public class LogicCanvasView: NSView {
             formattedElementLine.forEach { formattedElement in
                 let decoration: LogicElement.Decoration?
                 if let id = formattedElement.element.syntaxNodeID {
-                    decoration = self.getElementDecoration?(id)
+                    decoration = getElementDecoration?(id)
                 } else {
                     decoration = nil
                 }
@@ -556,7 +599,7 @@ public class LogicCanvasView: NSView {
                     y: yOffset + formattedElement.y)
 
                 var measured = formattedElement.element.measured(
-                    selected: self.selectedIndex == formattedElementIndex,
+                    selected: selectedIndex == formattedElementIndex,
                     origin: offset,
                     font: style.font,
                     boldFont: style.boldFont,
@@ -576,6 +619,24 @@ public class LogicCanvasView: NSView {
                 formattedElementIndex += 1
             }
         }
+
+        decorationCache = tempCache
+
+        return measuredLine
+    }
+
+    private var measuredElements: [LogicMeasuredElement] {
+        if let cached = _cachedMeasuredElements {
+            return cached
+        }
+
+        let measuredLine = LogicCanvasView.makeMeasuredElements(
+            formattedContent: formattedContent,
+            decorationCache: &_cachedElementDecorations,
+            getElementDecoration: getElementDecoration,
+            bounds: bounds,
+            selectedIndex: selectedIndex,
+            style: style)
 
         _cachedMeasuredElements = measuredLine
 
@@ -742,5 +803,79 @@ extension LogicCanvasView {
 extension LogicCanvasView: NSDraggingSource {
     public func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
         return .move
+    }
+}
+
+// MARK: - Headless rendering
+
+extension LogicCanvasView {
+    public func pdf(size: NSSize? = nil, mediaBox: NSRect? = nil) -> Data? {
+        return LogicCanvasView.pdf(
+            size: size ?? bounds.size,
+            mediaBox: mediaBox,
+            formattedContent: formattedContent,
+            getElementDecoration: getElementDecoration,
+            style: style
+        )
+    }
+
+    public static func pdf(
+        size: NSSize,
+        mediaBox: NSRect? = nil,
+        formattedContent: FormatterCommand<LogicElement>,
+        getElementDecoration: ((UUID) -> LogicElement.Decoration?)? = nil,
+        style: Style = Style()) -> Data? {
+        let frame = CGRect(origin: .zero, size: size)
+        var mediaBox = mediaBox ?? CGRect(origin: .zero, size: size)
+
+        if mediaBox.height < frame.height {
+            mediaBox.origin.y = (frame.height - mediaBox.height) - mediaBox.origin.y
+        }
+
+        let data = NSMutableData()
+
+        guard let consumer = CGDataConsumer(data: data as CFMutableData) else { return nil }
+        guard let context = CGContext(consumer: consumer, mediaBox: &mediaBox, nil) else { return nil }
+
+        context.beginPDFPage(nil)
+
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(cgContext: context, flipped: true)
+
+        context.translateBy(x: 0, y: size.height)
+        context.scaleBy(x: 1, y: -1)
+
+        var decorationCache: [UUID: LogicElement.Decoration?] = [:]
+
+        let measuredElements = makeMeasuredElements(
+            formattedContent: formattedContent,
+            decorationCache: &decorationCache,
+            getElementDecoration: getElementDecoration,
+            bounds: frame,
+            selectedIndex: nil,
+            style: style
+        )
+
+        drawCommon(
+            formattedContent: formattedContent,
+            measuredElements: measuredElements,
+            decorationCache: &decorationCache,
+            getElementDecoration: getElementDecoration,
+            bounds: frame,
+            dragDestinationLineIndex: nil,
+            selectedIndex: nil,
+            selectedLine: nil,
+            selectedRange: nil,
+            outlinedRange: nil,
+            underlinedRange: nil,
+            style: style
+        )
+
+        NSGraphicsContext.restoreGraphicsState()
+
+        context.endPDFPage()
+        context.closePDF()
+
+        return data as Data
     }
 }
