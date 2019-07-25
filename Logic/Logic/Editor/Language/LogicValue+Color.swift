@@ -35,7 +35,7 @@ extension LogicValue {
             shadow.shadowOffset.width = x
         }
         if let yValue = members["y"], case .some(.number(let y)) = yValue?.memory {
-            shadow.shadowOffset.height = y
+            shadow.shadowOffset.height = -y
         }
         if let blurValue = members["blur"], case .some(.number(let blur)) = blurValue?.memory {
             shadow.shadowBlurRadius = blur
