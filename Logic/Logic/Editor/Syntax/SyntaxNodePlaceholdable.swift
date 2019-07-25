@@ -138,3 +138,18 @@ extension LGCEnumerationCase: SyntaxNodePlaceholdable {
         return .placeholder(id: UUID())
     }
 }
+
+extension LGCFunctionCallArgument: SyntaxNodePlaceholdable {
+    public var isPlaceholder: Bool {
+        switch self {
+        case .placeholder:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public static func makePlaceholder() -> LGCFunctionCallArgument {
+        return .placeholder(id: UUID())
+    }
+}

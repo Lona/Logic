@@ -975,6 +975,10 @@ public extension LGCSyntaxNode {
             return []
         case .comment:
             return contents.suggestions(within: root, for: prefix)
+        case .functionCallArgument:
+            return [
+                .init(title: "TODO", category: "TODO", node: .identifier(.init(id: UUID(), string: "TODO")))
+            ]
         }
     }
 }

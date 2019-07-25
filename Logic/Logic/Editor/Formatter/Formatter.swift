@@ -231,7 +231,7 @@ public indirect enum FormatterCommand<Element> {
 
 //                Swift.print(currentYOffset, initialYOffset, decorationSize.height)
 
-//                currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height)
+                currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height - minimumLineHeight)
             case .spacer(let size):
                 currentYOffset += size
             }

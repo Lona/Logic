@@ -234,7 +234,14 @@ extension Compiler {
 
                 result.nodes[node.uuid] = placeholderReturnType
 
-                let argumentValues = arguments.map { $0.expression }
+                let argumentValues: [LGCExpression] = arguments.compactMap {
+                    switch $0 {
+                    case .argument(let value):
+                        return value.expression
+                    case .placeholder:
+                        return nil
+                    }
+                }
 
                 zip(placeholderArgTypes, argumentValues).forEach { (argType, argValue) in
                     result.constraints.append(Unification.Constraint(argType, result.nodes[argValue.uuid]!))

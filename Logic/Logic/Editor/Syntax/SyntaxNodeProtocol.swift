@@ -833,7 +833,7 @@ extension LGCExpression: SyntaxNodeProtocol {
         case .identifierExpression(let value):
             return [value.identifier.node]
         case .functionCallExpression(let value):
-            return [value.expression.node] + value.arguments.map { $0.expression.node }
+            return [value.expression.node] + value.arguments.map { $0.node }
         case .literalExpression(let value):
             return [value.literal.node]
         case .memberExpression(let value):
@@ -1635,34 +1635,66 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
     }
 }
 
-extension LGCFunctionCallArgument {
-    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
-        return LGCFunctionCallArgument(
-            id: self.uuid,
-            label: label,
-            expression: expression.replace(id: id, with: syntaxNode)
-        )
-    }
-
-    func copy(deep: Bool) -> LGCFunctionCallArgument {
-        return LGCFunctionCallArgument(
-            id: UUID(),
-            label: label,
-            expression: expression.copy(deep: deep)
-        )
-    }
-
-    // Implementation needed, since we don't conform to SyntaxNodeProtocol
-    public func find(id: UUID) -> LGCSyntaxNode? {
-        return expression.find(id: id)
-    }
-
-    public func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]? {
-        return expression.pathTo(id: id, includeTopLevel: includeTopLevel)
+extension LGCFunctionCallArgument: SyntaxNodeProtocol {
+    public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
+        return false
     }
 
     public var uuid: UUID {
-        return id
+        switch self {
+        case .argument(let value):
+            return value.id
+        case .placeholder(let value):
+            return value
+        }
+    }
+
+    public var node: LGCSyntaxNode {
+        return .functionCallArgument(self)
+    }
+
+    public var nodeTypeDescription: String {
+        return "Function Call Argument"
+    }
+
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .argument(let value):
+            return [value.expression.node]
+        case .placeholder:
+            return []
+        }
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCFunctionCallArgument {
+        switch syntaxNode {
+        case .functionCallArgument(let newNode) where id == uuid:
+            return newNode
+        default:
+            switch self {
+            case .argument(let value):
+                return .argument(
+                    id: UUID(),
+                    label: value.label,
+                    expression: value.expression.replace(id: id, with: syntaxNode)
+                )
+            case .placeholder:
+                return .placeholder(id: UUID())
+            }
+        }
+    }
+
+    public func copy(deep: Bool) -> LGCFunctionCallArgument {
+        switch self {
+        case .argument(let value):
+            return .argument(
+                id: UUID(),
+                label: value.label,
+                expression: value.expression.copy(deep: deep)
+            )
+        case .placeholder(let value):
+            return .placeholder(id: value)
+        }
     }
 
     public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
@@ -1743,6 +1775,8 @@ extension LGCSyntaxNode {
         case .topLevelDeclarations(let value):
             return value
         case .comment(let value):
+            return value
+        case .functionCallArgument(let value):
             return value
         }
     }

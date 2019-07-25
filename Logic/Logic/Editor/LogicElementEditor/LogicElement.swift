@@ -213,7 +213,7 @@ extension LogicElement {
                 attributedStringRect: rect,
                 backgroundRect: rect)
         case .indentGuide:
-            let rect: CGRect = .init(origin: origin, size: .init(width: 1, height: 68))
+            let rect: CGRect = .init(origin: origin, size: .init(width: 1, height: 0))
 
             return LogicMeasuredElement(
                 element: self,

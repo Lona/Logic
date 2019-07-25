@@ -324,16 +324,57 @@ public indirect enum LGCBinaryOperator: Codable & Equatable {
   }
 }
 
-public struct LGCFunctionCallArgument: Codable & Equatable {
-  public init(id: UUID, label: Optional<String>, expression: LGCExpression) {
-    self.id = id
-    self.label = label
-    self.expression = expression
+public indirect enum LGCFunctionCallArgument: Codable & Equatable {
+  case argument(id: UUID, label: Optional<String>, expression: LGCExpression)
+  case placeholder(id: UUID)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
   }
 
-  public var id: UUID
-  public var label: Optional<String>
-  public var expression: LGCExpression
+  public enum DataCodingKeys: CodingKey {
+    case id
+    case label
+    case expression
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "argument":
+        self =
+          .argument(
+            id: try data.decode(UUID.self, forKey: .id),
+            label: try data.decodeIfPresent(String.self, forKey: .label),
+            expression: try data.decode(LGCExpression.self, forKey: .expression))
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+
+    switch self {
+      case .argument(let value):
+        try container.encode("argument", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encodeIfPresent(value.label, forKey: .label)
+        try data.encode(value.expression, forKey: .expression)
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
+        try data.encode(value, forKey: .id)
+    }
+  }
 }
 
 public indirect enum LGCExpression: Codable & Equatable {
@@ -558,6 +599,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
   case genericParameter(LGCGenericParameter)
   case topLevelDeclarations(LGCTopLevelDeclarations)
   case comment(LGCComment)
+  case functionCallArgument(LGCFunctionCallArgument)
 
   // MARK: Codable
 
@@ -604,6 +646,8 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         self = .topLevelDeclarations(try container.decode(LGCTopLevelDeclarations.self, forKey: .data))
       case "comment":
         self = .comment(try container.decode(LGCComment.self, forKey: .data))
+      case "functionCallArgument":
+        self = .functionCallArgument(try container.decode(LGCFunctionCallArgument.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -660,6 +704,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .comment(let value):
         try container.encode("comment", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .functionCallArgument(let value):
+        try container.encode("functionCallArgument", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

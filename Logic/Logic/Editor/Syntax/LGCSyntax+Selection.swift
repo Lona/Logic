@@ -32,7 +32,12 @@ public extension LGCSyntaxNode {
                     switch parent {
                     case .expression(.functionCallExpression(let value)):
                         if value.arguments.contains(where: { arg in
-                            current.uuid == arg.expression.uuid
+                            switch arg {
+                            case .argument(_, _, expression: let expression):
+                                return current.uuid == expression.uuid
+                            case .placeholder:
+                                return false
+                            }
                         }) {
                             break
                         }

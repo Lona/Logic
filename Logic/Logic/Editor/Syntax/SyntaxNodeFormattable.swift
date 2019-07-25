@@ -176,15 +176,20 @@ extension LGCLiteral: SyntaxNodeFormattable {
 
 extension LGCFunctionCallArgument: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
-        if let label = self.label {
-            return .concat(
-                [
-                    .element(.text(label + ":")),
-                    self.expression.formatted(using: options)
-                ]
-            )
-        } else {
-            return self.expression.formatted(using: options)
+        switch self {
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
+        case .argument(let value):
+            if let label = value.label {
+                return .concat(
+                    [
+                        .element(.text(label + ":")),
+                        value.expression.formatted(using: options)
+                    ]
+                )
+            } else {
+                return value.expression.formatted(using: options)
+            }
         }
     }
 }
@@ -368,16 +373,10 @@ extension LGCExpression: SyntaxNodeFormattable {
                     value.expression.formatted(using: options),
                     .element(.text("(")),
                     .indent(
-                        .concat(
-                            [
-                                .hardLine,
-                                .join(with: .concat([.element(.text(",")), .hardLine])) {
-                                    value.arguments.map { $0.formatted(using: options) }
-                                }
-                            ]
-                        )
+                        .join(with: .concat([.element(.text(",")), .line])) {
+                            value.arguments.map { $0.formatted(using: options) }
+                        }
                     ),
-                    .hardLine,
                     .element(.text(")"))
                 ]
             )

@@ -138,12 +138,15 @@
     </Record>
   </Type>
   <Type name="FunctionCallArgument">
-    <Record name="functionCallArgument">
+    <Record name="argument">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="label" type="Optional">
         <Record.Substitution generic="Value" instance="String"/>
       </Record.Param>
       <Record.Param name="expression" type="Expression"/>
+    </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
     </Record>
   </Type>
   <Type name="Expression">
@@ -261,6 +264,9 @@
     </Case>
     <Case name="comment">
       <Case.Param type="Comment"/>
+    </Case>
+    <Case name="functionCallArgument">
+      <Case.Param type="FunctionCallArgument"/>
     </Case>
   </Type>
   <Type name="FunctionParameter">

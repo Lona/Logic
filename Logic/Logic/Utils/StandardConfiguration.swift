@@ -267,7 +267,7 @@ public enum StandardConfiguration {
                             let labels = unificationContext.functionArgumentLabels[id]
 
                             var suggestion = LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.enumerated().map { index, arg in
-                                LGCFunctionCallArgument(
+                                LGCFunctionCallArgument.argument(
                                     id: UUID(),
                                     label: labels?[index],
                                     expression: .identifierExpression(
@@ -357,7 +357,7 @@ public enum StandardConfiguration {
                                 expression: LGCExpression.makeMemberExpression(names: ["Optional", "value"]),
                                 arguments: .init(
                                     [
-                                        LGCFunctionCallArgument(id: UUID(), label: nil, expression: expression)
+                                        .argument(id: UUID(), label: nil, expression: expression)
                                     ]
                                 )
                             )

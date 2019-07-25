@@ -172,7 +172,14 @@ extension Compiler {
             // The function value to call
             guard let functionValue = context.values[expression.uuid] else { break }
 
-            let args = arguments.map { context.values[$0.expression.uuid] }
+            let args: [LogicValue] = arguments.compactMap {
+                switch $0 {
+                case .argument(_, _, let expression):
+                    return context.values[expression.uuid]
+                case .placeholder:
+                    return nil
+                }
+            }
 
             if case .function(let f) = functionValue.memory {
                 switch f {
