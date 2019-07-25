@@ -80,16 +80,19 @@ public class LogicFormattingOptions {
     public init(
         style: Style = .natural,
         locale: Locale = .en_US,
-        getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil}
+        getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil},
+        getShadow: @escaping (UUID) -> NSShadow? = {_ in nil}
         ) {
         self.style = style
         self.locale = locale
         self.getColor = getColor
+        self.getShadow = getShadow
     }
 
     public var style: Style
     public var locale: Locale
     public var getColor: (UUID) -> (String, NSColor)?
+    public var getShadow: (UUID) -> NSShadow?
 
     public static var normal = LogicFormattingOptions()
     public static var visual = LogicFormattingOptions(style: .visual)
@@ -530,7 +533,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         where identifier.string == Unification.T.color.name && options.style == .visual:
 
                         let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
-                        let decoration: LogicElement = .colorSwatch(colorInfo.0, colorInfo.1, value.id)
+                        let decoration: LogicElement = .colorPreview(colorInfo.0, colorInfo.1, value.id)
 
                         let formattedInitializer = initializer.formatted(using: options)
 
@@ -544,6 +547,27 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                     formattedInitializer,
                                     .hardLine,
                                     .element(.text(formattedInitializer.stringContents == colorInfo.0 ? "" : colorInfo.0)),
+                                    .spacer(4)
+                                ]
+                            )
+                        )
+                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                        where identifier.string == Unification.T.shadow.name && options.style == .visual:
+
+                        let shadowInfo = options.getShadow(initializer.uuid) ?? NSShadow(color: .clear, offset: .zero, blur: 0)
+                        let decoration: LogicElement = .shadowPreview(shadowInfo, value.id)
+
+                        let formattedInitializer = initializer.formatted(using: options)
+
+                        return .horizontalFloat(
+                            decoration: decoration,
+                            margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
+                            .concat(
+                                [
+                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
+                                    .hardLine,
+                                    formattedInitializer,
+                                    .hardLine,
                                     .spacer(4)
                                 ]
                             )

@@ -37,14 +37,16 @@ public enum LogicElement {
     case coloredText(String, NSColor)
     case dropdown(UUID, String, DropdownStyle)
     case title(UUID, String)
-    case colorSwatch(String, NSColor, UUID)
+    case colorPreview(String, NSColor, UUID)
+    case shadowPreview(NSShadow, UUID)
     case indentGuide(UUID)
 
     public var isActivatable: Bool {
         switch self {
         case .text,
              .coloredText,
-             .colorSwatch,
+             .colorPreview,
+             .shadowPreview,
              .indentGuide:
             return false
         case .title,
@@ -55,7 +57,8 @@ public enum LogicElement {
 
     public var allowsLineSelection: Bool {
         switch self {
-        case .colorSwatch,
+        case .colorPreview,
+             .shadowPreview,
              .indentGuide:
             return false
         case .title,
@@ -70,7 +73,8 @@ public enum LogicElement {
         switch self {
         case .text,
              .coloredText,
-             .colorSwatch,
+             .colorPreview,
+             .shadowPreview,
              .indentGuide:
             return nil
         case .title(let id, _),
@@ -87,7 +91,8 @@ public enum LogicElement {
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _),
-             .colorSwatch(_, _, let id):
+             .colorPreview(_, _, let id),
+             .shadowPreview(_, let id):
             return id
         }
     }
@@ -100,20 +105,22 @@ public enum LogicElement {
              .coloredText,
              .title,
              .dropdown,
-             .colorSwatch:
+             .colorPreview,
+             .shadowPreview:
             return true
         }
     }
 
     public var value: String {
         switch self {
-        case .indentGuide:
+        case .indentGuide,
+             .shadowPreview,
+             .colorPreview:
             return ""
         case .text(let value),
              .coloredText(let value, _),
              .title(_, let value),
-             .dropdown(_, let value, _),
-             .colorSwatch(let value, _, _):
+             .dropdown(_, let value, _):
             return value
         }
     }
@@ -122,12 +129,14 @@ public enum LogicElement {
         switch self {
         case .text, .title:
             return Colors.text
-        case .coloredText(_, let color), .colorSwatch(_, let color, _):
+        case .coloredText(_, let color), .colorPreview(_, let color, _):
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color
         case .indentGuide:
             return Colors.indentGuide
+        case .shadowPreview:
+            return .white
         }
     }
 
@@ -195,7 +204,7 @@ extension LogicElement {
                 attributedString: attributedString,
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
-        case .colorSwatch:
+        case .colorPreview, .shadowPreview:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
 
             return LogicMeasuredElement(

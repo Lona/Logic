@@ -332,7 +332,7 @@ public class LogicCanvasView: NSView {
             let attributedString = measuredText.attributedString
 
             switch (text) {
-            case .colorSwatch(_, let color, _):
+            case .colorPreview(_, let color, _):
                 color.setFill()
                 Colors.text.withAlphaComponent(0.1).setStroke()
 
@@ -346,6 +346,28 @@ public class LogicCanvasView: NSView {
 
                 backgroundBezier.fill()
                 outlineBezier.stroke()
+            case .shadowPreview(let shadow, _):
+                NSColor.white.setFill()
+                Colors.text.withAlphaComponent(0.1).setStroke()
+
+                let radius: CGFloat = 4
+
+                let insetRect = backgroundRect.insetBy(dx: style.textPadding.width, dy: style.textPadding.height)
+                let backgroundBezier = NSBezierPath(roundedRect: insetRect, xRadius: radius, yRadius: radius)
+
+                let outlineRect = insetRect.insetBy(dx: 0.5, dy: 0.5)
+                let outlineBezier = NSBezierPath(roundedRect: outlineRect, xRadius: radius, yRadius: radius)
+
+                backgroundBezier.fill()
+                outlineBezier.stroke()
+
+                NSGraphicsContext.saveGraphicsState()
+
+                shadow.set()
+
+                NSRect(x: backgroundRect.midX - 12, y: backgroundRect.midY - 12, width: 24, height: 24).fill()
+
+                NSGraphicsContext.restoreGraphicsState()
             case .indentGuide:
                 text.color.setFill()
 

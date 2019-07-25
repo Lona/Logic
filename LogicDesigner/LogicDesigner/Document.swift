@@ -118,15 +118,20 @@ class Document: NSDocument {
 
         var annotations: [UUID: String] = [:]
         var colorValues: [UUID: String] = [:]
+        var shadowValues: [UUID: NSShadow] = [:]
 
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
 //            locale: .es_ES,
-            getColor: { id in
+            getColor: ({ id in
                 guard let colorString = colorValues[id], let color = NSColor.parse(css: colorString) else { return nil }
                 return (colorString, color)
-            }
+            }),
+            getShadow: ({ id in
+                guard let shadow = shadowValues[id] else { return nil }
+                return shadow
+            })
         )
 
         logicEditor.decorationForNodeID = { id in
@@ -247,6 +252,7 @@ class Document: NSDocument {
 
             annotations.removeAll(keepingCapacity: true)
             colorValues.removeAll(keepingCapacity: true)
+            shadowValues.removeAll(keepingCapacity: true)
 
             switch result {
             case .success(let evaluationContext):
@@ -264,6 +270,10 @@ class Document: NSDocument {
 
                     if let colorString = value.colorString {
                         colorValues[id] = colorString
+                    }
+
+                    if let shadow = value.nsShadow {
+                        shadowValues[id] = shadow
                     }
                 }
             case .failure(let error):

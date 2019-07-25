@@ -15,6 +15,7 @@ extension Unification.T {
     public static var string: Unification.T = .cons(name: "String")
 
     public static var color: Unification.T = .cons(name: "Color")
+    public static var shadow: Unification.T = .cons(name: "Shadow")
 
     public static func optional(_ type: Unification.T) -> Unification.T {
         return .cons(name: "Optional", parameters: [type])

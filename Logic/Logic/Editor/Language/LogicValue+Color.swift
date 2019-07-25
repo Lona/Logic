@@ -24,4 +24,26 @@ extension LogicValue {
 
         return nil
     }
+
+    public var nsShadow: NSShadow? {
+        guard type == .shadow else { return nil }
+        guard case .record(let members) = memory else { return nil }
+
+        let shadow = NSShadow()
+
+        if let xValue = members["x"], case .some(.number(let x)) = xValue?.memory {
+            shadow.shadowOffset.width = x
+        }
+        if let yValue = members["y"], case .some(.number(let y)) = yValue?.memory {
+            shadow.shadowOffset.height = y
+        }
+        if let blurValue = members["blur"], case .some(.number(let blur)) = blurValue?.memory {
+            shadow.shadowBlurRadius = blur
+        }
+        if let colorValue = members["color"], let colorString = colorValue?.colorString {
+            shadow.shadowColor = NSColor.parse(css: colorString) ?? .black
+        }
+
+        return shadow
+    }
 }
