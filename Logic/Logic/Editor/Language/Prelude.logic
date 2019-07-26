@@ -12,7 +12,7 @@
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "A296B07A-2F99-41A8-B0B4-DF573787E2D3"
+                    "id" : "032456CB-D3D0-4070-9F1E-859EFD5C8441"
                   },
                   "type" : "placeholder"
                 }
@@ -42,7 +42,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "AEE16FE9-B37B-4FB8-B0B0-6AC5786262A6"
+                          "id" : "5C7340C6-52F4-410A-8A86-2C2450B602F1"
                         },
                         "type" : "placeholder"
                       }
@@ -118,7 +118,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "F9A1CA0C-0B17-4E5E-9D51-FD7C0D549DC2"
+                          "id" : "D2D27B5E-0375-4C02-980A-B18236301609"
                         },
                         "type" : "placeholder"
                       }
@@ -145,7 +145,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "364ABDA4-FC9D-4801-9036-40F59B7B0D14"
+                          "id" : "E3A68B1C-38C2-4228-828D-A3BA49461AEB"
                         },
                         "type" : "placeholder"
                       }
@@ -221,7 +221,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "32AEF1E5-5A2A-4326-AED1-0293AA57ABF1"
+                          "id" : "B656508E-45AF-415A-8ED3-FBFF4B258C65"
                         },
                         "type" : "placeholder"
                       }
@@ -245,7 +245,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "BF4612D3-6A41-4A28-8F33-33E98AC0BB2F"
+                    "id" : "D6B21B32-87DA-4CDB-BA05-20CE271CDE97"
                   },
                   "type" : "placeholder"
                 }
@@ -273,7 +273,7 @@
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "032F9AFD-7993-4174-A73D-0BF9BFD7BE71"
+                    "id" : "8C50AE0E-940E-4FD1-9F6E-90AC01DD6ADB"
                   },
                   "type" : "placeholder"
                 }
@@ -298,13 +298,13 @@
           "content" : {
             "data" : {
               "comment" : {
-                "id" : "45635E8E-9A4F-4637-A2D9-7D5F508EE43F",
-                "string" : "# String\n\nA `String` is a sequence of characters, such as `h` or `e`, put together to form text such as `hello`.\n\n## Example\n\nMy might want to declare a greeting variable as a `String`:\n\n```logic\n<Declarations>\n  <Variable name=\"greeting\" type=\"String\" value=\"Hello, world\"\/>\n<\/Declarations>\n```"
+                "id" : "3C44DC71-D554-4298-9DFC-B4A6F24D657E",
+                "string" : "# String\n\nA `String` is a sequence of characters, such as `h` or `e`, put together to form text such as `hello`.\n\n## Example\n\nWe might want to declare a greeting variable as a `String`:\n\n```logic\n<Declarations>\n  <Variable name=\"greeting\" type=\"String\" value=\"Hello, world\"\/>\n<\/Declarations>\n```"
               },
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "78450F65-A5A1-4672-9DBF-E530927BF855"
+                    "id" : "FE23427C-3CE4-4872-87E9-9FD15B24E05A"
                   },
                   "type" : "placeholder"
                 }
@@ -334,7 +334,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "B61D990E-51C0-4CDE-BD2E-250CB31DFC67"
+                          "id" : "AB8775D7-DE2A-4E22-BF09-F1253638EAC4"
                         },
                         "type" : "placeholder"
                       }
@@ -410,7 +410,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "A5226542-9DEB-49D6-B7EA-BB36D7E0FF57"
+                          "id" : "936F5D31-8903-4B81-9ABD-F91A00DF4271"
                         },
                         "type" : "placeholder"
                       }
@@ -434,7 +434,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "220760A1-BA0C-4ED8-A5A3-63A483A509C6"
+                    "id" : "8DF98CDC-7740-452D-957E-490CD5E189FD"
                   },
                   "type" : "placeholder"
                 }
@@ -462,7 +462,7 @@
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "9112AC0E-DD06-4BA8-9C1B-D884FA44934C"
+                    "id" : "902B5AAB-A230-4EA7-8307-E54E02E9EF89"
                   },
                   "type" : "placeholder"
                 }
@@ -515,7 +515,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "1247E361-C6C4-4170-ADFC-1AD87B09300F"
+                          "id" : "05644862-058E-4942-A8A0-90B730640E58"
                         },
                         "type" : "placeholder"
                       }
@@ -533,7 +533,7 @@
                     "associatedValueTypes" : [
                       {
                         "data" : {
-                          "id" : "C76CB196-882C-4F8E-A617-3E3CCBC7B92E"
+                          "id" : "391B8BE0-6A04-4AE9-B792-3AEBF4584CF8"
                         },
                         "type" : "placeholder"
                       }
@@ -548,7 +548,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "665661D8-AD85-470F-BE79-3D03E3303D1F"
+                    "id" : "7E3C5CCC-9A56-448E-8F8B-9FD23656A56B"
                   },
                   "type" : "placeholder"
                 }
@@ -583,7 +583,7 @@
       },
       {
         "data" : {
-          "id" : "AD7C92CE-7691-4092-84AD-E5D38857A44A"
+          "id" : "D477D9E0-D651-48C9-97BE-6D60C8B446CC"
         },
         "type" : "placeholder"
       }
