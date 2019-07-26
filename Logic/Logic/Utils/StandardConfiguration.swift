@@ -353,7 +353,7 @@ public enum StandardConfiguration {
                         case .fun(let arguments, _):
                             var suggestion = LGCExpression.Suggestion.functionCall(
                                 keyPath: keyPath,
-                                arguments: arguments.isEmpty ? [] : [.placeholder(id: UUID())]
+                                arguments: [.placeholder(id: UUID())]
                             )
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {

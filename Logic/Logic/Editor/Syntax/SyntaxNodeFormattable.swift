@@ -80,17 +80,20 @@ public class LogicFormattingOptions {
     public init(
         style: Style = .natural,
         locale: Locale = .en_US,
+        getArguments: @escaping (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)? = {_ in nil},
         getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil},
         getShadow: @escaping (UUID) -> NSShadow? = {_ in nil}
         ) {
         self.style = style
         self.locale = locale
+        self.getArguments = getArguments
         self.getColor = getColor
         self.getShadow = getShadow
     }
 
     public var style: Style
     public var locale: Locale
+    public var getArguments: (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)?
     public var getColor: (UUID) -> (String, NSColor)?
     public var getShadow: (UUID) -> NSShadow?
 
@@ -346,40 +349,34 @@ extension LGCExpression: SyntaxNodeFormattable {
                 )
             }
         case .functionCallExpression(let value):
-            if value.expression.flattenedMemberExpression?.map({ $0.string }) == ["Optional", "value"] {
+            let argumentOptions = options.getArguments(value.expression.uuid) ?? (Int.max, true, true)
+            let argumentsWithoutPlaceholder = value.arguments.filter { !$0.isPlaceholder }
+
+            let contents: FormatterCommand<LogicElement>
+            if argumentsWithoutPlaceholder.count >= argumentOptions.count {
+                contents = .join(with: .concat([.element(.text(",")), .line])) {
+                    argumentsWithoutPlaceholder.map { $0.formatted(using: options) }
+                }
+            } else {
+                contents = .join(with: .concat([.element(.text(",")), .line])) {
+                    value.arguments.map { $0.formatted(using: options) }
+                }
+            }
+
+            if !argumentOptions.showExpression {
+                return contents
+            } else if !argumentOptions.showParens {
+                return value.expression.formatted(using: options)
+            } else {
                 return .concat(
                     [
-                        .join(with: .concat([.element(.text(",")), .line])) {
-                            value.arguments.map { $0.formatted(using: options) }
-                        }
+                        value.expression.formatted(using: options),
+                        .element(.text("(")),
+                        .indent(contents),
+                        .element(.text(")"))
                     ]
                 )
             }
-
-            if value.arguments.isEmpty {
-                // TODO: We should still show () on non-enum calls, but right now we can't distinguish easily
-                return value.expression.formatted(using: options)
-
-//                return .concat {
-//                    [
-//                        value.expression.formatted(using: options),
-//                        .element(.text("()"))
-//                    ]
-//                }
-            }
-
-            return .concat(
-                [
-                    value.expression.formatted(using: options),
-                    .element(.text("(")),
-                    .indent(
-                        .join(with: .concat([.element(.text(",")), .line])) {
-                            value.arguments.map { $0.formatted(using: options) }
-                        }
-                    ),
-                    .element(.text(")"))
-                ]
-            )
         case .literalExpression(let value):
             return value.literal.formatted(using: options)
         case .memberExpression(let value):
