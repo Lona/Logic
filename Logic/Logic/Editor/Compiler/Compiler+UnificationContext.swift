@@ -74,7 +74,7 @@ extension Compiler {
 
                 let universalTypes = genericNames.map { name in Unification.T.gen(genericInScope[name]!) }
 
-                var parameterTypes: [Unification.T] = []
+                var parameterTypes: [Unification.FunctionArgument] = []
 
                 var labels: [String] = []
 
@@ -87,7 +87,7 @@ extension Compiler {
 
                         let annotationType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
 
-                        parameterTypes.append(annotationType)
+                        parameterTypes.append(Unification.FunctionArgument(label: pattern.name, type: annotationType))
 
                         result.nodes[pattern.uuid] = annotationType
                         //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
@@ -127,12 +127,15 @@ extension Compiler {
                     case .placeholder:
                         break
                     case .enumerationCase(_, name: let pattern, associatedValueTypes: let associatedValueTypes, _):
-                        let parameterTypes: [Unification.T] = associatedValueTypes.compactMap { annotation in
+                        let parameterTypes: [Unification.FunctionArgument] = associatedValueTypes.compactMap { annotation in
                             switch annotation {
                             case .placeholder:
                                 return nil
                             default:
-                                return annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
+                                return Unification.FunctionArgument(
+                                    label: pattern.name,
+                                    type: annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
+                                )
                             }
                         }
 
@@ -162,14 +165,14 @@ extension Compiler {
                     genericInScope[name] = result.makeGenericName()
                 }
 
-                var parameterTypes: [Unification.T] = []
+                var parameterTypes: [Unification.FunctionArgument] = []
 
                 parameters.forEach { parameter in
                     switch parameter {
                     case .parameter(id: _, externalName: _, localName: let pattern, annotation: let annotation, defaultValue: _):
                         let annotationType = annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
 
-                        parameterTypes.append(annotationType)
+                        parameterTypes.append(Unification.FunctionArgument(label: pattern.name, type: annotationType))
 
                         result.nodes[pattern.uuid] = annotationType
                         //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
@@ -225,26 +228,22 @@ extension Compiler {
             case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
                 let calleeType = result.nodes[expression.uuid]!
 
-                // Unify against these to enforce a function type
-                let placeholderReturnType = result.makeEvar()
-                let placeholderArgTypes = arguments.map { _ in result.makeEvar() }
-                let placeholderFunctionType: Unification.T = .fun(arguments: placeholderArgTypes, returnType: placeholderReturnType)
-
-                result.constraints.append(.init(calleeType, placeholderFunctionType))
-
-                result.nodes[node.uuid] = placeholderReturnType
-
-                let argumentValues: [LGCExpression] = arguments.compactMap {
-                    switch $0 {
-                    case .argument(let value):
-                        return value.expression
-                    case .placeholder:
-                        return nil
-                    }
+                guard case .fun(let targetArguments, let targetReturnType) = calleeType else {
+                    fatalError("Functions must currently be called by directly (not indirectly, via a reference)")
                 }
 
-                zip(placeholderArgTypes, argumentValues).forEach { (argType, argValue) in
-                    result.constraints.append(Unification.Constraint(argType, result.nodes[argValue.uuid]!))
+                result.nodes[node.uuid] = targetReturnType
+
+                arguments.forEach { argument in
+                    switch argument {
+                    case .argument(let value):
+                        // TODO: Values without labels will need positional handling, if we allow them at all
+                        guard let targetArgument = targetArguments.first(where: { $0.label == value.label }) else { break }
+
+                        result.constraints.append(Unification.Constraint(targetArgument.type, result.nodes[value.expression.uuid]!))
+                    case .placeholder:
+                        break
+                    }
                 }
 
                 return result

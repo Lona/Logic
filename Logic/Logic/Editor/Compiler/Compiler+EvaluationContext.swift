@@ -219,8 +219,29 @@ extension Compiler {
 
                     break
                 case .recordInit(let members):
-                    let values: [(String, LogicValue?)] = zip(members, args).map { pair, arg in
-                        return (pair.0, arg)
+                    let values: [(String, LogicValue?)] = members.reduce([]) { (result, item) in
+                        let argument = arguments.first(where: { argument in
+                            switch argument {
+                            case .argument(_, label: .some(item.0), _):
+                                return true
+                            case .argument, .placeholder:
+                                return false
+                            }
+                        })
+                        let argumentValue: LogicValue? = argument.flatMap({ argument in
+                            switch argument {
+                            case .argument(_, _, let expression):
+                                return context.values[expression.uuid]
+                            case .placeholder:
+                                return nil
+                            }
+                        })
+                        switch argumentValue {
+                        case .some:
+                            return result + [(item.0, argumentValue)]
+                        case .none:
+                            return result + [(item.0, item.1.1)]
+                        }
                     }
 
                     context.values[node.uuid] = LogicValue(returnType, .record(values: KeyValueList(values)))
@@ -251,14 +272,19 @@ extension Compiler {
 
             let resolvedType = Unification.substitute(substitution, in: type)
 
-            var parameterTypes: KeyValueList<String, Unification.T> = [:]
+            var parameterTypes: KeyValueList<String, (Unification.T, LogicValue?)> = [:]
 
             declarations.forEach { declaration in
                 switch declaration {
-                case .variable(id: _, name: let pattern, annotation: _, initializer: _, _):
+                case .variable(id: _, name: let pattern, annotation: _, initializer: let initializer, _):
                     guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
 
-                    parameterTypes.set(parameterType, for: pattern.name)
+                    var initialValue: LogicValue?
+                    if let initializer = initializer {
+                        initialValue = context.values[initializer.uuid]
+                    }
+
+                    parameterTypes.set((parameterType, initialValue), for: pattern.name)
                 default:
                     break
                 }

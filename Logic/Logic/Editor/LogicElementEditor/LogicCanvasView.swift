@@ -363,6 +363,8 @@ public class LogicCanvasView: NSView {
 
                 NSGraphicsContext.saveGraphicsState()
 
+                outlineBezier.setClip()
+
                 shadow.set()
 
                 NSRect(x: backgroundRect.midX - 12, y: backgroundRect.midY - 12, width: 24, height: 24).fill()

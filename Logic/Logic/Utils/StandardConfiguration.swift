@@ -125,6 +125,64 @@ public enum StandardConfiguration {
         ) -> [LogicSuggestionItem]? {
 
         switch node {
+        case .functionCallArgument:
+            guard let parent = rootNode.pathTo(id: node.uuid)?.dropLast().last else { return nil }
+
+            switch parent {
+            case .expression(.functionCallExpression(let value)):
+                guard let unificationType = unificationContext.nodes[value.expression.uuid] else {
+                    Swift.print("Can't determine function call argument suggestions - no type for expression", parent.uuid)
+                    return nil
+                }
+
+                let type = Unification.substitute(substitution, in: unificationType)
+
+                guard case .fun(let targetArguments, _) = type else {
+                    Swift.print("Invalid call expression - only function types are callable")
+                    return nil
+                }
+
+                let existingArgumentLabels: [String] = value.arguments.compactMap {
+                    switch $0 {
+                    case .argument(let value):
+                        return value.label
+                    case .placeholder:
+                        return nil
+                    }
+                }
+
+                let availableArguments: [Unification.FunctionArgument] = targetArguments.filter { argument in
+                    guard let label = argument.label else { return false }
+                    return !existingArgumentLabels.contains(label)
+                }
+
+                Swift.print(availableArguments)
+
+                if logLevel == .verbose {
+                    Swift.print("Resolved argument type: \(type)")
+                }
+
+                return availableArguments.map { argument in
+                    let identifierId = UUID()
+                    return LogicSuggestionItem(
+                        title: argument.label ?? "",
+                        category: "ARGUMENTS",
+                        node: .functionCallArgument(
+                            .argument(
+                                id: UUID(),
+                                label: argument.label,
+                                expression: .identifierExpression(
+                                    id: UUID(),
+                                    identifier: .init(id: identifierId, string: "value", isPlaceholder: true)
+                                )
+                            )
+                        ),
+                        nextFocusId: identifierId
+                    )
+                }.titleContains(prefix: query)
+            default:
+                return nil
+            }
         case .typeAnnotation:
             return currentScopeContext.patternToTypeName.map { key, value in
                 let node = rootNode.pathTo(id: key)?.last(where: { item in
@@ -266,16 +324,12 @@ public enum StandardConfiguration {
                         case .fun(arguments: let arguments, returnType: _):
                             let labels = unificationContext.functionArgumentLabels[id]
 
-                            var suggestion = LGCExpression.Suggestion.functionCall(keyPath: keyPath, arguments: arguments.enumerated().map { index, arg in
-                                LGCFunctionCallArgument.argument(
-                                    id: UUID(),
-                                    label: labels?[index],
-                                    expression: .identifierExpression(
-                                        id: UUID(),
-                                        identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
-                                    )
-                                )
-                            })
+                            var suggestion = LGCExpression.Suggestion.functionCall(
+                                keyPath: keyPath,
+                                arguments: [
+                                    .placeholder(id: UUID())
+                                ]
+                            )
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
                                 suggestion.documentation = { _ in

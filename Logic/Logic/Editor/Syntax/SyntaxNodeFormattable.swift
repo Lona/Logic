@@ -183,7 +183,7 @@ extension LGCFunctionCallArgument: SyntaxNodeFormattable {
             if let label = value.label {
                 return .concat(
                     [
-                        .element(.text(label + ":")),
+                        .element(LogicElement.dropdown(value.id, label, .source)),
                         value.expression.formatted(using: options)
                     ]
                 )

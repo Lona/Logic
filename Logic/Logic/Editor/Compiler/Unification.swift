@@ -9,11 +9,29 @@
 import Foundation
 
 public enum Unification {
+    public struct FunctionArgument: Equatable, CustomDebugStringConvertible {
+        public var debugDescription: String {
+            if let label = label {
+                return "\(label): \(type)"
+            } else {
+                return "\(type)"
+            }
+        }
+
+        var label: String?
+        var type: T
+
+        init(label: String? = nil, type: T) {
+            self.label = label
+            self.type = type
+        }
+    }
+
     public enum T: Equatable, CustomDebugStringConvertible {
         case evar(String)
         case cons(name: String, parameters: [T])
         case gen(String)
-        indirect case fun(arguments: [T], returnType: T)
+        indirect case fun(arguments: [FunctionArgument], returnType: T)
 
         public static func cons(name: String) -> T {
             return .cons(name: name, parameters: [])
@@ -54,7 +72,7 @@ public enum Unification {
             case .gen(let name):
                 return [name]
             case .fun(let arguments, let returnType):
-                return Array(arguments.map { $0.genericNames }.joined()) + returnType.genericNames
+                return Array(arguments.map { $0.type.genericNames }.joined()) + returnType.genericNames
             }
         }
 
@@ -137,7 +155,7 @@ public enum Unification {
                 }
 
                 zip(headArguments, tailArguments).forEach { a, b in
-                    constraints.append(Constraint(a, b))
+                    constraints.append(Constraint(a.type, b.type))
                 }
 
                 constraints.append(.init(headReturnType, tailReturnType))
@@ -189,7 +207,7 @@ public enum Unification {
             return .cons(name: name, parameters: parameters.map { substitute(substitution, in: $0) })
         case .fun(let arguments, let returnType):
             return .fun(
-                arguments: arguments.map { substitute(substitution, in: $0) },
+                arguments: arguments.map { FunctionArgument(label: $0.label, type: substitute(substitution, in: $0.type)) },
                 returnType: substitute(substitution, in: returnType)
             )
         }
