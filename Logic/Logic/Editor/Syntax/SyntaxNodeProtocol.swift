@@ -1698,7 +1698,12 @@ extension LGCFunctionCallArgument: SyntaxNodeProtocol {
     }
 
     public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
-        return .next
+        switch self {
+        case .placeholder:
+            return .none
+        case .argument:
+            return .next
+        }
     }
 }
 

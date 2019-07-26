@@ -125,7 +125,7 @@ public enum StandardConfiguration {
         ) -> [LogicSuggestionItem]? {
 
         switch node {
-        case .functionCallArgument:
+        case .functionCallArgument(let currentArgument):
             guard let parent = rootNode.pathTo(id: node.uuid)?.dropLast().last else { return nil }
 
             switch parent {
@@ -153,32 +153,61 @@ public enum StandardConfiguration {
 
                 let availableArguments: [Unification.FunctionArgument] = targetArguments.filter { argument in
                     guard let label = argument.label else { return false }
-                    return !existingArgumentLabels.contains(label)
+                    let available = !existingArgumentLabels.contains(label)
+                    switch currentArgument {
+                    case .argument(_, let argumentLabel, _):
+                        return available || argumentLabel == label
+                    case .placeholder:
+                        return available
+                    }
                 }
-
-                Swift.print(availableArguments)
 
                 if logLevel == .verbose {
                     Swift.print("Resolved argument type: \(type)")
                 }
 
                 return availableArguments.map { argument in
-                    let identifierId = UUID()
-                    return LogicSuggestionItem(
+                    var labelComment: String?
+
+                    if case .identifierExpression(_, identifier: let identifier) = value.expression,
+                        let definitionNameId = scopeContext.identifierToPattern[identifier.uuid],
+                        let definitionNode = rootNode.contents.parentOf(target: definitionNameId, includeTopLevel: false),
+                        case .declaration(.record(let record)) = definitionNode {
+
+                        record.declarations.forEach { declaration in
+                            switch declaration {
+                            case .variable(_, let labelPattern, _, _, _) where labelPattern.name == argument.label:
+                                if let comment = declaration.comment(within: rootNode) {
+                                    labelComment = comment
+                                }
+                            default:
+                                break
+                            }
+                        }
+                    }
+
+                    var suggestion = LogicSuggestionItem(
                         title: argument.label ?? "",
                         category: "ARGUMENTS",
                         node: .functionCallArgument(
                             .argument(
                                 id: UUID(),
-                                label: argument.label,
+                                label: argument.label ?? "Invalid argument label",
                                 expression: .identifierExpression(
                                     id: UUID(),
-                                    identifier: .init(id: identifierId, string: "value", isPlaceholder: true)
+                                    identifier: .init(id: UUID(), string: "value", isPlaceholder: true)
                                 )
                             )
-                        ),
-                        nextFocusId: identifierId
+                        )
                     )
+
+                    if let comment = labelComment {
+                        suggestion.documentation = { _ in
+                            return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
+                        }
+                    }
+
+                    return suggestion
                 }.titleContains(prefix: query)
             default:
                 return nil
@@ -321,9 +350,7 @@ public enum StandardConfiguration {
                     ) -> [LogicSuggestionItem] {
                     return validSuggestionPaths.map { (id, keyPath, resolvedType) in
                         switch resolvedType {
-                        case .fun(arguments: let arguments, returnType: _):
-                            let labels = unificationContext.functionArgumentLabels[id]
-
+                        case .fun:
                             var suggestion = LGCExpression.Suggestion.functionCall(
                                 keyPath: keyPath,
                                 arguments: [

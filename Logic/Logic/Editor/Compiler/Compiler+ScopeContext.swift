@@ -45,8 +45,7 @@ public extension Compiler {
         ) -> ScopeContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        return node.reduce(config: &traversalConfig, initialResult: initialContext) {
-            (context, node, config) -> ScopeContext in
+        func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> ScopeContext {
             if node.uuid == targetId {
                 config.stopTraversal = true
                 return context
@@ -207,5 +206,7 @@ public extension Compiler {
 
             return context
         }
+
+        return node.reduce(config: &traversalConfig, initialResult: initialContext, f: walk)
     }
 }

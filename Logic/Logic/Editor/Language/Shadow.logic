@@ -44,7 +44,11 @@
                   },
                   "type" : "typeIdentifier"
                 },
-                "id" : "86C6A167-2C51-4743-A1A9-163C47BFAC8E",
+                "comment" : {
+                  "id" : "7257C870-FFEF-4F82-A284-77FB94AB4422",
+                  "string" : "# x\n\nThe horizontal offset of the shadow."
+                },
+                "id" : "EE953A67-224B-450F-B922-456E171BE87E",
                 "initializer" : {
                   "data" : {
                     "id" : "336AD3B5-5E4E-4B5F-8CE6-9645F76C7325",
@@ -81,7 +85,11 @@
                   },
                   "type" : "typeIdentifier"
                 },
-                "id" : "8AD8D69C-6767-44B7-9E9C-2F512055F99D",
+                "comment" : {
+                  "id" : "32808241-2506-461A-A225-5FE380DF0106",
+                  "string" : "# y\n\nThe vertical of the shadow."
+                },
+                "id" : "78F86D18-1AE4-4FD6-8E6F-EC09F92F1A21",
                 "initializer" : {
                   "data" : {
                     "id" : "634D52AF-5009-4541-AD22-6D90F00E981B",
@@ -118,7 +126,11 @@
                   },
                   "type" : "typeIdentifier"
                 },
-                "id" : "1B16447A-D5F0-49C4-9DE3-58C991D18D74",
+                "comment" : {
+                  "id" : "EA429C1C-2A8A-484C-81EF-42A1C6152849",
+                  "string" : "# Blur\n\nThe blur radius of the shadow."
+                },
+                "id" : "7D6F2E52-7615-4DC4-969A-81A69D8887F8",
                 "initializer" : {
                   "data" : {
                     "id" : "78A2B94E-90AA-4C33-B120-377984518D9C",
@@ -155,7 +167,11 @@
                   },
                   "type" : "typeIdentifier"
                 },
-                "id" : "72C19166-C868-4DAD-B102-396D7EAD13AC",
+                "comment" : {
+                  "id" : "A2D4B006-53A8-4570-BA64-B07EEF4D70AA",
+                  "string" : "W> This property is not supported on iOS or Android.\n\n# Radius\n\nThe spread radius of the shadow."
+                },
+                "id" : "BF6F81C2-1572-4A1D-A89D-C24962624740",
                 "initializer" : {
                   "data" : {
                     "id" : "468DE1E8-56CA-4B9D-9482-7534B3BCCC43",
@@ -192,7 +208,11 @@
                   },
                   "type" : "typeIdentifier"
                 },
-                "id" : "4980838B-ECE6-416B-8CA3-74454AD607F1",
+                "comment" : {
+                  "id" : "07F8F38A-CD0F-4983-9C16-4951839857CB",
+                  "string" : "# Color\n\nThe shadow color."
+                },
+                "id" : "41A7D00E-55F0-4A3F-9992-F4F24D4DB47A",
                 "initializer" : {
                   "data" : {
                     "id" : "9CDEF2E7-5957-47DC-8236-A544A8C2AA17",
@@ -215,7 +235,7 @@
             },
             {
               "data" : {
-                "id" : "F86A5614-A83B-484C-A11B-2CB5A56F6DB2"
+                "id" : "B5D35EF3-CC12-4FA5-B070-7B3500E6F6EB"
               },
               "type" : "placeholder"
             }
@@ -233,7 +253,7 @@
       },
       {
         "data" : {
-          "id" : "6D4860A5-7F5D-4CBA-80EE-09BE83A7A3F5"
+          "id" : "8B6BD97A-530B-4212-8D2E-05F475876D3B"
         },
         "type" : "placeholder"
       }
