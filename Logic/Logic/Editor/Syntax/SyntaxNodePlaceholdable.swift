@@ -14,8 +14,12 @@ public protocol SyntaxNodePlaceholdable {
 }
 
 extension LGCList where T: SyntaxNodeProtocol, T: SyntaxNodePlaceholdable {
-    func replace(id: UUID, with syntaxNode: LGCSyntaxNode, preservingEndingPlaceholder: Bool) -> LGCList {
+    func replace(id: UUID, with syntaxNode: LGCSyntaxNode, preservingEndingPlaceholder: Bool, preservingEmptyList: Bool = false) -> LGCList {
         let result = self.map { $0.replace(id: id, with: syntaxNode) }
+
+        if preservingEmptyList && result.isEmpty {
+            return self
+        }
 
         if preservingEndingPlaceholder {
             return LGCList(result).normalizedPlaceholders

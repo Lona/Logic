@@ -874,7 +874,7 @@ extension LGCExpression: SyntaxNodeProtocol {
             return .functionCallExpression(
                 id: value.id,
                 expression: value.expression.replace(id: id, with: syntaxNode),
-                arguments: value.arguments.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true)
+                arguments: value.arguments.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true, preservingEmptyList: true)
             )
         case (_, .literalExpression(let value)):
             return .literalExpression(

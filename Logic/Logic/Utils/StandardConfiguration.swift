@@ -350,12 +350,10 @@ public enum StandardConfiguration {
                     ) -> [LogicSuggestionItem] {
                     return validSuggestionPaths.map { (id, keyPath, resolvedType) in
                         switch resolvedType {
-                        case .fun:
+                        case .fun(let arguments, _):
                             var suggestion = LGCExpression.Suggestion.functionCall(
                                 keyPath: keyPath,
-                                arguments: [
-                                    .placeholder(id: UUID())
-                                ]
+                                arguments: arguments.isEmpty ? [] : [.placeholder(id: UUID())]
                             )
 
                             if let comment = rootNode.find(id: id)?.comment(within: rootNode) {
