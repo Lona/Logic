@@ -39,6 +39,7 @@ public enum LogicElement {
     case title(UUID, String)
     case colorPreview(String, NSColor, UUID)
     case shadowPreview(NSShadow, UUID)
+    case textStylePreview(TextStyle, String, UUID)
     case indentGuide(UUID)
 
     public var isActivatable: Bool {
@@ -47,6 +48,7 @@ public enum LogicElement {
              .coloredText,
              .colorPreview,
              .shadowPreview,
+             .textStylePreview,
              .indentGuide:
             return false
         case .title,
@@ -59,6 +61,7 @@ public enum LogicElement {
         switch self {
         case .colorPreview,
              .shadowPreview,
+             .textStylePreview,
              .indentGuide:
             return false
         case .title,
@@ -75,6 +78,7 @@ public enum LogicElement {
              .coloredText,
              .colorPreview,
              .shadowPreview,
+             .textStylePreview,
              .indentGuide:
             return nil
         case .title(let id, _),
@@ -92,7 +96,8 @@ public enum LogicElement {
         case .title(let id, _),
              .dropdown(let id, _, _),
              .colorPreview(_, _, let id),
-             .shadowPreview(_, let id):
+             .shadowPreview(_, let id),
+             .textStylePreview(_, _, let id):
             return id
         }
     }
@@ -106,7 +111,8 @@ public enum LogicElement {
              .title,
              .dropdown,
              .colorPreview,
-             .shadowPreview:
+             .shadowPreview,
+             .textStylePreview:
             return true
         }
     }
@@ -115,7 +121,9 @@ public enum LogicElement {
         switch self {
         case .indentGuide,
              .shadowPreview,
-             .colorPreview:
+             .colorPreview,
+             .textStylePreview:
+            // This value has no meaning
             return ""
         case .text(let value),
              .coloredText(let value, _),
@@ -135,7 +143,8 @@ public enum LogicElement {
             return dropdownStyle.color
         case .indentGuide:
             return Colors.indentGuide
-        case .shadowPreview:
+        case .shadowPreview, .textStylePreview:
+            // This value has no meaning
             return .white
         }
     }
@@ -206,6 +215,14 @@ extension LogicElement {
                 backgroundRect: backgroundRect)
         case .colorPreview, .shadowPreview:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
+
+            return LogicMeasuredElement(
+                element: self,
+                attributedString: .init(),
+                attributedStringRect: rect,
+                backgroundRect: rect)
+        case .textStylePreview:
+            let rect: CGRect = .init(origin: origin, size: .init(width: 68 * 2, height: 68))
 
             return LogicMeasuredElement(
                 element: self,

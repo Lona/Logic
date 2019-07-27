@@ -370,6 +370,37 @@ public class LogicCanvasView: NSView {
                 NSRect(x: backgroundRect.midX - 12, y: backgroundRect.midY - 12, width: 24, height: 24).fill()
 
                 NSGraphicsContext.restoreGraphicsState()
+            case .textStylePreview(let textStyle, let previewString, _):
+                NSColor.white.setFill()
+                Colors.text.withAlphaComponent(0.1).setStroke()
+
+                let radius: CGFloat = 4
+
+                let insetRect = backgroundRect.insetBy(dx: style.textPadding.width, dy: style.textPadding.height)
+                let backgroundBezier = NSBezierPath(roundedRect: insetRect, xRadius: radius, yRadius: radius)
+
+                let outlineRect = insetRect.insetBy(dx: 0.5, dy: 0.5)
+                let outlineBezier = NSBezierPath(roundedRect: outlineRect, xRadius: radius, yRadius: radius)
+
+                backgroundBezier.fill()
+                outlineBezier.stroke()
+
+                NSGraphicsContext.saveGraphicsState()
+
+                outlineBezier.setClip()
+
+                let previewString = textStyle.apply(to: previewString)
+                let previewStringSize = previewString.size()
+
+                let previewStringRect = NSRect(
+                    x: outlineRect.midX - previewStringSize.width / 2,
+                    y: outlineRect.midY - previewStringSize.height / 2,
+                    width: previewStringSize.width,
+                    height: previewStringSize.height
+                )
+                previewString.draw(with: previewStringRect, options: [.truncatesLastVisibleLine, .usesLineFragmentOrigin])
+
+                NSGraphicsContext.restoreGraphicsState()
             case .indentGuide:
                 text.color.setFill()
 

@@ -46,4 +46,31 @@ extension LogicValue {
 
         return shadow
     }
+
+    public var textStyle: TextStyle? {
+        guard type == .textStyle else { return nil }
+        guard case .record(let members) = memory else { return nil }
+
+        var textStyle = TextStyle()
+
+        if let fontNameValue = members["fontName"], case .some(.string(let fontName)) = fontNameValue?.unwrapped?.memory {
+            textStyle = textStyle.with(name: fontName)
+        }
+        if let fontFamilyValue = members["fontFamily"], case .some(.string(let fontFamily)) = fontFamilyValue?.unwrapped?.memory {
+            textStyle = textStyle.with(family: fontFamily)
+        }
+        if let sizeValue = members["fontSize"], case .some(.number(let size)) = sizeValue?.unwrapped?.memory {
+            textStyle = textStyle.with(size: size)
+        }
+        if let colorValue = members["color"], let colorString = colorValue?.unwrapped?.colorString {
+            textStyle = textStyle.with(color: NSColor.parse(css: colorString) ?? .black)
+        }
+
+        return textStyle
+    }
+
+    public var unwrapped: LogicValue? {
+        guard case .enum("value", let associatedValues) = memory else { return nil }
+        return associatedValues[0]
+    }
 }

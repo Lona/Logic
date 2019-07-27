@@ -82,12 +82,14 @@ public class LogicFormattingOptions {
         locale: Locale = .en_US,
         getArguments: @escaping (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)? = {_ in nil},
         getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil},
+        getTextStyle: @escaping (UUID) -> TextStyle? = {_ in nil},
         getShadow: @escaping (UUID) -> NSShadow? = {_ in nil}
         ) {
         self.style = style
         self.locale = locale
         self.getArguments = getArguments
         self.getColor = getColor
+        self.getTextStyle = getTextStyle
         self.getShadow = getShadow
     }
 
@@ -95,6 +97,7 @@ public class LogicFormattingOptions {
     public var locale: Locale
     public var getArguments: (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)?
     public var getColor: (UUID) -> (String, NSColor)?
+    public var getTextStyle: (UUID) -> TextStyle?
     public var getShadow: (UUID) -> NSShadow?
 
     public static var normal = LogicFormattingOptions()
@@ -552,6 +555,27 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
                         let shadowInfo = options.getShadow(initializer.uuid) ?? NSShadow(color: .clear, offset: .zero, blur: 0)
                         let decoration: LogicElement = .shadowPreview(shadowInfo, value.id)
+
+                        let formattedInitializer = initializer.formatted(using: options)
+
+                        return .horizontalFloat(
+                            decoration: decoration,
+                            margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
+                            .concat(
+                                [
+                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
+                                    .hardLine,
+                                    formattedInitializer,
+                                    .hardLine,
+                                    .spacer(4)
+                                ]
+                            )
+                        )
+                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                        where identifier.string == Unification.T.textStyle.name && options.style == .visual:
+
+                        let textStyleInfo = options.getTextStyle(initializer.uuid) ?? TextStyle()
+                        let decoration: LogicElement = .textStylePreview(textStyleInfo, value.name.name, value.id)
 
                         let formattedInitializer = initializer.formatted(using: options)
 

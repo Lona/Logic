@@ -119,6 +119,7 @@ class Document: NSDocument {
         var annotations: [UUID: String] = [:]
         var colorValues: [UUID: String] = [:]
         var shadowValues: [UUID: NSShadow] = [:]
+        var textStyleValues: [UUID: TextStyle] = [:]
         var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
 
         infoBar.dropdownIndex = 0
@@ -160,10 +161,8 @@ class Document: NSDocument {
                 guard let colorString = colorValues[id], let color = NSColor.parse(css: colorString) else { return nil }
                 return (colorString, color)
             }),
-            getShadow: ({ id in
-                guard let shadow = shadowValues[id] else { return nil }
-                return shadow
-            })
+            getTextStyle: ({ id in return textStyleValues[id] }),
+            getShadow: ({ id in return shadowValues[id] })
         )
 
         logicEditor.decorationForNodeID = { id in
@@ -294,6 +293,7 @@ class Document: NSDocument {
             annotations.removeAll(keepingCapacity: true)
             colorValues.removeAll(keepingCapacity: true)
             shadowValues.removeAll(keepingCapacity: true)
+            textStyleValues.removeAll(keepingCapacity: true)
 
             switch result {
             case .success(let evaluationContext):
@@ -315,6 +315,10 @@ class Document: NSDocument {
 
                     if let shadow = value.nsShadow {
                         shadowValues[id] = shadow
+                    }
+
+                    if let textStyle = value.textStyle {
+                        textStyleValues[id] = textStyle
                     }
                 }
             case .failure(let error):
