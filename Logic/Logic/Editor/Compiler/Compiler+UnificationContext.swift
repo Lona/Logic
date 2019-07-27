@@ -133,7 +133,7 @@ extension Compiler {
                                 return nil
                             default:
                                 return Unification.FunctionArgument(
-                                    label: pattern.name,
+                                    label: nil,
                                     type: annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
                                 )
                             }
@@ -228,25 +228,34 @@ extension Compiler {
             case (true, .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments))):
                 let calleeType = result.nodes[expression.uuid]!
 
-                guard case .fun(let targetArguments, let targetReturnType) = calleeType else {
-                    fatalError("Functions must currently be called by directly (not indirectly, via a reference)")
-                }
-
-                result.nodes[node.uuid] = targetReturnType
-
-                arguments.forEach { argument in
+                // Unify against these to enforce a function type
+                let placeholderReturnType = result.makeEvar()
+                let placeholderArgTypes: [Unification.FunctionArgument] = arguments.compactMap { argument in
                     switch argument {
-                    case .argument(let value):
-                        // TODO: Values without labels will need positional handling, if we allow them at all
-                        guard let targetArgument = targetArguments.first(where: { $0.label == value.label }) else { break }
-
-                        result.constraints.append(Unification.Constraint(targetArgument.type, result.nodes[value.expression.uuid]!))
+                    case .argument(_, let label, _):
+                        return Unification.FunctionArgument(label: label, type: result.makeEvar())
                     case .placeholder:
-                        break
+                        return nil
+                    }
+                }
+                let placeholderFunctionType: Unification.T = .fun(arguments: placeholderArgTypes, returnType: placeholderReturnType)
+
+                result.constraints.append(.init(calleeType, placeholderFunctionType))
+
+                result.nodes[node.uuid] = placeholderReturnType
+
+                let argumentValues: [LGCExpression] = arguments.compactMap { argument in
+                    switch argument {
+                    case .argument(_, _, let expression):
+                        return expression
+                    case .placeholder:
+                        return nil
                     }
                 }
 
-                return result
+                zip(placeholderArgTypes, argumentValues).forEach { (argType, argValue) in
+                    result.constraints.append(Unification.Constraint(argType.type, result.nodes[argValue.uuid]!))
+                }
             case (false, .expression(.memberExpression)):
                 // The only supported children are identifiers currently, and we will handle them here when we revisit them
                 config.ignoreChildren = true

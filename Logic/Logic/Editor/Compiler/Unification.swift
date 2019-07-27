@@ -106,6 +106,7 @@ public enum Unification {
     public enum UnificationError: Error {
         case nameMismatch(T, T)
         case genericArgumentsCountMismatch(T, T)
+        case genericArgumentsLabelMismatch([FunctionArgument], [FunctionArgument])
         case kindMismatch(T, T)
     }
 
@@ -150,12 +151,33 @@ public enum Unification {
             switch (head, tail) {
             case (.fun(arguments: let headArguments, returnType: let headReturnType),
                   .fun(arguments: let tailArguments, returnType: let tailReturnType)):
-                if headArguments.count != tailArguments.count {
-                    return .failure(UnificationError.genericArgumentsCountMismatch(head, tail))
+                let headContainsLabels = headArguments.contains(where: { $0.label != nil })
+                let tailContainsLabels = headArguments.contains(where: { $0.label != nil })
+
+                if headContainsLabels && !tailContainsLabels && !tailArguments.isEmpty ||
+                    tailContainsLabels && !headContainsLabels && !headArguments.isEmpty {
+                    return .failure(.genericArgumentsLabelMismatch(headArguments, tailArguments))
                 }
 
-                zip(headArguments, tailArguments).forEach { a, b in
-                    constraints.append(Constraint(a.type, b.type))
+                if !headContainsLabels && !tailContainsLabels {
+                    if headArguments.count != tailArguments.count {
+                        return .failure(UnificationError.genericArgumentsCountMismatch(head, tail))
+                    }
+
+                    zip(headArguments, tailArguments).forEach { a, b in
+                        constraints.append(Constraint(a.type, b.type))
+                    }
+                } else {
+                    let headLabels = headArguments.compactMap { $0.label }
+                    let tailLabels = tailArguments.compactMap { $0.label }
+
+                    let common = Set(headLabels).intersection(tailLabels)
+                    for label in common {
+                        let headArgumentType = headArguments.first(where: { $0.label == label })!.type
+                        let tailArgumentType = tailArguments.first(where: { $0.label == label })!.type
+
+                        constraints.append(.init(headArgumentType, tailArgumentType))
+                    }
                 }
 
                 constraints.append(.init(headReturnType, tailReturnType))
