@@ -109,11 +109,17 @@ typealias LogicTextStyle = TextStyle
 
 extension LightMark {
     static func makeTextStyle(headingLevel: HeadingLevel? = nil, textStyle: TextStyle? = nil, isCode: Bool = false) -> LogicTextStyle {
+        return makeTextStyleMemoized(headingLevel, textStyle, isCode)
+    }
+
+    private static var makeTextStyleMemoized: (HeadingLevel?, TextStyle?, Bool) -> LogicTextStyle = Memoize.all({
+        headingLevel, textStyle, isCode in
+
         let weight: NSFont.Weight = textStyle?.weight ?? headingLevel?.weight ?? .regular
         let size: CGFloat = headingLevel?.size ?? 12
 
         return LogicTextStyle(weight: weight, size: size, lineHeight: 18, color: isCode ? Colors.editableText : nil)
-    }
+    })
 }
 
 extension LightMark.InlineElement {

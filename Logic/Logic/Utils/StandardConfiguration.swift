@@ -552,10 +552,9 @@ public enum StandardConfiguration {
     public static func suggestions(
         rootNode: LGCSyntaxNode,
         node: LGCSyntaxNode,
-        query: String,
         formattingOptions: LogicFormattingOptions,
         logLevel: LogLevel = LogLevel.none
-        ) -> [LogicSuggestionItem]? {
+        ) -> ((String) -> [LogicSuggestionItem]?)? {
         let (scopeContext, unificationContext, substitutionResult) = compile(rootNode)
 
         if logLevel == .verbose {
@@ -591,18 +590,20 @@ public enum StandardConfiguration {
             context: .init()
             ).get()
 
-        return suggestions(
-            rootNode: rootNode,
-            node: node,
-            query: query,
-            currentScopeContext: currentScopeContext,
-            scopeContext: scopeContext,
-            unificationContext: unificationContext,
-            substitution: substitution,
-            evaluationContext: evaluationContext,
-            formattingOptions: formattingOptions,
-            logLevel: logLevel
-        )
+        return { query in
+            suggestions(
+                rootNode: rootNode,
+                node: node,
+                query: query,
+                currentScopeContext: currentScopeContext,
+                scopeContext: scopeContext,
+                unificationContext: unificationContext,
+                substitution: substitution,
+                evaluationContext: evaluationContext,
+                formattingOptions: formattingOptions,
+                logLevel: logLevel
+            )
+        }
     }
 }
 

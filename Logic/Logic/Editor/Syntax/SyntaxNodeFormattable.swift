@@ -12,7 +12,13 @@ protocol SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement>
 }
 
-public class LogicFormattingOptions {
+public class LogicFormattingOptions: Equatable {
+
+    // We can't compare the functions for equality, but they should never need to be changed
+    public static func == (lhs: LogicFormattingOptions, rhs: LogicFormattingOptions) -> Bool {
+        return lhs.style == rhs.style && lhs.locale == rhs.locale
+    }
+
     public enum Style: String {
         case natural, visual, js
 

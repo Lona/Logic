@@ -245,18 +245,26 @@ class Document: NSDocument {
 
             return menu
         }
-        
-        logicEditor.suggestionsForNode = { [unowned self] rootNode, node, query in
-            guard let root = LGCProgram.make(from: rootNode) else { return [] }
+
+        let makeProgram: (LGCSyntaxNode) -> LGCSyntaxNode? = Memoize.one({ rootNode in
+            guard let root = LGCProgram.make(from: rootNode) else { return nil }
 
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
-            if let suggestions = StandardConfiguration.suggestions(
-                rootNode: program,
-                node: node,
-                query: query,
-                formattingOptions: self.logicEditor.formattingOptions
-                ) {
+            return program
+        })
+
+        let makeSuggestionBuilder: (LGCSyntaxNode, LGCSyntaxNode, LogicFormattingOptions) -> ((String) -> [LogicSuggestionItem]?)? = Memoize.one({
+            rootNode, node, formattingOptions in
+            return StandardConfiguration.suggestions(rootNode: rootNode, node: node, formattingOptions: formattingOptions)
+        })
+
+        logicEditor.suggestionsForNode = { [unowned self] rootNode, node, query in
+            guard let program = makeProgram(rootNode) else { return [] }
+
+            let suggestionBuilder = makeSuggestionBuilder(program, node, self.logicEditor.formattingOptions)
+
+            if let suggestionBuilder = suggestionBuilder, let suggestions = suggestionBuilder(query) {
                 return suggestions
             } else {
                 return LogicEditor.defaultSuggestionsForNode(program, node, query)
