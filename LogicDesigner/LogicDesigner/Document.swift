@@ -193,16 +193,16 @@ class Document: NSDocument {
                 return .color(NSColor.parse(css: colorValue) ?? NSColor.black)
             }
 
-            if let annotation = annotations[node.uuid] {
-                switch node {
-                case .literal:
-                    return nil
-                default:
-                    break
-                }
-
-                return .label(labelFont, annotation)
-            }
+//            if let annotation = annotations[node.uuid] {
+//                switch node {
+//                case .literal:
+//                    return nil
+//                default:
+//                    break
+//                }
+//
+//                return .label(labelFont, annotation)
+//            }
 
             switch node {
             case .literal(.color(id: _, value: let color)):

@@ -301,7 +301,7 @@ extension Compiler {
 
                 expressions.forEach { expression in
                     let expressionType = result.nodes[expression.uuid] ?? result.makeEvar()
-                    Swift.print("Evar for \(expression): \(expressionType)")
+//                    Swift.print("Evar for \(expression): \(expressionType)")
                     result.constraints.append(Unification.Constraint(elementType, expressionType))
                 }
             default:
