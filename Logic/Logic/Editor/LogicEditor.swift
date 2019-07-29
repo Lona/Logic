@@ -92,6 +92,22 @@ public class LogicEditor: NSBox {
 
     public var showsFilterBar: Bool = false
 
+    public var showsMinimap: Bool = false {
+        didSet {
+            if showsMinimap {
+                minimapScroller.drawKnobSlot = canvasView.drawScrollerBackground
+                
+                scrollView.autohidesScrollers = false
+                scrollView.verticalScroller = minimapScroller
+            } else {
+                minimapScroller.drawKnobSlot = nil
+
+                scrollView.autohidesScrollers = true
+                scrollView.verticalScroller = NSScroller()
+            }
+        }
+    }
+
     public var contextMenuForNode: ((LGCSyntaxNode, LGCSyntaxNode) -> NSMenu?) = {_, _ in nil}
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
@@ -161,6 +177,7 @@ public class LogicEditor: NSBox {
 
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
+    private let minimapScroller = MinimapScroller(frame: .zero)
 
     private func setScroll(enabled: Bool) {
         if enabled {

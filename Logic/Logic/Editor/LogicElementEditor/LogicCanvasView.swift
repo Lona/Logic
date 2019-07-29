@@ -47,6 +47,31 @@ public class LogicCanvasView: NSView {
         update()
 
         registerForDraggedTypes([.logicLineIndex])
+
+        drawScrollerBackground = { [unowned self] rect, isHighlighted in
+            let scale: CGFloat = MinimapScroller.renderingScale
+
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current?.cgContext.translateBy(x: rect.origin.x, y: rect.origin.y)
+            NSGraphicsContext.current?.cgContext.scaleBy(x: scale, y: scale)
+
+            LogicCanvasView.drawCommon(
+                formattedContent: self.formattedContent,
+                measuredElements: self.measuredElements,
+                decorationCache: &self._cachedElementDecorations,
+                getElementDecoration: self.getElementDecoration,
+                bounds: rect,
+                dragDestinationLineIndex: nil,
+                selectedIndex: nil,
+                selectedLine: nil,
+                selectedRange: nil,
+                outlinedRange: nil,
+                underlinedRange: nil,
+                style: self.style
+            )
+
+            NSGraphicsContext.restoreGraphicsState()
+        }
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -97,6 +122,7 @@ public class LogicCanvasView: NSView {
     public var onMoveLine: ((Int, Int) -> Void)?
     public var onFocus: (() -> Void)?
     public var onBlur: (() -> Void)?
+    public var drawScrollerBackground: ((NSRect, Bool) -> Void)?
 
     public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
 
