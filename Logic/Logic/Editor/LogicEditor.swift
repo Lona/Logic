@@ -54,6 +54,10 @@ public class LogicEditor: NSBox {
     public var rootNode: LGCSyntaxNode {
         didSet {
             canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
+
+            if showsMinimap {
+                minimapScroller.setNeedsDisplay()
+            }
         }
     }
 

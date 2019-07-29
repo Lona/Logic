@@ -119,6 +119,8 @@ public class MinimapScroller: NSScroller {
 
         let scrollableHeight = scrollViewDocumentHeight - scrollViewContentHeight
 
+        if scrollableHeight <= 0 { return }
+
         let initialPosition = convert(event.locationInWindow, from: nil)
         let initialValue = CGFloat(floatValue)
         let initialOrigin = scrollView.contentView.frame.origin
@@ -153,6 +155,8 @@ public class MinimapScroller: NSScroller {
             guard let scrollView = superview as? NSScrollView else { return }
 
             let scrollableHeight = scrollViewDocumentHeight - scrollViewContentHeight
+
+            if scrollableHeight <= 0 { return }
 
             let initialOrigin = scrollView.contentView.frame.origin
 
