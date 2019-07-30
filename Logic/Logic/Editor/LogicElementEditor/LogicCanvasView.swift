@@ -419,12 +419,12 @@ public class LogicCanvasView: NSView {
                 let previewStringSize = previewString.size()
 
                 let previewStringRect = NSRect(
-                    x: outlineRect.midX - previewStringSize.width / 2,
-                    y: outlineRect.midY - previewStringSize.height / 2,
+                    x: max(outlineRect.midX - previewStringSize.width / 2, outlineRect.minX),
+                    y: max(outlineRect.midY - previewStringSize.height / 2, outlineRect.minY),
                     width: previewStringSize.width,
                     height: previewStringSize.height
                 )
-                previewString.draw(with: previewStringRect, options: [.truncatesLastVisibleLine, .usesLineFragmentOrigin])
+                previewString.draw(with: previewStringRect, options: [.usesLineFragmentOrigin])
 
                 NSGraphicsContext.restoreGraphicsState()
             case .indentGuide:
