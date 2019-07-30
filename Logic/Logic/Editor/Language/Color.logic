@@ -5,8 +5,24 @@
         "data" : {
           "content" : {
             "data" : {
+              "id" : "6D5E7079-F205-40F3-8376-EAE309D7D31A",
+              "name" : {
+                "id" : "C36A00D2-189B-405B-9DCF-8FC1DE05242A",
+                "name" : "Prelude"
+              }
+            },
+            "type" : "importDeclaration"
+          },
+          "id" : "0BDA2286-737C-4E14-8FBB-61B5D8454F1B"
+        },
+        "type" : "declaration"
+      },
+      {
+        "data" : {
+          "content" : {
+            "data" : {
               "comment" : {
-                "id" : "181A11DA-4340-4F74-940C-8491100A87C0",
+                "id" : "951E23B6-95BA-40AD-95B2-4315CBF1FED5",
                 "string" : "# Color\n\nA color value. Colors can be defined using CSS color codes. \n\n## Example\n\nWe might declare a color variable, `ocean` to use throughout our design system to represent the hex code `#69D2E7`:\n\n```logic\n<Declarations>\n  <Variable name=\"ocean\" type=\"Color\" value=\"#69D2E7\"\/>\n<\/Declarations>\n```"
               },
               "declarations" : [
@@ -19,20 +35,20 @@
                         ],
                         "id" : "435E9B0F-6418-4591-8DDB-25CE57B059F2",
                         "identifier" : {
-                          "id" : "47A08665-4F22-41F1-85D8-E8344A479CC4",
+                          "id" : "4C4AB187-1446-47C6-A649-A7C71682767B",
                           "isPlaceholder" : false,
                           "string" : "String"
                         }
                       },
                       "type" : "typeIdentifier"
                     },
-                    "id" : "47C0D509-297A-48C6-B01B-ECD1DE015860",
+                    "id" : "DBE8C810-2A0E-4763-B831-416AA609A33E",
                     "initializer" : {
                       "data" : {
                         "id" : "E46F7965-D8EE-4183-834D-67759FE4023A",
                         "literal" : {
                           "data" : {
-                            "id" : "C21714E4-E25B-482C-A6E4-0621A8859CA0",
+                            "id" : "077C1A3F-11A7-46C6-832E-7027E8855F07",
                             "value" : ""
                           },
                           "type" : "string"
@@ -41,7 +57,7 @@
                       "type" : "literalExpression"
                     },
                     "name" : {
-                      "id" : "41DC04B2-4A9B-4242-AF8A-3A475D3525B4",
+                      "id" : "41F3954C-15B3-4B8C-B469-23EBCCE78E39",
                       "name" : "value"
                     }
                   },
@@ -49,7 +65,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "D4F702C1-AA83-4E1B-BDE4-E194015EB806"
+                    "id" : "DDF7615A-20BD-4CB2-A262-59E39F70F6B4"
                   },
                   "type" : "placeholder"
                 }
@@ -57,15 +73,15 @@
               "genericParameters" : [
 
               ],
-              "id" : "7B688357-0045-4186-B8E2-5B70215450F8",
+              "id" : "B0C9E8C8-DEDC-415C-B23B-2742AE793323",
               "name" : {
-                "id" : "6973AF93-7D51-4647-8401-F01E0992DEBB",
+                "id" : "8835C04F-A4CC-4741-89D5-5FA8B00BD3D7",
                 "name" : "Color"
               }
             },
             "type" : "record"
           },
-          "id" : "45B6655E-2159-4951-9E4B-7BEB6FAD66C6"
+          "id" : "8B3CB7A6-A775-4644-B2ED-7BB0A165C803"
         },
         "type" : "declaration"
       },
@@ -76,31 +92,134 @@
               "declarations" : [
                 {
                   "data" : {
-                    "id" : "52E25708-50A5-4612-95D2-598E3BD5A6D1"
+                    "block" : [
+                      {
+                        "data" : {
+                          "id" : "EB4B95E5-BBE2-41F0-8B1C-F24F277521A1"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "genericParameters" : [
+
+                    ],
+                    "id" : "F9FFA753-D4AF-482D-99DF-55D16D56E36F",
+                    "name" : {
+                      "id" : "3C80617B-DE12-4E57-BED8-D8D4B91F31F4",
+                      "name" : "saturate"
+                    },
+                    "parameters" : [
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "A2A29E36-6ABE-482C-B844-E2537D96ACE2",
+                              "identifier" : {
+                                "id" : "25FDC09D-805B-4976-9578-59F3ADD94B8B",
+                                "isPlaceholder" : false,
+                                "string" : "Color"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "29BCDA02-91B8-4336-B024-E06F2F78C4E6"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "78153E28-D8A3-4BD1-ABA8-9AC787FDF833",
+                          "localName" : {
+                            "id" : "D2CDD7BE-81C9-4B09-9CDD-5E8E09E3FDA5",
+                            "name" : "color"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "56F7DE88-E930-4D8D-ADE4-54FBB1D7B727",
+                              "identifier" : {
+                                "id" : "F30D8892-CCD7-49B2-B6E5-8674CD2E8480",
+                                "isPlaceholder" : false,
+                                "string" : "Number"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "FE9BDCED-3115-4BC4-9589-C9D19DA47209"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "D3737F06-2124-40ED-9173-EB8981D4ECE6",
+                          "localName" : {
+                            "id" : "A0B64D24-03F6-4048-9A7B-A9457CBBA5AE",
+                            "name" : "percent"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "id" : "9AD0C650-63CF-4D66-9537-B31B9CBB9723"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "returnType" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "2C2ADB0B-849B-46DE-8AC4-ADECEA4A7C8F",
+                        "identifier" : {
+                          "id" : "E5978B13-A272-4FEC-AB94-4EE98FC1E0D6",
+                          "isPlaceholder" : false,
+                          "string" : "Color"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    }
+                  },
+                  "type" : "function"
+                },
+                {
+                  "data" : {
+                    "id" : "67D4A3F6-BE5B-4F42-90D0-E9AF04E84443"
                   },
                   "type" : "placeholder"
                 }
               ],
-              "id" : "4AFA9DC1-3FAE-43BE-AAE8-FF96135A7C3A",
+              "id" : "A573412A-68E3-4C01-95D2-08837A7BFF5B",
               "name" : {
-                "id" : "AB8866D8-6AF6-4A7B-B079-ECBBD2489F2B",
+                "id" : "E3603B09-F4A4-454C-B8BE-3622535ECE4B",
                 "name" : "Color"
               }
             },
             "type" : "namespace"
           },
-          "id" : "5574237C-C4EB-493D-A1DD-37B1396D936C"
+          "id" : "D07ECF1A-2BA1-43FC-A7E4-A370493010A6"
         },
         "type" : "declaration"
       },
       {
         "data" : {
-          "id" : "AD7C92CE-7691-4092-84AD-E5D38857A44A"
+          "id" : "FFD79E3F-0A4C-44D9-8AF3-86244E3BC661"
         },
         "type" : "placeholder"
       }
     ],
-    "id" : "0AA4ACF6-FBC7-41A1-805D-993DE28BE142"
+    "id" : "4BE95B16-FBBC-4945-9EA6-98FDC1CB5674"
   },
   "type" : "program"
 }

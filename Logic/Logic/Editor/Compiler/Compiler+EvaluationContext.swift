@@ -197,7 +197,9 @@ extension Compiler {
                     }
 
 //                    Swift.print(f, "Args", args)
-                    context.values[node.uuid] = saturate(color: args[0], percent: args[1])
+                    if args.count >= 2 {
+                        context.values[node.uuid] = saturate(color: args[0], percent: args[1])
+                    }
                 case .stringConcat:
                     func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
                         guard case .string(let a)? = a?.memory else { return .unit }
