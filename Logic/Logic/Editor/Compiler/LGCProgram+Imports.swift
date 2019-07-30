@@ -23,6 +23,9 @@ public extension LGCProgram {
         self.block.forEach { statement in
             switch statement {
             case .declaration(id: _, content: .importDeclaration(id: _, name: let pattern)):
+                // Keep the import statement in the resulting code so we can search for its node in suggestions
+                statements.append(statement)
+
                 let libraryName = pattern.name
 
                 if imports.contains(libraryName) { return }
@@ -42,6 +45,7 @@ public extension LGCProgram {
                 let expanded = libraryProgram.expandImports(existingImports: imports, importLoader: importLoader)
 
                 imports = expanded.imports
+
                 statements.append(contentsOf: expanded.program.block)
             default:
                 statements.append(statement)

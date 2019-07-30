@@ -382,7 +382,67 @@ public extension LGCTypeAnnotation {
 }
 
 public extension LGCPattern {
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    enum Suggestion {
+        public static var `colorImport`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Color",
+                category: "LIBRARIES",
+                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Color")),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# Color
+
+The Lona Color library. This contains functions for creating and manipulating cross-platform color definitions.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
+            )
+        }
+
+        public static var `textStyleImport`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "TextStyle",
+                category: "LIBRARIES",
+                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "TextStyle")),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# TextStyle
+
+The Lona Text Style library. This contains functions for creating and manipulating cross-platform text style definitions.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
+            )
+        }
+
+        public static var `shadowImport`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Shadow",
+                category: "LIBRARIES",
+                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Shadow")),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# Shadow
+
+The Lona Shadow library. This contains functions for creating and manipulating cross-platform shadow definitions.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
+            )
+        }
+    }
+
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+        let parent = root.contents.parentOf(target: uuid, includeTopLevel: false)
+
+        switch parent {
+        case .some(.declaration(.importDeclaration)):
+            return [
+                Suggestion.colorImport,
+                Suggestion.textStyleImport,
+                Suggestion.shadowImport,
+            ].titleContains(prefix: prefix)
+        default:
+            break
+        }
+
         let items = [
             LogicSuggestionItem(
                 title: "Name: \(prefix)",
@@ -950,7 +1010,7 @@ public extension LGCSyntaxNode {
         case .identifier:
             return LGCIdentifier.suggestions(for: prefix)
         case .pattern:
-            return LGCPattern.suggestions(for: prefix)
+            return contents.suggestions(within: root, for: prefix)
         case .expression:
             return LGCExpression.suggestions(for: prefix)
         case .binaryOperator:
