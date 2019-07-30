@@ -383,6 +383,23 @@ public extension LGCTypeAnnotation {
 
 public extension LGCPattern {
     enum Suggestion {
+        public static var `preludeImport`: LogicSuggestionItem {
+            return LogicSuggestionItem(
+                title: "Prelude",
+                category: "LIBRARIES",
+                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Prelude")),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# Prelude
+
+The Logic type system.
+
+> This is automatically imported in all Lona files.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
+            )
+        }
+
         public static var `colorImport`: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Color",
@@ -438,7 +455,8 @@ The Lona Shadow library. This contains functions for creating and manipulating c
                 Suggestion.colorImport,
                 Suggestion.textStyleImport,
                 Suggestion.shadowImport,
-            ].titleContains(prefix: prefix)
+                Suggestion.preludeImport
+            ].titleContains(prefix: prefix).sortedByPrefix()
         default:
             break
         }
