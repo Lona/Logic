@@ -83,10 +83,12 @@ public class LogicFormattingOptions: Equatable {
         }
     }
 
+    public typealias ArgumentsFormat = (count: Int, showExpression: Bool, showParens: Bool)
+
     public init(
         style: Style = .natural,
         locale: Locale = .en_US,
-        getArguments: @escaping (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)? = {_ in nil},
+        getArguments: @escaping (UUID) -> ArgumentsFormat? = {_ in nil},
         getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil},
         getTextStyle: @escaping (UUID) -> TextStyle? = {_ in nil},
         getShadow: @escaping (UUID) -> NSShadow? = {_ in nil}
@@ -101,7 +103,7 @@ public class LogicFormattingOptions: Equatable {
 
     public var style: Style
     public var locale: Locale
-    public var getArguments: (UUID) -> (count: Int, showExpression: Bool, showParens: Bool)?
+    public var getArguments: (UUID) -> ArgumentsFormat?
     public var getColor: (UUID) -> (String, NSColor)?
     public var getTextStyle: (UUID) -> TextStyle?
     public var getShadow: (UUID) -> NSShadow?

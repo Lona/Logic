@@ -364,6 +364,11 @@ public enum StandardConfiguration {
                         return []
                     }
 
+                    guard targetArguments.count > currentIndex else {
+                        Swift.print("No more arguments exist")
+                        return []
+                    }
+
                     let targetUnificationType = targetArguments[currentIndex].type
                     let targetType = Unification.substitute(substitution, in: targetUnificationType)
 
@@ -604,6 +609,45 @@ public enum StandardConfiguration {
                 logLevel: logLevel
             )
         }
+    }
+
+    // Formatter Arguments
+
+    public static func formatArguments(
+        rootNode: LGCSyntaxNode,
+        id: UUID,
+        unificationContext: Compiler.UnificationContext?,
+        substitution: Unification.Substitution?
+        ) -> LogicFormattingOptions.ArgumentsFormat? {
+        guard let node = rootNode.find(id: id) else { return nil }
+
+        switch node {
+        case .expression(let expression):
+            let flattened = expression.flattenedMemberExpression?.map({ $0.string })
+            if flattened == ["Optional", "value"] {
+                return (1, false, false)
+            } else if flattened == ["Optional", "none"] {
+                return (0, true, false)
+            } else {
+                break
+            }
+        default:
+            break
+        }
+
+        if let unificationContext = unificationContext, let substitution = substitution {
+            if let type = unificationContext.nodes[node.uuid] {
+                let resolvedType = Unification.substitute(substitution, in: type)
+                switch resolvedType {
+                case .fun(arguments: let arguments, returnType: _):
+                    return (arguments.count, true, arguments.count > 0)
+                default:
+                    break
+                }
+            }
+        }
+
+        return nil
     }
 }
 

@@ -126,37 +126,15 @@ class Document: NSDocument {
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
-//            locale: .es_ES,
             getArguments: ({ [unowned self] id in
-                guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
+                let rootNode = self.logicEditor.rootNode
 
-                switch node {
-                case .expression(let expression):
-                    let flattened = expression.flattenedMemberExpression?.map({ $0.string })
-                    if flattened == ["Optional", "value"] {
-                        return (1, false, false)
-                    } else if flattened == ["Optional", "none"] {
-                        return (0, true, false)
-                    } else {
-                        break
-                    }
-                default:
-                    break
-                }
-
-                if let (context, substitution) = successfulUnification {
-                    if let type = context.nodes[node.uuid] {
-                        let resolvedType = Unification.substitute(substitution, in: type)
-                        switch resolvedType {
-                        case .fun(arguments: let arguments, returnType: _):
-                            return (arguments.count, true, arguments.count > 0)
-                        default:
-                            break
-                        }
-                    }
-                }
-
-                return nil
+                return StandardConfiguration.formatArguments(
+                    rootNode: rootNode,
+                    id: id,
+                    unificationContext: successfulUnification?.0,
+                    substitution: successfulUnification?.1
+                )
             }),
             getColor: ({ id in
                 guard let colorString = colorValues[id], let color = NSColor.parse(css: colorString) else { return nil }
