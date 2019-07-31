@@ -163,7 +163,7 @@ public extension LGCLiteral {
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.string(id: UUID(), value: prefix)),
                 documentation: ({ builder in
-                    let alert = prefix.isEmpty ? "I> Type anything to create a string containg those characters, or press enter to create an empty string.\n\n" : ""
+                    let alert = prefix.isEmpty ? "I> Type anything to create a string containing those characters, or press enter to create an empty string.\n\n" : ""
 
                     return LightMark.makeScrollView(markdown: """
 \(alert)# String Literal
