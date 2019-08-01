@@ -713,7 +713,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
 }
 
 public indirect enum LGCFunctionParameter: Codable & Equatable {
-  case parameter(id: UUID, externalName: Optional<String>, localName: LGCPattern, annotation: LGCTypeAnnotation, defaultValue: LGCFunctionParameterDefaultValue)
+  case parameter(id: UUID, externalName: Optional<String>, localName: LGCPattern, annotation: LGCTypeAnnotation, defaultValue: LGCFunctionParameterDefaultValue, comment: Optional<LGCComment>)
   case placeholder(id: UUID)
 
   // MARK: Codable
@@ -729,6 +729,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
     case localName
     case annotation
     case defaultValue
+    case comment
   }
 
   public init(from decoder: Decoder) throws {
@@ -744,7 +745,8 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
             externalName: try data.decodeIfPresent(String.self, forKey: .externalName),
             localName: try data.decode(LGCPattern.self, forKey: .localName),
             annotation: try data.decode(LGCTypeAnnotation.self, forKey: .annotation),
-            defaultValue: try data.decode(LGCFunctionParameterDefaultValue.self, forKey: .defaultValue))
+            defaultValue: try data.decode(LGCFunctionParameterDefaultValue.self, forKey: .defaultValue),
+            comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       case "placeholder":
         self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
@@ -764,6 +766,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable {
         try data.encode(value.localName, forKey: .localName)
         try data.encode(value.annotation, forKey: .annotation)
         try data.encode(value.defaultValue, forKey: .defaultValue)
+        try data.encodeIfPresent(value.comment, forKey: .comment)
       case .placeholder(let value):
         try container.encode("placeholder", forKey: .type)
         try data.encode(value, forKey: .id)

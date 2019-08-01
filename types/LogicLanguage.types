@@ -278,6 +278,9 @@
       <Record.Param name="localName" type="Pattern"/>
       <Record.Param name="annotation" type="TypeAnnotation"/>
       <Record.Param name="defaultValue" type="FunctionParameterDefaultValue"/>
+      <Record.Param name="comment" type="Optional">
+        <Record.Substitution generic="Value" instance="Comment"/>
+      </Record.Param>
     </Record>
     <Record name="placeholder">
       <Record.Param name="id" type="UUID"/>

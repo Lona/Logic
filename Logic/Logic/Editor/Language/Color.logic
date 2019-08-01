@@ -65,7 +65,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "DDF7615A-20BD-4CB2-A262-59E39F70F6B4"
+                    "id" : "381192A7-2A0C-4112-AB92-A48F328E0669"
                   },
                   "type" : "placeholder"
                 }
@@ -95,15 +95,19 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "EB4B95E5-BBE2-41F0-8B1C-F24F277521A1"
+                          "id" : "885C7A69-7158-4C29-ACC4-ECF5C59CC691"
                         },
                         "type" : "placeholder"
                       }
                     ],
+                    "comment" : {
+                      "id" : "FD20F1A5-6415-42A4-A9FD-68605EDE80C2",
+                      "string" : "# Saturate\n\nAdjust the saturation of a color."
+                    },
                     "genericParameters" : [
 
                     ],
-                    "id" : "F9FFA753-D4AF-482D-99DF-55D16D56E36F",
+                    "id" : "AD51098F-1FEB-432E-AB91-C0AC40C70B96",
                     "name" : {
                       "id" : "3C80617B-DE12-4E57-BED8-D8D4B91F31F4",
                       "name" : "saturate"
@@ -125,13 +129,17 @@
                             },
                             "type" : "typeIdentifier"
                           },
+                          "comment" : {
+                            "id" : "4A177220-09A9-4D13-BCE5-AD8C533F267D",
+                            "string" : "# Color\n\nThe base color to adjust."
+                          },
                           "defaultValue" : {
                             "data" : {
                               "id" : "29BCDA02-91B8-4336-B024-E06F2F78C4E6"
                             },
                             "type" : "none"
                           },
-                          "id" : "78153E28-D8A3-4BD1-ABA8-9AC787FDF833",
+                          "id" : "5E6B700A-C9F3-48A6-B0FC-7EE86AEBDD64",
                           "localName" : {
                             "id" : "D2CDD7BE-81C9-4B09-9CDD-5E8E09E3FDA5",
                             "name" : "color"
@@ -155,13 +163,17 @@
                             },
                             "type" : "typeIdentifier"
                           },
+                          "comment" : {
+                            "id" : "89E8F2C9-5F5B-40EE-9974-529348A1454E",
+                            "string" : "# Percent\n\nHow much to adjust saturation. A value **greater than 1** will result in a more saturated color, and a value **less than 1** will result in a less saturated color."
+                          },
                           "defaultValue" : {
                             "data" : {
                               "id" : "FE9BDCED-3115-4BC4-9589-C9D19DA47209"
                             },
                             "type" : "none"
                           },
-                          "id" : "D3737F06-2124-40ED-9173-EB8981D4ECE6",
+                          "id" : "52CAAA23-2E0D-4A05-A346-07400734DBFD",
                           "localName" : {
                             "id" : "A0B64D24-03F6-4048-9A7B-A9457CBBA5AE",
                             "name" : "percent"
@@ -171,7 +183,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "9AD0C650-63CF-4D66-9537-B31B9CBB9723"
+                          "id" : "DB241054-9ED3-4011-B165-EA0B4CFBA6F4"
                         },
                         "type" : "placeholder"
                       }
@@ -195,7 +207,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "67D4A3F6-BE5B-4F42-90D0-E9AF04E84443"
+                    "id" : "F7C9F1E1-15E6-4B80-A9D1-6302F4AAD54D"
                   },
                   "type" : "placeholder"
                 }
@@ -214,7 +226,7 @@
       },
       {
         "data" : {
-          "id" : "FFD79E3F-0A4C-44D9-8AF3-86244E3BC661"
+          "id" : "7F77CD37-824F-4006-B412-E1CDFEAA6B46"
         },
         "type" : "placeholder"
       }

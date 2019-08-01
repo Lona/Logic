@@ -244,8 +244,16 @@ extension LGCFunctionParameter: SyntaxNodeFormattable {
                 }
             }
 
+            var commentContents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                commentContents.append(.spacer(12))
+                commentContents.append(comment.formatted(using: options))
+                commentContents.append(.hardLine)
+            }
+
             return .concat(
-                [
+                commentContents + [
                     // Always select the parent node instead of the name
                     .element(LogicElement.dropdown(value.id, value.localName.name, .variable)),
                     //                    value.localName.formatted(using: options),
@@ -611,8 +619,16 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
             return .concat(contents)
         case .function(let value):
+            var commentContents: [FormatterCommand<LogicElement>] = []
+
+            if let comment = value.comment {
+                commentContents.append(.spacer(12))
+                commentContents.append(comment.formatted(using: options))
+                commentContents.append(.hardLine)
+            }
+
             return .concat(
-                [
+                commentContents + [
                     .element(LogicElement.dropdown(value.id, "Function", .source)),
                     value.name.formatted(using: options),
                     .indent(

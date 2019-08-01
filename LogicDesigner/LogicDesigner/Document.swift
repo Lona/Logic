@@ -202,21 +202,14 @@ class Document: NSDocument {
                 menu.addItem(addCommentItem)
             }
 
-            func menuForDeclaration(declaration: LGCDeclaration) {
-                switch declaration {
-                case .variable, .record, .enumeration, .function:
-                    addComment(declaration.uuid)
-                default:
-                    break
-                }
-            }
-
             switch node {
             case .statement(.declaration(id: _, content: let declaration)):
-                menuForDeclaration(declaration: declaration)
-            case .declaration(let declaration):
-                menuForDeclaration(declaration: declaration)
+                addComment(declaration.uuid)
+            case .declaration(let value):
+                addComment(value.uuid)
             case .enumerationCase(.enumerationCase(let value)):
+                addComment(value.id)
+            case .functionParameter(.parameter(let value)):
                 addComment(value.id)
             default:
                 return nil
@@ -359,9 +352,21 @@ class Document: NSDocument {
             guard let node = logicEditor.rootNode.find(id: id) else { return }
 
             switch node {
+            case .functionParameter(.parameter(let value)):
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .functionParameter(
+                        .parameter(
+                            id: UUID(),
+                            externalName: value.externalName,
+                            localName: value.localName,
+                            annotation: value.annotation,
+                            defaultValue: value.defaultValue,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
+                        )
+                    )
+                )
             case .declaration(.variable(let value)):
-                Swift.print("Add comment", sender)
-
                 logicEditor.rootNode = logicEditor.rootNode.replace(
                     id: id,
                     with: .declaration(
@@ -396,6 +401,21 @@ class Document: NSDocument {
                             name: value.name,
                             genericParameters: value.genericParameters,
                             cases: value.cases,
+                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
+                        )
+                    )
+                )
+            case .declaration(.function(let value)):
+                logicEditor.rootNode = logicEditor.rootNode.replace(
+                    id: id,
+                    with: .declaration(
+                        .function(
+                            id: UUID(),
+                            name: value.name,
+                            returnType: value.returnType,
+                            genericParameters: value.genericParameters,
+                            parameters: value.parameters,
+                            block: value.block,
                             comment: value.comment ?? .init(id: UUID(), string: "A comment")
                         )
                     )

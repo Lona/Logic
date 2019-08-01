@@ -105,7 +105,7 @@ public extension Compiler {
                     switch parameter {
                     case .placeholder:
                         break
-                    case .parameter(id: _, externalName: _, localName: let pattern, annotation: _, defaultValue: _):
+                    case .parameter(id: _, externalName: _, localName: let pattern, annotation: _, defaultValue: _, _):
                         context.patternToName[pattern.uuid] = pattern.name
                         context.patternNames.set(pattern, for: pattern.name)
                     }

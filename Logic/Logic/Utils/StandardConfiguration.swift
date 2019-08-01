@@ -433,21 +433,50 @@ public enum StandardConfiguration {
                 return availableArguments.map { argument in
                     var labelComment: String?
 
-                    if case .identifierExpression(_, identifier: let identifier) = value.expression,
-                        let definitionNameId = scopeContext.identifierToPattern[identifier.uuid],
-                        let definitionNode = rootNode.contents.parentOf(target: definitionNameId, includeTopLevel: false),
-                        case .declaration(.record(let record)) = definitionNode {
-
-                        record.declarations.forEach { declaration in
-                            switch declaration {
-                            case .variable(_, let labelPattern, _, _, _) where labelPattern.name == argument.label:
-                                if let comment = declaration.comment(within: rootNode) {
-                                    labelComment = comment
+                    switch value.expression {
+                    case .identifierExpression(_, identifier: let identifier):
+                        if let definitionNameId = scopeContext.identifierToPattern[identifier.uuid],
+                            let definitionNode = rootNode.contents.parentOf(target: definitionNameId, includeTopLevel: false) {
+                            switch definitionNode {
+                            case .declaration(.record(let record)):
+                                record.declarations.forEach { declaration in
+                                    switch declaration {
+                                    case .variable(_, let labelPattern, _, _, _) where labelPattern.name == argument.label:
+                                        if let comment = declaration.comment(within: rootNode) {
+                                            labelComment = comment
+                                        }
+                                    default:
+                                        break
+                                    }
                                 }
-                            default:
-                                break
                             }
                         }
+                    case .memberExpression:
+                        guard let flattened = value.expression.flattenedMemberExpression else { break }
+
+                        let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
+                            return (keyPath, id)
+                        })
+
+                        guard let (_, patternId) = namespacePaths.first(where: { $0.0 == flattened.map { $0.string } }) else { break }
+
+                        if let definitionNode = rootNode.contents.parentOf(target: patternId, includeTopLevel: false) {
+                            switch definitionNode {
+                            case .declaration(.function(let function)):
+                                function.parameters.forEach { parameter in
+                                    switch parameter {
+                                    case .parameter(_, _, let localName, _, _, _) where localName.name == argument.label:
+                                        if let comment = parameter.comment(within: rootNode) {
+                                            labelComment = comment
+                                        }
+                                    case .placeholder, .parameter:
+                                        break
+                                    }
+                                }
+                            }
+                        }
+                    default:
+                        break
                     }
 
                     var suggestion = LogicSuggestionItem(

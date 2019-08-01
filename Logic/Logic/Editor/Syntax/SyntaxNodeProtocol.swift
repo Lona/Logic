@@ -476,7 +476,7 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         case .placeholder:
             return []
         case .parameter(let value):
-            return [value.localName.node, value.annotation.node, value.defaultValue.node]
+            return [value.localName.node, value.annotation.node, value.defaultValue.node, value.comment?.node].compactMap { $0 }
         }
     }
 
@@ -498,7 +498,8 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
                 externalName: value.externalName,
                 localName: value.localName.delete(id: id),
                 annotation: value.annotation.delete(id: id),
-                defaultValue: value.defaultValue.delete(id: id)
+                defaultValue: value.defaultValue.delete(id: id),
+                comment: value.comment?.delete(id: id)
             )
         }
     }
@@ -517,7 +518,8 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
                     externalName: value.externalName,
                     localName: value.localName.replace(id: id, with: syntaxNode),
                     annotation: value.annotation.replace(id: id, with: syntaxNode),
-                    defaultValue: value.defaultValue.replace(id: id, with: syntaxNode)
+                    defaultValue: value.defaultValue.replace(id: id, with: syntaxNode),
+                    comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
             }
         }
@@ -533,7 +535,8 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
                 externalName: value.externalName,
                 localName: value.localName.copy(deep: deep),
                 annotation: value.annotation.copy(deep: deep),
-                defaultValue: value.defaultValue.copy(deep: deep)
+                defaultValue: value.defaultValue.copy(deep: deep),
+                comment: value.comment?.copy(deep: deep)
             )
         }
     }
@@ -553,6 +556,15 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return true
+    }
+
+    public func comment(within root: LGCSyntaxNode) -> String? {
+        switch self {
+        case .parameter(let value):
+            return value.comment?.string
+        default:
+            return nil
+        }
     }
 }
 
@@ -1369,10 +1381,11 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return value.comment?.string
         case .record(let value):
             return value.comment?.string
-        default:
-            break
+        case .function(let value):
+            return value.comment?.string
+        case .namespace, .importDeclaration, .placeholder:
+            return nil
         }
-        return nil
     }
 }
 
