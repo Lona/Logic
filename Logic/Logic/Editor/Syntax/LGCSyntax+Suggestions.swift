@@ -133,7 +133,14 @@ public extension LGCLiteral {
                 title: "true",
                 badge: "Boolean",
                 category: categoryTitle,
-                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true))
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: true)),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# Boolean Literal
+
+A boolean is either `true` or `false` - this one is `true`.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
             )
         }
 
@@ -142,7 +149,14 @@ public extension LGCLiteral {
                 title: "false",
                 badge: "Boolean",
                 category: categoryTitle,
-                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false))
+                node: LGCSyntaxNode.literal(.boolean(id: UUID(), value: false)),
+                documentation: ({ builder in
+                    return LightMark.makeScrollView(markdown: """
+# Boolean Literal
+
+A boolean is either `true` or `false` - this one is `false`.
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
             )
         }
 
@@ -152,7 +166,20 @@ public extension LGCLiteral {
                 badge: "Number",
                 category: categoryTitle,
                 node: LGCSyntaxNode.literal(.number(id: UUID(), value: CGFloat(Double(prefix) ?? 0))),
-                disabled: Double(prefix) == nil
+                disabled: Double(prefix) == nil,
+                documentation: ({ builder in
+                    let alert = prefix.isEmpty
+                        ? "I> Type any number.\n\n"
+                        : Double(prefix) == nil
+                        ? "E> That's not a valid number!\n\n"
+                        : ""
+
+                    return LightMark.makeScrollView(markdown: """
+\(alert)# Number Literal
+
+Create a new `Number`: **\(prefix)**
+""", renderingOptions: .init(formattingOptions: builder.formattingOptions))
+                })
             )
         }
 
