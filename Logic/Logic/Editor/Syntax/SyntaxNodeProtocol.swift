@@ -940,6 +940,42 @@ extension LGCExpression: SyntaxNodeProtocol {
         }
     }
 
+    public func insert(childNode: LGCSyntaxNode, atIndex: Int) -> LGCExpression {
+        guard case .functionCallArgument(let child) = childNode,
+            case .functionCallExpression(let value) = self else { return self }
+
+        var updated = value.arguments.normalizedPlaceholders.map { $0 }
+        updated.insert(child, at: atIndex)
+
+        return LGCExpression.functionCallExpression(
+            id: value.id,
+            expression: value.expression,
+            arguments: .init(updated)
+        )
+    }
+
+    public func delete(id: UUID) -> LGCExpression {
+        switch self {
+        case .functionCallExpression(let value):
+            return .functionCallExpression(
+                id: value.id,
+                expression: value.expression.delete(id: id),
+                arguments: LGCList(
+                    value.arguments.filter({
+                        switch $0 {
+                        case .placeholder:
+                            return true
+                        case .argument(let value):
+                            return value.id != id
+                        }
+                    })
+                )
+            )
+        case .binaryExpression, .identifierExpression, .literalExpression, .memberExpression, .placeholder:
+            return self
+        }
+    }
+
     public var uuid: UUID {
         switch self {
         case .binaryExpression(let value):
@@ -1143,8 +1179,14 @@ extension LGCDeclaration: SyntaxNodeProtocol {
 
     public func delete(id: UUID) -> LGCDeclaration {
         switch self {
-        case .variable:
-            return self
+        case .variable(let value):
+            return .variable(
+                id: value.id,
+                name: value.name.delete(id: id),
+                annotation: value.annotation?.delete(id: id),
+                initializer: value.initializer?.delete(id: id),
+                comment: value.comment?.delete(id: id)
+            )
         case .enumeration(let value):
             return .enumeration(
                 id: value.id,
