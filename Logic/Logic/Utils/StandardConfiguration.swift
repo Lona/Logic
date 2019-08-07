@@ -449,6 +449,8 @@ public enum StandardConfiguration {
                                         break
                                     }
                                 }
+                            default:
+                                Swift.print("Unhandled definition")
                             }
                         }
                     case .memberExpression:

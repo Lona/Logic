@@ -125,7 +125,7 @@ public extension Compiler {
                 context.patternNames = context.patternNames.pop()
 
                 return context
-            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: let genericParameters, declarations: _, _))):
+            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: let genericParameters, declarations: let declarations, _))):
                 context.patternToTypeName[pattern.id] = pattern.name
 
                 genericParameters.forEach { param in
@@ -137,7 +137,16 @@ public extension Compiler {
                     }
                 }
 
-                // We don't want to introduce the record's member variables into scope
+                // Handle variable initializers manually so we don't introduce their names into scope
+                declarations.forEach { declaration in
+                    switch declaration {
+                    case .variable(_, _, _, initializer: .some(let initializer), _):
+                        _ = LGCSyntaxNode.expression(initializer).reduce(config: &config, initialResult: context, f: walk)
+                    default:
+                        break
+                    }
+                }
+
                 config.ignoreChildren = true
 
                 return context
