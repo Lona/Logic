@@ -302,6 +302,15 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
+    public var children: [LGCSyntaxNode] {
+        switch self {
+        case .array(let value):
+            return value.value.map { $0.node }
+        case .none, .boolean, .color, .number, .string:
+            return []
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Literal Value"
     }
@@ -379,6 +388,35 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
+    public func delete(id: UUID) -> LGCLiteral {
+        switch self {
+        case .array(let value):
+            return .array(
+                id: value.id,
+                value: LGCList(value.value.filter({
+                    switch $0 {
+                    case .placeholder:
+                        return true
+                    default:
+                        return $0.uuid != id
+                    }
+                }).map { $0.delete(id: id) })
+            )
+        case .boolean, .number, .string, .color, .none:
+            return self
+        }
+    }
+
+    public func insert(childNode: LGCSyntaxNode, atIndex: Int) -> LGCLiteral {
+        guard case .expression(let child) = childNode,
+            case .array(let value) = self else { return self }
+
+        var updated = value.value.normalizedPlaceholders.map { $0 }
+        updated.insert(child, at: atIndex)
+
+        return .array(id: uuid, value: .init(updated))
+    }
+
     public var uuid: UUID {
         switch self {
         case .boolean(let value):
@@ -402,6 +440,15 @@ extension LGCLiteral: SyntaxNodeProtocol {
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
         return false
+    }
+
+    public func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool {
+        switch (self, childNode) {
+        case (.array, .expression):
+            return true
+        default:
+            return false
+        }
     }
 }
 
@@ -911,27 +958,27 @@ extension LGCExpression: SyntaxNodeProtocol {
                 left: value.left.copy(deep: deep),
                 right: value.right.copy(deep: deep),
                 op: value.op.copy(deep: deep),
-                id: value.id
+                id: UUID()
             )
         case .identifierExpression(let value):
             return .identifierExpression(
-                id: value.id,
+                id: UUID(),
                 identifier: value.identifier.copy(deep: deep)
             )
         case .functionCallExpression(let value):
             return .functionCallExpression(
-                id: value.id,
+                id: UUID(),
                 expression: value.expression.copy(deep: deep),
                 arguments: value.arguments.copy(deep: deep)
             )
         case .literalExpression(let value):
             return .literalExpression(
-                id: value.id,
+                id: UUID(),
                 literal: value.literal.copy(deep: deep)
             )
         case .memberExpression(let value):
             return .memberExpression(
-                id: value.id,
+                id: UUID(),
                 expression: value.expression.copy(deep: deep),
                 memberName: value.memberName.copy(deep: deep)
             )
@@ -971,7 +1018,9 @@ extension LGCExpression: SyntaxNodeProtocol {
                     })
                 )
             )
-        case .binaryExpression, .identifierExpression, .literalExpression, .memberExpression, .placeholder:
+        case .literalExpression(let value):
+            return .literalExpression(id: value.id, literal: value.literal.delete(id: id))
+        case .binaryExpression, .identifierExpression, .memberExpression, .placeholder:
             return self
         }
     }
@@ -1011,7 +1060,14 @@ extension LGCExpression: SyntaxNodeProtocol {
     }
 
     public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
-        return false
+        guard let parent = rootNode.contents.parentOf(target: uuid, includeTopLevel: false) else { return false }
+
+        switch parent {
+        case .literal(.array):
+            return true
+        default:
+            return false
+        }
     }
 }
 

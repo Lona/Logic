@@ -174,7 +174,7 @@ extension LGCLiteral: SyntaxNodeFormattable {
                         .concat(
                             [
                                 .hardLine,
-                                .join(with: .concat([.element(.text(",")), .hardLine])) {
+                                .join(with: .hardLine) {
                                     value.value.map { $0.formatted(using: options) }
                                 }
                             ]
