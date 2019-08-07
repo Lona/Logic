@@ -220,7 +220,9 @@ There's no need to escape characters in string literals. This will be done autom
         }
 
         public static func color(for prefix: String) -> LogicSuggestionItem {
-            let color = NSColor.parse(css: prefix)
+            let result = NSColor.parseAndNormalize(css: prefix)
+            let color = result?.color
+            let prefix = result?.css ?? prefix
 
             return LogicSuggestionItem(
                 title: "Color",

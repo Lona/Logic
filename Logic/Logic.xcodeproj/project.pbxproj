@@ -61,6 +61,7 @@
 		6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E25FD22E7A55000F0076A /* TextStyle.logic */; };
 		6B4E260022E7B27000F0076A /* Color.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E25FF22E7B27000F0076A /* Color.logic */; };
 		6B4E260222E7B39500F0076A /* Shadow.logic in Resources */ = {isa = PBXBuildFile; fileRef = 6B4E260122E7B39500F0076A /* Shadow.logic */; };
+		6B5A6AC622FB49BB00CA004E /* NSColor+Parsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5A6AC522FB49BB00CA004E /* NSColor+Parsing.swift */; };
 		6B5B7522215B198400CDC9C6 /* Logic.h in Headers */ = {isa = PBXBuildFile; fileRef = 6B5B7520215B198400CDC9C6 /* Logic.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6B5B755E215B1ABE00CDC9C6 /* TypeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7554215B1ABE00CDC9C6 /* TypeListRowView.swift */; };
 		6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7555215B1ABE00CDC9C6 /* TypeListHeaderView.swift */; };
@@ -162,6 +163,7 @@
 		6B4E25FD22E7A55000F0076A /* TextStyle.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TextStyle.logic; sourceTree = "<group>"; };
 		6B4E25FF22E7B27000F0076A /* Color.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Color.logic; sourceTree = "<group>"; };
 		6B4E260122E7B39500F0076A /* Shadow.logic */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shadow.logic; sourceTree = "<group>"; };
+		6B5A6AC522FB49BB00CA004E /* NSColor+Parsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Parsing.swift"; sourceTree = "<group>"; };
 		6B5B751D215B198400CDC9C6 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B5B7520215B198400CDC9C6 /* Logic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logic.h; sourceTree = "<group>"; };
 		6B5B7521215B198400CDC9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -362,6 +364,7 @@
 				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
 				6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */,
 				6BEEA13522A713FA00905664 /* StandardConfiguration.swift */,
+				6B5A6AC522FB49BB00CA004E /* NSColor+Parsing.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -607,6 +610,7 @@
 				6B5B7562215B1ABE00CDC9C6 /* TypeCase.swift in Sources */,
 				6B44759F22AED58E009AE087 /* Divider.swift in Sources */,
 				6B5B755F215B1ABE00CDC9C6 /* TypeListHeaderView.swift in Sources */,
+				6B5A6AC622FB49BB00CA004E /* NSColor+Parsing.swift in Sources */,
 				6B44E16B223B3E9E00740318 /* SuggestionListView.swift in Sources */,
 				6B44E186223B40CF00740318 /* LGCSyntax+Documentation.swift in Sources */,
 				6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */,
