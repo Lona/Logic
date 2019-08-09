@@ -289,30 +289,31 @@ extension LogicEditor {
 
         if let selectedRange = range(),
             let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
-            let shouldActivate = onChangeRootNode?(rootNode.delete(id: selectedNode.uuid))
+            let targetNode = canvasView.selectedLine != nil ? findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
+            let shouldActivate = onChangeRootNode?(rootNode.delete(id: targetNode.uuid))
             if shouldActivate == true {
                 handleActivateElement(nil)
             }
         }
     }
 
-    private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
-//        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
+    // Find the smallest node that accepts a line drag
+    private func findDragSource(id: UUID) -> LGCSyntaxNode? {
+        guard var path = rootNode.pathTo(id: id) else { return nil }
 
-        // Find the smallest node that accepts a line drag
-        func findDragSource(node: LGCSyntaxNode) -> LGCSyntaxNode? {
-            guard var path = rootNode.pathTo(id: node.uuid) else { return nil }
-
-            while let current = path.last {
-                if current.contents.acceptsLineDrag(rootNode: rootNode) {
-                    return current
-                }
-
-                path = path.dropLast()
+        while let current = path.last {
+            if current.contents.acceptsLineDrag(rootNode: rootNode) {
+                return current
             }
 
-            return nil
+            path = path.dropLast()
         }
+
+        return nil
+    }
+
+    private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
+//        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
 
         // Find the smallest node that accepts a drop
         func findDropTarget(relativeTo node: LGCSyntaxNode, accepting sourceNode: LGCSyntaxNode) -> LGCSyntaxNode? {
@@ -343,7 +344,7 @@ extension LogicEditor {
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
             let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
-            let sourceNode = findDragSource(node: originalSourceNode),
+            let sourceNode = findDragSource(id: originalSourceNode.uuid),
             let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, includeTopLevel: true, useOwnerId: true) {
 
             // Target is within source

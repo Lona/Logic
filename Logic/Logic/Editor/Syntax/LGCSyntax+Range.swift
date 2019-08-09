@@ -50,7 +50,9 @@ public extension LGCSyntaxNode {
         useOwnerId: Bool = false) -> LGCSyntaxNode? {
         let elements = formatted(using: options).elements
         let clampedRange = range.clamped(to: elements.startIndex..<elements.endIndex)
-        guard let first = elements[clampedRange].first, let firstId = nodeId(first, useOwnerId: useOwnerId) else {
+
+        guard let first = elements[clampedRange].first(where: { $0.isActivatable }),
+            let firstId = nodeId(first, useOwnerId: useOwnerId) else {
             return nil
         }
 
