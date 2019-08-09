@@ -126,6 +126,13 @@ class Document: NSDocument {
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
+            getError: ({ [unowned self ] id in
+                if let error = self.logicEditor.elementErrors.first(where: { $0.uuid == id }) {
+                    return error.message
+                } else {
+                    return nil
+                }
+            }),
             getArguments: ({ [unowned self] id in
                 let rootNode = self.logicEditor.rootNode
 
@@ -253,6 +260,15 @@ class Document: NSDocument {
             let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
             let scopeContext = Compiler.scopeContext(program)
+
+            if let errorId = scopeContext.undefinedIdentifiers.first, case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {
+                logicEditor.elementErrors = [
+                    LogicEditor.ElementError(uuid: errorId, message: "The name \"\(identifierNode.string)\" hasn't been declared yet")
+                ]
+            } else {
+                logicEditor.elementErrors = []
+            }
+
             let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
 
             guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {

@@ -19,6 +19,7 @@ public extension Compiler {
         public var patternToName: [UUID: String] = [:]
         public var identifierToPattern: [UUID: UUID] = [:]
         public var patternToTypeName: [UUID: String] = [:]
+        public var undefinedIdentifiers = Set<UUID>()
 
         // This keeps track of the current scope
         fileprivate var patternNames = ScopeStack<String, LGCPattern>()
@@ -62,11 +63,12 @@ public extension Compiler {
             case (true, .identifier(let identifier)):
                 if identifier.isPlaceholder { return context }
 
-                if context.patternNames.value(for: identifier.string) == nil {
-                    Swift.print("No \(identifier.string)", context.patternNames)
+                if let pattern = context.patternNames.value(for: identifier.string) {
+                    context.identifierToPattern[identifier.uuid] = pattern.uuid
+                } else {
+                    Swift.print("No identifier: \(identifier.string)", context.patternNames)
+                    context.undefinedIdentifiers.insert(identifier.uuid)
                 }
-
-                context.identifierToPattern[identifier.uuid] = context.patternNames.value(for: identifier.string)!.uuid
 
                 return context
             case (false, .expression(.memberExpression)):

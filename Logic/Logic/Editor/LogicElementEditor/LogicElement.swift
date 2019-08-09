@@ -41,6 +41,7 @@ public enum LogicElement {
     case shadowPreview(NSShadow, UUID)
     case textStylePreview(TextStyle, String, UUID)
     case indentGuide(UUID)
+    case errorSummary(String, UUID)
 
     public var isActivatable: Bool {
         switch self {
@@ -49,7 +50,8 @@ public enum LogicElement {
              .colorPreview,
              .shadowPreview,
              .textStylePreview,
-             .indentGuide:
+             .indentGuide,
+             .errorSummary:
             return false
         case .title,
              .dropdown:
@@ -62,7 +64,8 @@ public enum LogicElement {
         case .colorPreview,
              .shadowPreview,
              .textStylePreview,
-             .indentGuide:
+             .indentGuide,
+             .errorSummary:
             return false
         case .title,
              .dropdown,
@@ -79,7 +82,8 @@ public enum LogicElement {
              .colorPreview,
              .shadowPreview,
              .textStylePreview,
-             .indentGuide:
+             .indentGuide,
+             .errorSummary:
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _):
@@ -91,7 +95,8 @@ public enum LogicElement {
         switch self {
         case .text,
              .coloredText,
-             .indentGuide:
+             .indentGuide,
+             .errorSummary:
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _),
@@ -104,7 +109,8 @@ public enum LogicElement {
 
     public var isLogicalNode: Bool {
         switch self {
-        case .indentGuide:
+        case .indentGuide,
+             .errorSummary:
             return false
         case .text,
              .coloredText,
@@ -128,14 +134,15 @@ public enum LogicElement {
         case .text(let value),
              .coloredText(let value, _),
              .title(_, let value),
-             .dropdown(_, let value, _):
+             .dropdown(_, let value, _),
+             .errorSummary(let value, _):
             return value
         }
     }
 
     public var color: NSColor {
         switch self {
-        case .text, .title:
+        case .text, .title, .errorSummary:
             return Colors.text
         case .coloredText(_, let color), .colorPreview(_, let color, _):
             return color
@@ -153,6 +160,8 @@ public enum LogicElement {
         switch self {
         case .dropdown(_, _, .comment):
             return Colors.commentBackground
+        case .errorSummary:
+            return Colors.errorSummaryBackground
         default:
             return nil
         }
@@ -201,6 +210,20 @@ extension LogicElement {
         switch self {
         case .text:
             return textElement(color: Colors.textNoneditable, font: font)
+        case .errorSummary:
+            var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: font)
+
+            let offset: CGFloat = 16
+
+            backgroundRect.size.width += offset
+            backgroundRect.origin.x += 6
+            rect.origin.x += 6 + offset
+
+            return LogicMeasuredElement(
+                element: self,
+                attributedString: attributedString,
+                attributedStringRect: rect,
+                backgroundRect: backgroundRect)
         case .title:
             var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: titleTextStyle.nsFont)
 

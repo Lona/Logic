@@ -66,7 +66,8 @@ public class LogicCanvasView: NSView {
                 selectedLine: nil,
                 selectedRange: nil,
                 outlinedRange: nil,
-                underlinedRange: nil,
+                errorRanges: [],
+                errorLines: [],
                 style: self.style
             )
 
@@ -108,7 +109,12 @@ public class LogicCanvasView: NSView {
             update()
         }
     }
-    public var underlinedRange: Range<Int>? {
+    public var errorLines: [Int] = [] {
+        didSet {
+            update()
+        }
+    }
+    public var errorRanges: [Range<Int>] = [] {
         didSet {
             update()
         }
@@ -131,17 +137,17 @@ public class LogicCanvasView: NSView {
         invalidateIntrinsicContentSize()
     }
 
-    // MARK: Styles
+    // MARK: Computed properties
 
     private var selectedIndex: Int? {
         return selectedRange?.lowerBound
     }
 
-    var selectedElement: LogicElement? {
+    private var selectedElement: LogicElement? {
         return selectedMeasuredElement?.element
     }
 
-    var selectedMeasuredElement: LogicMeasuredElement? {
+    private var selectedMeasuredElement: LogicMeasuredElement? {
         guard let index = selectedIndex else { return nil }
         return measuredElements[index]
     }
@@ -275,7 +281,8 @@ public class LogicCanvasView: NSView {
         selectedLine: Int?,
         selectedRange: Range<Int>?,
         outlinedRange: Range<Int>?,
-        underlinedRange: Range<Int>?,
+        errorRanges: [Range<Int>],
+        errorLines: [Int],
         style: Style
         ) {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
@@ -297,10 +304,31 @@ public class LogicCanvasView: NSView {
             }
         }
 
+        errorLines.forEach { line in
+            if let range = formattedContent.elementIndexRange(for: line) {
+                let elements = measuredElements[range]
+                if let first = elements.first, let last = elements.last {
+                    Colors.errorLine.set()
+                    let rect = NSRect(
+                        x: 0,
+                        y: first.backgroundRect.minY,
+                        width: bounds.width,
+                        height: last.backgroundRect.maxY - first.backgroundRect.minY)
+                    let path = NSBezierPath(rect: rect)
+                    path.fill()
+                }
+            }
+        }
+
         if let selectedLine = selectedLine, let range = formattedContent.elementIndexRange(for: selectedLine) {
             let elements = measuredElements[range]
             if let first = elements.first, let last = elements.last {
-                Colors.highlightedLine.set()
+                if errorLines.contains(selectedLine) {
+                    Colors.errorLineSelected.set()
+                } else {
+                    Colors.highlightedLine.set()
+                }
+
                 let rect = NSRect(
                     x: 0,
                     y: first.backgroundRect.minY,
@@ -312,7 +340,7 @@ public class LogicCanvasView: NSView {
         }
 
         if let range = outlinedRange {
-            let rect = measuredElements[range].map { $0.backgroundRect }.union
+            let rect = measuredElements[range].filter { $0.element.isLogicalNode }.map { $0.backgroundRect }.union
             NSColor.selectedMenuItemColor.setStroke()
             let path = NSBezierPath(
                 roundedRect: rect.insetBy(dx: style.outlineWidth / 2, dy: style.outlineWidth / 2),
@@ -323,7 +351,7 @@ public class LogicCanvasView: NSView {
         } else {
             if let range = selectedRange {
                 let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
-                let rect = measuredElements[clampedRange].map { $0.backgroundRect }.union
+                let rect = measuredElements[clampedRange].filter { $0.element.isLogicalNode }.map { $0.backgroundRect }.union
                 Colors.highlightedCode.set()
                 NSBezierPath(
                     roundedRect: rect,
@@ -332,12 +360,12 @@ public class LogicCanvasView: NSView {
             }
         }
 
-        if let range = underlinedRange {
+        for range in errorRanges {
             let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
 
             NSColor.red.setStroke()
 
-            measuredElements[clampedRange].forEach { element in
+            measuredElements[clampedRange].filter { $0.element.isLogicalNode }.forEach { element in
                 let underlineRect = NSRect(
                     x: element.backgroundRect.minX,
                     y: element.backgroundRect.maxY - 2,
@@ -434,6 +462,22 @@ public class LogicCanvasView: NSView {
 
                 bezier.fill()
             case .text, .coloredText:
+                attributedString.draw(at: rect.origin)
+            case .errorSummary:
+                text.backgroundColor?.setFill()
+
+                backgroundRect.fill()
+
+                let scale: CGFloat = 1
+                let errorIcon = LightMark.QuoteKind.iconError
+                let iconRect = NSRect(
+                    x: round(backgroundRect.minX + 4),
+                    y: round(rect.midY - (errorIcon.size.height * scale) / 2),
+                    width: round(errorIcon.size.width * scale),
+                    height: round(errorIcon.size.height * scale)
+                )
+                errorIcon.draw(in: iconRect)
+
                 attributedString.draw(at: rect.origin)
             case .title(_, let value),
                  .dropdown(_, let value, _):
@@ -582,7 +626,8 @@ public class LogicCanvasView: NSView {
             selectedLine: selectedLine,
             selectedRange: selectedRange,
             outlinedRange: outlinedRange,
-            underlinedRange: underlinedRange,
+            errorRanges: errorRanges,
+            errorLines: errorLines,
             style: style
         )
     }
@@ -948,7 +993,8 @@ extension LogicCanvasView {
             selectedLine: nil,
             selectedRange: nil,
             outlinedRange: nil,
-            underlinedRange: nil,
+            errorRanges: [],
+            errorLines: [],
             style: style
         )
 

@@ -4,6 +4,16 @@ import AppKit
 
 public class LogicEditor: NSBox {
 
+    public struct ElementError {
+        public var uuid: UUID
+        public var message: String
+
+        public init(uuid: UUID, message: String) {
+            self.uuid = uuid
+            self.message = message
+        }
+    }
+
     // MARK: Lifecycle
 
     public init(rootNode: LGCSyntaxNode = defaultRootNode) {
@@ -67,19 +77,26 @@ public class LogicEditor: NSBox {
         }
     }
 
-    public var underlinedId: UUID? {
+    public var elementErrors: [ElementError] = [] {
         didSet {
-            guard let underlinedId = underlinedId else {
-                canvasView.underlinedRange = nil
-                return
+            let rows = rootNode.formatted(using: formattingOptions).logicalRows
+
+            canvasView.errorLines = rows.map({ row in row.compactMap({ $0.syntaxNodeID }) }).enumerated().compactMap { line, ids in
+                if elementErrors.contains(where: { ids.contains($0.uuid) }) {
+                    return line
+                } else {
+                    return nil
+                }
             }
 
-            let topNode = self.rootNode.topNodeWithEqualElements(as: underlinedId, options: formattingOptions, includeTopLevel: false)
+            canvasView.errorRanges = elementErrors.compactMap { error in
+//                let topNode = self.rootNode.topNodeWithEqualElements(as: error.uuid, options: formattingOptions, includeTopLevel: false)
 
-            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions, includeTopLevel: false) {
-                self.canvasView.underlinedRange = selectedRange
-            } else {
-                self.canvasView.underlinedRange = nil
+                if let selectedRange = self.rootNode.elementRange(for: error.uuid, options: formattingOptions, includeTopLevel: false) {
+                    return selectedRange
+                } else {
+                    return nil
+                }
             }
         }
     }

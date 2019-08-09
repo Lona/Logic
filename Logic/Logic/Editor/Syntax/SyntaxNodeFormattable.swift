@@ -88,6 +88,7 @@ public class LogicFormattingOptions: Equatable {
     public init(
         style: Style = .natural,
         locale: Locale = .en_US,
+        getError: @escaping (UUID) -> String? = {_ in nil},
         getArguments: @escaping (UUID) -> ArgumentsFormat? = {_ in nil},
         getColor: @escaping (UUID) -> (String, NSColor)? = {_ in nil},
         getTextStyle: @escaping (UUID) -> TextStyle? = {_ in nil},
@@ -95,6 +96,7 @@ public class LogicFormattingOptions: Equatable {
         ) {
         self.style = style
         self.locale = locale
+        self.getError = getError
         self.getArguments = getArguments
         self.getColor = getColor
         self.getTextStyle = getTextStyle
@@ -103,6 +105,7 @@ public class LogicFormattingOptions: Equatable {
 
     public var style: Style
     public var locale: Locale
+    public var getError: (UUID) -> String?
     public var getArguments: (UUID) -> ArgumentsFormat?
     public var getColor: (UUID) -> (String, NSColor)?
     public var getTextStyle: (UUID) -> TextStyle?
@@ -128,11 +131,18 @@ extension LGCComment: SyntaxNodeFormattable {
 
 extension LGCIdentifier: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
-        if isPlaceholder {
-            return .element(LogicElement.dropdown(id, string, .placeholder))
-        }
+        let element: FormatterCommand<LogicElement> = .element(LogicElement.dropdown(id, string, isPlaceholder ? .placeholder : .variable))
 
-        return .element(LogicElement.dropdown(id, string, .variable))
+        if let errorMessage = options.getError(id) {
+            return .concat(
+                [
+                    element,
+                    .floatRightCollapse(.errorSummary(errorMessage, self.id))
+                ]
+            )
+        } else {
+            return element
+        }
     }
 }
 

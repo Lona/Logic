@@ -139,6 +139,12 @@ extension Colors {
         return NSColor.selectedMenuItemColor.highlight(withLevel: 0.9)!
     }()
 
+    public static let errorLine: NSColor = NSColor.systemRed.withAlphaComponent(0.1)
+
+    public static let errorLineSelected: NSColor = Colors.errorLine.blended(withFraction: 0.9, of: Colors.highlightedLine)!
+
+    public static let errorSummaryBackground: NSColor = NSColor.parse(css: "rgba(255,13,0,0.19)")!
+
     public static let suggestionListBackground: NSColor = {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {

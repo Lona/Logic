@@ -16,6 +16,7 @@ public indirect enum FormatterCommand<Element> {
     case join(with: FormatterCommand, () -> [FormatterCommand])
     case concat(@autoclosure () -> [FormatterCommand])
     case horizontalFloat(decoration: Element, margins: NSEdgeInsets, FormatterCommand)
+    case floatRightCollapse(Element)
     case spacer(CGFloat)
 
     public static var empty: FormatterCommand<Element> {
@@ -79,6 +80,8 @@ public indirect enum FormatterCommand<Element> {
                 }
             case .spacer:
                 break
+            case .floatRightCollapse(let element):
+                currentRow.append(element)
             }
         }
 
@@ -137,12 +140,22 @@ public indirect enum FormatterCommand<Element> {
         var currentElementIndex: Int = 0
         var currentDecorationIndent: CGFloat = 0
         var currentRowContainsNonFloatingElement = false
+        var currentRightFloatingElementWidth: CGFloat = 0
 
         func append(element: FormattedElement) {
             currentRow.append(element)
             currentMaxElementHeight = max(currentMaxElementHeight, element.size.height)
             currentElementIndex += 1
             currentRowContainsNonFloatingElement = true
+        }
+
+        func append(rightFloatingElement element: FormattedElement) {
+            currentRow.append(element)
+            currentMaxElementHeight = max(currentMaxElementHeight, element.size.height)
+            currentElementIndex += 1
+            if currentRightFloatingElementWidth == 0 {
+                currentRightFloatingElementWidth = element.size.width
+            }
         }
 
         func append(decoration: FormattedElement) -> (row: Int, column: Int) {
@@ -159,6 +172,7 @@ public indirect enum FormatterCommand<Element> {
             currentYOffset += currentMaxElementHeight
             currentMaxElementHeight = minimumLineHeight
             currentRowContainsNonFloatingElement = false
+            currentRightFloatingElementWidth = 0
         }
 
         func process(command: FormatterCommand) {
@@ -178,7 +192,7 @@ public indirect enum FormatterCommand<Element> {
             case .element(let element):
                 let elementSize = getElementSize(element, currentElementIndex)
 
-                if currentXOffset + elementSize.width >= maxLineWidth && !currentRow.isEmpty {
+                if currentXOffset + elementSize.width + currentRightFloatingElementWidth >= maxLineWidth && !currentRow.isEmpty {
                     moveToNextRow(wrapping: true)
                 }
 
@@ -234,6 +248,13 @@ public indirect enum FormatterCommand<Element> {
                 currentYOffset = max(currentYOffset, initialYOffset + decorationSize.height - minimumLineHeight)
             case .spacer(let size):
                 currentYOffset += size
+            case .floatRightCollapse(let element):
+                let elementSize = getElementSize(element, currentElementIndex)
+
+                let formattedElement = FormatterCommand<Element>.FormattedElement(
+                    element: element, origin: CGPoint(x: maxLineWidth - elementSize.width, y: currentYOffset), size: elementSize)
+
+                append(rightFloatingElement: formattedElement)
             }
         }
 
