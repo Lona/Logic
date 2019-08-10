@@ -829,7 +829,7 @@ public extension LGCDeclaration {
 
         static var `enum`: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Enumeration",
+                title: "Enumeration Type",
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.enumeration(
@@ -845,7 +845,7 @@ public extension LGCDeclaration {
 
         static var genericEnum: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Generic Enumeration",
+                title: "Generic Enumeration Type",
                 category: "GENERIC \(categoryTitle)",
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.enumeration(
@@ -861,7 +861,7 @@ public extension LGCDeclaration {
 
         static var record: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Record",
+                title: "Record Type",
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.record(
@@ -877,7 +877,7 @@ public extension LGCDeclaration {
 
         static var genericRecord: LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Generic Record",
+                title: "Generic Record Type",
                 category: "GENERIC \(categoryTitle)",
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.record(

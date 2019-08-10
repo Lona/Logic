@@ -409,13 +409,22 @@ extension LGCExpression: SyntaxNodeFormattable {
         case .literalExpression(let value):
             return value.literal.formatted(using: options)
         case .memberExpression(let value):
-            //            let joined = FormatterCommand<LogicElement>.concat {
-            //                [value.expression.formatted(using: options), .element(.text(".")), value.memberName.formatted(using: options)]
-            //            }
+            if let errorMessage = options.getError(value.id) {
+                let joined = FormatterCommand<LogicElement>.concat(
+                    [value.expression.formatted(using: options), .element(.text(".")), value.memberName.formatted(using: options)]
+                )
 
-            let joined = value.memberName.formatted(using: options)
+                return .concat(
+                    [
+                        .element(.dropdown(value.id, joined.stringContents, .variable)),
+                        .floatRightCollapse(.errorSummary(errorMessage, value.id))
+                    ]
+                )
+            } else {
+                let memberName = value.memberName.formatted(using: options)
 
-            return .element(.dropdown(value.id, joined.stringContents, .variable))
+                return .element(.dropdown(value.id, memberName.stringContents, .variable))
+            }
         case .placeholder(let value):
             return .element(LogicElement.dropdown(value, "", .variable))
         }

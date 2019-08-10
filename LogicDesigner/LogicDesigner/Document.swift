@@ -261,13 +261,28 @@ class Document: NSDocument {
 
             let scopeContext = Compiler.scopeContext(program)
 
-            if let errorId = scopeContext.undefinedIdentifiers.first, case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {
-                logicEditor.elementErrors = [
-                    LogicEditor.ElementError(uuid: errorId, message: "The name \"\(identifierNode.string)\" hasn't been declared yet")
-                ]
-            } else {
-                logicEditor.elementErrors = []
+            var errors: [LogicEditor.ElementError] = []
+
+            scopeContext.undefinedIdentifiers.forEach { errorId in
+                if case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {
+                    errors.append(
+                        LogicEditor.ElementError(uuid: errorId, message: "The name \"\(identifierNode.string)\" hasn't been declared yet")
+                    )
+                }
             }
+
+            scopeContext.undefinedMemberExpressions.forEach { errorId in
+                if case .expression(let expression)? = logicEditor.rootNode.find(id: errorId), let identifiers = expression.flattenedMemberExpression {
+                    let keyPath = identifiers.map { $0.string }
+                    let last = keyPath.last ?? ""
+                    let rest = keyPath.dropLast().joined(separator: ".")
+                    errors.append(
+                        LogicEditor.ElementError(uuid: errorId, message: "The name \"\(last)\" hasn't been declared in \"\(rest)\" yet")
+                    )
+                }
+            }
+
+            logicEditor.elementErrors = errors
 
             let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
 

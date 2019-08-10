@@ -20,6 +20,7 @@ public extension Compiler {
         public var identifierToPattern: [UUID: UUID] = [:]
         public var patternToTypeName: [UUID: String] = [:]
         public var undefinedIdentifiers = Set<UUID>()
+        public var undefinedMemberExpressions = Set<UUID>()
 
         // This keeps track of the current scope
         fileprivate var patternNames = ScopeStack<String, LGCPattern>()
@@ -80,9 +81,12 @@ public extension Compiler {
 
                     let keyPath = identifiers.map { $0.string }
 
-                    guard let patternId = context.namespace.get(keyPath) else { return context }
-
-                    context.identifierToPattern[expression.uuid] = patternId
+                    if let patternId = context.namespace.get(keyPath) {
+                        context.identifierToPattern[expression.uuid] = patternId
+                    } else {
+                        Swift.print("No identifier path: \(keyPath)", context.patternNames)
+                        context.undefinedMemberExpressions.insert(expression.uuid)
+                    }
                 default:
                     assertionFailure("Only expressions here")
                 }
