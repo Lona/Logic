@@ -2,7 +2,7 @@ import AppKit
 
 // MARK: - LogicEditor
 
-public class LogicEditor: NSBox {
+open class LogicEditor: NSBox {
 
     public struct ElementError {
         public var uuid: UUID
