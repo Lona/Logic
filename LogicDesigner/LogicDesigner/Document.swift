@@ -118,10 +118,8 @@ class Document: NSDocument {
         let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
 
         var annotations: [UUID: String] = [:]
-        var colorValues: [UUID: String] = [:]
-        var shadowValues: [UUID: NSShadow] = [:]
-        var textStyleValues: [UUID: TextStyle] = [:]
         var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
+        var successfulEvaluation: Compiler.EvaluationContext?
 
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
@@ -143,18 +141,44 @@ class Document: NSDocument {
                     substitution: successfulUnification?.1
                 )
             }),
-            getColor: ({ id in
-                guard let colorString = colorValues[id], let color = NSColor.parse(css: colorString) else { return nil }
+            getColor: ({ [unowned self] id in
+                guard let evaluation = successfulEvaluation else { return nil }
+
+                guard let value = evaluation.evaluate(uuid: id) else {
+//                    Swift.print("Failed to evaluate color", id)
+                    return nil
+                }
+
+                guard let colorString = value.colorString, let color = NSColor.parse(css: colorString) else { return nil }
                 return (colorString, color)
             }),
-            getTextStyle: ({ id in return textStyleValues[id] }),
-            getShadow: ({ id in return shadowValues[id] })
+            getTextStyle: ({ [unowned self] id in
+                guard let evaluation = successfulEvaluation else { return nil }
+
+                guard let value = evaluation.evaluate(uuid: id) else {
+//                    Swift.print("Failed to evaluate text style", id)
+                    return nil
+                }
+
+                return value.textStyle
+            }),
+            getShadow: ({ [unowned self] id in
+                guard let evaluation = successfulEvaluation else { return nil }
+
+                guard let value = evaluation.evaluate(uuid: id) else {
+//                    Swift.print("Failed to evaluate shadow", id)
+                    return nil
+                }
+
+                return value.nsShadow
+            })
         )
 
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
 
-            if let colorValue = colorValues[node.uuid] {
+            if let evaluation = successfulEvaluation,
+                let colorValue = evaluation.evaluate(uuid: node.uuid)?.colorString {
                 if self.logicEditor.formattingOptions.style == .visual,
                     let path = self.logicEditor.rootNode.pathTo(id: id),
                     let parent = path.dropLast().last {
@@ -251,6 +275,8 @@ class Document: NSDocument {
         }
 
         func evaluate(rootNode: LGCSyntaxNode) -> Bool {
+            successfulEvaluation = nil
+
             self.logicEditor.rootNode = rootNode
 
             let rootNode = self.logicEditor.rootNode
@@ -301,37 +327,9 @@ class Document: NSDocument {
                 context: .init()
             )
 
-            annotations.removeAll(keepingCapacity: true)
-            colorValues.removeAll(keepingCapacity: true)
-            shadowValues.removeAll(keepingCapacity: true)
-            textStyleValues.removeAll(keepingCapacity: true)
-
             switch result {
             case .success(let evaluationContext):
-                //                Swift.print("Result", evaluationContext.values)
-
-                evaluationContext.values.forEach { id, value in
-                    switch value.memory {
-                    case .unit, .bool, .number, .string, .enum, .array:
-                        annotations[id] = "\(value.memory)"
-                    case .record, .function:
-                        break
-                    }
-
-                    //                    Swift.print(id, value.type, value.memory)
-
-                    if let colorString = value.colorString {
-                        colorValues[id] = colorString
-                    }
-
-                    if let shadow = value.nsShadow {
-                        shadowValues[id] = shadow
-                    }
-
-                    if let textStyle = value.textStyle {
-                        textStyleValues[id] = textStyle
-                    }
-                }
+                successfulEvaluation = evaluationContext
             case .failure(let error):
                 Swift.print("Eval failure", error)
             }

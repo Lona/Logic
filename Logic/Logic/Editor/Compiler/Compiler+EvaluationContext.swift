@@ -40,12 +40,68 @@ private extension NSColor {
 }
 
 extension Compiler {
+    public struct EvaluationThunk {
+        public init(label: String? = nil, dependencies: [UUID] = [], _ f: @escaping ([LogicValue]) -> LogicValue) {
+            self.label = label
+            self.dependencies = dependencies
+            self.f = f
+        }
+
+        public var label: String?
+        public var dependencies: [UUID]
+        public var f: ([LogicValue]) -> LogicValue
+    }
+
     public class EvaluationContext {
-        public init(values: [UUID: LogicValue] = [:]) {
+        public init(values: [UUID: LogicValue] = [:], thunks: [UUID: EvaluationThunk] = [:]) {
             self.values = values
+            self.thunks = thunks
         }
 
         public var values: [UUID: LogicValue]
+        public var thunks: [UUID: EvaluationThunk]
+
+        public func add(uuid: UUID, _ thunk: EvaluationThunk) {
+            thunks[uuid] = thunk
+        }
+
+        public func evaluate(uuid: UUID, logLevel: StandardConfiguration.LogLevel = .none) -> LogicValue? {
+            if let value = values[uuid] {
+                return value
+            }
+
+            if let thunk = thunks[uuid] {
+                if logLevel == .verbose, let label = thunk.label {
+                    Swift.print("Evaluate thunk: \(label) - \(thunk.dependencies.map { $0.uuidString }.joined(separator: ", "))")
+                }
+
+                let resolvedDependencies = thunk.dependencies.map { evaluate(uuid: $0, logLevel: logLevel) }
+
+                if let index = resolvedDependencies.firstIndex(where: { $0 == nil }) {
+                    if logLevel == .verbose, let label = thunk.label {
+                        Swift.print("Evaluate thunk: \(label) - FAILED")
+
+                        let unresolved = thunk.dependencies[index]
+                        if let unresolvedThunk = thunks[unresolved] {
+                            Swift.print("Unresolved thunk", unresolvedThunk.label ?? "")
+                        } else {
+                            Swift.print("Missing thunk")
+                        }
+                    }
+
+                    return nil
+                } else {
+                    if logLevel == .verbose, let label = thunk.label {
+                        Swift.print("Evaluate thunk: \(label) - SUCCESS")
+                    }
+                }
+                let result = thunk.f(resolvedDependencies.compactMap { $0 })
+                values[uuid] = result
+                return result
+            }
+
+            return nil
+        }
     }
 
     public typealias EvaluationResult = Result<EvaluationContext, Error>
@@ -110,189 +166,219 @@ extension Compiler {
         // Post
         switch node {
         case .literal(.boolean(id: _, value: let value)):
-            context.values[node.uuid] = .bool(value)
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Boolean Literal", { _ in LogicValue.bool(value) }))
         case .literal(.number(id: _, value: let value)):
-            context.values[node.uuid] = .number(value)
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Number Literal", { _ in LogicValue.number(value) }))
         case .literal(.string(id: _, value: let value)):
-            context.values[node.uuid] = .string(value)
+            context.add(uuid: node.uuid, EvaluationThunk(label: "String Literal", { _ in LogicValue.string(value) }))
         case .literal(.color(id: _, value: let value)):
-            let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
-            context.values[node.uuid] = LogicValue(.color, cssValue)
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Color Literal", { _ in
+                let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
+                return LogicValue(.color, cssValue)
+            }))
         case .literal(.array(id: _, value: let expressions)):
-            guard let type = unificationContext.nodes[node.uuid] else { break }
+            guard let type = unificationContext.nodes[node.uuid] else {
+                Swift.print("Failed to unify type of array")
+                break
+            }
+
             let resolvedType = Unification.substitute(substitution, in: type)
-            
-            let values: [LogicValue] = expressions.compactMap { expression in context.values[expression.uuid] }
 
-            if values.count == expressions.filter({ !$0.isPlaceholder }).count {
-                context.values[node.uuid] = LogicValue(resolvedType, .array(values))
-            }
+            let dependencies = expressions.filter { $0.isPlaceholder }.map { $0.uuid }
+
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Array Literal", dependencies: dependencies, { values in
+                return LogicValue(resolvedType, .array(values))
+            }))
         case .expression(.literalExpression(id: _, literal: let literal)):
-            if let value = context.values[literal.uuid] {
-                context.values[node.uuid] = value
-            }
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Literal expression", dependencies: [literal.uuid], { values in
+                return values[0]
+            }))
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
-//            Swift.print("ident", identifier.string)
+            guard let patternId = scopeContext.identifierToPattern[identifier.uuid] else {
+                Swift.print("Failed to find pattern for identifier expression")
+                break
+            }
 
-            guard let patternId = scopeContext.identifierToPattern[identifier.uuid] else { break }
-
-//            Swift.print("pattern id", patternId)
-
-            guard let value = context.values[patternId] else { break }
-
-//            Swift.print("value", value)
-
-            context.values[identifier.uuid] = value
-            context.values[node.uuid] = value
+            context.add(uuid: identifier.uuid, EvaluationThunk(label: "Identifier \(identifier.string)", dependencies: [patternId], { values in
+                return values[0]
+            }))
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Identifier expression \(identifier.string)", dependencies: [patternId], { values in
+                return values[0]
+            }))
         case .expression(.memberExpression):
-//            Swift.print("member")
+            guard let patternId = scopeContext.identifierToPattern[node.uuid] else {
+                Swift.print("Failed to find pattern for member expression")
+                break
+            }
 
-            guard let patternId = scopeContext.identifierToPattern[node.uuid] else { break }
-
-//            Swift.print("pattern id", patternId)
-
-            guard let type = unificationContext.patternTypes[patternId] else { break }
-
-//            Swift.print("type", type)
-
-            guard let value = context.values[patternId] else { break }
-
-//            Swift.print("value", value)
-
-            context.values[node.uuid] = value
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Member expression",  dependencies: [patternId], { values in
+                return values[0]
+            }))
         case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
             Swift.print("binary expr", left, right, op)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
 
             // Determine type based on return value of constructor function
-            guard let functionType = unificationContext.nodes[expression.uuid] else { break }
+            guard let functionType = unificationContext.nodes[expression.uuid] else {
+                Swift.print("Unknown type of functionCallExpression")
+                break
+            }
+
             let resolvedType = Unification.substitute(substitution, in: functionType)
-            guard case .fun(_, let returnType) = resolvedType else { break }
 
-            // The function value to call
-            guard let functionValue = context.values[expression.uuid] else { break }
+            guard case .fun(_, let returnType) = resolvedType else {
+                Swift.print("Invalid functionCallExpression type (only functions are valid)")
+                break
+            }
 
-            let args: [LogicValue] = arguments.compactMap {
+            let dependencies = [expression.uuid] + arguments.compactMap({
                 switch $0 {
                 case .argument(_, _, let expression):
-                    return context.values[expression.uuid]
+                    return expression.uuid
                 case .placeholder:
                     return nil
                 }
-            }
+            })
 
-            if case .function(let f) = functionValue.memory {
-                switch f {
-                case .colorSaturate:
-                    func saturate(color: LogicValue?, percent: LogicValue?) -> LogicValue {
-                        let defaultColor = LogicValue.color("black")
-                        guard let colorString = color?.colorString else { return defaultColor }
-                        guard case .number(let number)? = percent?.memory else { return defaultColor }
+            context.add(uuid: node.uuid, EvaluationThunk(label: "functionCallExpression",  dependencies: dependencies, { values in
+                let functionValue = values[0]
+                let args = Array(values.dropFirst())
 
-                        guard let nsColor = NSColor.parse(css: colorString) else { return defaultColor }
+                if case .function(let f) = functionValue.memory {
+                    switch f {
+                    case .colorSaturate:
+                        func saturate(color: LogicValue?, percent: LogicValue?) -> LogicValue {
+                            let defaultColor = LogicValue.color("black")
+                            guard let colorString = color?.colorString else { return defaultColor }
+                            guard case .number(let number)? = percent?.memory else { return defaultColor }
 
-                        let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
+                            guard let nsColor = NSColor.parse(css: colorString) else { return defaultColor }
 
-                        return LogicValue.color(newColor.cssString)
-                    }
+                            let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
 
-//                    Swift.print(f, "Args", args)
-                    if args.count >= 2 {
-                        context.values[node.uuid] = saturate(color: args[0], percent: args[1])
-                    }
-                case .stringConcat:
-                    func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
-                        guard case .string(let a)? = a?.memory else { return .unit }
-                        guard case .string(let b)? = b?.memory else { return .unit }
-                        return .init(.string, .string(a + b))
-                    }
-
-//                    Swift.print(f, "Args", args)
-                    context.values[node.uuid] = concat(a: args[0], b: args[1])
-                case .enumInit(let patternName):
-
-//                    Swift.print("init enum", returnType, patternName)
-
-                    let filtered = args.compactMap { $0 }
-
-                    if filtered.count != args.count { break }
-
-                    context.values[node.uuid] = LogicValue(returnType, .enum(caseName: patternName, associatedValues: filtered))
-
-                    break
-                case .recordInit(let members):
-                    let values: [(String, LogicValue?)] = members.reduce([]) { (result, item) in
-                        let argument = arguments.first(where: { argument in
-                            switch argument {
-                            case .argument(_, label: .some(item.0), _):
-                                return true
-                            case .argument, .placeholder:
-                                return false
-                            }
-                        })
-                        let argumentValue: LogicValue? = argument.flatMap({ argument in
-                            switch argument {
-                            case .argument(_, _, let expression):
-                                return context.values[expression.uuid]
-                            case .placeholder:
-                                return nil
-                            }
-                        })
-                        switch argumentValue {
-                        case .some:
-                            return result + [(item.0, argumentValue)]
-                        case .none:
-                            return result + [(item.0, item.1.1)]
+                            return LogicValue.color(newColor.cssString)
                         }
-                    }
 
-                    context.values[node.uuid] = LogicValue(returnType, .record(values: KeyValueList(values)))
-                    break
+                        //                    Swift.print(f, "Args", args)
+                        if args.count >= 2 {
+                            return saturate(color: args[0], percent: args[1])
+                        } else {
+                            break
+                        }
+                    case .stringConcat:
+                        func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
+                            guard case .string(let a)? = a?.memory else { return .unit }
+                            guard case .string(let b)? = b?.memory else { return .unit }
+                            return .init(.string, .string(a + b))
+                        }
+
+                        //                    Swift.print(f, "Args", args)
+                        return concat(a: args[0], b: args[1])
+                    case .enumInit(let patternName):
+
+                        //                    Swift.print("init enum", returnType, patternName)
+
+                        let filtered = args.compactMap { $0 }
+
+                        if filtered.count != args.count { break }
+
+                        return LogicValue(returnType, .enum(caseName: patternName, associatedValues: filtered))
+                    case .recordInit(let members):
+                        let values: [(String, LogicValue?)] = members.reduce([]) { (result, item) in
+                            let argument = arguments.first(where: { argument in
+                                switch argument {
+                                case .argument(_, label: .some(item.0), _):
+                                    return true
+                                case .argument, .placeholder:
+                                    return false
+                                }
+                            })
+                            let argumentValue: LogicValue? = argument.flatMap({ argument in
+                                switch argument {
+                                case .argument(_, _, let expression):
+                                    return context.values[expression.uuid]
+                                case .placeholder:
+                                    return nil
+                                }
+                            })
+                            switch argumentValue {
+                            case .some:
+                                return result + [(item.0, argumentValue)]
+                            case .none:
+                                return result + [(item.0, item.1.1)]
+                            }
+                        }
+
+                        return LogicValue(returnType, .record(values: KeyValueList(values)))
+                    }
                 }
-            }
+
+                return .unit
+            }))
         case .declaration(.variable(_, let pattern, _, let initializer, _)):
             guard let initializer = initializer else { return .success(context) }
 
-            context.values[pattern.uuid] = context.values[initializer.uuid]
+            context.add(uuid: pattern.uuid, EvaluationThunk(label: "Variable initializer for \(pattern.name)", dependencies: [initializer.uuid], { values in
+                return values[0]
+            }))
         case .declaration(.function(_, name: let pattern, returnType: _, genericParameters: _, parameters: _, block: _, _)):
             guard let type = unificationContext.patternTypes[pattern.uuid] else { break }
 
             let fullPath = rootNode.declarationPath(id: node.uuid)
 
-            switch fullPath {
-            case ["String", "concat"]:
-                context.values[pattern.uuid] = LogicValue(type, .function(.stringConcat))
-                break
-            case ["Color", "saturate"]:
-                context.values[pattern.uuid] = LogicValue(type, .function(.colorSaturate))
-                break
-            default:
+            context.add(uuid: pattern.uuid, EvaluationThunk(label: "Function declaration for \(pattern.name)", { values in
+                switch fullPath {
+                case ["String", "concat"]:
+                    return LogicValue(type, .function(.stringConcat))
+                case ["Color", "saturate"]:
+                    return LogicValue(type, .function(.colorSaturate))
+                default:
+                    return .unit
+                }
+            }))
+        case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations, _)):
+            guard let type = unificationContext.patternTypes[functionName.uuid] else {
+                Swift.print("Unknown type of record \(functionName.name)")
                 break
             }
-        case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations, _)):
-            guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
             let resolvedType = Unification.substitute(substitution, in: type)
 
-            var parameterTypes: KeyValueList<String, (Unification.T, LogicValue?)> = [:]
+            var dependencies: [UUID] = []
 
             declarations.forEach { declaration in
                 switch declaration {
-                case .variable(id: _, name: let pattern, annotation: _, initializer: let initializer, _):
-                    guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
-
-                    var initialValue: LogicValue?
-                    if let initializer = initializer {
-                        initialValue = context.values[initializer.uuid]
-                    }
-
-                    parameterTypes.set((parameterType, initialValue), for: pattern.name)
+                case .variable(id: _, name: _, annotation: _, initializer: .some(let initializer), _):
+                    dependencies.append(initializer.uuid)
                 default:
                     break
                 }
             }
 
-            context.values[functionName.uuid] = LogicValue(resolvedType, .function(.recordInit(members: parameterTypes)))
+            context.add(uuid: functionName.uuid, EvaluationThunk(label: "Record declaration for \(functionName.name)", dependencies: dependencies, { values in
+                var parameterTypes: KeyValueList<String, (Unification.T, LogicValue?)> = [:]
+
+                var index: Int = 0
+
+                declarations.forEach { declaration in
+                    switch declaration {
+                    case .variable(id: _, name: let pattern, annotation: _, initializer: let initializer, _):
+                        guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
+
+                        var initialValue: LogicValue?
+                        if initializer != nil {
+                            initialValue = values[index]
+                            index += 1
+                        }
+
+                        parameterTypes.set((parameterType, initialValue), for: pattern.name)
+                    default:
+                        break
+                    }
+                }
+
+                return LogicValue(resolvedType, .function(.recordInit(members: parameterTypes)))
+            }))
         case .declaration(.enumeration(id: _, name: let functionName, genericParameters: _, cases: let enumCases, _)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else { break }
 
@@ -301,13 +387,11 @@ extension Compiler {
                 case .placeholder:
                     break
                 case .enumerationCase(_, name: let pattern, associatedValueTypes: _, _):
-//                    guard let consType = unificationContext.patternTypes[pattern.uuid] else { break }
-
                     let resolvedConsType = Unification.substitute(substitution, in: type)
 
-//                    Swift.print("enum case", pattern, resolvedConsType)
-
-                    context.values[pattern.uuid] = LogicValue(resolvedConsType, .function(.enumInit(caseName: pattern.name)))
+                    context.add(uuid: pattern.uuid, EvaluationThunk(label: "Enum case declaration for \(pattern.name)", { values in
+                        return LogicValue(resolvedConsType, .function(.enumInit(caseName: pattern.name)))
+                    }))
                 }
             }
         default:
