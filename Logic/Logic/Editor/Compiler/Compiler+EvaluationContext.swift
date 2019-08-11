@@ -233,6 +233,8 @@ extension Compiler {
 
             let dependencies = [expression.uuid] + arguments.compactMap({
                 switch $0 {
+                case .argument(_, _, .identifierExpression(_, let identifier)) where identifier.isPlaceholder:
+                    return nil
                 case .argument(_, _, let expression):
                     return expression.uuid
                 case .placeholder:
@@ -295,6 +297,9 @@ extension Compiler {
                             })
                             let argumentValue: LogicValue? = argument.flatMap({ argument in
                                 switch argument {
+                                case .argument(_, _, .identifierExpression(_, let identifier)) where identifier.isPlaceholder:
+                                    // In the case of a placeholder identifier, continue running the function as if no argument is passed
+                                    return nil
                                 case .argument(_, _, let expression):
                                     return context.values[expression.uuid]
                                 case .placeholder:
