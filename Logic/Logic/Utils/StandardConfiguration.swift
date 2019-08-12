@@ -138,6 +138,22 @@ public enum StandardConfiguration {
 
             return (literals + identifiers + common).titleContains(prefix: query)
         case .cons:
+            // If we're within a variable declaration, we don't want to suggest the variable name as an identifier.
+            // This will cause an infinite loop/crash during execution
+            // TODO: We can prevent the crash and show an error by traversing the thunk dependency graph
+            func getSelfReferentialNamespacePaths() -> [[String]] {
+                guard let node = node, let path = rootNode.pathTo(id: node.uuid) else { return [] }
+
+                return path.dropLast().compactMap { ancestor in
+                    switch ancestor {
+                    case .declaration(.variable(_, _, _, initializer: .some(let initializer), _)) where initializer.find(id: node.uuid) != nil:
+                        return rootNode.declarationPath(id: node.uuid)
+                    default:
+                        return nil
+                    }
+                }
+            }
+
             func getIdentifierPaths(
                 scopeContext: Compiler.ScopeContext,
                 unificationContext: Compiler.UnificationContext
@@ -249,16 +265,18 @@ public enum StandardConfiguration {
                 }
             }
 
+            let selfReferentialNamespacePaths = getSelfReferentialNamespacePaths()
+
             let identifierPaths = getIdentifierPaths(
                 scopeContext: currentScopeContext,
                 unificationContext: unificationContext
-            )
+                ).filter({ !selfReferentialNamespacePaths.contains($0.keyPath) })
 
             let validSuggestionPaths = getValidSuggestionsPaths(
                 expressionType: type,
                 identifierPaths: identifierPaths,
                 unificationContext: unificationContext
-            )
+                ).filter({ !selfReferentialNamespacePaths.contains($0.keyPath) })
 
             let matchingSuggestions = getMatchingSuggestions(validSuggestionPaths: validSuggestionPaths)
 

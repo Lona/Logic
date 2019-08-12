@@ -41,7 +41,7 @@ public extension Compiler {
         }
     }
 
-    private static var builtInTypeConstructorNames = Set<String>(arrayLiteral: "Boolean", "Number", "String", "Array", "Color")
+    private static var builtInTypeConstructorNames: Set<String> = ["Boolean", "Number", "String", "Array", "Color"]
 
     static func scopeContext(
         _ node: LGCSyntaxNode,
