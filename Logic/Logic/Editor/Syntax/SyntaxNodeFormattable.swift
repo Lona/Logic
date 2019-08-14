@@ -147,8 +147,23 @@ extension LGCIdentifier: SyntaxNodeFormattable {
 }
 
 extension LGCPattern: SyntaxNodeFormattable {
+    func formatted(using options: LogicFormattingOptions, bold: Bool) -> FormatterCommand<LogicElement> {
+        let element: FormatterCommand<LogicElement> = .element(LogicElement.dropdown(id, name, bold ? .boldVariable : .variable))
+
+        if let errorMessage = options.getError(id) {
+            return .concat(
+                [
+                    element,
+                    .floatRightCollapse(.errorSummary(errorMessage, self.id))
+                ]
+            )
+        } else {
+            return element
+        }
+    }
+
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
-        return .element(LogicElement.dropdown(id, name, .variable))
+        return formatted(using: options, bold: false)
     }
 
     var formattedAsTitle: FormatterCommand<LogicElement> {
@@ -576,7 +591,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
                             .concat(
                                 [
-                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
+                                    value.name.formatted(using: options, bold: true),
                                     .hardLine,
                                     formattedInitializer,
                                     .hardLine,
@@ -598,7 +613,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
                             .concat(
                                 [
-                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
+                                    value.name.formatted(using: options, bold: true),
                                     .hardLine,
                                     formattedInitializer,
                                     .hardLine,
@@ -619,7 +634,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                             margins: NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
                             .concat(
                                 [
-                                    .element(.dropdown(value.name.uuid, value.name.name, .boldVariable)),
+                                    value.name.formatted(using: options, bold: true),
                                     .hardLine,
                                     formattedInitializer,
                                     .hardLine,

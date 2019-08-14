@@ -330,6 +330,17 @@ class Document: NSDocument {
             switch result {
             case .success(let evaluationContext):
                 successfulEvaluation = evaluationContext
+
+                if evaluationContext.hasCycle {
+                    Swift.print("Logic cycle(s) found", evaluationContext.cycles)
+                }
+
+                let cycleErrors = evaluationContext.cycles.map { cycle in
+                    return cycle.map { id -> LogicEditor.ElementError in
+                        return LogicEditor.ElementError(uuid: id, message: "A variable's definition can't include its name (there's a cycle somewhere)")
+                    }
+                }
+                logicEditor.elementErrors.append(contentsOf: Array(cycleErrors.joined()))
             case .failure(let error):
                 Swift.print("Eval failure", error)
             }

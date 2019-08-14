@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import class SwiftGraph.UnweightedGraph
 
 private extension NSColor {
     var hexString: String {
@@ -61,11 +62,48 @@ extension Compiler {
         public var values: [UUID: LogicValue]
         public var thunks: [UUID: EvaluationThunk]
 
+        public var cycles: [[UUID]] {
+            if let cycles = cachedCycles {
+                return cycles
+            }
+
+            let cycles = detectCycles()
+            cachedCycles = cycles
+            return cycles
+        }
+
+        public var hasCycle: Bool {
+            return !cycles.isEmpty
+        }
+
+        private var cachedCycles: [[UUID]]?
+
+        private func detectCycles() -> [[UUID]] {
+            let graph = UnweightedGraph<UUID>()
+
+            thunks.keys.forEach { key in
+                _ = graph.addVertex(key)
+            }
+
+            thunks.forEach { (arg) in
+                let (uuid, thunk) = arg
+                thunk.dependencies.forEach { dependency in
+                    graph.addEdge(from: uuid, to: dependency, directed: true)
+                }
+            }
+
+            return graph.detectCycles()
+        }
+
         public func add(uuid: UUID, _ thunk: EvaluationThunk) {
             thunks[uuid] = thunk
         }
 
         public func evaluate(uuid: UUID, logLevel: StandardConfiguration.LogLevel = .none) -> LogicValue? {
+            if hasCycle && cycles.joined().contains(uuid) {
+                return nil
+            }
+
             if let value = values[uuid] {
                 return value
             }

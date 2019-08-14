@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6B4218C7223DEF220060CC9A /* XMLCoder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B4218C5223DEF180060CC9A /* XMLCoder.framework */; };
-		6B4218C8223DEF220060CC9A /* XMLCoder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B4218C5223DEF180060CC9A /* XMLCoder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6B5B7535215B19EE00CDC9C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7534215B19EE00CDC9C6 /* AppDelegate.swift */; };
 		6B5B7537215B19EE00CDC9C6 /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7536215B19EE00CDC9C6 /* Document.swift */; };
 		6B5B753A215B19EE00CDC9C6 /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B5B7538215B19EE00CDC9C6 /* Document.xib */; };
@@ -16,6 +14,10 @@
 		6B5B753F215B19EF00CDC9C6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B5B753D215B19EF00CDC9C6 /* MainMenu.xib */; };
 		6B5B7568215B1C0200CDC9C6 /* Logic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B5B7567215B1C0200CDC9C6 /* Logic.framework */; };
 		6B5B7569215B1C0200CDC9C6 /* Logic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B5B7567215B1C0200CDC9C6 /* Logic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B6F19C72304B2D800E5AC60 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */; };
+		6B6F19C92304B2E500E5AC60 /* SwiftGraph.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B6F19CA2304B2E700E5AC60 /* XMLCoder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */; };
+		6B6F19CB2304B2E700E5AC60 /* XMLCoder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,8 +27,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6B4218C8223DEF220060CC9A /* XMLCoder.framework in Embed Frameworks */,
 				6B5B7569215B1C0200CDC9C6 /* Logic.framework in Embed Frameworks */,
+				6B6F19C92304B2E500E5AC60 /* SwiftGraph.framework in Embed Frameworks */,
+				6B6F19CB2304B2E700E5AC60 /* XMLCoder.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -34,7 +37,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6B4218C5223DEF180060CC9A /* XMLCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XMLCoder.framework; path = Carthage/Build/Mac/XMLCoder.framework; sourceTree = "<group>"; };
 		6B5B7531215B19ED00CDC9C6 /* TypeDesigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TypeDesigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B5B7534215B19EE00CDC9C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6B5B7536215B19EE00CDC9C6 /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
@@ -44,6 +46,8 @@
 		6B5B7540215B19EF00CDC9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B5B7541215B19EF00CDC9C6 /* TypeDesigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TypeDesigner.entitlements; sourceTree = "<group>"; };
 		6B5B7567215B1C0200CDC9C6 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XMLCoder.framework; path = Carthage/Build/Mac/XMLCoder.framework; sourceTree = "<group>"; };
+		6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +55,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B4218C7223DEF220060CC9A /* XMLCoder.framework in Frameworks */,
+				6B6F19C72304B2D800E5AC60 /* SwiftGraph.framework in Frameworks */,
+				6B6F19CA2304B2E700E5AC60 /* XMLCoder.framework in Frameworks */,
 				6B5B7568215B1C0200CDC9C6 /* Logic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,10 +67,12 @@
 		6B5B7528215B19ED00CDC9C6 = {
 			isa = PBXGroup;
 			children = (
-				6B4218C5223DEF180060CC9A /* XMLCoder.framework */,
+				6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */,
 				6B5B7567215B1C0200CDC9C6 /* Logic.framework */,
+				6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */,
 				6B5B7533215B19ED00CDC9C6 /* TypeDesigner */,
 				6B5B7532215B19ED00CDC9C6 /* Products */,
+				6B6F19B62304B00800E5AC60 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -89,6 +96,13 @@
 				6B5B753D215B19EF00CDC9C6 /* MainMenu.xib */,
 			);
 			path = TypeDesigner;
+			sourceTree = "<group>";
+		};
+		6B6F19B62304B00800E5AC60 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -315,8 +329,9 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = CV2RHZWPY9;
 				FRAMEWORK_SEARCH_PATHS = (
-					/Users/devinabbott/Projects/Logic/TypeDesigner/Carthage/Build/Mac,
+					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/../Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = TypeDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -339,8 +354,9 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = CV2RHZWPY9;
 				FRAMEWORK_SEARCH_PATHS = (
-					/Users/devinabbott/Projects/Logic/TypeDesigner/Carthage/Build/Mac,
+					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
+					"$(PROJECT_DIR)/../Carthage/Build/Mac",
 				);
 				INFOPLIST_FILE = TypeDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
