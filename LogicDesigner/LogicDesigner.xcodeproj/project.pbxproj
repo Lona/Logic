@@ -12,18 +12,21 @@
 		6B12C5E92218BD75005A808C /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5E72218BD75005A808C /* Document.xib */; };
 		6B12C5EB2218BD77005A808C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5EA2218BD77005A808C /* Assets.xcassets */; };
 		6B12C5EE2218BD77005A808C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5EC2218BD77005A808C /* MainMenu.xib */; };
-		6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; };
-		6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B6F198723049E3F00E5AC60 /* Logic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F198623049E2C00E5AC60 /* Logic.framework */; };
+		6B6F198823049E3F00E5AC60 /* Logic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F198623049E2C00E5AC60 /* Logic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B6F198A23049E7500E5AC60 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F198923049E7500E5AC60 /* SwiftGraph.framework */; };
+		6B6F198B23049E7500E5AC60 /* SwiftGraph.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F198923049E7500E5AC60 /* SwiftGraph.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		6B44E13F223B3CED00740318 /* Embed Frameworks */ = {
+		6B6F198423049E2600E5AC60 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */,
+				6B6F198823049E3F00E5AC60 /* Logic.framework in Embed Frameworks */,
+				6B6F198B23049E7500E5AC60 /* SwiftGraph.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,7 +42,8 @@
 		6B12C5ED2218BD77005A808C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6B12C5EF2218BD77005A808C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B12C5F02218BD77005A808C /* LogicDesigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LogicDesigner.entitlements; sourceTree = "<group>"; };
-		6B44E13C223B3CED00740318 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B6F198623049E2C00E5AC60 /* Logic.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Logic.framework; path = "../../../Library/Developer/Xcode/DerivedData/Logic-fkyyhgjkppbbtybvmgnmammwpwvq/Build/Products/Debug/Logic.framework"; sourceTree = "<group>"; };
+		6B6F198923049E7500E5AC60 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,7 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */,
+				6B6F198723049E3F00E5AC60 /* Logic.framework in Frameworks */,
+				6B6F198A23049E7500E5AC60 /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,8 +62,8 @@
 		6B12C5D72218BD75005A808C = {
 			isa = PBXGroup;
 			children = (
-				6B44E13C223B3CED00740318 /* Logic.framework */,
 				6B12C5E22218BD75005A808C /* LogicDesigner */,
+				6B9F9D3C23049DA50000A3BB /* Frameworks */,
 				6B12C5E12218BD75005A808C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,6 +90,15 @@
 			path = LogicDesigner;
 			sourceTree = "<group>";
 		};
+		6B9F9D3C23049DA50000A3BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6B6F198923049E7500E5AC60 /* SwiftGraph.framework */,
+				6B6F198623049E2C00E5AC60 /* Logic.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -95,7 +109,7 @@
 				6B12C5DC2218BD75005A808C /* Sources */,
 				6B12C5DD2218BD75005A808C /* Frameworks */,
 				6B12C5DE2218BD75005A808C /* Resources */,
-				6B44E13F223B3CED00740318 /* Embed Frameworks */,
+				6B6F198423049E2600E5AC60 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -312,6 +326,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = CV2RHZWPY9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = LogicDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -330,6 +349,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = CV2RHZWPY9;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(SRCROOT)/../Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = LogicDesigner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
