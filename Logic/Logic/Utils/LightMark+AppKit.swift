@@ -205,7 +205,8 @@ extension LightMark.BlockElement {
             let attributedString = elements.map { $0.attributedString() }.joined(separator: "")
 
             return LightMark.makeTextField(attributedString: attributedString)
-        case .block(language: "logic", content: let content):
+        case .block(language: "logic", content: let content),
+             .block(language: "tokens", content: let content):
             let xml = #"<?xml version="1.0"?>"# + content
 
             guard let data = xml.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
