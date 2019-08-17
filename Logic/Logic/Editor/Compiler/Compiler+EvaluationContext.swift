@@ -186,20 +186,14 @@ extension Compiler {
                 substitution: substitution,
                 context: context
                 ).flatMap({ context -> EvaluationResult in
-                    let dependencies = [condition.uuid]
+                    if let value = context.evaluate(uuid: condition.uuid),
+                        case .bool(let memory) = value.memory, memory == true,
+                        value.type == .bool {
 
-                    context.add(uuid: node.uuid, EvaluationThunk(label: "Branch Statement", dependencies: dependencies, { values in
-                        let value = values[0]
-                        if let case .bool(let memory) = value.memory, memory == true,
-                            value.type == .bool {
-
-                            return processChildren(result: .success(context))
-                        } else {
-                            return .success(context)
-                        }
-                    }))
-
-                    return .success(context)
+                        return processChildren(result: .success(context))
+                    } else {
+                        return .success(context)
+                    }
                 })
         default:
             result = processChildren(result: .success(context))
