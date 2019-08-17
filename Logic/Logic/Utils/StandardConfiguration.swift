@@ -244,17 +244,17 @@ public enum StandardConfiguration {
 
                         switch resolvedType {
                         case Unification.T.color:
-                            guard let colorString = evaluationContext?.values[id]?.colorString else { break }
+                            guard let colorString = evaluationContext?.evaluate(uuid: id)?.colorString else { break }
                             suggestion.style = .colorPreview(code: colorString, NSColor.parse(css: colorString) ?? .black)
                             return suggestion
                         default:
                             break
                         }
 
-                        if let memory = evaluationContext?.values[id]?.memory {
+                        if let memory = evaluationContext?.evaluate(uuid: id)?.memory {
                             switch memory {
                             case .bool, .number, .string:
-                                suggestion.badge = evaluationContext?.values[id]?.memory.debugDescription
+                                suggestion.badge = evaluationContext?.evaluate(uuid: id)?.memory.debugDescription
                             default:
                                 suggestion.badge = resolvedType.debugDescription
                             }

@@ -59,7 +59,7 @@ extension Compiler {
             self.thunks = thunks
         }
 
-        public var values: [UUID: LogicValue]
+        private var values: [UUID: LogicValue]
         public var thunks: [UUID: EvaluationThunk]
 
         public var cycles: [[UUID]] {
@@ -185,16 +185,22 @@ extension Compiler {
                 unificationContext: unificationContext,
                 substitution: substitution,
                 context: context
-                ).flatMap { context -> EvaluationResult in
-                    if let value = context.values[condition.uuid],
-                        case .bool(let memory) = value.memory, memory == true,
-                        value.type == .bool {
+                ).flatMap({ context -> EvaluationResult in
+                    let dependencies = [condition.uuid]
 
-                        return processChildren(result: .success(context))
-                    } else {
-                        return .success(context)
-                    }
-            }
+                    context.add(uuid: node.uuid, EvaluationThunk(label: "Branch Statement", dependencies: dependencies, { values in
+                        let value = values[0]
+                        if let case .bool(let memory) = value.memory, memory == true,
+                            value.type == .bool {
+
+                            return processChildren(result: .success(context))
+                        } else {
+                            return .success(context)
+                        }
+                    }))
+
+                    return .success(context)
+                })
         default:
             result = processChildren(result: .success(context))
         }
@@ -339,7 +345,8 @@ extension Compiler {
                                     // In the case of a placeholder identifier, continue running the function as if no argument is passed
                                     return nil
                                 case .argument(_, _, let expression):
-                                    return context.values[expression.uuid]
+                                    guard let dependencyIndex = dependencies.firstIndex(of: expression.uuid) else { return nil }
+                                    return values[dependencyIndex]
                                 case .placeholder:
                                     return nil
                                 }
