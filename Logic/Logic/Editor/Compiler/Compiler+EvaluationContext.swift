@@ -7,7 +7,29 @@
 //
 
 import Foundation
+import Colors
 import class SwiftGraph.UnweightedGraph
+
+private extension Color {
+    var rgbaString: String {
+        let r = Int(rgb.red * 255)
+        let g = Int(rgb.green * 255)
+        let b = Int(rgb.blue * 255)
+        let a = round(alpha * 100) / 100
+        return "rgba(\(r),\(g),\(b),\(a))"
+    }
+
+    var cssString: String {
+        return alpha < 1 ? rgbaString : hexString.uppercased()
+    }
+
+    init(cssString: String) {
+        let cssColor = parseCSSColor(cssString) ?? CSSColor(0, 0, 0, 0)
+        var colorValue = Color(redInt: cssColor.r, greenInt: cssColor.g, blueInt: cssColor.b)
+        colorValue.alpha = Float(cssColor.a)
+        self = colorValue
+    }
+}
 
 private extension NSColor {
     var hexString: String {
@@ -286,22 +308,57 @@ extension Compiler {
 
                 if case .function(let f) = functionValue.memory {
                     switch f {
-                    case .colorSaturate:
-                        func saturate(color: LogicValue?, percent: LogicValue?) -> LogicValue {
+                    case .colorSetHue:
+                        func setHue(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
                             let defaultColor = LogicValue.color("black")
-                            guard let colorString = color?.colorString else { return defaultColor }
-                            guard case .number(let number)? = percent?.memory else { return defaultColor }
+                            guard let colorString = colorValue?.colorString else { return defaultColor }
+                            guard case .number(let number)? = numberValue?.memory else { return defaultColor }
 
-                            guard let nsColor = NSColor.parse(css: colorString) else { return defaultColor }
+                            let originalSwiftColor = Color(cssString: colorString)
+                            let components = originalSwiftColor.hsl
+                            let newSwiftColor = Color(hue: Float(number), saturation: components.saturation, luminosity: components.luminosity)
 
-                            let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
-
-                            return LogicValue.color(newColor.cssString)
+                            return LogicValue.color(newSwiftColor.cssString)
                         }
 
-                        //                    Swift.print(f, "Args", args)
                         if args.count >= 2 {
-                            return saturate(color: args[0], percent: args[1])
+                            return setHue(colorValue: args[0], numberValue: args[1])
+                        } else {
+                            break
+                        }
+                    case .colorSetSaturation:
+                        func setSaturation(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
+                            let defaultColor = LogicValue.color("black")
+                            guard let colorString = colorValue?.colorString else { return defaultColor }
+                            guard case .number(let number)? = numberValue?.memory else { return defaultColor }
+
+                            let originalSwiftColor = Color(cssString: colorString)
+                            let components = originalSwiftColor.hsl
+                            let newSwiftColor = Color(hue: components.hue, saturation: Float(number), luminosity: components.luminosity)
+
+                            return LogicValue.color(newSwiftColor.cssString)
+                        }
+
+                        if args.count >= 2 {
+                            return setSaturation(colorValue: args[0], numberValue: args[1])
+                        } else {
+                            break
+                        }
+                    case .colorSetLuminosity:
+                        func setLuminosity(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
+                            let defaultColor = LogicValue.color("black")
+                            guard let colorString = colorValue?.colorString else { return defaultColor }
+                            guard case .number(let number)? = numberValue?.memory else { return defaultColor }
+
+                            let originalSwiftColor = Color(cssString: colorString)
+                            let components = originalSwiftColor.hsl
+                            let newSwiftColor = Color(hue: components.hue, saturation: components.saturation, luminosity: Float(number))
+
+                            return LogicValue.color(newSwiftColor.cssString)
+                        }
+
+                        if args.count >= 2 {
+                            return setLuminosity(colorValue: args[0], numberValue: args[1])
                         } else {
                             break
                         }
@@ -374,8 +431,12 @@ extension Compiler {
                 switch fullPath {
                 case ["String", "concat"]:
                     return LogicValue(type, .function(.stringConcat))
-                case ["Color", "saturate"]:
-                    return LogicValue(type, .function(.colorSaturate))
+                case ["Color", "setHue"]:
+                    return LogicValue(type, .function(.colorSetHue))
+                case ["Color", "setSaturation"]:
+                    return LogicValue(type, .function(.colorSetSaturation))
+                case ["Color", "setLuminosity"]:
+                    return LogicValue(type, .function(.colorSetLuminosity))
                 default:
                     return .unit
                 }

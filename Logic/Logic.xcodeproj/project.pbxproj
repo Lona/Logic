@@ -76,6 +76,7 @@
 		6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */; };
 		6B5B7574215C387E00CDC9C6 /* TypeParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7573215C387E00CDC9C6 /* TypeParameter.swift */; };
 		6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */; };
+		6B6F19D3230B3E1300E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D2230B3E1200E5AC60 /* Colors.framework */; };
 		6B858C21229DB13A00DE6216 /* ScopeStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C20229DB13A00DE6216 /* ScopeStack.swift */; };
 		6B858C23229DB19200DE6216 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C22229DB19200DE6216 /* Compiler.swift */; };
 		6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */; };
@@ -181,6 +182,7 @@
 		6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalTypeCaseParameter.swift; sourceTree = "<group>"; };
 		6B5B7573215C387E00CDC9C6 /* TypeParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeParameter.swift; sourceTree = "<group>"; };
 		6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTypeParameterSubstitution.swift; sourceTree = "<group>"; };
+		6B6F19D2230B3E1200E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
 		6B858C20229DB13A00DE6216 /* ScopeStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeStack.swift; sourceTree = "<group>"; };
 		6B858C22229DB19200DE6216 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
 		6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+Namespace.swift"; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B6F19D3230B3E1300E5AC60 /* Colors.framework in Frameworks */,
 				6B9F9D3B23049D140000A3BB /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -489,6 +492,7 @@
 		6B9F9D3723049C400000A3BB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6B6F19D2230B3E1200E5AC60 /* Colors.framework */,
 				6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */,
 			);
 			name = Frameworks;

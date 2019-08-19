@@ -16,6 +16,8 @@
 		6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6B6F19B32304AFFB00E5AC60 /* SwiftGraph.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6B6F19B92304B00E00E5AC60 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */; };
+		6B6F19D5230B3E2300E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D4230B3E2300E5AC60 /* Colors.framework */; };
+		6B6F19D7230B3E2B00E5AC60 /* Colors.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D4230B3E2300E5AC60 /* Colors.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +28,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */,
+				6B6F19D7230B3E2B00E5AC60 /* Colors.framework in Embed Frameworks */,
 				6B6F19B32304AFFB00E5AC60 /* SwiftGraph.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -44,6 +47,7 @@
 		6B12C5F02218BD77005A808C /* LogicDesigner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LogicDesigner.entitlements; sourceTree = "<group>"; };
 		6B44E13C223B3CED00740318 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
+		6B6F19D4230B3E2300E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +56,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */,
+				6B6F19D5230B3E2300E5AC60 /* Colors.framework in Frameworks */,
 				6B6F19B92304B00E00E5AC60 /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,6 +67,7 @@
 		6B12C5D72218BD75005A808C = {
 			isa = PBXGroup;
 			children = (
+				6B6F19D4230B3E2300E5AC60 /* Colors.framework */,
 				6B44E13C223B3CED00740318 /* Logic.framework */,
 				6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */,
 				6B12C5E22218BD75005A808C /* LogicDesigner */,

@@ -44,6 +44,20 @@ extension KeyValueList where Key: Hashable {
     }
 }
 
+extension KeyValueList: Equatable where Value: Equatable {
+    public static func == (lhs: KeyValueList<Key, Value>, rhs: KeyValueList<Key, Value>) -> Bool {
+        if lhs.pairs.count != rhs.pairs.count { return false }
+
+        for index in 0..<lhs.pairs.count {
+            if lhs.pairs[index].0 != rhs.pairs[index].0 || lhs.pairs[index].1 != rhs.pairs[index].1 {
+                return false
+            }
+        }
+
+        return true
+    }
+}
+
 extension KeyValueList: CustomDebugStringConvertible {
     public var debugDescription: String {
         let contents = pairs.map { "\($0.0): \($0.1)" }.joined(separator: ", ")

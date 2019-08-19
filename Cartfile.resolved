@@ -1,1 +1,2 @@
 github "davecom/SwiftGraph" "3.0.0"
+github "dylan/colors" "0.9.10"
