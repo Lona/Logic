@@ -255,7 +255,7 @@ extension Compiler {
             }))
         case .expression(.identifierExpression(id: _, identifier: let identifier)):
             guard let patternId = scopeContext.identifierToPattern[identifier.uuid] else {
-                Swift.print("Failed to find pattern for identifier expression")
+//                Swift.print("Failed to find pattern for identifier expression")
                 break
             }
 
@@ -308,6 +308,23 @@ extension Compiler {
 
                 if case .function(let f) = functionValue.memory {
                     switch f {
+                    case .colorFromHSL:
+                        func makeColor(componentValues: [LogicValue]) -> LogicValue {
+                            let numbers: [CGFloat] = componentValues.map { componentValue in
+                                guard case .number(let number) = componentValue.memory else { return 0 }
+                                return number
+                            }
+
+                            let newSwiftColor = Color(hue: Float(numbers[0]), saturation: Float(numbers[1]), luminosity: Float(numbers[2]))
+
+                            return LogicValue.color(newSwiftColor.cssString)
+                        }
+
+                        if args.count >= 3 {
+                            return makeColor(componentValues: args)
+                        } else {
+                            break
+                        }
                     case .colorSetHue:
                         func setHue(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
                             let defaultColor = LogicValue.color("black")
@@ -437,6 +454,8 @@ extension Compiler {
                     return LogicValue(type, .function(.colorSetSaturation))
                 case ["Color", "setLuminosity"]:
                     return LogicValue(type, .function(.colorSetLuminosity))
+                case ["Color", "fromHSL"]:
+                    return LogicValue(type, .function(.colorFromHSL))
                 default:
                     return .unit
                 }

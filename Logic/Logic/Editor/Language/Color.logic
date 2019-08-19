@@ -65,7 +65,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "A33148EC-40FC-4CB6-B397-2718B5F5D0DB"
+                    "id" : "756BD11D-D6E5-4567-A8D5-5FF9EA53826A"
                   },
                   "type" : "placeholder"
                 }
@@ -73,7 +73,7 @@
               "genericParameters" : [
                 {
                   "data" : {
-                    "id" : "589C14DD-3C39-488A-94AB-1CBA37E47DE6"
+                    "id" : "9473FA8A-F50C-46CA-A2C2-DC039CE9C63F"
                   },
                   "type" : "placeholder"
                 }
@@ -100,7 +100,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "8DE4EE2F-4DDE-46C8-9937-1539A80F740F"
+                          "id" : "A0098F5F-93EC-470C-B45B-5C458B9C7BED"
                         },
                         "type" : "placeholder"
                       }
@@ -108,7 +108,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "91CF9817-42B5-494D-B55F-9013DB1A6800"
+                          "id" : "017F7CFE-DC42-4706-AB49-52939A100DDA"
                         },
                         "type" : "placeholder"
                       }
@@ -181,7 +181,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "0DEE93C6-5AD1-41AC-8B1C-E3DAA3E6B030"
+                          "id" : "4D7EC007-0E38-4B88-A41E-7A79DEFB8EE1"
                         },
                         "type" : "placeholder"
                       }
@@ -208,7 +208,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "5D65E124-F16B-47FB-8B1C-987629BD031A"
+                          "id" : "C3BE3D05-B407-4E69-8977-F1C82425CD64"
                         },
                         "type" : "placeholder"
                       }
@@ -220,7 +220,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "FAA3A092-A2B2-4C32-B9B6-96F34822FFA3"
+                          "id" : "A73D4406-6D78-465F-A90D-5AD674C1CE1B"
                         },
                         "type" : "placeholder"
                       }
@@ -297,7 +297,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "BBE01353-684F-4089-9A96-ED46D3291C30"
+                          "id" : "197194DA-889F-46EB-85B7-9EB45D7E85DC"
                         },
                         "type" : "placeholder"
                       }
@@ -324,7 +324,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "0A0A51BF-A244-47FE-B956-C877555DBAE5"
+                          "id" : "26EC1236-B6C9-4000-94D6-CB1A169D6C72"
                         },
                         "type" : "placeholder"
                       }
@@ -332,7 +332,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "76878C9B-2213-4412-85B1-8A8141484C22"
+                          "id" : "CBB30611-BA49-4921-BEEA-4B866E6B2179"
                         },
                         "type" : "placeholder"
                       }
@@ -405,7 +405,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "6B13CED8-8154-4236-BA25-849D28A9E5AB"
+                          "id" : "CFAD214D-FEAB-40CA-B213-6DD37EB833E4"
                         },
                         "type" : "placeholder"
                       }
@@ -429,7 +429,145 @@
                 },
                 {
                   "data" : {
-                    "id" : "B66C2F98-A13E-4EF3-B020-506DD0A9CE40"
+                    "block" : [
+                      {
+                        "data" : {
+                          "id" : "F501A4DE-4D96-41D0-9FA9-D63AFF98EEE0"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "genericParameters" : [
+                      {
+                        "data" : {
+                          "id" : "026B5287-F1EB-4A0E-B256-1EA6F51FD09B"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "id" : "BD0911EA-0CF1-4BC6-A333-4B164D154901",
+                    "name" : {
+                      "id" : "0B31F854-0BA4-4675-A9A0-D75F617FC997",
+                      "name" : "fromHSL"
+                    },
+                    "parameters" : [
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "CF21C8CD-6001-463E-9D09-9D8E8D23FF7B",
+                              "identifier" : {
+                                "id" : "CE3D7CD8-C255-4E80-9983-AC97825A37A9",
+                                "isPlaceholder" : false,
+                                "string" : "Number"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "D55BB156-9803-4132-9F17-A02FAAF30BB6"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "2718750B-D038-42CD-A9C6-D697E2B8E0B7",
+                          "localName" : {
+                            "id" : "DFFE8EC0-F849-49E3-84A5-22C6745836CA",
+                            "name" : "hue"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "29D7040A-C9AC-40E9-977E-27B33A5401A8",
+                              "identifier" : {
+                                "id" : "6B96403E-90E7-4429-A01F-716FDF7BF066",
+                                "isPlaceholder" : false,
+                                "string" : "Number"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "D764154A-D792-47A3-9F5A-F52CF8E4E53B"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "28FBDB76-FD61-45DA-A87D-786D1D4B31ED",
+                          "localName" : {
+                            "id" : "BFF238DA-B01F-40D8-89EF-D1B1301C3CBF",
+                            "name" : "saturation"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "B4D77256-A454-43E1-9B73-E825BBBD07A2",
+                              "identifier" : {
+                                "id" : "A7F0CFB3-9942-4A8F-826F-76848B9FF628",
+                                "isPlaceholder" : false,
+                                "string" : "Number"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "563200E0-54C5-4CBC-82E4-0009A70655F5"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "AA808BB0-D8FF-41AB-802B-8CE49EEC9307",
+                          "localName" : {
+                            "id" : "F80E3BEC-0B0C-47BC-AB44-0E4AFA2225C9",
+                            "name" : "luminosity"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "id" : "754E29C1-6ACE-4A98-9D17-CD9D2A1AFD55"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "returnType" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "AA8093F5-AE12-4477-AA9B-A20BAA4C1A27",
+                        "identifier" : {
+                          "id" : "8EB82A7A-B874-4BE0-98DD-4FF5A0E035B0",
+                          "isPlaceholder" : false,
+                          "string" : "Color"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    }
+                  },
+                  "type" : "function"
+                },
+                {
+                  "data" : {
+                    "id" : "4F340E31-25F9-4A87-99D4-9446F66EDF7F"
                   },
                   "type" : "placeholder"
                 }
@@ -448,7 +586,7 @@
       },
       {
         "data" : {
-          "id" : "01969FFC-6865-431B-81ED-F3DD47E74B6C"
+          "id" : "AC03E6E3-2D08-44DF-A02E-BD79AA235ECC"
         },
         "type" : "placeholder"
       }
