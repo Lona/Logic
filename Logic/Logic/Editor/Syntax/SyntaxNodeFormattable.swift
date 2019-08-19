@@ -501,9 +501,10 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             case .function(id: _, name: _, returnType: _, genericParameters: let genericParameters, parameters: _, block: _, _),
                  .enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _, _),
                  .record(id: _, name: _, genericParameters: let genericParameters, declarations: _, _):
-                if genericParameters.isEmpty {
+                switch genericParameters {
+                case .empty, .next(.placeholder(_), .empty):
                     return .empty
-                } else {
+                case .next(_):
                     return .concat(
                         [
                             .hardLine,

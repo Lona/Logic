@@ -1322,7 +1322,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
                     returnType: value.returnType.replace(id: id, with: syntaxNode),
-                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     parameters: value.parameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     block: value.block.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     comment: value.comment?.replace(id: id, with: syntaxNode)
@@ -1331,7 +1331,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 return LGCDeclaration.enumeration(
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
-                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     cases: value.cases.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     comment: value.comment?.replace(id: id, with: syntaxNode)
                 )
@@ -1339,7 +1339,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 return LGCDeclaration.record(
                     id: value.id,
                     name: value.name.replace(id: id, with: syntaxNode),
-                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode),
+                    genericParameters: value.genericParameters.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     declarations: value.declarations.replace(id: id, with: syntaxNode, preservingEndingPlaceholder: true),
                     comment: value.comment?.replace(id: id, with: syntaxNode)
                 )

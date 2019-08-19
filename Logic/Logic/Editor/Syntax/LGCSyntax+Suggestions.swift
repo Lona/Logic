@@ -818,7 +818,12 @@ public extension LGCDeclaration {
                             identifier: LGCIdentifier(id: UUID(), string: "Void"),
                             genericArguments: .empty
                         ),
-                        genericParameters: .next(LGCGenericParameter.makePlaceholder(), .empty),
+                        genericParameters: .init(
+                            [
+                                .parameter(id: UUID(), name: .init(id: UUID(), name: "T")),
+                                .makePlaceholder()
+                            ]
+                        ),
                         parameters: .next(LGCFunctionParameter.placeholder(id: UUID()), .empty),
                         block: .next(LGCStatement.placeholder(id: UUID()), .empty),
                         comment: nil
@@ -851,7 +856,12 @@ public extension LGCDeclaration {
                     LGCDeclaration.enumeration(
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
-                        genericParameters: .next(.makePlaceholder(), .empty),
+                        genericParameters: .init(
+                            [
+                                .parameter(id: UUID(), name: .init(id: UUID(), name: "T")),
+                                .makePlaceholder()
+                            ]
+                        ),
                         cases: .next(LGCEnumerationCase.makePlaceholder(), .empty),
                         comment: nil
                     )
@@ -883,7 +893,12 @@ public extension LGCDeclaration {
                     LGCDeclaration.record(
                         id: UUID(),
                         name: LGCPattern(id: UUID(), name: "name"),
-                        genericParameters: .next(.makePlaceholder(), .empty),
+                        genericParameters: .init(
+                            [
+                                .parameter(id: UUID(), name: .init(id: UUID(), name: "T")),
+                                .makePlaceholder()
+                            ]
+                        ),
                         declarations: .next(LGCDeclaration.makePlaceholder(), .empty),
                         comment: nil
                     )
