@@ -225,28 +225,60 @@ class Document: NSDocument {
         }
 
         logicEditor.contextMenuForNode = { rootNode, node in
+            func makeContextMenu(for node: LGCSyntaxNode) -> NSMenu? {
+                let menu = NSMenu()
+
+                func addComment(_ uuid: UUID) {
+                    let item = NSMenuItem(title: "Add comment", action: #selector(self.handleMenuAction), keyEquivalent: "")
+                    item.representedObject = MenuAction.addComment(uuid)
+                    menu.addItem(item)
+                }
+
+                func duplicateItem(_ uuid: UUID, title: String) {
+                    let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
+                    item.representedObject = MenuAction.duplicate(uuid)
+                    menu.addItem(item)
+                }
+
+                switch node {
+                case .statement(.declaration(id: _, content: let declaration)):
+                    addComment(declaration.uuid)
+                    duplicateItem(node.uuid, title: "Duplicate statement")
+                case .declaration(let value):
+                    addComment(value.uuid)
+                    duplicateItem(node.uuid, title: "Duplicate declaration")
+                case .enumerationCase(.enumerationCase(let value)):
+                    addComment(value.id)
+                case .functionParameter(.parameter(let value)):
+                    addComment(value.id)
+                default:
+                    return nil
+                }
+
+                return menu
+            }
+
             let menu = NSMenu()
 
             func addComment(_ uuid: UUID) {
-                let addCommentItem = NSMenuItem(title: "Add comment", action: #selector(self.addComment), keyEquivalent: "")
-                addCommentItem.representedObject = MenuAction.addComment(uuid)
-                menu.addItem(addCommentItem)
+                let item = NSMenuItem(title: "Add comment", action: #selector(self.handleMenuAction), keyEquivalent: "")
+                item.representedObject = MenuAction.addComment(uuid)
+                menu.addItem(item)
+            }
+
+            func duplicateItem(_ uuid: UUID, title: String) {
+                let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
+                item.representedObject = MenuAction.duplicate(uuid)
+                menu.addItem(item)
             }
 
             switch node {
-            case .statement(.declaration(id: _, content: let declaration)):
-                addComment(declaration.uuid)
-            case .declaration(let value):
-                addComment(value.uuid)
-            case .enumerationCase(.enumerationCase(let value)):
-                addComment(value.id)
-            case .functionParameter(.parameter(let value)):
-                addComment(value.id)
+            case .pattern:
+                guard let parent = rootNode.contents.parentOf(target: node.uuid, includeTopLevel: false) else { return nil }
+                return makeContextMenu(for: parent)
             default:
-                return nil
+                return makeContextMenu(for: node)
             }
-
-            return menu
         }
 
         let makeProgram: (LGCSyntaxNode) -> LGCSyntaxNode? = Memoize.one({ rootNode in
@@ -382,12 +414,17 @@ class Document: NSDocument {
 
     private enum MenuAction {
         case addComment(UUID)
+        case duplicate(UUID)
     }
 
-    @objc func addComment(_ sender: NSMenuItem) {
+    @objc func handleMenuAction(_ sender: NSMenuItem) {
         guard let action = sender.representedObject as? MenuAction else { return }
 
         switch action {
+        case .duplicate(let id):
+            if let newRootNode = logicEditor.rootNode.duplicate(id: id) {
+                logicEditor.rootNode = newRootNode
+            }
         case .addComment(let id):
             guard let node = logicEditor.rootNode.find(id: id) else { return }
 

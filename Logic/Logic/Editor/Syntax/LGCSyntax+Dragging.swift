@@ -1,0 +1,62 @@
+//
+//  LGCSyntax+Dragging.swift
+//  Logic
+//
+//  Created by Devin Abbott on 8/19/19.
+//  Copyright © 2019 BitDisco, Inc. All rights reserved.
+//
+
+import Foundation
+
+extension LGCSyntaxNode {
+    
+    /// Find the smallest node that accepts a drop
+    public func findDropTarget(relativeTo node: LGCSyntaxNode, accepting sourceNode: LGCSyntaxNode) -> LGCSyntaxNode? {
+        guard var path = self.pathTo(id: node.uuid, includeTopLevel: true) else { return nil }
+
+        while let parent = path.dropLast().last {
+            if parent.contents.acceptsNode(rootNode: self, childNode: sourceNode) {
+                return parent
+            }
+
+            path = path.dropLast()
+        }
+
+        return nil
+    }
+
+    /// Find the smallest node that accepts a line drag
+    public func findDragSource(id: UUID) -> LGCSyntaxNode? {
+        guard var path = self.pathTo(id: id) else { return nil }
+
+        while let current = path.last {
+            if current.contents.acceptsLineDrag(rootNode: self) {
+                return current
+            }
+
+            path = path.dropLast()
+        }
+
+        return nil
+    }
+
+    /// Duplicate the selected node, returning the new root node
+    public func duplicate(id: UUID) -> LGCSyntaxNode? {
+        guard let node = find(id: id) else { return nil }
+
+        switch node {
+        case .declaration:
+            if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
+                let childIndex = targetParent.contents.children.firstIndex(of: node) {
+                let newParent = targetParent.contents.insert(childNode: node.copy(deep: true), atIndex: childIndex + 1)
+                return self.replace(id: targetParent.uuid, with: newParent.node)
+            } else {
+                break
+            }
+        default:
+            break
+        }
+
+        return nil
+    }
+}

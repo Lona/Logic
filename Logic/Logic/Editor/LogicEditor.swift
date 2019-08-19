@@ -289,7 +289,7 @@ extension LogicEditor {
 
         if let selectedRange = range(),
             let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
-            let targetNode = canvasView.selectedLine != nil ? findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
+            let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
             let shouldActivate = onChangeRootNode?(rootNode.delete(id: targetNode.uuid))
             if shouldActivate == true {
                 handleActivateElement(nil)
@@ -297,61 +297,31 @@ extension LogicEditor {
         }
     }
 
-    // Find the smallest node that accepts a line drag
-    private func findDragSource(id: UUID) -> LGCSyntaxNode? {
-        guard var path = rootNode.pathTo(id: id) else { return nil }
+    // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
+    private func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
+        let childRanges = parent.contents.children.map {
+            rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false, useOwnerId: true)
+            }.compactMap { $0 }
 
-        while let current = path.last {
-            if current.contents.acceptsLineDrag(rootNode: rootNode) {
-                return current
-            }
-
-            path = path.dropLast()
-        }
-
-        return nil
+        return childRanges.firstIndex(where: { $0.contains(index) })
     }
 
     private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
 //        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
-
-        // Find the smallest node that accepts a drop
-        func findDropTarget(relativeTo node: LGCSyntaxNode, accepting sourceNode: LGCSyntaxNode) -> LGCSyntaxNode? {
-            guard var path = rootNode.pathTo(id: node.uuid, includeTopLevel: true) else { return nil }
-
-            while let parent = path.dropLast().last {
-                if parent.contents.acceptsNode(rootNode: rootNode, childNode: sourceNode) {
-                    return parent
-                }
-
-                path = path.dropLast()
-            }
-
-            return nil
-        }
-
-        // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
-        func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
-            let childRanges = parent.contents.children.map {
-                rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false, useOwnerId: true)
-                }.compactMap { $0 }
-
-            return childRanges.firstIndex(where: { $0.contains(index) })
-        }
 
         let formattedContent = rootNode.formatted(using: formattingOptions)
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
             let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
-            let sourceNode = findDragSource(id: originalSourceNode.uuid),
+            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
             let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, includeTopLevel: true, useOwnerId: true) {
 
             // Target is within source
             if let _ = sourceNode.find(id: targetNode.uuid) { return }
 
             var initialParent = targetNode
-            while let targetParent = findDropTarget(relativeTo: initialParent, accepting: sourceNode) {
+            while let targetParent = rootNode.findDropTarget(relativeTo: initialParent, accepting: sourceNode) {
                 initialParent = targetParent
 
                 if let targetIndex = findDropIndex(relativeTo: targetNode, within: targetParent, index: destinationRange.lowerBound) {
