@@ -228,48 +228,31 @@ class Document: NSDocument {
             func makeContextMenu(for node: LGCSyntaxNode) -> NSMenu? {
                 let menu = NSMenu()
 
-                func addComment(_ uuid: UUID) {
-                    let item = NSMenuItem(title: "Add comment", action: #selector(self.handleMenuAction), keyEquivalent: "")
-                    item.representedObject = MenuAction.addComment(uuid)
-                    menu.addItem(item)
-                }
-
-                func duplicateItem(_ uuid: UUID, title: String) {
+                func makeMenuItem(title: String, action: MenuAction) -> NSMenuItem {
                     let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
-                    item.representedObject = MenuAction.duplicate(uuid)
-                    menu.addItem(item)
+                    item.representedObject = action
+                    return item
                 }
 
                 switch node {
                 case .statement(.declaration(id: _, content: let declaration)):
-                    addComment(declaration.uuid)
-                    duplicateItem(node.uuid, title: "Duplicate statement")
+                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(declaration.uuid)))
+                    menu.addItem(makeMenuItem(title: "Duplicate statement", action: MenuAction.duplicate(node.uuid)))
                 case .declaration(let value):
-                    addComment(value.uuid)
-                    duplicateItem(node.uuid, title: "Duplicate declaration")
+                    menu.addItem(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
+                    menu.addItem(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
+                    menu.addItem(.separator())
+                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
+                    menu.addItem(makeMenuItem(title: "Duplicate declaration", action: MenuAction.duplicate(node.uuid)))
                 case .enumerationCase(.enumerationCase(let value)):
-                    addComment(value.id)
+                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
                 case .functionParameter(.parameter(let value)):
-                    addComment(value.id)
+                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
                 default:
                     return nil
                 }
 
                 return menu
-            }
-
-            let menu = NSMenu()
-
-            func addComment(_ uuid: UUID) {
-                let item = NSMenuItem(title: "Add comment", action: #selector(self.handleMenuAction), keyEquivalent: "")
-                item.representedObject = MenuAction.addComment(uuid)
-                menu.addItem(item)
-            }
-
-            func duplicateItem(_ uuid: UUID, title: String) {
-                let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
-                item.representedObject = MenuAction.duplicate(uuid)
-                menu.addItem(item)
             }
 
             switch node {
@@ -415,6 +398,8 @@ class Document: NSDocument {
     private enum MenuAction {
         case addComment(UUID)
         case duplicate(UUID)
+        case insertAbove(UUID)
+        case insertBelow(UUID)
     }
 
     @objc func handleMenuAction(_ sender: NSMenuItem) {
@@ -423,6 +408,14 @@ class Document: NSDocument {
         switch action {
         case .duplicate(let id):
             if let newRootNode = logicEditor.rootNode.duplicate(id: id) {
+                logicEditor.rootNode = newRootNode
+            }
+        case .insertAbove(let id):
+            if let newRootNode = logicEditor.rootNode.insert(.above, id: id) {
+                logicEditor.rootNode = newRootNode
+            }
+        case .insertBelow(let id):
+            if let newRootNode = logicEditor.rootNode.insert(.below, id: id) {
                 logicEditor.rootNode = newRootNode
             }
         case .addComment(let id):

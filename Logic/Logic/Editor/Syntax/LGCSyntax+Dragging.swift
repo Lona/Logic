@@ -59,4 +59,27 @@ extension LGCSyntaxNode {
 
         return nil
     }
+
+    public enum InsertPosition {
+        case above, below
+    }
+
+    /// Insert a placeholder above the selected node, returning the new root node
+    public func insert(_ position: InsertPosition, id: UUID) -> LGCSyntaxNode? {
+        guard let node = find(id: id) else { return nil }
+
+        switch node {
+        case .declaration:
+            if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
+                let childIndex = targetParent.contents.children.firstIndex(of: node) {
+                let newIndex = childIndex + (position == .above ? 0 : 1)
+                let newParent = targetParent.contents.insert(childNode: .declaration(.makePlaceholder()), atIndex: newIndex)
+                return self.replace(id: targetParent.uuid, with: newParent.node)
+            }
+        default:
+            break
+        }
+
+        return nil
+    }
 }
