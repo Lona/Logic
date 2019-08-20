@@ -130,6 +130,8 @@ public class LogicCanvasView: NSView {
     public var onBlur: (() -> Void)?
     public var drawScrollerBackground: ((NSRect, Bool) -> Void)?
 
+    public var onDuplicateCommand: (() -> Void)?
+
     public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
 
     public func forceUpdate() {
@@ -220,6 +222,16 @@ public class LogicCanvasView: NSView {
 
     public override func keyDown(with event: NSEvent) {
         Swift.print("LogicElementEditor kd", event.keyCode)
+
+        let isShiftEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
+        let isCommandEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.command)
+
+        switch (event.characters) {
+        case "d" where isShiftEnabled && isCommandEnabled:
+            onDuplicateCommand?()
+        default:
+            break
+        }
 
         switch Int(event.keyCode) {
         case 36: // Enter

@@ -242,6 +242,7 @@ open class LogicEditor: NSBox {
         canvasView.onPressTabKey = nextNode
         canvasView.onPressShiftTabKey = previousNode
         canvasView.onPressDeleteKey = handleDelete
+        canvasView.onDuplicateCommand = handleDuplicateCommand
         canvasView.onMoveLine = handleMoveLine
         canvasView.onBlur = handleBlur
         canvasView.onFocus = handleFocus
@@ -273,6 +274,30 @@ extension LogicEditor {
 
     private func handleBlur() {
         handleActivateElement(nil)
+    }
+
+    private func handleDuplicateCommand() {
+        let formattedContent = rootNode.formatted(using: formattingOptions)
+        let elements = formattedContent.elements
+
+        func range() -> Range<Int>? {
+            if let selectedLine = canvasView.selectedLine {
+                return formattedContent.elementIndexRange(for: selectedLine)
+            } else {
+                return canvasView.selectedRange
+            }
+        }
+
+        if let selectedRange = range(),
+            let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
+            let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
+            if let newRootNode = rootNode.duplicate(id: targetNode.uuid) {
+                let shouldActivate = onChangeRootNode?(newRootNode)
+                if shouldActivate == true {
+                    handleActivateElement(nil)
+                }
+            }
+        }
     }
 
     private func handleDelete() {
