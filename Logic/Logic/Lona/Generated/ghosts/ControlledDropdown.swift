@@ -20,8 +20,8 @@ public class ControlledDropdown: NSBox {
     update()
   }
 
-  public convenience init(selectedIndex: Int, values: [String]) {
-    self.init(Parameters(selectedIndex: selectedIndex, values: values))
+  public convenience init(selectedIndex: Int, values: [String], keyEquivalents: [String]) {
+    self.init(Parameters(selectedIndex: selectedIndex, values: values, keyEquivalents: keyEquivalents))
   }
 
   public convenience init() {
@@ -65,6 +65,15 @@ public class ControlledDropdown: NSBox {
     set {
       if parameters.values != newValue {
         parameters.values = newValue
+      }
+    }
+  }
+
+  public var keyEquivalents: [String] {
+    get { return parameters.keyEquivalents }
+    set {
+      if parameters.keyEquivalents != newValue {
+        parameters.keyEquivalents = newValue
       }
     }
   }
@@ -185,6 +194,7 @@ extension ControlledDropdown {
   public struct Parameters: Equatable {
     public var selectedIndex: Int
     public var values: [String]
+    public var keyEquivalents: [String]
     public var onChangeIndex: ((Int) -> Void)?
     public var onHighlightIndex: ((Int?) -> Void)?
     public var onCloseMenu: (() -> Void)?
@@ -193,6 +203,7 @@ extension ControlledDropdown {
     public init(
       selectedIndex: Int,
       values: [String],
+      keyEquivalents: [String],
       onChangeIndex: ((Int) -> Void)? = nil,
       onHighlightIndex: ((Int?) -> Void)? = nil,
       onCloseMenu: (() -> Void)? = nil,
@@ -200,6 +211,7 @@ extension ControlledDropdown {
     {
       self.selectedIndex = selectedIndex
       self.values = values
+      self.keyEquivalents = keyEquivalents
       self.onChangeIndex = onChangeIndex
       self.onHighlightIndex = onHighlightIndex
       self.onCloseMenu = onCloseMenu
@@ -207,11 +219,12 @@ extension ControlledDropdown {
     }
 
     public init() {
-      self.init(selectedIndex: 0, values: [])
+      self.init(selectedIndex: 0, values: [], keyEquivalents: [])
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.selectedIndex == rhs.selectedIndex && lhs.values == rhs.values
+      return lhs.selectedIndex == rhs.selectedIndex &&
+        lhs.values == rhs.values && lhs.keyEquivalents == rhs.keyEquivalents
     }
   }
 }
@@ -238,6 +251,7 @@ extension ControlledDropdown {
     public init(
       selectedIndex: Int,
       values: [String],
+      keyEquivalents: [String],
       onChangeIndex: ((Int) -> Void)? = nil,
       onHighlightIndex: ((Int?) -> Void)? = nil,
       onCloseMenu: (() -> Void)? = nil,
@@ -248,6 +262,7 @@ extension ControlledDropdown {
           Parameters(
             selectedIndex: selectedIndex,
             values: values,
+            keyEquivalents: keyEquivalents,
             onChangeIndex: onChangeIndex,
             onHighlightIndex: onHighlightIndex,
             onCloseMenu: onCloseMenu,
@@ -255,7 +270,7 @@ extension ControlledDropdown {
     }
 
     public init() {
-      self.init(selectedIndex: 0, values: [])
+      self.init(selectedIndex: 0, values: [], keyEquivalents: [])
     }
   }
 }

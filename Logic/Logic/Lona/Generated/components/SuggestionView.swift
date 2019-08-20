@@ -26,6 +26,7 @@ public class SuggestionView: NSBox {
     selectedIndex: Int?,
     dropdownIndex: Int,
     dropdownValues: [String],
+    dropdownKeyEquivalents: [String],
     detailView: CustomDetailView,
     showsDropdown: Bool,
     suggestionFilter: SuggestionFilter,
@@ -39,6 +40,7 @@ public class SuggestionView: NSBox {
           selectedIndex: selectedIndex,
           dropdownIndex: dropdownIndex,
           dropdownValues: dropdownValues,
+          dropdownKeyEquivalents: dropdownKeyEquivalents,
           detailView: detailView,
           showsDropdown: showsDropdown,
           suggestionFilter: suggestionFilter,
@@ -158,6 +160,15 @@ public class SuggestionView: NSBox {
     set {
       if parameters.dropdownValues != newValue {
         parameters.dropdownValues = newValue
+      }
+    }
+  }
+
+  public var dropdownKeyEquivalents: [String] {
+    get { return parameters.dropdownKeyEquivalents }
+    set {
+      if parameters.dropdownKeyEquivalents != newValue {
+        parameters.dropdownKeyEquivalents = newValue
       }
     }
   }
@@ -865,6 +876,7 @@ public class SuggestionView: NSBox {
     controlledDropdownView.onChangeIndex = handleOnSelectDropdownIndex
     controlledDropdownContainerView.isHidden = !showsDropdown
     controlledDropdownView.values = dropdownValues
+    controlledDropdownView.keyEquivalents = dropdownKeyEquivalents
     controlledDropdownView.selectedIndex = dropdownIndex
     controlledDropdownView.onHighlightIndex = handleOnHighlightDropdownIndex
     controlledDropdownView.onCloseMenu = handleOnCloseDropdown
@@ -977,6 +989,7 @@ extension SuggestionView {
     public var selectedIndex: Int?
     public var dropdownIndex: Int
     public var dropdownValues: [String]
+    public var dropdownKeyEquivalents: [String]
     public var detailView: CustomDetailView
     public var showsDropdown: Bool
     public var suggestionFilter: SuggestionFilter
@@ -1005,6 +1018,7 @@ extension SuggestionView {
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
+      dropdownKeyEquivalents: [String],
       detailView: CustomDetailView,
       showsDropdown: Bool,
       suggestionFilter: SuggestionFilter,
@@ -1032,6 +1046,7 @@ extension SuggestionView {
       self.selectedIndex = selectedIndex
       self.dropdownIndex = dropdownIndex
       self.dropdownValues = dropdownValues
+      self.dropdownKeyEquivalents = dropdownKeyEquivalents
       self.detailView = detailView
       self.showsDropdown = showsDropdown
       self.suggestionFilter = suggestionFilter
@@ -1063,6 +1078,7 @@ extension SuggestionView {
           selectedIndex: nil,
           dropdownIndex: 0,
           dropdownValues: [],
+          dropdownKeyEquivalents: [],
           detailView: nil,
           showsDropdown: false,
           suggestionFilter: .recommended,
@@ -1075,9 +1091,10 @@ extension SuggestionView {
           lhs.selectedIndex == rhs.selectedIndex &&
             lhs.dropdownIndex == rhs.dropdownIndex &&
               lhs.dropdownValues == rhs.dropdownValues &&
-                lhs.detailView == rhs.detailView &&
-                  lhs.showsDropdown == rhs.showsDropdown &&
-                    lhs.suggestionFilter == rhs.suggestionFilter && lhs.showsFilterBar == rhs.showsFilterBar
+                lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents &&
+                  lhs.detailView == rhs.detailView &&
+                    lhs.showsDropdown == rhs.showsDropdown &&
+                      lhs.suggestionFilter == rhs.suggestionFilter && lhs.showsFilterBar == rhs.showsFilterBar
     }
   }
 }
@@ -1107,6 +1124,7 @@ extension SuggestionView {
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
+      dropdownKeyEquivalents: [String],
       detailView: CustomDetailView,
       showsDropdown: Bool,
       suggestionFilter: SuggestionFilter,
@@ -1137,6 +1155,7 @@ extension SuggestionView {
             selectedIndex: selectedIndex,
             dropdownIndex: dropdownIndex,
             dropdownValues: dropdownValues,
+            dropdownKeyEquivalents: dropdownKeyEquivalents,
             detailView: detailView,
             showsDropdown: showsDropdown,
             suggestionFilter: suggestionFilter,
@@ -1168,6 +1187,7 @@ extension SuggestionView {
           selectedIndex: nil,
           dropdownIndex: 0,
           dropdownValues: [],
+          dropdownKeyEquivalents: [],
           detailView: nil,
           showsDropdown: false,
           suggestionFilter: .recommended,

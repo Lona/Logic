@@ -226,6 +226,18 @@
       "assignee" : [
         "layers",
         "ControlledDropdown",
+        "keyEquivalents"
+      ],
+      "content" : [
+        "parameters",
+        "dropdownKeyEquivalents"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "ControlledDropdown",
         "selectedIndex"
       ],
       "content" : [
@@ -536,6 +548,13 @@
     },
     {
       "name" : "dropdownValues",
+      "type" : {
+        "name" : "Array",
+        "of" : "String"
+      }
+    },
+    {
+      "name" : "dropdownKeyEquivalents",
       "type" : {
         "name" : "Array",
         "of" : "String"

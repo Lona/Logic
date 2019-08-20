@@ -234,7 +234,14 @@ public class SuggestionWindow: NSWindow {
 
     public var dropdownValues: [String] {
         get { return suggestionView.dropdownValues }
-        set { suggestionView.dropdownValues = newValue }
+        set {
+            var keyEquivalents = Array<String>(repeating: "", count: newValue.count)
+            if newValue.count >= 2 {
+                keyEquivalents[newValue.count - 2] = "⌘"
+            }
+            suggestionView.dropdownKeyEquivalents = keyEquivalents
+            suggestionView.dropdownValues = newValue
+        }
     }
 
     public var onSelectDropdownIndex: ((Int) -> Void)? {

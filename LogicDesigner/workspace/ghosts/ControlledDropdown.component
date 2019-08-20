@@ -58,6 +58,13 @@
       }
     },
     {
+      "name" : "keyEquivalents",
+      "type" : {
+        "name" : "Array",
+        "of" : "String"
+      }
+    },
+    {
       "name" : "onCloseMenu",
       "type" : {
         "name" : "Function"

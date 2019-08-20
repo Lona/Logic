@@ -60,6 +60,11 @@ public class ControlledDropdown: NSPopUpButton {
         set { parameters.values = newValue }
     }
 
+    public var keyEquivalents: [String] {
+        get { return parameters.keyEquivalents }
+        set { parameters.keyEquivalents = newValue }
+    }
+
     public var onChangeIndex: ((Int) -> Void)? {
         get { return parameters.onChangeIndex }
         set { parameters.onChangeIndex = newValue }
@@ -82,13 +87,26 @@ public class ControlledDropdown: NSPopUpButton {
 
     // MARK: Private
 
+    /// Extract modifier keys from a keyEquivalent, so that we can encode the shortcut as a string
+    private func process(keyEquivalent: String) -> (String, NSEvent.ModifierFlags) {
+        if keyEquivalent.contains("⌘") {
+            let keys = keyEquivalent.replacingOccurrences(of: "⌘", with: "")
+            return (keys, .command)
+        } else {
+            return (keyEquivalent, [])
+        }
+    }
+
     private func update() {
         if itemTitles != parameters.values {
             removeAllItems()
 
             // Add items without going through NSPopUpButton methods, since those filter duplicates.
-            parameters.values.forEach { value in
-                let item = NSMenuItem(title: value, action: nil, keyEquivalent: "")
+            parameters.values.enumerated().forEach { index, value in
+                let rawKeyEquivalent = keyEquivalents.count > index ? keyEquivalents[index] : ""
+                let (keyEquivalent, modifierMask) = process(keyEquivalent: rawKeyEquivalent)
+                let item = NSMenuItem(title: value, action: nil, keyEquivalent: keyEquivalent)
+                item.keyEquivalentModifierMask = modifierMask
                 menu?.addItem(item)
             }
         }
@@ -128,6 +146,7 @@ public class ControlledDropdown: NSPopUpButton {
 extension ControlledDropdown {
     public struct Parameters: Equatable {
         public var values: [String]
+        public var keyEquivalents: [String]
         public var selectedIndex: Int
         public var onChangeIndex: ((Int) -> Void)?
         public var onHighlightIndex: ((Int?) -> Void)?
@@ -136,6 +155,7 @@ extension ControlledDropdown {
 
         public init(
             values: [String] = [],
+            keyEquivalents: [String] = [],
             selectedIndex: Int = -1,
             onChangeIndex: ((Int) -> Void)? = nil,
             onHighlightIndex: ((Int?) -> Void)? = nil,
@@ -143,6 +163,7 @@ extension ControlledDropdown {
             onOpenMenu: (() -> Void)? = nil
             ) {
             self.values = values
+            self.keyEquivalents = keyEquivalents
             self.selectedIndex = selectedIndex
             self.onChangeIndex = onChangeIndex
             self.onHighlightIndex = onHighlightIndex
