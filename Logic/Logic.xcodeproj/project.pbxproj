@@ -93,6 +93,7 @@
 		6B9528D522A0C2710094D9C7 /* CSSColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D422A0C2710094D9C7 /* CSSColor.swift */; };
 		6B9528D822A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */; };
 		6B9F9D3B23049D140000A3BB /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */; };
+		6BB64E28230DBFFE00CE2D9E /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */; };
 		6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Traversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */; };
 		6BBD0BFB2292134700EB87A9 /* EnumType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFA2292134700EB87A9 /* EnumType.swift */; };
 		6BBD0BFF2294D92B00EB87A9 /* Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFE2294D92B00EB87A9 /* Unification.swift */; };
@@ -200,6 +201,7 @@
 		6B9528D422A0C2710094D9C7 /* CSSColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSColor.swift; sourceTree = "<group>"; };
 		6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+EvaluationContext.swift"; sourceTree = "<group>"; };
 		6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
+		6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
 		6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Traversal.swift"; sourceTree = "<group>"; };
 		6BBD0BFA2292134700EB87A9 /* EnumType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumType.swift; sourceTree = "<group>"; };
 		6BBD0BFE2294D92B00EB87A9 /* Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unification.swift; sourceTree = "<group>"; };
@@ -368,12 +370,13 @@
 				6BBD0C012294DA1100EB87A9 /* KeyValueList.swift */,
 				6B1DE40422DAB9BE00FC565E /* LightMark.swift */,
 				6B44E141223B3D2200740318 /* LightMark+AppKit.swift */,
+				6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */,
 				6B87001122ECB98A007C589C /* Memoize.swift */,
 				6BBD0C0622961B9C00EB87A9 /* NameGenerator.swift */,
 				6B44E18D223B411B00740318 /* NSBezierPath+Polygon.swift */,
 				6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */,
-				6BEEA13522A713FA00905664 /* StandardConfiguration.swift */,
 				6B5A6AC522FB49BB00CA004E /* NSColor+Parsing.swift */,
+				6BEEA13522A713FA00905664 /* StandardConfiguration.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -638,6 +641,7 @@
 				6B858C23229DB19200DE6216 /* Compiler.swift in Sources */,
 				6B858C2B229DB35B00DE6216 /* Compiler+UnificationContext.swift in Sources */,
 				6B44E194223C146400740318 /* Formatter+Test.swift in Sources */,
+				6BB64E28230DBFFE00CE2D9E /* LRUCache.swift in Sources */,
 				6B5B756D215B1C5200CDC9C6 /* Array+Operations.swift in Sources */,
 				6B5B7570215C383B00CDC9C6 /* KeyedParameter.swift in Sources */,
 				6B3414A02258154500CC65D1 /* SyntaxNodePlaceholdable.swift in Sources */,

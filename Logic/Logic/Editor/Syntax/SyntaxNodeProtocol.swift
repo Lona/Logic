@@ -1902,6 +1902,7 @@ extension LGCSyntaxNode {
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
+        LGCSyntaxNode.lookupCache.remove(key: self.uuid)
         return contents.replace(id: id, with: syntaxNode).node
     }
 
@@ -1910,6 +1911,10 @@ extension LGCSyntaxNode {
     }
 
     public func find(id: UUID) -> LGCSyntaxNode? {
+        if let found = LGCSyntaxNode.lookup(rootNode: self, nodeId: id) {
+            return found
+        }
+
         return contents.find(id: id)
     }
 
@@ -1939,5 +1944,32 @@ extension LGCSyntaxNode {
 
     func comment(within root: LGCSyntaxNode) -> String? {
         return contents.comment(within: root)
+    }
+}
+
+extension LGCSyntaxNode {
+    static func makeLookupMap(from rootNode: LGCSyntaxNode) -> [UUID: LGCSyntaxNode] {
+        var map: [UUID: LGCSyntaxNode] = [:]
+
+        var nodes: [LGCSyntaxNode] = [rootNode]
+
+        while let next = nodes.popLast() {
+            map[next.uuid] = next
+            nodes.append(contentsOf: next.subnodes)
+        }
+
+        return map
+    }
+
+    fileprivate static var lookupCache: LRUCache<UUID, [UUID: LGCSyntaxNode]> = .init()
+
+    fileprivate static func lookup(rootNode: LGCSyntaxNode, nodeId: UUID) -> LGCSyntaxNode? {
+        if let map = lookupCache.item(for: rootNode.uuid) {
+            return map[nodeId]
+        } else {
+            let map = makeLookupMap(from: rootNode)
+            lookupCache.add(item: map, for: rootNode.uuid)
+            return map[nodeId]
+        }
     }
 }
