@@ -65,7 +65,7 @@
                 },
                 {
                   "data" : {
-                    "id" : "756BD11D-D6E5-4567-A8D5-5FF9EA53826A"
+                    "id" : "8019EC72-746F-41B4-8EF1-2E6B20388060"
                   },
                   "type" : "placeholder"
                 }
@@ -73,7 +73,7 @@
               "genericParameters" : [
                 {
                   "data" : {
-                    "id" : "9473FA8A-F50C-46CA-A2C2-DC039CE9C63F"
+                    "id" : "60BDD050-4F8C-4DBB-BCF9-7840E51F364D"
                   },
                   "type" : "placeholder"
                 }
@@ -100,7 +100,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "A0098F5F-93EC-470C-B45B-5C458B9C7BED"
+                          "id" : "CBE9A980-43DC-40F0-8C79-C7D7E3E1163E"
                         },
                         "type" : "placeholder"
                       }
@@ -108,7 +108,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "017F7CFE-DC42-4706-AB49-52939A100DDA"
+                          "id" : "EB29F5AC-2D54-4E21-8CC1-28CAD6B713E8"
                         },
                         "type" : "placeholder"
                       }
@@ -181,7 +181,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "4D7EC007-0E38-4B88-A41E-7A79DEFB8EE1"
+                          "id" : "7731E45F-05E0-496A-93C3-FB06326CE378"
                         },
                         "type" : "placeholder"
                       }
@@ -208,7 +208,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "C3BE3D05-B407-4E69-8977-F1C82425CD64"
+                          "id" : "7091A61B-4093-4377-B0C3-BCD43C9026D4"
                         },
                         "type" : "placeholder"
                       }
@@ -220,7 +220,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "A73D4406-6D78-465F-A90D-5AD674C1CE1B"
+                          "id" : "3E21D3FF-B65B-40F8-940B-540984F590BF"
                         },
                         "type" : "placeholder"
                       }
@@ -297,7 +297,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "197194DA-889F-46EB-85B7-9EB45D7E85DC"
+                          "id" : "82BFBDB3-796D-4D9C-8912-A116C1CB9C19"
                         },
                         "type" : "placeholder"
                       }
@@ -324,7 +324,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "26EC1236-B6C9-4000-94D6-CB1A169D6C72"
+                          "id" : "AADD776D-D4CD-4A30-9DF6-13DA38BB72DE"
                         },
                         "type" : "placeholder"
                       }
@@ -332,7 +332,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "CBB30611-BA49-4921-BEEA-4B866E6B2179"
+                          "id" : "BADAB227-E65C-440E-B46D-27EA2D3E588C"
                         },
                         "type" : "placeholder"
                       }
@@ -405,7 +405,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "CFAD214D-FEAB-40CA-B213-6DD37EB833E4"
+                          "id" : "9127B79D-85AC-4068-97F6-193B5239DFB6"
                         },
                         "type" : "placeholder"
                       }
@@ -432,7 +432,7 @@
                     "block" : [
                       {
                         "data" : {
-                          "id" : "F501A4DE-4D96-41D0-9FA9-D63AFF98EEE0"
+                          "id" : "FBFEB720-978B-4998-B298-834C7F910EB2"
                         },
                         "type" : "placeholder"
                       }
@@ -440,7 +440,7 @@
                     "genericParameters" : [
                       {
                         "data" : {
-                          "id" : "026B5287-F1EB-4A0E-B256-1EA6F51FD09B"
+                          "id" : "DE7E2CA0-680A-459B-BCE7-07B6650A93EC"
                         },
                         "type" : "placeholder"
                       }
@@ -543,7 +543,7 @@
                       },
                       {
                         "data" : {
-                          "id" : "754E29C1-6ACE-4A98-9D17-CD9D2A1AFD55"
+                          "id" : "3FD37378-48F8-4E69-92AC-962A03A9E394"
                         },
                         "type" : "placeholder"
                       }
@@ -567,7 +567,115 @@
                 },
                 {
                   "data" : {
-                    "id" : "4F340E31-25F9-4A87-99D4-9446F66EDF7F"
+                    "block" : [
+                      {
+                        "data" : {
+                          "id" : "728A73DB-55DE-48EE-BF20-269815E6D104"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "genericParameters" : [
+                      {
+                        "data" : {
+                          "id" : "A1423458-BCDB-44DD-BAC2-038DF71578F7"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "id" : "44114BD4-716D-45B4-AC20-E825588043FF",
+                    "name" : {
+                      "id" : "CA3BDD36-E77B-4BD1-AB25-A43D7443369A",
+                      "name" : "saturate"
+                    },
+                    "parameters" : [
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "82B5B935-DD38-4F66-B6EA-650031414700",
+                              "identifier" : {
+                                "id" : "FCE8F620-E080-4C56-8154-9CE4008DB5BD",
+                                "isPlaceholder" : false,
+                                "string" : "Color"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "FB8607D7-B98C-4D57-8F2E-9508178420A7"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "BC117C1D-2FB5-4DBF-A1EA-9712D6B24D79",
+                          "localName" : {
+                            "id" : "3388BB0F-AB7B-4913-8C86-2F5774D2BDC3",
+                            "name" : "color"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "annotation" : {
+                            "data" : {
+                              "genericArguments" : [
+
+                              ],
+                              "id" : "BC80DAEE-31C8-47B1-B4CF-1DA2941CCBDD",
+                              "identifier" : {
+                                "id" : "6000BC18-98E4-4A58-9C4E-E883626FB0B9",
+                                "isPlaceholder" : false,
+                                "string" : "Number"
+                              }
+                            },
+                            "type" : "typeIdentifier"
+                          },
+                          "defaultValue" : {
+                            "data" : {
+                              "id" : "0859759D-CC8B-456B-8807-1AE3CEAB1883"
+                            },
+                            "type" : "none"
+                          },
+                          "id" : "9B7A8F7A-5CC0-40EC-A845-FE1F31E5B2F9",
+                          "localName" : {
+                            "id" : "19A1AE57-782D-4E1A-8E5B-71EE1AD7386F",
+                            "name" : "amount"
+                          }
+                        },
+                        "type" : "parameter"
+                      },
+                      {
+                        "data" : {
+                          "id" : "F27F987E-65E2-400B-9686-4FF9004F937F"
+                        },
+                        "type" : "placeholder"
+                      }
+                    ],
+                    "returnType" : {
+                      "data" : {
+                        "genericArguments" : [
+
+                        ],
+                        "id" : "79ECA8A1-7C16-4611-93E2-04EF9D960480",
+                        "identifier" : {
+                          "id" : "00A4AE11-BFDF-4E16-8589-E1F7E0ECCF46",
+                          "isPlaceholder" : false,
+                          "string" : "Color"
+                        }
+                      },
+                      "type" : "typeIdentifier"
+                    }
+                  },
+                  "type" : "function"
+                },
+                {
+                  "data" : {
+                    "id" : "4059BBE2-28A8-4FF0-B5CA-C70D2BBFDAD5"
                   },
                   "type" : "placeholder"
                 }
@@ -586,7 +694,7 @@
       },
       {
         "data" : {
-          "id" : "AC03E6E3-2D08-44DF-A02E-BD79AA235ECC"
+          "id" : "32BB8EAC-DE1F-4D1D-8DBB-76EBEF4D7170"
         },
         "type" : "placeholder"
       }

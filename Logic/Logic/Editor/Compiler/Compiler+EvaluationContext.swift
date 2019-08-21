@@ -379,6 +379,25 @@ extension Compiler {
                         } else {
                             break
                         }
+                    case .colorSaturate:
+                        func saturate(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
+                            let defaultColor = LogicValue.color("black")
+                            guard let colorString = colorValue?.colorString else { return defaultColor }
+                            guard case .number(let number)? = numberValue?.memory else { return defaultColor }
+
+                            let originalSwiftColor = Color(cssString: colorString)
+                            let components = originalSwiftColor.hsl
+                            let newSaturation = max(min(components.saturation + Float(number), 100), 0)
+                            let newSwiftColor = Color(hue: components.hue, saturation: newSaturation, luminosity: components.luminosity)
+
+                            return LogicValue.color(newSwiftColor.cssString)
+                        }
+
+                        if args.count >= 2 {
+                            return saturate(colorValue: args[0], numberValue: args[1])
+                        } else {
+                            break
+                        }
                     case .stringConcat:
                         func concat(a: LogicValue?, b: LogicValue?) -> LogicValue {
                             guard case .string(let a)? = a?.memory else { return .unit }
@@ -448,6 +467,8 @@ extension Compiler {
                 switch fullPath {
                 case ["String", "concat"]:
                     return LogicValue(type, .function(.stringConcat))
+                case ["Color", "saturate"]:
+                    return LogicValue(type, .function(.colorSaturate))
                 case ["Color", "setHue"]:
                     return LogicValue(type, .function(.colorSetHue))
                 case ["Color", "setSaturation"]:

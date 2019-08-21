@@ -13,6 +13,7 @@ public struct LogicValue: CustomDebugStringConvertible {
     // MARK: Types
 
     public enum Function {
+        case colorSaturate
         case colorSetHue
         case colorSetSaturation
         case colorSetLuminosity
