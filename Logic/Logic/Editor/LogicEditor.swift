@@ -350,9 +350,7 @@ extension LogicEditor {
                 initialParent = targetParent
 
                 if let targetIndex = findDropIndex(relativeTo: targetNode, within: targetParent, index: destinationRange.lowerBound) {
-                    let newParent = targetParent.contents
-                        .insert(childNode: sourceNode.copy(), atIndex: targetIndex)
-                        .node
+                    let newParent = targetParent.insert(childNode: sourceNode.copy(), atIndex: targetIndex)
 
                     let newRoot = rootNode
                         .replace(id: targetParent.uuid, with: newParent)

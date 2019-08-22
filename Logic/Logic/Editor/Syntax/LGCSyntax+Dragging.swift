@@ -48,8 +48,8 @@ extension LGCSyntaxNode {
         case .declaration:
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
                 let childIndex = targetParent.contents.children.firstIndex(of: node) {
-                let newParent = targetParent.contents.insert(childNode: node.copy(deep: true), atIndex: childIndex + 1)
-                return self.replace(id: targetParent.uuid, with: newParent.node)
+                let newParent = targetParent.insert(childNode: node.copy(deep: true), atIndex: childIndex + 1)
+                return self.replace(id: targetParent.uuid, with: newParent)
             } else {
                 break
             }
@@ -73,8 +73,8 @@ extension LGCSyntaxNode {
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
                 let childIndex = targetParent.contents.children.firstIndex(of: node) {
                 let newIndex = childIndex + (position == .above ? 0 : 1)
-                let newParent = targetParent.contents.insert(childNode: .declaration(.makePlaceholder()), atIndex: newIndex)
-                return self.replace(id: targetParent.uuid, with: newParent.node)
+                let newParent = targetParent.insert(childNode: .declaration(.makePlaceholder()), atIndex: newIndex)
+                return self.replace(id: targetParent.uuid, with: newParent)
             }
         default:
             break

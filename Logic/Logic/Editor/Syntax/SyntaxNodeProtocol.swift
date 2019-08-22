@@ -1897,7 +1897,13 @@ extension LGCSyntaxNode {
         }
     }
 
+    func insert(childNode: LGCSyntaxNode, atIndex: Int) -> LGCSyntaxNode {
+        LGCSyntaxNode.lookupCache.remove(key: self.uuid)
+        return contents.insert(childNode: childNode, atIndex: atIndex).node
+    }
+
     public func delete(id: UUID) -> LGCSyntaxNode {
+        LGCSyntaxNode.lookupCache.remove(key: self.uuid)
         return contents.delete(id: id).node
     }
 
