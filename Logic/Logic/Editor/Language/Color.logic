@@ -340,7 +340,7 @@
                     "id" : "A2B966A8-C5D3-4C2F-8F9C-D0549D813F10",
                     "name" : {
                       "id" : "E41BF3BC-772F-4C78-AE2F-C346E8BBB1B7",
-                      "name" : "setLuminosity"
+                      "name" : "setLightness"
                     },
                     "parameters" : [
                       {
@@ -398,7 +398,7 @@
                           "id" : "75CA2C13-CEFA-419E-B779-4A0CB4415E23",
                           "localName" : {
                             "id" : "2064A7A1-04D7-4F55-8EAE-56246DFE583A",
-                            "name" : "luminosity"
+                            "name" : "lightness"
                           }
                         },
                         "type" : "parameter"
@@ -536,7 +536,7 @@
                           "id" : "AA808BB0-D8FF-41AB-802B-8CE49EEC9307",
                           "localName" : {
                             "id" : "F80E3BEC-0B0C-47BC-AB44-0E4AFA2225C9",
-                            "name" : "luminosity"
+                            "name" : "lightness"
                           }
                         },
                         "type" : "parameter"

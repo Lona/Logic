@@ -361,7 +361,7 @@ extension Compiler {
                         } else {
                             break
                         }
-                    case .colorSetLuminosity:
+                    case .colorSetLightness:
                         func setLuminosity(colorValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
                             let defaultColor = LogicValue.color("black")
                             guard let colorString = colorValue?.colorString else { return defaultColor }
@@ -472,8 +472,8 @@ extension Compiler {
                     return LogicValue(type, .function(.colorSetHue))
                 case ["Color", "setSaturation"]:
                     return LogicValue(type, .function(.colorSetSaturation))
-                case ["Color", "setLuminosity"]:
-                    return LogicValue(type, .function(.colorSetLuminosity))
+                case ["Color", "setLightness"]:
+                    return LogicValue(type, .function(.colorSetLightness))
                 case ["Color", "fromHSL"]:
                     return LogicValue(type, .function(.colorFromHSL))
                 default:

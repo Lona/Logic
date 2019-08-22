@@ -16,7 +16,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case colorSaturate
         case colorSetHue
         case colorSetSaturation
-        case colorSetLuminosity
+        case colorSetLightness
         case colorFromHSL
         case stringConcat
         case enumInit(caseName: String)
