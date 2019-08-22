@@ -10,6 +10,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>logic</string>
+				<string>tokens</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string></string>
