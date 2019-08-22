@@ -385,12 +385,11 @@ extension Compiler {
                             guard let colorString = colorValue?.colorString else { return defaultColor }
                             guard case .number(let number)? = numberValue?.memory else { return defaultColor }
 
-                            let originalSwiftColor = Color(cssString: colorString)
-                            let components = originalSwiftColor.hsl
-                            let newSaturation = max(min(components.saturation + Float(number), 100), 0)
-                            let newSwiftColor = Color(hue: components.hue, saturation: newSaturation, luminosity: components.luminosity)
+                            guard let nsColor = NSColor.parse(css: colorString) else { return defaultColor }
 
-                            return LogicValue.color(newSwiftColor.cssString)
+                            let newColor = NSColor(hue: nsColor.hueComponent, saturation: nsColor.saturationComponent * number, brightness: nsColor.brightnessComponent, alpha: nsColor.alphaComponent)
+
+                            return LogicValue.color(newColor.cssString)
                         }
 
                         if args.count >= 2 {
