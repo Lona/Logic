@@ -9,7 +9,7 @@
 import Foundation
 
 public enum Unification {
-    public struct FunctionArgument: Equatable, CustomDebugStringConvertible {
+    public struct FunctionArgument: Equatable, CustomDebugStringConvertible, Hashable {
         public var debugDescription: String {
             if let label = label {
                 return "\(label): \(type)"
@@ -27,7 +27,22 @@ public enum Unification {
         }
     }
 
-    public enum T: Equatable, CustomDebugStringConvertible {
+    public enum T: Equatable, CustomDebugStringConvertible, Hashable {
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .evar(let name):
+                hasher.combine(name)
+            case .cons(name: let name, parameters: let parameters):
+                hasher.combine(name)
+                hasher.combine(parameters.hashValue)
+            case .fun(arguments: let arguments, returnType: let returnType):
+                hasher.combine(arguments)
+                hasher.combine(returnType)
+            case .gen(let name):
+                hasher.combine(name)
+            }
+        }
+
         case evar(String)
         case cons(name: String, parameters: [T])
         case gen(String)
@@ -95,7 +110,7 @@ public enum Unification {
 
         public func replacingGenericsWithEvars(getName: () -> String) -> Unification.T {
             let replacedNames = Unification.Substitution(
-                self.genericNames.map { name in
+                uniqueKeysWithValues: self.genericNames.map { name in
                     return (.gen(name), .evar(getName()))
                 }
             )
@@ -110,7 +125,7 @@ public enum Unification {
         case kindMismatch(T, T)
     }
 
-    public typealias Substitution = KeyValueList<T, T>
+    public typealias Substitution = [T: T]
 
     public struct Constraint: Equatable, CustomDebugStringConvertible {
         var head: T
@@ -121,28 +136,16 @@ public enum Unification {
             self.tail = tail
         }
 
-        func substituting(_ substitution: Substitution) -> Constraint {
-            return Constraint(substitution[head] ?? head, substitution[tail] ?? tail)
-        }
-
         public var debugDescription: String {
             return "\(head) == \(tail)"
         }
-    }
-
-    private static func update(constraints: [Constraint], using substitution: Substitution) -> [Constraint] {
-        return constraints.map { $0.substituting(substitution) }
     }
 
     public static func unify(constraints: [Constraint], substitution: Substitution = Substitution()) -> Result<Substitution, UnificationError> {
         var substitution = substitution
         var constraints = constraints
 
-//        Swift.print("INITIAL CONSTRAINTS", constraints)
-
         while let constraint = constraints.popLast() {
-//            Swift.print("CURRENT", constraint)
-
             let head = constraint.head
             let tail = constraint.tail
 
@@ -198,18 +201,25 @@ public enum Unification {
                 Swift.print("Unify generics", head, tail)
                 break
             case (.evar, _):
-                substitution = substitution.with(tail, for: head)
+                substitution[head] = tail
             case (_, .evar):
-                substitution = substitution.with(head, for: tail)
+                substitution[tail] = head
             case (.cons, .fun), (.fun, .cons):
                 return .failure(.kindMismatch(head, tail))
             }
 
-//            Swift.print("SUBS", substitution)
-
-            constraints = update(constraints: constraints, using: substitution)
-
-//            Swift.print("CONSTRAINTS", constraints)
+            for (index, constraint) in constraints.enumerated() {
+                switch (substitution[constraint.head], substitution[constraint.tail]) {
+                case (.some(let head), .some(let tail)):
+                    constraints[index] = Constraint(head, tail)
+                case (.some(let head), .none):
+                    constraints[index] = Constraint(head, constraint.tail)
+                case (.none, .some(let tail)):
+                    constraints[index] = Constraint(constraint.head, tail)
+                case (.none, .none):
+                    break
+                }
+            }
         }
 
         return .success(substitution)
