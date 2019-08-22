@@ -110,7 +110,7 @@ public enum Unification {
 
         public func replacingGenericsWithEvars(getName: () -> String) -> Unification.T {
             let replacedNames = Unification.Substitution(
-                uniqueKeysWithValues: self.genericNames.map { name in
+                self.genericNames.map { name in
                     return (.gen(name), .evar(getName()))
                 }
             )
@@ -125,7 +125,7 @@ public enum Unification {
         case kindMismatch(T, T)
     }
 
-    public typealias Substitution = [T: T]
+    public typealias Substitution = KeyValueList<T, T>
 
     public struct Constraint: Equatable, CustomDebugStringConvertible {
         var head: T
@@ -201,9 +201,9 @@ public enum Unification {
                 Swift.print("Unify generics", head, tail)
                 break
             case (.evar, _):
-                substitution[head] = tail
+                substitution.set(tail, for: head)
             case (_, .evar):
-                substitution[tail] = head
+                substitution.set(head, for: tail)
             case (.cons, .fun), (.fun, .cons):
                 return .failure(.kindMismatch(head, tail))
             }
