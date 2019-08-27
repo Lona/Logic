@@ -8,10 +8,10 @@
 
 import Foundation
 
-public extension LGCTypeAnnotation {
+public extension LGCTypeName {
     func unificationType(genericsInScope: [String: String], getName: () -> String) -> Unification.T {
         switch self {
-        case .typeIdentifier(id: _, identifier: let identifier, genericArguments: let arguments):
+        case .typeName(_, identifier: let identifier, nestedName: nil, genericArguments: let arguments):
             if identifier.isPlaceholder { return .evar(getName()) }
 
             if let renamed = genericsInScope[identifier.string] {
@@ -21,6 +21,17 @@ public extension LGCTypeAnnotation {
             let parameters = arguments.map { $0.unificationType(genericsInScope: genericsInScope, getName: getName) }
 
             return .cons(name: identifier.string, parameters: parameters)
+        default:
+            fatalError("Not supported")
+        }
+    }
+}
+
+public extension LGCTypeAnnotation {
+    func unificationType(genericsInScope: [String: String], getName: () -> String) -> Unification.T {
+        switch self {
+        case .typeIdentifier(id: _, name: let name):
+            return name.unificationType(genericsInScope: genericsInScope, getName: getName)
         case .placeholder(id: _):
             return .evar(getName())
         default:

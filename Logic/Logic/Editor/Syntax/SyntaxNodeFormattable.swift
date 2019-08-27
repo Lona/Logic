@@ -257,11 +257,13 @@ extension LGCFunctionParameter: SyntaxNodeFormattable {
         case .parameter(let value):
             func defaultValue() -> FormatterCommand<LogicElement> {
                 switch value.annotation {
-                case .typeIdentifier(let annotation):
+                case .typeIdentifier(_, name: .typeName(let annotation)):
                     if annotation.identifier.isPlaceholder {
                         return .element(.text("no default"))
                     }
                     return value.defaultValue.formatted(using: options)
+                case .typeIdentifier(_, name: .placeholder):
+                    fatalError("Not supported")
                 case .functionType:
                     return value.defaultValue.formatted(using: options)
                 case .placeholder:
@@ -331,10 +333,12 @@ extension LGCEnumerationCase: SyntaxNodeFormattable {
     }
 }
 
-extension LGCTypeAnnotation: SyntaxNodeFormattable {
+extension LGCTypeName: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
-        case .typeIdentifier(let value):
+        case .placeholder(let value):
+            return .element(LogicElement.dropdown(value, "", .variable))
+        case .typeName(let value):
             switch value.genericArguments {
             case .empty:
                 return value.identifier.formatted(using: options)
@@ -352,6 +356,15 @@ extension LGCTypeAnnotation: SyntaxNodeFormattable {
                     ]
                 )
             }
+        }
+    }
+}
+
+extension LGCTypeAnnotation: SyntaxNodeFormattable {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
+        switch self {
+        case .typeIdentifier(let value):
+            return value.name.formatted(using: options)
         case .functionType(let value):
             return .concat(
                 [
@@ -579,7 +592,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
 
                 if let initializer = value.initializer {
                     switch annotation {
-                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                    case .typeIdentifier(id: _, name: .typeName(_, identifier: let identifier, nestedName: nil, genericArguments: .empty))
                         where identifier.string == Unification.T.color.name && options.style == .visual:
 
                         let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
@@ -601,7 +614,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 ]
                             )
                         )
-                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                    case .typeIdentifier(id: _, name: .typeName(_, identifier: let identifier, nestedName: nil, genericArguments: .empty))
                         where identifier.string == Unification.T.shadow.name && options.style == .visual:
 
                         let shadowInfo = options.getShadow(initializer.uuid) ?? NSShadow(color: .clear, offset: .zero, blur: 0)
@@ -622,7 +635,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 ]
                             )
                         )
-                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty)
+                    case .typeIdentifier(id: _, name: .typeName(_, identifier: let identifier, nestedName: nil, genericArguments: .empty))
                         where identifier.string == Unification.T.textStyle.name && options.style == .visual:
 
                         let textStyleInfo = options.getTextStyle(initializer.uuid) ?? TextStyle()
@@ -643,7 +656,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                                 ]
                             )
                         )
-                    case .typeIdentifier(id: _, identifier: let identifier, genericArguments: .empty) where identifier.isPlaceholder:
+                    case .typeIdentifier(id: _, name: .typeName(_, identifier: let identifier, nestedName: nil, genericArguments: .empty)) where identifier.isPlaceholder:
                         break
                     default:
                         contents.append(.element(.text("=")))

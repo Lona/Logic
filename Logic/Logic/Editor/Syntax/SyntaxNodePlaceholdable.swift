@@ -153,3 +153,18 @@ extension LGCFunctionCallArgument: SyntaxNodePlaceholdable {
         return .placeholder(id: UUID())
     }
 }
+
+extension LGCTypeName: SyntaxNodePlaceholdable {
+    public var isPlaceholder: Bool {
+        switch self {
+        case .placeholder:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public static func makePlaceholder() -> LGCTypeName {
+        return .placeholder(id: UUID())
+    }
+}

@@ -268,6 +268,9 @@
     <Case name="functionCallArgument">
       <Case.Param type="FunctionCallArgument"/>
     </Case>
+    <Case name="typeName">
+      <Case.Param type="TypeName"/>
+    </Case>
   </Type>
   <Type name="FunctionParameter">
     <Record name="parameter">
@@ -298,10 +301,7 @@
   <Type name="TypeAnnotation">
     <Record name="typeIdentifier">
       <Record.Param name="id" type="UUID"/>
-      <Record.Param name="identifier" type="Identifier"/>
-      <Record.Param name="genericArguments" type="List">
-        <Record.Substitution generic="T" instance="TypeAnnotation"/>
-      </Record.Param>
+      <Record.Param name="name" type="TypeName"/>
     </Record>
     <Record name="functionType">
       <Record.Param name="id" type="UUID"/>
@@ -370,6 +370,21 @@
     <Record name="comment">
       <Record.Param name="id" type="UUID"/>
       <Record.Param name="string" type="String"/>
+    </Record>
+  </Type>
+  <Type name="TypeName">
+    <Record name="typeName">
+      <Record.Param name="id" type="UUID"/>
+      <Record.Param name="identifier" type="Identifier"/>
+      <Record.Param name="nestedName" type="Optional">
+        <Record.Substitution generic="Value" instance="TypeName"/>
+      </Record.Param>
+      <Record.Param name="genericArguments" type="List">
+        <Record.Substitution generic="T" instance="TypeName"/>
+      </Record.Param>
+    </Record>
+    <Record name="placeholder">
+      <Record.Param name="id" type="UUID"/>
     </Record>
   </Type>
 </root>

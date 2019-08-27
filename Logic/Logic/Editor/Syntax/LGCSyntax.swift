@@ -600,6 +600,7 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
   case topLevelDeclarations(LGCTopLevelDeclarations)
   case comment(LGCComment)
   case functionCallArgument(LGCFunctionCallArgument)
+  case typeName(LGCTypeName)
 
   // MARK: Codable
 
@@ -648,6 +649,8 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         self = .comment(try container.decode(LGCComment.self, forKey: .data))
       case "functionCallArgument":
         self = .functionCallArgument(try container.decode(LGCFunctionCallArgument.self, forKey: .data))
+      case "typeName":
+        self = .typeName(try container.decode(LGCTypeName.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -707,6 +710,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .functionCallArgument(let value):
         try container.encode("functionCallArgument", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .typeName(let value):
+        try container.encode("typeName", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
@@ -825,7 +831,7 @@ public indirect enum LGCFunctionParameterDefaultValue: Codable & Equatable {
 }
 
 public indirect enum LGCTypeAnnotation: Codable & Equatable {
-  case typeIdentifier(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeAnnotation>)
+  case typeIdentifier(id: UUID, name: LGCTypeName)
   case functionType(id: UUID, returnType: LGCTypeAnnotation, argumentTypes: LGCList<LGCTypeAnnotation>)
   case placeholder(id: UUID)
 
@@ -838,8 +844,7 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
 
   public enum DataCodingKeys: CodingKey {
     case id
-    case identifier
-    case genericArguments
+    case name
     case returnType
     case argumentTypes
   }
@@ -854,8 +859,7 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
         self =
           .typeIdentifier(
             id: try data.decode(UUID.self, forKey: .id),
-            identifier: try data.decode(LGCIdentifier.self, forKey: .identifier),
-            genericArguments: try data.decode(LGCList.self, forKey: .genericArguments))
+            name: try data.decode(LGCTypeName.self, forKey: .name))
       case "functionType":
         self =
           .functionType(
@@ -877,8 +881,7 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable {
       case .typeIdentifier(let value):
         try container.encode("typeIdentifier", forKey: .type)
         try data.encode(value.id, forKey: .id)
-        try data.encode(value.identifier, forKey: .identifier)
-        try data.encode(value.genericArguments, forKey: .genericArguments)
+        try data.encode(value.name, forKey: .name)
       case .functionType(let value):
         try container.encode("functionType", forKey: .type)
         try data.encode(value.id, forKey: .id)
@@ -1043,4 +1046,60 @@ public struct LGCComment: Codable & Equatable {
 
   public var id: UUID
   public var string: String
+}
+
+public indirect enum LGCTypeName: Codable & Equatable {
+  case typeName(id: UUID, identifier: LGCIdentifier, nestedName: Optional<LGCTypeName>, genericArguments: LGCList<LGCTypeName>)
+  case placeholder(id: UUID)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public enum DataCodingKeys: CodingKey {
+    case id
+    case identifier
+    case nestedName
+    case genericArguments
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let data = try container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "typeName":
+        self =
+          .typeName(
+            id: try data.decode(UUID.self, forKey: .id),
+            identifier: try data.decode(LGCIdentifier.self, forKey: .identifier),
+            nestedName: try data.decodeIfPresent(LGCTypeName.self, forKey: .nestedName),
+            genericArguments: try data.decode(LGCList.self, forKey: .genericArguments))
+      case "placeholder":
+        self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
+      default:
+        fatalError("Failed to decode enum due to invalid case type.")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    var data = container.nestedContainer(keyedBy: DataCodingKeys.self, forKey: CodingKeys.data)
+
+    switch self {
+      case .typeName(let value):
+        try container.encode("typeName", forKey: .type)
+        try data.encode(value.id, forKey: .id)
+        try data.encode(value.identifier, forKey: .identifier)
+        try data.encodeIfPresent(value.nestedName, forKey: .nestedName)
+        try data.encode(value.genericArguments, forKey: .genericArguments)
+      case .placeholder(let value):
+        try container.encode("placeholder", forKey: .type)
+        try data.encode(value, forKey: .id)
+    }
+  }
 }

@@ -70,14 +70,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "B5A51D75-E1A7-484F-85D3-62407ADDCAF9",
-                              "identifier" : {
-                                "id" : "C9931B02-C4F9-4BF8-B93E-B957EA52A477",
-                                "isPlaceholder" : false,
-                                "string" : "Boolean"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "Boolean"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -100,14 +106,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "155FB7B2-6556-4B84-8542-1853C84F060A",
-                              "identifier" : {
-                                "id" : "EE6530FA-6167-4544-80B8-4ADFAA29BC3D",
-                                "isPlaceholder" : false,
-                                "string" : "Boolean"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "Boolean"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -135,14 +147,20 @@
                     ],
                     "returnType" : {
                       "data" : {
-                        "genericArguments" : [
+                        "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                        "name" : {
+                          "data" : {
+                            "genericArguments" : [
 
-                        ],
-                        "id" : "D5456457-2F77-4B22-975A-B375AC5115FE",
-                        "identifier" : {
-                          "id" : "DD636E7B-30C7-4131-BFA3-D2EBF36C1A75",
-                          "isPlaceholder" : false,
-                          "string" : "Boolean"
+                            ],
+                            "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                            "identifier" : {
+                              "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                              "isPlaceholder" : false,
+                              "string" : "Boolean"
+                            }
+                          },
+                          "type" : "typeName"
                         }
                       },
                       "type" : "typeIdentifier"
@@ -178,14 +196,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "7A159A94-56B0-4CB9-A9E2-9116AB7CB8F8",
-                              "identifier" : {
-                                "id" : "D9DF70E6-7839-4DDC-95BB-7FE9E52267EC",
-                                "isPlaceholder" : false,
-                                "string" : "Boolean"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "Boolean"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -208,14 +232,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "20919B79-0C6E-4729-9C5D-41307395B90B",
-                              "identifier" : {
-                                "id" : "BE105338-A4C1-4074-8818-CD1F85B3D683",
-                                "isPlaceholder" : false,
-                                "string" : "Boolean"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "Boolean"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -243,14 +273,20 @@
                     ],
                     "returnType" : {
                       "data" : {
-                        "genericArguments" : [
+                        "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                        "name" : {
+                          "data" : {
+                            "genericArguments" : [
 
-                        ],
-                        "id" : "CC5AF7EA-99D5-4E65-9F92-D35BE1B38FE0",
-                        "identifier" : {
-                          "id" : "A42B7A6C-5BE8-439E-B0E6-34F9AC09ACDA",
-                          "isPlaceholder" : false,
-                          "string" : "Boolean"
+                            ],
+                            "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                            "identifier" : {
+                              "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                              "isPlaceholder" : false,
+                              "string" : "Boolean"
+                            }
+                          },
+                          "type" : "typeName"
                         }
                       },
                       "type" : "typeIdentifier"
@@ -382,14 +418,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "1E0D1535-ED5C-4166-B99B-16321CDA0417",
-                              "identifier" : {
-                                "id" : "CF7FC633-47F4-44C4-8A3A-2FAEB01B6355",
-                                "isPlaceholder" : false,
-                                "string" : "String"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "String"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -412,14 +454,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "BD807FD6-59E5-4B8C-B361-D4C0DE6DF64E",
-                              "identifier" : {
-                                "id" : "052BA7E7-6E65-4078-A6AB-7ACDC16C96F3",
-                                "isPlaceholder" : false,
-                                "string" : "String"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "String"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -447,14 +495,20 @@
                     ],
                     "returnType" : {
                       "data" : {
-                        "genericArguments" : [
+                        "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                        "name" : {
+                          "data" : {
+                            "genericArguments" : [
 
-                        ],
-                        "id" : "05537C49-76C8-437B-B383-7DB7728E8830",
-                        "identifier" : {
-                          "id" : "234EB031-31F7-4773-9E99-C1D258F75E13",
-                          "isPlaceholder" : false,
-                          "string" : "String"
+                            ],
+                            "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                            "identifier" : {
+                              "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                              "isPlaceholder" : false,
+                              "string" : "String"
+                            }
+                          },
+                          "type" : "typeName"
                         }
                       },
                       "type" : "typeIdentifier"
@@ -564,14 +618,20 @@
                         "data" : {
                           "annotation" : {
                             "data" : {
-                              "genericArguments" : [
+                              "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                              "name" : {
+                                "data" : {
+                                  "genericArguments" : [
 
-                              ],
-                              "id" : "BC6CEF89-A575-4A16-AD48-710FB1BFA751",
-                              "identifier" : {
-                                "id" : "5A1BE8DF-A13B-4F4D-BCDD-78BF2E4F0F66",
-                                "isPlaceholder" : false,
-                                "string" : "Number"
+                                  ],
+                                  "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                                  "identifier" : {
+                                    "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                    "isPlaceholder" : false,
+                                    "string" : "Number"
+                                  }
+                                },
+                                "type" : "typeName"
                               }
                             },
                             "type" : "typeIdentifier"
@@ -599,14 +659,20 @@
                     ],
                     "returnType" : {
                       "data" : {
-                        "genericArguments" : [
+                        "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                        "name" : {
+                          "data" : {
+                            "genericArguments" : [
 
-                        ],
-                        "id" : "0197C7AE-2087-4245-BD19-FBFFCD908586",
-                        "identifier" : {
-                          "id" : "2BF75873-3B54-4B0C-89FC-52DC1F88AD87",
-                          "isPlaceholder" : false,
-                          "string" : "Element"
+                            ],
+                            "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                            "identifier" : {
+                              "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                              "isPlaceholder" : false,
+                              "string" : "Element"
+                            }
+                          },
+                          "type" : "typeName"
                         }
                       },
                       "type" : "typeIdentifier"
@@ -643,14 +709,20 @@
                     "associatedValueTypes" : [
                       {
                         "data" : {
-                          "genericArguments" : [
+                          "id" : "94A397CA-EB76-490C-BED9-E787D22E9181",
+                          "name" : {
+                            "data" : {
+                              "genericArguments" : [
 
-                          ],
-                          "id" : "635972CA-C330-425F-8016-F54227B7C0FD",
-                          "identifier" : {
-                            "id" : "5B8A2D22-3B57-438F-989B-324D268A2235",
-                            "isPlaceholder" : false,
-                            "string" : "Wrapped"
+                              ],
+                              "id" : "78C4C4B4-C3D9-411D-9EC2-4206FF855E87",
+                              "identifier" : {
+                                "id" : "8BD45F86-FC16-4977-85C9-ABAD9060C02D",
+                                "isPlaceholder" : false,
+                                "string" : "Wrapped"
+                              }
+                            },
+                            "type" : "typeName"
                           }
                         },
                         "type" : "typeIdentifier"

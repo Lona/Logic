@@ -298,18 +298,21 @@ public extension LGCFunctionParameterDefaultValue {
 public extension LGCTypeAnnotation {
     enum Suggestion {
         public static func from(type: Unification.T) -> LogicSuggestionItem {
-            func makeTypeAnnotation(type: Unification.T) -> LGCTypeAnnotation {
+            func makeTypeAnnotation(type: Unification.T) -> LGCTypeName {
                 switch type {
                 case .cons(name: let name, parameters: let parameters):
-                    return LGCTypeAnnotation.typeIdentifier(
+                    let arguments: [LGCTypeName] = parameters.map(makeTypeAnnotation(type:))
+                    return LGCTypeName.typeName(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: name),
-                        genericArguments: .init(parameters.map(makeTypeAnnotation(type:)))
+                        identifier: .init(id: UUID(), string: name),
+                        nestedName: nil,
+                        genericArguments: .init(arguments)
                     )
                 case .evar(let name), .gen(let name):
-                    return LGCTypeAnnotation.typeIdentifier(
+                    return LGCTypeName.typeName(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: name),
+                        identifier: .init(id: UUID(), string: name),
+                        nestedName: nil,
                         genericArguments: .empty
                     )
                 case .fun:
@@ -321,7 +324,9 @@ public extension LGCTypeAnnotation {
                 title: type.name,
                 badge: "Type",
                 category: "Types".uppercased(),
-                node: LGCSyntaxNode.typeAnnotation(makeTypeAnnotation(type: type))
+                node: .typeAnnotation(
+                    .typeIdentifier(id: UUID(), name: makeTypeAnnotation(type: type))
+                )
             )
         }
     }
@@ -356,14 +361,20 @@ public extension LGCTypeAnnotation {
                 node: LGCSyntaxNode.typeAnnotation(
                     LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
-                        identifier: LGCIdentifier(id: UUID(), string: "Optional"),
-                        genericArguments: .next(
-                            LGCTypeAnnotation.typeIdentifier(
-                                id: UUID(),
-                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
-                                genericArguments: .empty
-                            ),
-                            .empty
+                        name: .typeName(
+                            id: UUID(),
+                            identifier: LGCIdentifier(id: UUID(), string: "Optional"),
+                            nestedName: nil,
+                            genericArguments: .init(
+                                [
+                                    LGCTypeName.typeName(
+                                        id: UUID(),
+                                        identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                                        nestedName: nil,
+                                        genericArguments: .empty
+                                    )
+                                ]
+                            )
                         )
                     )
                 )
@@ -375,13 +386,15 @@ public extension LGCTypeAnnotation {
                     LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
                         identifier: LGCIdentifier(id: UUID(), string: "Array"),
-                        genericArguments: .next(
-                            LGCTypeAnnotation.typeIdentifier(
-                                id: UUID(),
-                                identifier: LGCIdentifier(id: UUID(), string: "Void"),
-                                genericArguments: .empty
-                            ),
-                            .empty
+                        genericArguments: .init(
+                            [
+                                LGCTypeName.typeName(
+                                    id: UUID(),
+                                    identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                                    nestedName: nil,
+                                    genericArguments: .empty
+                                )
+                            ]
                         )
                     )
                 )
@@ -1103,6 +1116,8 @@ public extension LGCSyntaxNode {
             return [
                 .init(title: "TODO", category: "TODO", node: .identifier(.init(id: UUID(), string: "TODO")))
             ]
+        case .typeName:
+            fatalError("TODO")
         }
     }
 }

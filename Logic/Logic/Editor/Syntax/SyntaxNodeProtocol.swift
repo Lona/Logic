@@ -130,6 +130,65 @@ extension LGCIdentifier: SyntaxNodeProtocol {
     }
 }
 
+extension LGCTypeName: SyntaxNodeProtocol {
+    public func copy(deep: Bool) -> LGCTypeName {
+        switch self {
+        case .placeholder(let value):
+            return LGCTypeName.placeholder(id: value)
+        case .typeName(let value):
+            return LGCTypeName.typeName(
+                id: UUID(),
+                identifier: value.identifier.copy(deep: deep),
+                nestedName: value.nestedName?.copy(deep: deep),
+                genericArguments: value.genericArguments.copy(deep: deep)
+            )
+        }
+    }
+
+    public var subnodes: [LGCSyntaxNode] {
+        switch self {
+        case .placeholder:
+            return []
+        case .typeName(let value):
+            return [value.identifier.node] + value.genericArguments.map { $0.node } + [value.nestedName].compactMap { $0?.node }
+        }
+    }
+
+    public var nodeTypeDescription: String {
+        return "TypeName"
+    }
+
+    public var node: LGCSyntaxNode {
+        return .typeName(self)
+    }
+
+    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCTypeName {
+        switch syntaxNode {
+        case .typeName(let newNode) where id == uuid:
+            return newNode
+        default:
+            return self
+        }
+    }
+
+    public var uuid: UUID {
+        switch self {
+        case .placeholder(let value):
+            return value
+        case .typeName(let value):
+            return value.id
+        }
+    }
+
+    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
+        return .next
+    }
+
+    public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
+        return false
+    }
+}
+
 extension LGCPattern: SyntaxNodeProtocol {
     public func copy(deep: Bool) -> LGCPattern {
         return .init(id: UUID(), name: name)
@@ -177,7 +236,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
         switch self {
         case .typeIdentifier(let value):
-            return [value.identifier.node] + value.genericArguments.map { $0.node }
+            return [value.name.node]
         case .functionType(let value):
             return [value.returnType.node] + value.argumentTypes.map { $0.node }
         case .placeholder:
@@ -231,8 +290,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
             case .typeIdentifier(let value):
                 return LGCTypeAnnotation.typeIdentifier(
                     id: value.id,
-                    identifier: value.identifier.replace(id: id, with: syntaxNode),
-                    genericArguments: value.genericArguments.replace(id: id, with: syntaxNode)
+                    name: value.name.replace(id: id, with: syntaxNode)
                 )
             case .functionType(let value):
                 return LGCTypeAnnotation.functionType(
@@ -251,8 +309,7 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         case .typeIdentifier(let value):
             return LGCTypeAnnotation.typeIdentifier(
                 id: value.id,
-                identifier: value.identifier.copy(deep: deep),
-                genericArguments: value.genericArguments.copy(deep: deep)
+                name: value.name.copy(deep: deep)
             )
         case .functionType(let value):
             return LGCTypeAnnotation.functionType(
@@ -1894,6 +1951,8 @@ extension LGCSyntaxNode {
             return value
         case .functionCallArgument(let value):
             return value
+        case .typeName(let value):
+            return value
         }
     }
 
@@ -1977,5 +2036,14 @@ extension LGCSyntaxNode {
             lookupCache.add(item: map, for: rootNode.uuid)
             return map[nodeId]
         }
+    }
+}
+
+extension LGCTypeAnnotation {
+    public static func typeIdentifier(id: UUID, identifier: LGCIdentifier, genericArguments: LGCList<LGCTypeName>) -> LGCTypeAnnotation {
+        return LGCTypeAnnotation.typeIdentifier(
+            id: id,
+            name: .typeName(id: UUID(), identifier: identifier, nestedName: nil, genericArguments: genericArguments)
+        )
     }
 }

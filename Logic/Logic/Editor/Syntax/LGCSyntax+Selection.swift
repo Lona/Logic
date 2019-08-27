@@ -14,12 +14,16 @@ public extension LGCSyntaxNode {
 
         func redirect(current: LGCSyntaxNode, remaining: [LGCSyntaxNode]) -> UUID {
             switch current {
+            case .typeName:
+                if let parent = remaining.last {
+                    return parent.uuid
+                }
             case .identifier:
                 if let parent = remaining.last {
                     switch parent {
                     case .expression(.identifierExpression):
                         return redirect(current: parent, remaining: remaining.dropLast())
-                    case .typeAnnotation(.typeIdentifier(_, identifier: let identifier, _)):
+                    case .typeAnnotation(.typeIdentifier(_, name: let identifier)):
                         if identifier.uuid == current.uuid {
                             return redirect(current: parent, remaining: remaining.dropLast())
                         }
