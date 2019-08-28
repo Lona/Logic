@@ -154,17 +154,12 @@ public enum StandardConfiguration {
                 }
             }
 
-            func getIdentifierPaths(
-                scopeContext: Compiler.ScopeContext,
-                unificationContext: Compiler.UnificationContext
-                ) -> [(keyPath: [String], id: UUID)] {
-
+            func getIdentifierPaths() -> [(keyPath: [String], id: UUID)] {
                 let currentScopePaths = currentScopeContext.patternsInScope.map({ pattern -> ([String], UUID) in
                     return ([pattern.name], pattern.uuid)
                 })
 
-                let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
-
+                let namespacePaths = scopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
                     // Ignore variables in scope, which are listed by their shortest name
                     if currentScopePaths.contains(where: { id == $1 }) { return nil }
 
@@ -267,10 +262,7 @@ public enum StandardConfiguration {
 
             let selfReferentialNamespacePaths = getSelfReferentialNamespacePaths()
 
-            let identifierPaths = getIdentifierPaths(
-                scopeContext: currentScopeContext,
-                unificationContext: unificationContext
-                ).filter({ !selfReferentialNamespacePaths.contains($0.keyPath) })
+            let identifierPaths = getIdentifierPaths().filter({ !selfReferentialNamespacePaths.contains($0.keyPath) })
 
             let validSuggestionPaths = getValidSuggestionsPaths(
                 expressionType: type,
@@ -493,6 +485,17 @@ public enum StandardConfiguration {
                                         break
                                     }
                                 }
+                            case .declaration(.record(let record)):
+                                record.declarations.forEach { declaration in
+                                    switch declaration {
+                                    case .variable(_, let labelPattern, _, _, _) where labelPattern.name == argument.label:
+                                        if let comment = declaration.comment(within: rootNode) {
+                                            labelComment = comment
+                                        }
+                                    default:
+                                        break
+                                    }
+                                }
                             }
                         }
                     default:
@@ -526,56 +529,76 @@ public enum StandardConfiguration {
                 return nil
             }
         case .typeAnnotation:
-            return currentScopeContext.patternToTypeName.map { key, value in
-                let node = rootNode.pathTo(id: key)?.last(where: { item in
-                    switch item {
-                    case .declaration:
-                        return true
-                    default:
-                        return false
-                    }
+            func getTypePaths() -> [(keyPath: [String], id: UUID)] {
+                let currentScopePaths = currentScopeContext.typesInScope.map({ pattern -> ([String], UUID) in
+                    return ([pattern.name], pattern.uuid)
                 })
 
-                switch node {
-                case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _, _))),
-                     .some(.declaration(.record(id: _, name: _, genericParameters: let genericParameters, declarations: _, _))):
-                    let parameterNames: [String] = genericParameters.compactMap { param in
-                        switch param {
-                        case .parameter(_, name: let pattern):
-                            return pattern.name
-                        case .placeholder:
-                            return nil
+                let namespacePaths = currentScopeContext.typeNamespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
+                    // Ignore variables in scope, which are listed by their shortest name
+                    if currentScopePaths.contains(where: { id == $1 }) { return nil }
+
+                    return (keyPath, id)
+                })
+
+                return namespacePaths + currentScopePaths
+            }
+
+            return getTypePaths()
+                .map({ keyPath, uuid in
+                    if keyPath.count != 1 { fatalError("Types must be declared at the top-level namespace for now") }
+
+                    let key = uuid
+                    let value = keyPath.last!
+                    let node = rootNode.pathTo(id: key)?.last(where: { item in
+                        switch item {
+                        case .declaration:
+                            return true
+                        default:
+                            return false
                         }
-                    }
+                    })
 
-                    if parameterNames.contains(value) {
-                        return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value))
-                    }
-
-                    let params: [Unification.T] = genericParameters.compactMap { param in
-                        switch param {
-                        case .parameter(id: _, name: let pattern):
-                            return .evar(pattern.name)
-                        case .placeholder:
-                            return nil
+                    switch node {
+                    case .some(.declaration(.enumeration(id: _, name: _, genericParameters: let genericParameters, cases: _, _))),
+                         .some(.declaration(.record(id: _, name: _, genericParameters: let genericParameters, declarations: _, _))):
+                        let parameterNames: [String] = genericParameters.compactMap { param in
+                            switch param {
+                            case .parameter(_, name: let pattern):
+                                return pattern.name
+                            case .placeholder:
+                                return nil
+                            }
                         }
-                    }
 
-                    var suggestion = LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
-
-                    if let comment = node?.comment(within: rootNode) {
-                        suggestion.documentation = { _ in
-                            return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
+                        if parameterNames.contains(value) {
+                            return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value))
                         }
+
+                        let params: [Unification.T] = genericParameters.compactMap { param in
+                            switch param {
+                            case .parameter(id: _, name: let pattern):
+                                return .evar(pattern.name)
+                            case .placeholder:
+                                return nil
+                            }
+                        }
+
+                        var suggestion = LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: params))
+
+                        if let comment = node?.comment(within: rootNode) {
+                            suggestion.documentation = { _ in
+                                return LightMark.makeScrollView(LightMark.parse(comment), renderingOptions: .init(formattingOptions: formattingOptions))
+                            }
+                        }
+
+                        return suggestion
+                    default:
+                        break
                     }
 
-                    return suggestion
-                default:
-                    break
-                }
-
-                return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: []))
-                }.titleContains(prefix: query)
+                    return LGCTypeAnnotation.Suggestion.from(type: .cons(name: value, parameters: []))
+                }).titleContains(prefix: query)
         case .expression(let expression):
             guard let unificationType = unificationContext.nodes[expression.uuid] else {
                 Swift.print("Can't determine suggestions - no type for expression", expression.uuid)

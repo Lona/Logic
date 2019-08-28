@@ -117,7 +117,6 @@ class Document: NSDocument {
 
         let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
 
-        var annotations: [UUID: String] = [:]
         var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
         var successfulEvaluation: Compiler.EvaluationContext?
 
@@ -202,6 +201,10 @@ class Document: NSDocument {
 
                 return .color(NSColor.parse(css: colorValue) ?? NSColor.black)
             }
+
+//            if let value = successfulEvaluation?.evaluate(uuid: node.uuid, logLevel: .verbose) {
+//                return .label(labelFont, value.debugDescription)
+//            }
 
 //            if let annotation = annotations[node.uuid] {
 //                switch node {

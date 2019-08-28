@@ -160,6 +160,8 @@ extension Compiler {
                     }
                 }
 
+                // Generic function parameters don't use namespace scoping, so we rename them here.
+                // TODO: Is there a different way we can make these unambiguous
                 var genericInScope: [String: String] = [:]
                 genericNames.forEach { name in
                     genericInScope[name] = result.makeGenericName()
