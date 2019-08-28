@@ -18,9 +18,31 @@ public struct LogicValue: CustomDebugStringConvertible {
         case colorSetSaturation
         case colorSetLightness
         case colorFromHSL
+        case arrayAt
         case stringConcat
         case enumInit(caseName: String)
         case recordInit(members: KeyValueList<String, (Unification.T, LogicValue?)>)
+
+        init?(qualifiedName: [String]) {
+            switch qualifiedName {
+            case ["Color", "saturate"]:
+                self = .colorSaturate
+            case ["Color", "setHue"]:
+                self = .colorSetHue
+            case ["Color", "setSaturation"]:
+                self = .colorSetSaturation
+            case ["Color", "setLightness"]:
+                self = .colorSetLightness
+            case ["Color", "fromHSL"]:
+                self = .colorFromHSL
+            case ["Array", "at"]:
+                self = .arrayAt
+            case ["String", "concat"]:
+                self = .stringConcat
+            default:
+                return nil
+            }
+        }
     }
 
     public indirect enum Memory: CustomDebugStringConvertible {

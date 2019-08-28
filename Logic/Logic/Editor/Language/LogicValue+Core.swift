@@ -39,4 +39,13 @@ extension LogicValue {
             return nil
         }
     }
+
+    public var array: [LogicValue]? {
+        switch memory {
+        case .array(let values):
+            return values
+        default:
+            return nil
+        }
+    }
 }

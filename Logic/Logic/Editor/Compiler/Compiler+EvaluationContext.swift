@@ -132,7 +132,7 @@ extension Compiler {
 
             if let thunk = thunks[uuid] {
                 if logLevel == .verbose, let label = thunk.label {
-                    Swift.print("Evaluate thunk: \(label) - \(thunk.dependencies.map { $0.uuidString }.joined(separator: ", "))")
+                    Swift.print("Evaluate thunk: \(label) \(uuid) - [\(thunk.dependencies.map { $0.uuidString }.joined(separator: ", "))]")
                 }
 
                 let resolvedDependencies = thunk.dependencies.map { evaluate(uuid: $0, logLevel: logLevel) }
@@ -145,7 +145,7 @@ extension Compiler {
                         if let unresolvedThunk = thunks[unresolved] {
                             Swift.print("Unresolved thunk", unresolvedThunk.label ?? "")
                         } else {
-                            Swift.print("Missing thunk")
+                            Swift.print("Missing thunk", unresolved)
                         }
                     }
 
@@ -244,7 +244,7 @@ extension Compiler {
 
             let resolvedType = Unification.substitute(substitution, in: type)
 
-            let dependencies = expressions.filter { $0.isPlaceholder }.map { $0.uuid }
+            let dependencies = expressions.filter { !$0.isPlaceholder }.map { $0.uuid }
 
             context.add(uuid: node.uuid, EvaluationThunk(label: "Array Literal", dependencies: dependencies, { values in
                 return LogicValue(resolvedType, .array(values))
@@ -446,6 +446,22 @@ extension Compiler {
                         }
 
                         return LogicValue(returnType, .record(values: KeyValueList(values)))
+                    case .arrayAt:
+                        func arrayAt(arrayValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
+                            guard let array = arrayValue?.array else { return .unit }
+                            guard case .number(let float)? = numberValue?.memory else { return .unit }
+                            let number = Int(float)
+                            if number < 0 || number > array.count - 1 { return .unit }
+                            return array[number]
+                        }
+
+                        if args.count >= 2 {
+                            let result = arrayAt(arrayValue: args[0], numberValue: args[1])
+                            Swift.print("Access array at \(args[1]): \(result)")
+                            return result
+                        } else {
+                            break
+                        }
                     }
                 }
 
@@ -463,22 +479,8 @@ extension Compiler {
             let fullPath = rootNode.declarationPath(id: node.uuid)
 
             context.add(uuid: pattern.uuid, EvaluationThunk(label: "Function declaration for \(pattern.name)", { values in
-                switch fullPath {
-                case ["String", "concat"]:
-                    return LogicValue(type, .function(.stringConcat))
-                case ["Color", "saturate"]:
-                    return LogicValue(type, .function(.colorSaturate))
-                case ["Color", "setHue"]:
-                    return LogicValue(type, .function(.colorSetHue))
-                case ["Color", "setSaturation"]:
-                    return LogicValue(type, .function(.colorSetSaturation))
-                case ["Color", "setLightness"]:
-                    return LogicValue(type, .function(.colorSetLightness))
-                case ["Color", "fromHSL"]:
-                    return LogicValue(type, .function(.colorFromHSL))
-                default:
-                    return .unit
-                }
+                guard let f = LogicValue.Function(qualifiedName: fullPath) else { return .unit }
+                return LogicValue(type, .function(f))
             }))
         case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations, _)):
             guard let type = unificationContext.patternTypes[functionName.uuid] else {
