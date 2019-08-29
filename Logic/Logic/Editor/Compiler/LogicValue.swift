@@ -18,6 +18,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case colorSetSaturation
         case colorSetLightness
         case colorFromHSL
+        case numberRange
         case arrayAt
         case stringConcat
         case enumInit(caseName: String)
@@ -35,6 +36,8 @@ public struct LogicValue: CustomDebugStringConvertible {
                 self = .colorSetLightness
             case ["Color", "fromHSL"]:
                 self = .colorFromHSL
+            case ["Number", "range"]:
+                self = .numberRange
             case ["Array", "at"]:
                 self = .arrayAt
             case ["String", "concat"]:

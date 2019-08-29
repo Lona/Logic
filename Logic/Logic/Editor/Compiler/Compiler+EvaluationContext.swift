@@ -462,6 +462,30 @@ extension Compiler {
                         } else {
                             break
                         }
+                    case .numberRange:
+                        func numberRange(from startValue: LogicValue?, to endValue: LogicValue?, strideValue: LogicValue?) -> LogicValue {
+                            guard case .number(let start)? = startValue?.memory,
+                                case .number(let end)? = endValue?.memory
+                                else { return .unit }
+
+                            var step: CGFloat
+                            if case .number(let value)? = strideValue?.memory {
+                                step = value
+                            } else {
+                                step = 1
+                            }
+
+                            let range = stride(from: start, to: end, by: step).map { LogicValue.number($0) }
+                            return LogicValue(.array(.number), .array(range))
+                        }
+
+                        if args.count >= 2 {
+                            let result = numberRange(from: args[0], to: args[1], strideValue: args.count > 2 ? args[2] : nil)
+                            Swift.print("Access array at \(args[1]): \(result)")
+                            return result
+                        } else {
+                            break
+                        }
                     }
                 }
 
