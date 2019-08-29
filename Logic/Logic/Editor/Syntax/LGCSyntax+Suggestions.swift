@@ -117,12 +117,7 @@ public extension LGCIdentifier {
     }
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let items = [
-            Suggestion.name("bar"),
-            Suggestion.name("foo")
-        ]
-
-        return items.titleContains(prefix: prefix)
+        return []
     }
 }
 
@@ -238,32 +233,12 @@ There's no need to escape characters in string literals. This will be done autom
     }
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let items = [
-            Suggestion.true,
-            Suggestion.false,
-            LogicSuggestionItem(
-                title: "red",
-                category: "Colors".uppercased(),
-                node: LGCSyntaxNode.literal(.color(id: UUID(), value: "red")),
-                style: .colorPreview(code: "#FF0000", .red)
-            )
-        ]
-
-        return items.titleContains(prefix: prefix)
+        return []
     }
 }
 
 public extension LGCFunctionParameterDefaultValue {
     func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
-//        let inferredType = inferType(
-//            within: root,
-//            context: [
-//                TypeEntity.nativeType(NativeType(name: "Boolean")),
-//                TypeEntity.nativeType(NativeType(name: "Number")),
-//                TypeEntity.nativeType(NativeType(name: "String")),
-//            ]
-//        )
-
         let items = [
             LogicSuggestionItem(
                 title: "No default",
@@ -735,26 +710,20 @@ public extension LGCExpression {
     }
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let items = [
-            Suggestion.comparison,
-            assignmentSuggestionItem
-        ]
+//        let items = [
+//            Suggestion.comparison,
+//            assignmentSuggestionItem
+//        ]
+//
+//        let literalExpressions: [LogicSuggestionItem] = LGCLiteral
+//            .suggestions(for: prefix)
+//            .compactMap(Suggestion.from(literalSuggestion:))
+//
+//        return items.titleContains(prefix: prefix) +
+//            LGCIdentifier.suggestions(for: prefix) +
+//            literalExpressions
 
-        let literalExpressions: [LogicSuggestionItem] = LGCLiteral
-            .suggestions(for: prefix)
-            .compactMap(Suggestion.from(literalSuggestion:))
-
-//        let textStyleExample = LogicSuggestionItem(
-//            title: "Title Muted",
-//            category: "Text Styles".uppercased(),
-//            node: LGCSyntaxNode.identifier(LGCIdentifier(id: UUID(), string: "TextStyles.title")),
-//            style: .textStylePreview(TextStyle(weight: .bold, size: 18, color: NSColor.purple))
-//        )
-
-        return items.titleContains(prefix: prefix) +
-            LGCIdentifier.suggestions(for: prefix) +
-//            [textStyleExample].titleContains(prefix: prefix) +
-            literalExpressions
+        return []
     }
 }
 

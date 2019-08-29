@@ -102,6 +102,7 @@ class Document: NSDocument {
             self.logicEditor.suggestionFilter = value
         }
 
+        logicEditor.placeholderText = "Search"
         logicEditor.showsMinimap = true
         logicEditor.showsDropdown = true
         logicEditor.showsFilterBar = true

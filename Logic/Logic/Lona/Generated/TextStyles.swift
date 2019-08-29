@@ -9,5 +9,6 @@ class TextStyles {
   public static let row = TextStyle()
   public static let rowInverse = TextStyle(color: Colors.white)
   public static let rowDisabled = TextStyle(color: Colors.textMuted)
+  public static let subtitleMuted = TextStyle(weight: NSFont.Weight.light, size: 18, color: Colors.textMuted)
   public static let defaultStyle = TextStyle()
 }

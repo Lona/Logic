@@ -31,6 +31,13 @@
       "color" : "textMuted",
       "id" : "rowDisabled",
       "name" : "Row Disabled"
+    },
+    {
+      "color" : "textMuted",
+      "fontSize" : 18,
+      "fontWeight" : "300",
+      "id" : "subtitleMuted",
+      "name" : "Subtitle Muted"
     }
   ]
 }

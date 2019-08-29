@@ -111,6 +111,8 @@ open class LogicEditor: NSBox {
 
     public var showsDropdown: Bool = true
 
+    public var placeholderText: String? = nil
+
     public var showsFilterBar: Bool = false
 
     public var showsMinimap: Bool = false {
@@ -199,6 +201,28 @@ open class LogicEditor: NSBox {
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
     private let minimapScroller = MinimapScroller(frame: .zero)
+
+    private var emptyTextField = LNATextField(labelWithString: "")
+
+    private var emptyDetailView: NSView {
+        let container = NSView()
+        let textField = emptyTextField
+
+        container.addSubview(textField)
+
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
+        textField.centerYAnchor.constraint(equalTo: container.centerYAnchor).isActive = true
+        textField.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor, constant: 30).isActive = true
+        textField.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: 30).isActive = true
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        textField.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        textField.lineBreakMode = .byCharWrapping
+
+        return container
+    }
 
     private func setScroll(enabled: Bool) {
         if enabled {
@@ -541,7 +565,11 @@ extension LogicEditor {
         for suggestion: LogicSuggestionItem?,
         query: String,
         builder: LogicSuggestionItem.DynamicSuggestionBuilder) -> NSView? {
-        guard let suggestion = suggestion else { return nil }
+        guard let suggestion = suggestion else {
+            let text = query.isEmpty ? "No suggestions available" : "No results for \"\(query)\""
+            emptyTextField.attributedStringValue = TextStyles.subtitleMuted.apply(to: text)
+            return emptyDetailView
+        }
 
         return documentationForSuggestion(rootNode, suggestion, query, formattingOptions, builder)
     }
@@ -628,6 +656,7 @@ extension LogicEditor {
             )
         }
 
+        childWindow.placeholderText = placeholderText
         childWindow.showsDropdown = showsDropdown
         childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
