@@ -731,9 +731,9 @@ public extension LGCExpression {
     }
 }
 
-public extension LGCDeclaration {
-    enum Suggestion {
-        static func variable(query: String) -> LogicSuggestionItem {
+extension LGCDeclaration {
+    public enum Suggestion {
+        public static func variable(query: String) -> LogicSuggestionItem {
             let nameId = UUID()
             let typeId = UUID()
 
@@ -760,7 +760,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static func function(query: String) -> LogicSuggestionItem {
+        public static func function(query: String) -> LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: makeTitle(label: "Function", query: query),
                 category: categoryTitle,
@@ -782,7 +782,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static var genericFunction: LogicSuggestionItem {
+        public static var genericFunction: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Generic Function",
                 category: "GENERIC \(categoryTitle)",
@@ -809,7 +809,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static func `enum`(query: String) -> LogicSuggestionItem? {
+        public static func `enum`(query: String) -> LogicSuggestionItem? {
             if let first = query.first, first.isLowercase { return nil }
 
             let patternId = UUID()
@@ -831,7 +831,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static var genericEnum: LogicSuggestionItem {
+        public static var genericEnum: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Generic Enumeration Type",
                 category: "GENERIC \(categoryTitle)",
@@ -852,7 +852,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static func record(query: String) -> LogicSuggestionItem? {
+        public static func record(query: String) -> LogicSuggestionItem? {
             if let first = query.first, first.isLowercase { return nil }
 
             let patternId = UUID()
@@ -874,7 +874,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static var genericRecord: LogicSuggestionItem {
+        public static var genericRecord: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Generic Record Type",
                 category: "GENERIC \(categoryTitle)",
@@ -895,7 +895,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static func namespace(query: String) -> LogicSuggestionItem? {
+        public static func namespace(query: String) -> LogicSuggestionItem? {
             if let first = query.first, first.isLowercase { return nil }
 
             let patternId = UUID()
@@ -915,7 +915,7 @@ public extension LGCDeclaration {
             )
         }
 
-        static var `import`: LogicSuggestionItem {
+        public static var `import`: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Import",
                 category: categoryTitle,
@@ -928,10 +928,10 @@ public extension LGCDeclaration {
             )
         }
 
-        static let categoryTitle = "Declarations".uppercased()
+        public static let categoryTitle = "Declarations".uppercased()
     }
 
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
+    public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
             Suggestion.variable(query: prefix),
             Suggestion.function(query: prefix),
