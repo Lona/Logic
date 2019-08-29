@@ -8,6 +8,10 @@
 
 import AppKit
 
+private func makeTitle(label: String, query: String) -> String {
+    return label + (query.isEmpty ? "" : ": \(query)")
+}
+
 public struct LogicSuggestionItem {
     public enum Style {
         case normal
@@ -729,17 +733,20 @@ public extension LGCExpression {
 
 public extension LGCDeclaration {
     enum Suggestion {
-        static var variable: LogicSuggestionItem {
+        static func variable(query: String) -> LogicSuggestionItem {
+            let nameId = UUID()
+            let typeId = UUID()
+
             return LogicSuggestionItem(
-                title: "Variable",
+                title: makeTitle(label: "Variable", query: query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.variable(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCPattern(id: nameId, name: query.isEmpty ? "name" : query),
                         annotation: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
+                            identifier: LGCIdentifier(id: typeId, string: "type", isPlaceholder: true),
                             genericArguments: .empty
                         ),
                         initializer: .identifierExpression(
@@ -748,21 +755,22 @@ public extension LGCDeclaration {
                         ),
                         comment: nil
                     )
-                )
+                ),
+                nextFocusId: query.isEmpty ? nameId : typeId
             )
         }
 
-        static var function: LogicSuggestionItem {
+        static func function(query: String) -> LogicSuggestionItem {
             return LogicSuggestionItem(
-                title: "Function",
+                title: makeTitle(label: "Function", query: query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.function(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCPattern(id: UUID(), name: query.isEmpty ? "name" : query),
                         returnType: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "Void"),
+                            identifier: LGCIdentifier(id: UUID(), string: "Type", isPlaceholder: true),
                             genericArguments: .empty
                         ),
                         genericParameters: .empty,
@@ -801,19 +809,25 @@ public extension LGCDeclaration {
             )
         }
 
-        static var `enum`: LogicSuggestionItem {
+        static func `enum`(query: String) -> LogicSuggestionItem? {
+            if let first = query.first, first.isLowercase { return nil }
+
+            let patternId = UUID()
+            let placeholderId = UUID()
+
             return LogicSuggestionItem(
-                title: "Enumeration Type",
+                title: makeTitle(label: "Enumeration Type", query: query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.enumeration(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         genericParameters: .empty,
-                        cases: .next(LGCEnumerationCase.makePlaceholder(), .empty),
+                        cases: .next(.placeholder(id: placeholderId), .empty),
                         comment: nil
                     )
-                )
+                ),
+                nextFocusId: query.isEmpty ? patternId : placeholderId
             )
         }
 
@@ -838,19 +852,25 @@ public extension LGCDeclaration {
             )
         }
 
-        static var record: LogicSuggestionItem {
+        static func record(query: String) -> LogicSuggestionItem? {
+            if let first = query.first, first.isLowercase { return nil }
+
+            let patternId = UUID()
+            let placeholderId = UUID()
+
             return LogicSuggestionItem(
-                title: "Record Type",
+                title: makeTitle(label: "Record Type", query: query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.record(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         genericParameters: .empty,
-                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty),
+                        declarations: .next(.placeholder(id: placeholderId), .empty),
                         comment: nil
                     )
-                )
+                ),
+                nextFocusId: query.isEmpty ? patternId : placeholderId
             )
         }
 
@@ -876,23 +896,22 @@ public extension LGCDeclaration {
         }
 
         static func namespace(query: String) -> LogicSuggestionItem? {
-            if let first = query.first, first.isLowercase {
-                return nil
-            }
+            if let first = query.first, first.isLowercase { return nil }
 
             let patternId = UUID()
+            let placeholderId = UUID()
 
             return LogicSuggestionItem(
-                title: "Namespace" + (query.isEmpty ? "" : " " + query),
+                title: makeTitle(label: "Namespace", query: query),
                 category: categoryTitle,
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.namespace(
                         id: UUID(),
                         name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
-                        declarations: .next(LGCDeclaration.makePlaceholder(), .empty)
+                        declarations: .next(.placeholder(id: placeholderId), .empty)
                     )
                 ),
-                nextFocusId: patternId
+                nextFocusId: query.isEmpty ? patternId : placeholderId
             )
         }
 
@@ -914,11 +933,11 @@ public extension LGCDeclaration {
 
     static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            Suggestion.variable,
-            Suggestion.function,
-            Suggestion.enum,
-            Suggestion.record,
-            Suggestion.namespace(query: ""),
+            Suggestion.variable(query: prefix),
+            Suggestion.function(query: prefix),
+            Suggestion.enum(query: prefix),
+            Suggestion.record(query: prefix),
+            Suggestion.namespace(query: prefix),
             Suggestion.genericFunction,
             Suggestion.genericEnum,
             Suggestion.genericRecord,
