@@ -51,6 +51,8 @@ public class SuggestionWindow: NSWindow {
         suggestionView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
         suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
+        suggestionView.suggestionListWidth = 200
+        suggestionView.showsSuggestionDetails = true
         suggestionView.searchInput.isBordered = false
         suggestionView.searchInput.focusRingType = .none
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)

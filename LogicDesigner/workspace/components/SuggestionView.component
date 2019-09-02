@@ -15,9 +15,42 @@
         "showsFilterBar" : true,
         "suggestionFilter" : null
       }
+    },
+    {
+      "id" : "name",
+      "name" : "name",
+      "params" : {
+        "onSelectIndex" : null,
+        "showsSuggestionDetails" : false,
+        "suggestionListWidth" : 300
+      }
     }
   ],
   "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "Detail Area",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsSuggestionDetails"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "VDivider",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsSuggestionDetails"
+      ],
+      "type" : "AssignExpr"
+    },
     {
       "assignee" : [
         "layers",
@@ -343,6 +376,18 @@
       "type" : "AssignExpr"
     },
     {
+      "assignee" : [
+        "layers",
+        "Suggestion List Container",
+        "width"
+      ],
+      "content" : [
+        "parameters",
+        "suggestionListWidth"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
       "body" : [
         {
           "assignee" : [
@@ -621,6 +666,22 @@
     {
       "name" : "showsFilterBar",
       "type" : "Boolean"
+    },
+    {
+      "defaultValue" : {
+        "data" : 200,
+        "type" : "Number"
+      },
+      "name" : "suggestionListWidth",
+      "type" : "Number"
+    },
+    {
+      "defaultValue" : {
+        "data" : true,
+        "type" : "Boolean"
+      },
+      "name" : "showsSuggestionDetails",
+      "type" : "Boolean"
     }
   ],
   "root" : {
@@ -731,7 +792,8 @@
             "params" : {
               "alignSelf" : "stretch",
               "backgroundColor" : "raisedBackground",
-              "flex" : 1
+              "flex" : 1,
+              "visible" : false
             },
             "type" : "Lona:View"
           }

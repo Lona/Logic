@@ -30,7 +30,9 @@ public class SuggestionView: NSBox {
     detailView: CustomDetailView,
     showsDropdown: Bool,
     suggestionFilter: SuggestionFilter,
-    showsFilterBar: Bool)
+    showsFilterBar: Bool,
+    suggestionListWidth: CGFloat,
+    showsSuggestionDetails: Bool)
   {
     self
       .init(
@@ -44,7 +46,9 @@ public class SuggestionView: NSBox {
           detailView: detailView,
           showsDropdown: showsDropdown,
           suggestionFilter: suggestionFilter,
-          showsFilterBar: showsFilterBar))
+          showsFilterBar: showsFilterBar,
+          suggestionListWidth: suggestionListWidth,
+          showsSuggestionDetails: showsSuggestionDetails))
   }
 
   public convenience init() {
@@ -239,6 +243,24 @@ public class SuggestionView: NSBox {
     }
   }
 
+  public var suggestionListWidth: CGFloat {
+    get { return parameters.suggestionListWidth }
+    set {
+      if parameters.suggestionListWidth != newValue {
+        parameters.suggestionListWidth = newValue
+      }
+    }
+  }
+
+  public var showsSuggestionDetails: Bool {
+    get { return parameters.showsSuggestionDetails }
+    set {
+      if parameters.showsSuggestionDetails != newValue {
+        parameters.showsSuggestionDetails = newValue
+      }
+    }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -278,6 +300,14 @@ public class SuggestionView: NSBox {
   private var controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint: NSLayoutConstraint?
   private var controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint: NSLayoutConstraint?
   private var controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint: NSLayoutConstraint?
+  private var detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint: NSLayoutConstraint?
+  private var suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint: NSLayoutConstraint?
+  private var suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint: NSLayoutConstraint?
   private var filterContainerViewBottomAnchorBottomAnchorConstraint: NSLayoutConstraint?
   private var filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint: NSLayoutConstraint?
   private var filterContainerViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
@@ -300,7 +330,13 @@ public class SuggestionView: NSBox {
   private var filterDividerViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
   private var filterDividerViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
   private var filterDividerViewHeightAnchorConstraint: NSLayoutConstraint?
+  private var vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint: NSLayoutConstraint?
+  private var vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var vDividerViewWidthAnchorConstraint: NSLayoutConstraint?
   private var filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var suggestionListContainerViewWidthAnchorConstraint: NSLayoutConstraint?
 
   private func setUpViews() {
     boxType = .custom
@@ -420,23 +456,6 @@ public class SuggestionView: NSBox {
     let suggestionListContainerViewBottomAnchorConstraint = suggestionListContainerView
       .bottomAnchor
       .constraint(equalTo: suggestionAreaView.bottomAnchor)
-    let vDividerViewLeadingAnchorConstraint = vDividerView
-      .leadingAnchor
-      .constraint(equalTo: suggestionListContainerView.trailingAnchor)
-    let vDividerViewTopAnchorConstraint = vDividerView.topAnchor.constraint(equalTo: suggestionAreaView.topAnchor)
-    let vDividerViewBottomAnchorConstraint = vDividerView
-      .bottomAnchor
-      .constraint(equalTo: suggestionAreaView.bottomAnchor)
-    let detailAreaViewTrailingAnchorConstraint = detailAreaView
-      .trailingAnchor
-      .constraint(equalTo: suggestionAreaView.trailingAnchor)
-    let detailAreaViewLeadingAnchorConstraint = detailAreaView
-      .leadingAnchor
-      .constraint(equalTo: vDividerView.trailingAnchor)
-    let detailAreaViewTopAnchorConstraint = detailAreaView.topAnchor.constraint(equalTo: suggestionAreaView.topAnchor)
-    let detailAreaViewBottomAnchorConstraint = detailAreaView
-      .bottomAnchor
-      .constraint(equalTo: suggestionAreaView.bottomAnchor)
     let searchInputViewTopAnchorConstraint = searchInputView
       .topAnchor
       .constraint(equalTo: searchInputContainerView.topAnchor, constant: 5)
@@ -464,19 +483,6 @@ public class SuggestionView: NSBox {
     let suggestionListViewViewTrailingAnchorConstraint = suggestionListViewView
       .trailingAnchor
       .constraint(equalTo: suggestionListContainerView.trailingAnchor)
-    let vDividerViewWidthAnchorConstraint = vDividerView.widthAnchor.constraint(equalToConstant: 1)
-    let suggestionDetailViewViewTopAnchorConstraint = suggestionDetailViewView
-      .topAnchor
-      .constraint(equalTo: detailAreaView.topAnchor)
-    let suggestionDetailViewViewBottomAnchorConstraint = suggestionDetailViewView
-      .bottomAnchor
-      .constraint(equalTo: detailAreaView.bottomAnchor)
-    let suggestionDetailViewViewLeadingAnchorConstraint = suggestionDetailViewView
-      .leadingAnchor
-      .constraint(equalTo: detailAreaView.leadingAnchor)
-    let suggestionDetailViewViewTrailingAnchorConstraint = suggestionDetailViewView
-      .trailingAnchor
-      .constraint(equalTo: detailAreaView.trailingAnchor)
     let suggestionAreaViewBottomAnchorBottomAnchorConstraint = suggestionAreaView
       .bottomAnchor
       .constraint(equalTo: bottomAnchor)
@@ -510,6 +516,30 @@ public class SuggestionView: NSBox {
     let controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint = controlledDropdownView
       .bottomAnchor
       .constraint(lessThanOrEqualTo: controlledDropdownContainerView.bottomAnchor)
+    let detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint = detailAreaView
+      .trailingAnchor
+      .constraint(equalTo: suggestionAreaView.trailingAnchor)
+    let detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint = detailAreaView
+      .leadingAnchor
+      .constraint(equalTo: suggestionListContainerView.trailingAnchor)
+    let detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint = detailAreaView
+      .topAnchor
+      .constraint(equalTo: suggestionAreaView.topAnchor)
+    let detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint = detailAreaView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint = suggestionDetailViewView
+      .topAnchor
+      .constraint(equalTo: detailAreaView.topAnchor)
+    let suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint = suggestionDetailViewView
+      .bottomAnchor
+      .constraint(equalTo: detailAreaView.bottomAnchor)
+    let suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint = suggestionDetailViewView
+      .leadingAnchor
+      .constraint(equalTo: detailAreaView.leadingAnchor)
+    let suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint = suggestionDetailViewView
+      .trailingAnchor
+      .constraint(equalTo: detailAreaView.trailingAnchor)
     let filterContainerViewBottomAnchorBottomAnchorConstraint = filterContainerView
       .bottomAnchor
       .constraint(equalTo: bottomAnchor)
@@ -572,9 +602,22 @@ public class SuggestionView: NSBox {
       .trailingAnchor
       .constraint(equalTo: trailingAnchor)
     let filterDividerViewHeightAnchorConstraint = filterDividerView.heightAnchor.constraint(equalToConstant: 1)
+    let vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint = vDividerView
+      .leadingAnchor
+      .constraint(equalTo: suggestionListContainerView.trailingAnchor)
+    let vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint = vDividerView
+      .topAnchor
+      .constraint(equalTo: suggestionAreaView.topAnchor)
+    let vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint = vDividerView
+      .bottomAnchor
+      .constraint(equalTo: suggestionAreaView.bottomAnchor)
+    let vDividerViewWidthAnchorConstraint = vDividerView.widthAnchor.constraint(equalToConstant: 1)
     let filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint = filterContainerView
       .topAnchor
       .constraint(equalTo: filterDividerView.bottomAnchor)
+    let detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint = detailAreaView
+      .leadingAnchor
+      .constraint(equalTo: vDividerView.trailingAnchor)
 
     filterRecommendedViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
     hSpacerViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
@@ -601,6 +644,22 @@ public class SuggestionView: NSBox {
       controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint
     self.controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint =
       controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
+    self.detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint =
+      detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint
+    self.detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint =
+      detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint
+    self.detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint =
+      detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint
+    self.detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint =
+      detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint
+    self.suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint =
+      suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint
+    self.suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint =
+      suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint
+    self.suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint =
+      suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint
+    self.suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint =
+      suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
     self.filterContainerViewBottomAnchorBottomAnchorConstraint = filterContainerViewBottomAnchorBottomAnchorConstraint
     self.filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint =
       filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint
@@ -637,8 +696,19 @@ public class SuggestionView: NSBox {
     self.filterDividerViewTrailingAnchorTrailingAnchorConstraint =
       filterDividerViewTrailingAnchorTrailingAnchorConstraint
     self.filterDividerViewHeightAnchorConstraint = filterDividerViewHeightAnchorConstraint
+    self.vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint =
+      vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint
+    self.vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint =
+      vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint
+    self.vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint =
+      vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint
+    self.vDividerViewWidthAnchorConstraint = vDividerViewWidthAnchorConstraint
     self.filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint =
       filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint
+    self.detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint =
+      detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint
+
+    self.suggestionListContainerViewWidthAnchorConstraint = suggestionListContainerViewWidthAnchorConstraint
 
     NSLayoutConstraint.activate(
       [
@@ -659,13 +729,6 @@ public class SuggestionView: NSBox {
         suggestionListContainerViewLeadingAnchorConstraint,
         suggestionListContainerViewTopAnchorConstraint,
         suggestionListContainerViewBottomAnchorConstraint,
-        vDividerViewLeadingAnchorConstraint,
-        vDividerViewTopAnchorConstraint,
-        vDividerViewBottomAnchorConstraint,
-        detailAreaViewTrailingAnchorConstraint,
-        detailAreaViewLeadingAnchorConstraint,
-        detailAreaViewTopAnchorConstraint,
-        detailAreaViewBottomAnchorConstraint,
         searchInputViewTopAnchorConstraint,
         searchInputViewBottomAnchorConstraint,
         searchInputViewLeadingAnchorConstraint,
@@ -674,33 +737,38 @@ public class SuggestionView: NSBox {
         suggestionListViewViewTopAnchorConstraint,
         suggestionListViewViewBottomAnchorConstraint,
         suggestionListViewViewLeadingAnchorConstraint,
-        suggestionListViewViewTrailingAnchorConstraint,
-        vDividerViewWidthAnchorConstraint,
-        suggestionDetailViewViewTopAnchorConstraint,
-        suggestionDetailViewViewBottomAnchorConstraint,
-        suggestionDetailViewViewLeadingAnchorConstraint,
-        suggestionDetailViewViewTrailingAnchorConstraint
+        suggestionListViewViewTrailingAnchorConstraint
       ] +
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerView.isHidden,
+          detailAreaViewIsHidden: detailAreaView.isHidden,
           filterContainerViewIsHidden: filterContainerView.isHidden,
-          filterDividerViewIsHidden: filterDividerView.isHidden))
+          filterDividerViewIsHidden: filterDividerView.isHidden,
+          vDividerViewIsHidden: vDividerView.isHidden))
   }
 
   private func conditionalConstraints(
     controlledDropdownContainerViewIsHidden: Bool,
+    detailAreaViewIsHidden: Bool,
     filterContainerViewIsHidden: Bool,
-    filterDividerViewIsHidden: Bool) -> [NSLayoutConstraint]
+    filterDividerViewIsHidden: Bool,
+    vDividerViewIsHidden: Bool) -> [NSLayoutConstraint]
   {
     var constraints: [NSLayoutConstraint?]
 
-    switch (controlledDropdownContainerViewIsHidden, filterContainerViewIsHidden, filterDividerViewIsHidden) {
-      case (true, true, true):
+    switch
+    (controlledDropdownContainerViewIsHidden,
+      detailAreaViewIsHidden,
+      filterContainerViewIsHidden,
+      filterDividerViewIsHidden,
+      vDividerViewIsHidden)
+    {
+      case (true, true, true, true, true):
         constraints = [
           suggestionAreaViewBottomAnchorBottomAnchorConstraint,
           searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint
         ]
-      case (false, true, true):
+      case (false, true, true, true, true):
         constraints = [
           suggestionAreaViewBottomAnchorBottomAnchorConstraint,
           controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
@@ -713,7 +781,20 @@ public class SuggestionView: NSBox {
           controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
           controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
         ]
-      case (true, false, true):
+      case (true, false, true, true, true):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (true, true, false, true, true):
         constraints = [
           filterContainerViewBottomAnchorBottomAnchorConstraint,
           filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
@@ -734,7 +815,7 @@ public class SuggestionView: NSBox {
           filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
           hSpacerViewWidthAnchorConstraint
         ]
-      case (true, true, false):
+      case (true, true, true, false, true):
         constraints = [
           filterDividerViewBottomAnchorBottomAnchorConstraint,
           filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
@@ -743,7 +824,33 @@ public class SuggestionView: NSBox {
           searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
           filterDividerViewHeightAnchorConstraint
         ]
-      case (false, true, false):
+      case (true, true, true, true, false):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint
+        ]
+      case (false, true, true, true, false):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint
+        ]
+      case (false, true, true, false, true):
         constraints = [
           filterDividerViewBottomAnchorBottomAnchorConstraint,
           filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
@@ -760,7 +867,7 @@ public class SuggestionView: NSBox {
           controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
           controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
         ]
-      case (false, false, true):
+      case (false, true, false, true, true):
         constraints = [
           filterContainerViewBottomAnchorBottomAnchorConstraint,
           filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
@@ -789,7 +896,74 @@ public class SuggestionView: NSBox {
           controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
           hSpacerViewWidthAnchorConstraint
         ]
-      case (true, false, false):
+      case (false, false, true, true, true):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (true, false, true, false, true):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (true, false, false, true, true):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, true, false, false, true):
         constraints = [
           filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
           filterDividerViewLeadingAnchorLeadingAnchorConstraint,
@@ -814,7 +988,141 @@ public class SuggestionView: NSBox {
           filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
           hSpacerViewWidthAnchorConstraint
         ]
-      case (false, false, false):
+      case (true, true, true, false, false):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          vDividerViewWidthAnchorConstraint
+        ]
+      case (true, true, false, true, false):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, false, true, true, false):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (false, false, true, true, false):
+        constraints = [
+          suggestionAreaViewBottomAnchorBottomAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (false, true, false, true, false):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, true, true, false, false):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint
+        ]
+      case (false, true, false, false, true):
         constraints = [
           filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
           filterDividerViewLeadingAnchorLeadingAnchorConstraint,
@@ -845,6 +1153,414 @@ public class SuggestionView: NSBox {
           controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
           controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
           controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, false, false, true, true):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, false, true, false, true):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (true, false, false, false, true):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, true, false, false, false):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, false, false, true, false):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, false, true, false, false):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (false, false, true, false, false):
+        constraints = [
+          filterDividerViewBottomAnchorBottomAnchorConstraint,
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint
+        ]
+      case (false, false, false, true, false):
+        constraints = [
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, true, false, false, false):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, false, false, false, true):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (true, false, false, false, false):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
+          hSpacerViewWidthAnchorConstraint
+        ]
+      case (false, false, false, false, false):
+        constraints = [
+          filterDividerViewTopAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewLeadingAnchorLeadingAnchorConstraint,
+          filterDividerViewTrailingAnchorTrailingAnchorConstraint,
+          filterContainerViewBottomAnchorBottomAnchorConstraint,
+          filterContainerViewTopAnchorFilterDividerViewBottomAnchorConstraint,
+          filterContainerViewLeadingAnchorLeadingAnchorConstraint,
+          filterContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorSearchAreaViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorSearchAreaViewTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorSearchAreaViewBottomAnchorConstraint,
+          vDividerViewLeadingAnchorSuggestionListContainerViewTrailingAnchorConstraint,
+          vDividerViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          vDividerViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          detailAreaViewTrailingAnchorSuggestionAreaViewTrailingAnchorConstraint,
+          detailAreaViewLeadingAnchorVDividerViewTrailingAnchorConstraint,
+          detailAreaViewTopAnchorSuggestionAreaViewTopAnchorConstraint,
+          detailAreaViewBottomAnchorSuggestionAreaViewBottomAnchorConstraint,
+          filterDividerViewHeightAnchorConstraint,
+          filterRecommendedViewHeightAnchorParentConstraint,
+          hSpacerViewHeightAnchorParentConstraint,
+          filterAllViewHeightAnchorParentConstraint,
+          filterRecommendedViewLeadingAnchorFilterContainerViewLeadingAnchorConstraint,
+          filterRecommendedViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterRecommendedViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          hSpacerViewLeadingAnchorFilterRecommendedViewTrailingAnchorConstraint,
+          hSpacerViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          hSpacerViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          filterAllViewLeadingAnchorHSpacerViewTrailingAnchorConstraint,
+          filterAllViewTopAnchorFilterContainerViewTopAnchorConstraint,
+          filterAllViewBottomAnchorFilterContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          vDividerViewWidthAnchorConstraint,
+          suggestionDetailViewViewTopAnchorDetailAreaViewTopAnchorConstraint,
+          suggestionDetailViewViewBottomAnchorDetailAreaViewBottomAnchorConstraint,
+          suggestionDetailViewViewLeadingAnchorDetailAreaViewLeadingAnchorConstraint,
+          suggestionDetailViewViewTrailingAnchorDetailAreaViewTrailingAnchorConstraint,
           hSpacerViewWidthAnchorConstraint
         ]
     }
@@ -854,11 +1570,15 @@ public class SuggestionView: NSBox {
 
   private func update() {
     let controlledDropdownContainerViewIsHidden = controlledDropdownContainerView.isHidden
+    let detailAreaViewIsHidden = detailAreaView.isHidden
     let filterContainerViewIsHidden = filterContainerView.isHidden
     let filterDividerViewIsHidden = filterDividerView.isHidden
+    let vDividerViewIsHidden = vDividerView.isHidden
 
     filterAllView.isActive = false
     filterRecommendedView.isActive = false
+    detailAreaView.isHidden = !showsSuggestionDetails
+    vDividerView.isHidden = !showsSuggestionDetails
     filterContainerView.isHidden = !showsFilterBar
     filterDividerView.isHidden = !showsFilterBar
     searchInputView.onChangeTextValue = handleOnChangeSearchText
@@ -886,6 +1606,7 @@ public class SuggestionView: NSBox {
     searchInputView.onPressCommandUpKey = handleOnPressCommandUpKey
     filterAllView.onClick = handleOnPressFilterAll
     filterRecommendedView.onClick = handleOnPressFilterRecommended
+    suggestionListContainerViewWidthAnchorConstraint?.constant = suggestionListWidth
     if suggestionFilter == .recommended {
       filterRecommendedView.isActive = true
     }
@@ -895,19 +1616,24 @@ public class SuggestionView: NSBox {
 
     if
     controlledDropdownContainerView.isHidden != controlledDropdownContainerViewIsHidden ||
-      filterContainerView.isHidden != filterContainerViewIsHidden ||
-        filterDividerView.isHidden != filterDividerViewIsHidden
+      detailAreaView.isHidden != detailAreaViewIsHidden ||
+        filterContainerView.isHidden != filterContainerViewIsHidden ||
+          filterDividerView.isHidden != filterDividerViewIsHidden || vDividerView.isHidden != vDividerViewIsHidden
     {
       NSLayoutConstraint.deactivate(
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerViewIsHidden,
+          detailAreaViewIsHidden: detailAreaViewIsHidden,
           filterContainerViewIsHidden: filterContainerViewIsHidden,
-          filterDividerViewIsHidden: filterDividerViewIsHidden))
+          filterDividerViewIsHidden: filterDividerViewIsHidden,
+          vDividerViewIsHidden: vDividerViewIsHidden))
       NSLayoutConstraint.activate(
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerView.isHidden,
+          detailAreaViewIsHidden: detailAreaView.isHidden,
           filterContainerViewIsHidden: filterContainerView.isHidden,
-          filterDividerViewIsHidden: filterDividerView.isHidden))
+          filterDividerViewIsHidden: filterDividerView.isHidden,
+          vDividerViewIsHidden: vDividerView.isHidden))
     }
   }
 
@@ -994,6 +1720,8 @@ extension SuggestionView {
     public var showsDropdown: Bool
     public var suggestionFilter: SuggestionFilter
     public var showsFilterBar: Bool
+    public var suggestionListWidth: CGFloat
+    public var showsSuggestionDetails: Bool
     public var onChangeSearchText: ((String) -> Void)?
     public var onPressDownKey: (() -> Void)?
     public var onPressUpKey: (() -> Void)?
@@ -1023,6 +1751,8 @@ extension SuggestionView {
       showsDropdown: Bool,
       suggestionFilter: SuggestionFilter,
       showsFilterBar: Bool,
+      suggestionListWidth: CGFloat,
+      showsSuggestionDetails: Bool,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -1051,6 +1781,8 @@ extension SuggestionView {
       self.showsDropdown = showsDropdown
       self.suggestionFilter = suggestionFilter
       self.showsFilterBar = showsFilterBar
+      self.suggestionListWidth = suggestionListWidth
+      self.showsSuggestionDetails = showsSuggestionDetails
       self.onChangeSearchText = onChangeSearchText
       self.onPressDownKey = onPressDownKey
       self.onPressUpKey = onPressUpKey
@@ -1082,7 +1814,9 @@ extension SuggestionView {
           detailView: nil,
           showsDropdown: false,
           suggestionFilter: .recommended,
-          showsFilterBar: false)
+          showsFilterBar: false,
+          suggestionListWidth: 0,
+          showsSuggestionDetails: false)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
@@ -1094,7 +1828,10 @@ extension SuggestionView {
                 lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents &&
                   lhs.detailView == rhs.detailView &&
                     lhs.showsDropdown == rhs.showsDropdown &&
-                      lhs.suggestionFilter == rhs.suggestionFilter && lhs.showsFilterBar == rhs.showsFilterBar
+                      lhs.suggestionFilter == rhs.suggestionFilter &&
+                        lhs.showsFilterBar == rhs.showsFilterBar &&
+                          lhs.suggestionListWidth == rhs.suggestionListWidth &&
+                            lhs.showsSuggestionDetails == rhs.showsSuggestionDetails
     }
   }
 }
@@ -1129,6 +1866,8 @@ extension SuggestionView {
       showsDropdown: Bool,
       suggestionFilter: SuggestionFilter,
       showsFilterBar: Bool,
+      suggestionListWidth: CGFloat,
+      showsSuggestionDetails: Bool,
       onChangeSearchText: ((String) -> Void)? = nil,
       onPressDownKey: (() -> Void)? = nil,
       onPressUpKey: (() -> Void)? = nil,
@@ -1160,6 +1899,8 @@ extension SuggestionView {
             showsDropdown: showsDropdown,
             suggestionFilter: suggestionFilter,
             showsFilterBar: showsFilterBar,
+            suggestionListWidth: suggestionListWidth,
+            showsSuggestionDetails: showsSuggestionDetails,
             onChangeSearchText: onChangeSearchText,
             onPressDownKey: onPressDownKey,
             onPressUpKey: onPressUpKey,
@@ -1191,7 +1932,9 @@ extension SuggestionView {
           detailView: nil,
           showsDropdown: false,
           suggestionFilter: .recommended,
-          showsFilterBar: false)
+          showsFilterBar: false,
+          suggestionListWidth: 0,
+          showsSuggestionDetails: false)
     }
   }
 }
