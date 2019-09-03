@@ -1678,10 +1678,7 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
     }
 
     public func delete(id: UUID) -> LGCTopLevelDeclarations {
-        let updated = declarations
-            .filter { !$0.isPlaceholder }
-            .filter { $0.uuid != id }
-            .map { $0.delete(id: id) }
+        let updated = declarations.filter { $0.uuid != id }.map { $0.delete(id: id) }
 
         return LGCTopLevelDeclarations(
             id: self.uuid,
@@ -1692,12 +1689,12 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
     public func insert(childNode: LGCSyntaxNode, atIndex: Int) -> LGCTopLevelDeclarations {
         guard case .declaration(let child) = childNode else { return self }
 
-        var updated = declarations.normalizedPlaceholders.map { $0 }
+        var updated = declarations.map { $0 }
         updated.insert(child, at: min(atIndex, updated.count))
 
         return LGCTopLevelDeclarations(
             id: uuid,
-            declarations: LGCList(updated)
+            declarations: LGCList(updated).normalizedPlaceholders
         )
     }
 

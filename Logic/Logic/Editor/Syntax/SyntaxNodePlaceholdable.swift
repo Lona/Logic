@@ -34,6 +34,29 @@ extension LGCList where T: SyntaxNodeProtocol, T: SyntaxNodePlaceholdable {
     }
 }
 
+extension LGCList where T == LGCDeclaration {
+    func replace(id: UUID, with syntaxNode: LGCSyntaxNode, preservingEndingPlaceholder: Bool) -> LGCList {
+        let result = self.map { $0.replace(id: id, with: syntaxNode) }
+
+        if preservingEndingPlaceholder {
+            return LGCList(result).normalizedPlaceholders
+        }
+
+        return LGCList(result)
+    }
+
+    var normalizedPlaceholders: LGCList {
+        var result = self.map { $0 }
+
+        if let last = result.last, !last.isPlaceholder {
+            let placeholder = T.self.makePlaceholder()
+            result.append(placeholder)
+        }
+
+        return LGCList(result)
+    }
+}
+
 extension LGCStatement: SyntaxNodePlaceholdable {
     public var isPlaceholder: Bool {
         switch self {
