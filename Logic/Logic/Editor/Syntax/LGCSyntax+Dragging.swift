@@ -74,9 +74,18 @@ extension LGCSyntaxNode {
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
                 let childIndex = targetParent.contents.children.firstIndex(of: node) {
                 let newIndex = childIndex + (position == .above ? 0 : 1)
-                let childNode: LGCSyntaxNode = .declaration(.makePlaceholder())
-                let newParent = targetParent.insert(childNode: childNode, atIndex: newIndex)
-                return (self.replace(id: targetParent.uuid, with: newParent), childNode)
+
+                // Reuse a placeholder instead of inserting a new one in the same place
+                if newIndex < targetParent.contents.children.count,
+                    let contents = targetParent.contents.children[newIndex].contents as? SyntaxNodePlaceholdable,
+                    contents.isPlaceholder {
+
+                    return (self, targetParent.contents.children[newIndex])
+                } else {
+                    let childNode: LGCSyntaxNode = .declaration(.makePlaceholder())
+                    let newParent = targetParent.insert(childNode: childNode, atIndex: newIndex)
+                    return (self.replace(id: targetParent.uuid, with: newParent), childNode)
+                }
             }
         default:
             break

@@ -428,7 +428,11 @@ class Document: NSDocument {
                 logicEditor.select(nodeByID: inserted.insertedNode.uuid)
             }
         case .insertBelow(let id):
-            if let inserted = logicEditor.rootNode.insert(.below, id: id) {
+            if let node = logicEditor.rootNode.find(id: id),
+                let contents = node.contents as? SyntaxNodePlaceholdable,
+                contents.isPlaceholder {
+                logicEditor.select(nodeByID: node.uuid)
+            } else if let inserted = logicEditor.rootNode.insert(.below, id: id) {
                 logicEditor.rootNode = inserted.rootNode
                 logicEditor.select(nodeByID: inserted.insertedNode.uuid)
             }
