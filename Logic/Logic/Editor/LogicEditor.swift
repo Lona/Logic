@@ -4,6 +4,16 @@ import AppKit
 
 open class LogicEditor: NSBox {
 
+    public struct MenuItem {
+        public var row: SuggestionListItem
+        public var action: () -> Void
+
+        public init(row: SuggestionListItem, action: @escaping () -> Void) {
+            self.row = row
+            self.action = action
+        }
+    }
+
     public struct ElementError {
         public var uuid: UUID
         public var message: String
@@ -131,7 +141,9 @@ open class LogicEditor: NSBox {
         }
     }
 
-    public var contextMenuForNode: ((LGCSyntaxNode, LGCSyntaxNode) -> NSMenu?) = {_, _ in nil}
+    public var onInsertBelow: ((LGCSyntaxNode, LGCSyntaxNode) -> Void)?
+
+    public var contextMenuForNode: ((LGCSyntaxNode, LGCSyntaxNode) -> [MenuItem]?) = {_, _ in nil}
 
     public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
 
@@ -464,40 +476,37 @@ extension LogicEditor {
     }
 
     private func handleRightClick(_ item: LogicCanvasView.Item?, _ point: NSPoint) {
-        guard let item = item else { return }
-
-        switch item {
-        case .line:
-            break
-        case .range(let range):
-            guard let selectedNode = rootNode.topNodeWithEqualRange(
-                as: range,
-                options: formattingOptions,
-                includeTopLevel: false
-                ) else { return }
-
-            guard let menu = contextMenuForNode(rootNode, selectedNode),
-                let firstItem = menu.items.first else { return }
-
-            hideSuggestionWindow()
-
-            canvasView.outlinedRange = rootNode.elementRange(for: selectedNode.uuid, options: formattingOptions, includeTopLevel: false)
-
-            menu.delegate = self
-            menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
-        }
+//        guard let item = item else { return }
+//
+//        switch item {
+//        case .line:
+//            break
+//        case .range(let range):
+//            guard let selectedNode = rootNode.topNodeWithEqualRange(
+//                as: range,
+//                options: formattingOptions,
+//                includeTopLevel: false
+//                ) else { return }
+//
+//            guard let menu = contextMenuForNode(rootNode, selectedNode),
+//                let firstItem = menu.items.first else { return }
+//
+//            hideSuggestionWindow()
+//
+//            canvasView.outlinedRange = rootNode.elementRange(for: selectedNode.uuid, options: formattingOptions, includeTopLevel: false)
+//
+//            menu.delegate = self
+//            menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
+//        }
     }
 
     private func handleClickPlus(_ line: Int, rect: NSRect) {
         guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
             let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
-            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
-            let menu = contextMenuForNode(rootNode, sourceNode)
+            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid)
             else { return }
 
-        if let item = menu.items.first(where: { $0.title == "Insert below" }) {
-            item.target!.performSelector(onMainThread: item.action!, with: item, waitUntilDone: true)
-        }
+        onInsertBelow?(rootNode, sourceNode)
     }
 
     private func handleClickMore(_ line: Int, rect: NSRect) {
@@ -512,9 +521,8 @@ extension LogicEditor {
         let windowRect = canvasView.convert(rect, to: nil)
         let screenRect = window.convertToScreen(windowRect)
 
-        let suggestionItems: [SuggestionListItem] = menu.items.filter { !$0.isSeparatorItem }.map {
-            return SuggestionListItem.row($0.title, nil, false, nil)
-        }
+        let suggestionItems = menu.map { $0.row }
+
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
         subwindow.defaultWindowSize = .init(width: 230, height: min(suggestionListHeight + 32 + 25, 400))
@@ -544,8 +552,8 @@ extension LogicEditor {
         subwindow.onRequestHide = hideWindow
 
         subwindow.onSubmit = { [unowned self] index in
-            let item = menu.items.filter { !$0.isSeparatorItem }[index]
-            item.target!.performSelector(onMainThread: item.action!, with: item, waitUntilDone: true)
+            let item = menu[index]
+            item.action()
 
             hideWindow()
             self.update()

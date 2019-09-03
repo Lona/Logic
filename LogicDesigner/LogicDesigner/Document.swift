@@ -228,31 +228,39 @@ class Document: NSDocument {
             }
         }
 
-        logicEditor.contextMenuForNode = { rootNode, node in
-            func makeContextMenu(for node: LGCSyntaxNode) -> NSMenu? {
-                let menu = NSMenu()
+        logicEditor.onInsertBelow = { [unowned self] rootNode, node in
+            self.handleMenuAction(.insertBelow(node.uuid))
+        }
 
-                func makeMenuItem(title: String, action: MenuAction) -> NSMenuItem {
-                    let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
-                    item.target = self
-                    item.representedObject = action
-                    return item
+        logicEditor.contextMenuForNode = { rootNode, node in
+            func makeContextMenu(for node: LGCSyntaxNode) -> [LogicEditor.MenuItem]? {
+                var menu: [LogicEditor.MenuItem] = [
+                    .init(row: .sectionHeader("ACTIONS"), action: {})
+                ]
+
+                func makeMenuItem(title: String, action: MenuAction) -> LogicEditor.MenuItem {
+                    return .init(
+                        row: .row(title, nil, false, nil),
+                        action: ({ [unowned self] in
+                            self.handleMenuAction(action)
+                        })
+                    )
                 }
 
                 switch node {
                 case .statement(.declaration(id: _, content: let declaration)):
-                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(declaration.uuid)))
-                    menu.addItem(makeMenuItem(title: "Duplicate statement", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(declaration.uuid)))
+                    menu.append(makeMenuItem(title: "Duplicate statement", action: MenuAction.duplicate(node.uuid)))
                 case .declaration(let value):
-                    menu.addItem(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
-                    menu.addItem(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
-                    menu.addItem(.separator())
-                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
-                    menu.addItem(makeMenuItem(title: "Duplicate declaration", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
+                    menu.append(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
+//                    menu.append(.separator())
+                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
+                    menu.append(makeMenuItem(title: "Duplicate declaration", action: MenuAction.duplicate(node.uuid)))
                 case .enumerationCase(.enumerationCase(let value)):
-                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
+                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
                 case .functionParameter(.parameter(let value)):
-                    menu.addItem(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
+                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
                 default:
                     return nil
                 }
@@ -407,9 +415,7 @@ class Document: NSDocument {
         case insertBelow(UUID)
     }
 
-    @objc func handleMenuAction(_ sender: NSMenuItem) {
-        guard let action = sender.representedObject as? MenuAction else { return }
-
+    private func handleMenuAction(_ action: MenuAction) {
         switch action {
         case .duplicate(let id):
             if let duplicated = logicEditor.rootNode.duplicate(id: id) {
