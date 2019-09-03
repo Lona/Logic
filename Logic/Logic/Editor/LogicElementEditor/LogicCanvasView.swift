@@ -18,7 +18,7 @@ public class LogicCanvasView: NSView {
         public var font = TextStyle(family: "San Francisco", size: 13).nsFont
         public var boldFont = TextStyle(family: "San Francisco", weight: NSFont.Weight.semibold, size: 13).nsFont
         public var textPadding = CGSize(width: 4, height: 3)
-        public var textMargin = CGSize(width: 36, height: 6)
+        public var textMargin = CGSize(width: 42, height: 6)
         public var textBackgroundRadius = CGSize(width: 2, height: 2)
         public var outlineWidth: CGFloat = 2.0
         public var textSpacing: CGFloat = 4.0
@@ -28,8 +28,6 @@ public class LogicCanvasView: NSView {
 
         public init() {}
     }
-
-    public static var dropdownCarets: Bool = false
 
     public enum Item: Equatable {
         case range(Range<Int>)
@@ -605,16 +603,21 @@ public class LogicCanvasView: NSView {
 
                 NSShadow().set()
 
-                if LogicCanvasView.dropdownCarets || value.isEmpty {
+                if value.isEmpty && dropdownStyle != .empty {
                     if drawSelection {
                         NSColor.white.setStroke()
                     } else {
                         color.setStroke()
                     }
 
-                    let caretX = rect.maxX + (value.isEmpty ? 0 : 3)
                     let caret = NSBezierPath(downwardCaretWithin:
-                        CGRect(x: caretX, y: backgroundRect.midY, width: 5, height: 2.5))
+                        CGRect(x: rect.maxX, y: backgroundRect.midY, width: 5, height: 2.5))
+
+//                    let caret = NSBezierPath(
+//                        plusWithin: CGRect(x: rect.maxX, y: backgroundRect.midY - 5, width: 10, height: 10),
+//                        lineWidth: 2,
+//                        margin: .init(width: 1, height: 1)
+//                    )
 
                     caret.stroke()
                 }
@@ -728,7 +731,7 @@ public class LogicCanvasView: NSView {
                 path.fill()
             }
 
-            let plusPath = NSBezierPath(plusWithin: rect, lineWidth: 2, margin: .init(width: 3, height: 3))
+            let plusPath = NSBezierPath(plusWithin: rect, lineWidth: 1, margin: .init(width: 3, height: 3))
             NSColor.black.withAlphaComponent(0.5).setStroke()
             plusPath.stroke()
         }
@@ -741,13 +744,13 @@ public class LogicCanvasView: NSView {
                 path.fill()
             }
 
-            let plusPath = NSBezierPath(ellipsisWithin: rect, radius: 1.5, spacing: 3)
-            NSColor.black.withAlphaComponent(0.5).setFill()
-            plusPath.fill()
+            let plusPath = NSBezierPath(hamburgerWithin: rect, thickness: 1, margin: .init(width: 4, height: 5))
+            NSColor.black.withAlphaComponent(0.5).setStroke()
+            plusPath.stroke()
         }
     }
 
-    public let lineButtonSize = NSSize(width: 18, height: 18)
+    public let lineButtonSize = NSSize(width: 17, height: 17)
     public let lineButtonMargin: CGFloat = 2
 
     private func plusButtonRect(for line: Int) -> CGRect? {
@@ -757,7 +760,7 @@ public class LogicCanvasView: NSView {
 
         let rect = NSRect(
             x: first.backgroundRect.minX - lineButtonSize.width - lineButtonMargin,
-            y: first.backgroundRect.minY + (style.minimumLineHeight - lineButtonSize.height) / 2,
+            y: first.backgroundRect.minY + (style.minimumLineHeight + 1 - lineButtonSize.height) / 2,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -769,12 +772,10 @@ public class LogicCanvasView: NSView {
         let elements = measuredElements[range]
         guard let first = elements.first else { return nil }
 
-        let width: CGFloat = 12
-
         let rect = NSRect(
-            x: first.backgroundRect.minX - lineButtonSize.width - width - lineButtonMargin * 2,
-            y: first.backgroundRect.minY + (style.minimumLineHeight - lineButtonSize.height) / 2,
-            width: width,
+            x: first.backgroundRect.minX - lineButtonSize.width * 2 - lineButtonMargin * 2,
+            y: first.backgroundRect.minY + (style.minimumLineHeight + 1 - lineButtonSize.height) / 2,
+            width: lineButtonSize.width,
             height: lineButtonSize.height)
 
         return rect

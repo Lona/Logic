@@ -250,13 +250,15 @@ class Document: NSDocument {
                 switch node {
                 case .statement(.declaration(id: _, content: let declaration)):
                     menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(declaration.uuid)))
-                    menu.append(makeMenuItem(title: "Duplicate statement", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Duplicate", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Delete", action: MenuAction.delete(node.uuid)))
                 case .declaration(let value):
                     menu.append(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
                     menu.append(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
 //                    menu.append(.separator())
                     menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
-                    menu.append(makeMenuItem(title: "Duplicate declaration", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Duplicate", action: MenuAction.duplicate(node.uuid)))
+                    menu.append(makeMenuItem(title: "Delete", action: MenuAction.delete(node.uuid)))
                 case .enumerationCase(.enumerationCase(let value)):
                     menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
                 case .functionParameter(.parameter(let value)):
@@ -411,12 +413,15 @@ class Document: NSDocument {
     private enum MenuAction {
         case addComment(UUID)
         case duplicate(UUID)
+        case delete(UUID)
         case insertAbove(UUID)
         case insertBelow(UUID)
     }
 
     private func handleMenuAction(_ action: MenuAction) {
         switch action {
+        case .delete(let id):
+            logicEditor.rootNode = logicEditor.rootNode.delete(id: id)
         case .duplicate(let id):
             if let duplicated = logicEditor.rootNode.duplicate(id: id) {
                 logicEditor.rootNode = duplicated.rootNode

@@ -24,14 +24,12 @@ extension NSBezierPath {
 
         move(to: .init(x: rect.minX + halfLineWidth + margin.width, y: rect.midY))
 
-        lineCapStyle = .round
-        lineJoinStyle = .round
+        lineCapStyle = .square
+        lineJoinStyle = .bevel
     }
 
     convenience init(ellipsisWithin rect: CGRect, radius: CGFloat, spacing: CGFloat) {
         self.init()
-
-        self.lineWidth = lineWidth
 
         let rect1 = CGRect(
             x: rect.midX - radius,
@@ -58,5 +56,25 @@ extension NSBezierPath {
 
         lineCapStyle = .round
         lineJoinStyle = .round
+    }
+
+    convenience init(hamburgerWithin rect: CGRect, thickness: CGFloat, margin: CGSize) {
+        self.init()
+
+        self.lineWidth = thickness
+
+        let halfLineWidth = lineWidth / 2
+
+        move(to: .init(x: rect.minX + halfLineWidth + margin.width, y: rect.minY + halfLineWidth + margin.height))
+        line(to: .init(x: rect.maxX - halfLineWidth - margin.width, y: rect.minY + halfLineWidth + margin.height))
+
+        move(to: .init(x: rect.minX + halfLineWidth + margin.width, y: rect.midY))
+        line(to: .init(x: rect.maxX - halfLineWidth - margin.width, y: rect.midY))
+
+        move(to: .init(x: rect.minX + halfLineWidth + margin.width, y: rect.maxY - halfLineWidth - margin.height))
+        line(to: .init(x: rect.maxX - halfLineWidth - margin.width, y: rect.maxY - halfLineWidth - margin.height))
+
+        lineCapStyle = .square
+        lineJoinStyle = .bevel
     }
 }

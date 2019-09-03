@@ -17,11 +17,11 @@ public enum LogicElement {
     }
 
     public enum DropdownStyle {
-        case source, variable, placeholder, boldVariable, comment
+        case source, variable, placeholder, boldVariable, comment, empty
 
         var color: NSColor {
             switch self {
-            case .source:
+            case .source, .empty:
                 return Colors.text
             case .variable, .boldVariable:
                 return Colors.editableText
@@ -227,7 +227,7 @@ extension LogicElement {
         case .title:
             var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: titleTextStyle.nsFont)
 
-            if LogicCanvasView.dropdownCarets || value.isEmpty {
+            if value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 
@@ -269,7 +269,7 @@ extension LogicElement {
                 font: dropdownStyle == .boldVariable ? boldFont : font
             )
 
-            if LogicCanvasView.dropdownCarets || value.isEmpty {
+            if value.isEmpty {
                 backgroundRect.size.width += value.isEmpty ? 5 : 11
             }
 

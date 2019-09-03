@@ -722,7 +722,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 commentContents + [
                     .element(LogicElement.dropdown(value.id, "Enumeration", .source)),
                     value.name.formatted(using: options),
-                    (value.genericParameters.isEmpty ? contents : .indent(
+                    (value.genericParameters.isEmpty || value.genericParameters.first?.isPlaceholder == true ? contents : .indent(
                         .concat(
                             [
                                 genericParameters(),
@@ -835,7 +835,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .placeholder(let value):
-            return .element(LogicElement.dropdown(value, "", .variable))
+            return .element(LogicElement.dropdown(value, "", .empty))
         }
     }
 }

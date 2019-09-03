@@ -44,7 +44,7 @@ open class LogicEditor: NSBox {
 
     // MARK: Public
 
-    public var supportsLineSelection = true {
+    public var supportsLineSelection = false {
         didSet {
             if !supportsLineSelection, let _ = canvasView.selectedLine {
                 canvasView.selectedLine = nil
