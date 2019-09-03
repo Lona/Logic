@@ -54,6 +54,9 @@ class Document: NSDocument {
 
     let editorDisplayStyles: [LogicFormattingOptions.Style] = [.visual, .natural, .js]
 
+    var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
+    var successfulEvaluation: Compiler.EvaluationContext?
+
     override func makeWindowControllers() {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
@@ -118,9 +121,6 @@ class Document: NSDocument {
 
         let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
 
-        var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
-        var successfulEvaluation: Compiler.EvaluationContext?
-
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
             style: .visual,
@@ -137,12 +137,12 @@ class Document: NSDocument {
                 return StandardConfiguration.formatArguments(
                     rootNode: rootNode,
                     id: id,
-                    unificationContext: successfulUnification?.0,
-                    substitution: successfulUnification?.1
+                    unificationContext: self.successfulUnification?.0,
+                    substitution: self.successfulUnification?.1
                 )
             }),
             getColor: ({ [unowned self] id in
-                guard let evaluation = successfulEvaluation else { return nil }
+                guard let evaluation = self.successfulEvaluation else { return nil }
 
                 guard let value = evaluation.evaluate(uuid: id) else {
 //                    Swift.print("Failed to evaluate color", id)
@@ -153,7 +153,7 @@ class Document: NSDocument {
                 return (colorString, color)
             }),
             getTextStyle: ({ [unowned self] id in
-                guard let evaluation = successfulEvaluation else { return nil }
+                guard let evaluation = self.successfulEvaluation else { return nil }
 
                 guard let value = evaluation.evaluate(uuid: id) else {
 //                    Swift.print("Failed to evaluate text style", id)
@@ -163,7 +163,7 @@ class Document: NSDocument {
                 return value.textStyle
             }),
             getShadow: ({ [unowned self] id in
-                guard let evaluation = successfulEvaluation else { return nil }
+                guard let evaluation = self.successfulEvaluation else { return nil }
 
                 guard let value = evaluation.evaluate(uuid: id) else {
 //                    Swift.print("Failed to evaluate shadow", id)
@@ -177,7 +177,7 @@ class Document: NSDocument {
         logicEditor.decorationForNodeID = { id in
             guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
 
-            if let evaluation = successfulEvaluation,
+            if let evaluation = self.successfulEvaluation,
                 let colorValue = evaluation.evaluate(uuid: node.uuid)?.colorString {
                 if self.logicEditor.formattingOptions.style == .visual,
                     let path = self.logicEditor.rootNode.pathTo(id: id),
@@ -234,6 +234,7 @@ class Document: NSDocument {
 
                 func makeMenuItem(title: String, action: MenuAction) -> NSMenuItem {
                     let item = NSMenuItem(title: title, action: #selector(self.handleMenuAction), keyEquivalent: "")
+                    item.target = self
                     item.representedObject = action
                     return item
                 }
@@ -293,82 +294,8 @@ class Document: NSDocument {
             }
         }
 
-        func evaluate(rootNode: LGCSyntaxNode) -> Bool {
-            successfulEvaluation = nil
-
-            self.logicEditor.rootNode = rootNode
-
-            let rootNode = self.logicEditor.rootNode
-
-            guard let root = LGCProgram.make(from: rootNode) else { return true }
-
-            let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
-
-            let scopeContext = Compiler.scopeContext(program)
-
-            var errors: [LogicEditor.ElementError] = []
-
-            scopeContext.undefinedIdentifiers.forEach { errorId in
-                if case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {
-                    errors.append(
-                        LogicEditor.ElementError(uuid: errorId, message: "The name \"\(identifierNode.string)\" hasn't been declared yet")
-                    )
-                }
-            }
-
-            scopeContext.undefinedMemberExpressions.forEach { errorId in
-                if case .expression(let expression)? = logicEditor.rootNode.find(id: errorId), let identifiers = expression.flattenedMemberExpression {
-                    let keyPath = identifiers.map { $0.string }
-                    let last = keyPath.last ?? ""
-                    let rest = keyPath.dropLast().joined(separator: ".")
-                    errors.append(
-                        LogicEditor.ElementError(uuid: errorId, message: "The name \"\(last)\" hasn't been declared in \"\(rest)\" yet")
-                    )
-                }
-            }
-
-            logicEditor.elementErrors = errors
-
-            let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
-
-            guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
-                return true
-            }
-
-            successfulUnification = (unificationContext, substitution)
-
-            let result = Compiler.evaluate(
-                program,
-                rootNode: program,
-                scopeContext: scopeContext,
-                unificationContext: unificationContext,
-                substitution: substitution,
-                context: .init()
-            )
-
-            switch result {
-            case .success(let evaluationContext):
-                successfulEvaluation = evaluationContext
-
-                if evaluationContext.hasCycle {
-                    Swift.print("Logic cycle(s) found", evaluationContext.cycles)
-                }
-
-                let cycleErrors = evaluationContext.cycles.map { cycle in
-                    return cycle.map { id -> LogicEditor.ElementError in
-                        return LogicEditor.ElementError(uuid: id, message: "A variable's definition can't include its name (there's a cycle somewhere)")
-                    }
-                }
-                logicEditor.elementErrors.append(contentsOf: Array(cycleErrors.joined()))
-            case .failure(let error):
-                Swift.print("Eval failure", error)
-            }
-
-            return true
-        }
-
-        logicEditor.onChangeRootNode = { rootNode in
-            return evaluate(rootNode: rootNode)
+        logicEditor.onChangeRootNode = { [unowned self] rootNode in
+            return self.evaluate(rootNode: rootNode)
         }
 
         _ = evaluate(rootNode: logicEditor.rootNode)
@@ -382,6 +309,80 @@ class Document: NSDocument {
         let windowController = NSWindowController(window: window)
         windowController.showWindow(nil)
         addWindowController(windowController)
+    }
+
+    func evaluate(rootNode: LGCSyntaxNode) -> Bool {
+        successfulEvaluation = nil
+
+        self.logicEditor.rootNode = rootNode
+
+        let rootNode = self.logicEditor.rootNode
+
+        guard let root = LGCProgram.make(from: rootNode) else { return true }
+
+        let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
+
+        let scopeContext = Compiler.scopeContext(program)
+
+        var errors: [LogicEditor.ElementError] = []
+
+        scopeContext.undefinedIdentifiers.forEach { errorId in
+            if case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {
+                errors.append(
+                    LogicEditor.ElementError(uuid: errorId, message: "The name \"\(identifierNode.string)\" hasn't been declared yet")
+                )
+            }
+        }
+
+        scopeContext.undefinedMemberExpressions.forEach { errorId in
+            if case .expression(let expression)? = logicEditor.rootNode.find(id: errorId), let identifiers = expression.flattenedMemberExpression {
+                let keyPath = identifiers.map { $0.string }
+                let last = keyPath.last ?? ""
+                let rest = keyPath.dropLast().joined(separator: ".")
+                errors.append(
+                    LogicEditor.ElementError(uuid: errorId, message: "The name \"\(last)\" hasn't been declared in \"\(rest)\" yet")
+                )
+            }
+        }
+
+        logicEditor.elementErrors = errors
+
+        let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
+
+        guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+            return true
+        }
+
+        successfulUnification = (unificationContext, substitution)
+
+        let result = Compiler.evaluate(
+            program,
+            rootNode: program,
+            scopeContext: scopeContext,
+            unificationContext: unificationContext,
+            substitution: substitution,
+            context: .init()
+        )
+
+        switch result {
+        case .success(let evaluationContext):
+            successfulEvaluation = evaluationContext
+
+            if evaluationContext.hasCycle {
+                Swift.print("Logic cycle(s) found", evaluationContext.cycles)
+            }
+
+            let cycleErrors = evaluationContext.cycles.map { cycle in
+                return cycle.map { id -> LogicEditor.ElementError in
+                    return LogicEditor.ElementError(uuid: id, message: "A variable's definition can't include its name (there's a cycle somewhere)")
+                }
+            }
+            logicEditor.elementErrors.append(contentsOf: Array(cycleErrors.joined()))
+        case .failure(let error):
+            Swift.print("Eval failure", error)
+        }
+
+        return true
     }
 
     override func data(ofType typeName: String) throws -> Data {
@@ -411,16 +412,19 @@ class Document: NSDocument {
 
         switch action {
         case .duplicate(let id):
-            if let newRootNode = logicEditor.rootNode.duplicate(id: id) {
-                logicEditor.rootNode = newRootNode
+            if let duplicated = logicEditor.rootNode.duplicate(id: id) {
+                logicEditor.rootNode = duplicated.rootNode
+                logicEditor.select(nodeByID: nil)
             }
         case .insertAbove(let id):
-            if let newRootNode = logicEditor.rootNode.insert(.above, id: id) {
-                logicEditor.rootNode = newRootNode
+            if let inserted = logicEditor.rootNode.insert(.above, id: id) {
+                logicEditor.rootNode = inserted.rootNode
+                logicEditor.select(nodeByID: inserted.insertedNode.uuid)
             }
         case .insertBelow(let id):
-            if let newRootNode = logicEditor.rootNode.insert(.below, id: id) {
-                logicEditor.rootNode = newRootNode
+            if let inserted = logicEditor.rootNode.insert(.below, id: id) {
+                logicEditor.rootNode = inserted.rootNode
+                logicEditor.select(nodeByID: inserted.insertedNode.uuid)
             }
         case .addComment(let id):
             guard let node = logicEditor.rootNode.find(id: id) else { return }
@@ -512,6 +516,8 @@ class Document: NSDocument {
 
             break
         }
+
+        _ = evaluate(rootNode: logicEditor.rootNode)
     }
 
 //    override func data(ofType typeName: String) throws -> Data {

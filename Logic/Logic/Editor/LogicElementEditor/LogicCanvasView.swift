@@ -18,7 +18,7 @@ public class LogicCanvasView: NSView {
         public var font = TextStyle(family: "San Francisco", size: 13).nsFont
         public var boldFont = TextStyle(family: "San Francisco", weight: NSFont.Weight.semibold, size: 13).nsFont
         public var textPadding = CGSize(width: 4, height: 3)
-        public var textMargin = CGSize(width: 6, height: 6)
+        public var textMargin = CGSize(width: 36, height: 6)
         public var textBackgroundRadius = CGSize(width: 2, height: 2)
         public var outlineWidth: CGFloat = 2.0
         public var textSpacing: CGFloat = 4.0
@@ -73,10 +73,21 @@ public class LogicCanvasView: NSView {
 
             NSGraphicsContext.restoreGraphicsState()
         }
+
+        addTrackingArea(trackingArea)
     }
+
+    private lazy var trackingArea = NSTrackingArea(
+        rect: self.frame,
+        options: [.mouseEnteredAndExited, .activeAlways, .mouseMoved, .inVisibleRect],
+        owner: self)
 
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        removeTrackingArea(trackingArea)
     }
 
     // MARK: Public
@@ -128,6 +139,8 @@ public class LogicCanvasView: NSView {
     public var onMoveLine: ((Int, Int) -> Void)?
     public var onFocus: (() -> Void)?
     public var onBlur: (() -> Void)?
+    public var onClickLinePlus: ((Int, NSRect) -> Void)?
+    public var onClickLineMore: ((Int, NSRect) -> Void)?
     public var drawScrollerBackground: ((NSRect, Bool) -> Void)?
 
     public var onDuplicateCommand: (() -> Void)?
@@ -185,6 +198,45 @@ public class LogicCanvasView: NSView {
     private var pressed = false
     private var pressedPoint = CGPoint.zero
 
+    private var hoveredLine: Int? {
+        didSet {
+            if oldValue != hoveredLine {
+                update()
+            }
+        }
+    }
+
+    private var hoveredPlusButton: Bool = false {
+        didSet {
+            if oldValue != hoveredPlusButton {
+                update()
+            }
+        }
+    }
+
+    private var hoveredMoreButton: Bool = false {
+        didSet {
+            if oldValue != hoveredMoreButton {
+                update()
+            }
+        }
+    }
+
+    public override func mouseMoved(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+        hoveredLine = logicalLineIndex(at: point, measuredFromMidpoint: false)
+
+        if let hoveredLine = hoveredLine {
+            if let rect = plusButtonRect(for: hoveredLine) {
+                hoveredPlusButton = rect.contains(point)
+            }
+
+            if let rect = moreButtonRect(for: hoveredLine) {
+                hoveredMoreButton = rect.contains(point)
+            }
+        }
+    }
+
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
@@ -202,8 +254,37 @@ public class LogicCanvasView: NSView {
         case .some(.range(let range)):
             onActivate?(range.lowerBound)
         case .some(.line(let index)):
-            onActivateLine?(index)
+            if let rect = plusButtonRect(for: index), rect.contains(point) {
+                return
+            } else if let rect = moreButtonRect(for: index), rect.contains(point) {
+                return
+            } else {
+                onActivateLine?(index)
+            }
         }
+    }
+
+    public override func mouseUp(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+
+        pressed = false
+
+        let clickedItem = item(at: point)
+
+        switch clickedItem {
+        case .none, .some(.range):
+            break
+        case .some(.line(let index)):
+            if let rect = plusButtonRect(for: index), rect.contains(point) {
+                onClickLinePlus?(index, rect)
+            } else if let rect = moreButtonRect(for: index), rect.contains(point) {
+                onClickLineMore?(index, rect)
+            }
+        }
+    }
+
+    public override func mouseExited(with event: NSEvent) {
+        hoveredLine = nil
     }
 
     public override func rightMouseDown(with event: NSEvent) {
@@ -214,10 +295,6 @@ public class LogicCanvasView: NSView {
         let clickedItem = item(at: point)
 
         onRightClick?(clickedItem, point)
-    }
-
-    public override func mouseUp(with event: NSEvent) {
-        pressed = false
     }
 
     public override func keyDown(with event: NSEvent) {
@@ -642,6 +719,65 @@ public class LogicCanvasView: NSView {
             errorLines: errorLines,
             style: style
         )
+
+        if let hoveredLine = hoveredLine, let rect = plusButtonRect(for: hoveredLine) {
+            let path = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+
+            if hoveredPlusButton {
+                Colors.divider.set()
+                path.fill()
+            }
+
+            let plusPath = NSBezierPath(plusWithin: rect, lineWidth: 2, margin: .init(width: 3, height: 3))
+            NSColor.black.withAlphaComponent(0.5).setStroke()
+            plusPath.stroke()
+        }
+
+        if let hoveredLine = hoveredLine, let rect = moreButtonRect(for: hoveredLine) {
+            let path = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+
+            if hoveredMoreButton {
+                Colors.divider.set()
+                path.fill()
+            }
+
+            let plusPath = NSBezierPath(ellipsisWithin: rect, radius: 1.5, spacing: 3)
+            NSColor.black.withAlphaComponent(0.5).setFill()
+            plusPath.fill()
+        }
+    }
+
+    public let lineButtonSize = NSSize(width: 18, height: 18)
+    public let lineButtonMargin: CGFloat = 2
+
+    private func plusButtonRect(for line: Int) -> CGRect? {
+        guard let range = formattedContent.elementIndexRange(for: line) else { return nil }
+        let elements = measuredElements[range]
+        guard let first = elements.first else { return nil }
+
+        let rect = NSRect(
+            x: first.backgroundRect.minX - lineButtonSize.width - lineButtonMargin,
+            y: first.backgroundRect.minY + (style.minimumLineHeight - lineButtonSize.height) / 2,
+            width: lineButtonSize.width,
+            height: lineButtonSize.height)
+
+        return rect
+    }
+
+    private func moreButtonRect(for line: Int) -> CGRect? {
+        guard let range = formattedContent.elementIndexRange(for: line) else { return nil }
+        let elements = measuredElements[range]
+        guard let first = elements.first else { return nil }
+
+        let width: CGFloat = 12
+
+        let rect = NSRect(
+            x: first.backgroundRect.minX - lineButtonSize.width - width - lineButtonMargin * 2,
+            y: first.backgroundRect.minY + (style.minimumLineHeight - lineButtonSize.height) / 2,
+            width: width,
+            height: lineButtonSize.height)
+
+        return rect
     }
 
     private var _cachedMeasuredElements: [LogicMeasuredElement]? = nil
@@ -869,14 +1005,14 @@ public class LogicCanvasView: NSView {
 
     public override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
         let point = convert(sender.draggingLocation, from: nil)
-        dragDestinationLineIndex = logicalLineIndex(at: point)
+        dragDestinationLineIndex = logicalLineIndex(at: point, measuredFromMidpoint: true)
 
         return .move
     }
 
     public override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
         let point = convert(sender.draggingLocation, from: nil)
-        dragDestinationLineIndex = logicalLineIndex(at: point)
+        dragDestinationLineIndex = logicalLineIndex(at: point, measuredFromMidpoint: true)
 
         return .move
     }
@@ -925,9 +1061,10 @@ extension LogicCanvasView {
         return nil
     }
 
-    private func logicalLineIndex(at point: CGPoint) -> Int {
+    private func logicalLineIndex(at point: CGPoint, measuredFromMidpoint: Bool) -> Int {
         if let lineElementIndex = measuredElements.firstIndex(where: { measuredElement in
-            measuredElement.element.allowsLineSelection && point.y < measuredElement.backgroundRect.midY
+            measuredElement.element.allowsLineSelection &&
+                point.y < (measuredFromMidpoint ? measuredElement.backgroundRect.midY : measuredElement.backgroundRect.maxY)
         }) {
             return formattedContent.lineIndex(for: lineElementIndex)
         }

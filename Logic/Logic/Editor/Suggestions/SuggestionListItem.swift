@@ -31,4 +31,19 @@ public enum SuggestionListItem {
             return true
         }
     }
+
+    public var height: CGFloat {
+        switch self {
+        case .row(_, .none, _, _):
+            return 26
+        case .row(_, .some, _, _):
+            return 40
+        case .colorRow:
+            return 40
+        case .sectionHeader:
+            return 18
+        case .textStyleRow(let value, let style, _):
+            return 8 + style.apply(to: value).size().height
+        }
+    }
 }

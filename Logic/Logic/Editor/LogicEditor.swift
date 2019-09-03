@@ -198,6 +198,8 @@ open class LogicEditor: NSBox {
         return SuggestionWindow.shared
     }
 
+    private lazy var subwindow = SuggestionWindow()
+
     private let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
     private let minimapScroller = MinimapScroller(frame: .zero)
@@ -263,6 +265,8 @@ open class LogicEditor: NSBox {
         canvasView.onActivate = handleActivateElement
         canvasView.onActivateLine = handleActivateLine
         canvasView.onRightClick = handleRightClick
+        canvasView.onClickLineMore = handleClickMore
+        canvasView.onClickLinePlus = handleClickPlus
         canvasView.onPressTabKey = nextNode
         canvasView.onPressShiftTabKey = previousNode
         canvasView.onPressDeleteKey = handleDelete
@@ -316,7 +320,7 @@ extension LogicEditor {
             let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
             let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
             if let newRootNode = rootNode.duplicate(id: targetNode.uuid) {
-                let shouldActivate = onChangeRootNode?(newRootNode)
+                let shouldActivate = onChangeRootNode?(newRootNode.rootNode)
                 if shouldActivate == true {
                     handleActivateElement(nil)
                 }
@@ -416,7 +420,7 @@ extension LogicEditor {
         }
     }
 
-    private func select(nodeByID originalId: UUID?) {
+    public func select(nodeByID originalId: UUID?) {
         let syntaxNodeId = willSelectNode?(rootNode, originalId) ?? originalId
 
         self.canvasView.selectedLine = nil
@@ -481,6 +485,70 @@ extension LogicEditor {
 
             menu.delegate = self
             menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
+        }
+    }
+
+    private func handleClickPlus(_ line: Int, rect: NSRect) {
+        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
+            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
+            let menu = contextMenuForNode(rootNode, sourceNode)
+            else { return }
+
+        if let item = menu.items.first(where: { $0.title == "Insert below" }) {
+            item.target!.performSelector(onMainThread: item.action!, with: item, waitUntilDone: true)
+        }
+    }
+
+    private func handleClickMore(_ line: Int, rect: NSRect) {
+        guard let window = self.window else { return }
+
+        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
+            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
+            let menu = contextMenuForNode(rootNode, sourceNode)
+            else { return }
+
+        let windowRect = canvasView.convert(rect, to: nil)
+        let screenRect = window.convertToScreen(windowRect)
+
+        let suggestionItems: [SuggestionListItem] = menu.items.filter { !$0.isSeparatorItem }.map {
+            return SuggestionListItem.row($0.title, nil, false, nil)
+        }
+        let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
+
+        subwindow.defaultWindowSize = .init(width: 230, height: min(suggestionListHeight + 32 + 25, 400))
+        subwindow.suggestionView.showsSuggestionDetails = false
+        subwindow.suggestionView.suggestionListWidth = 230
+        subwindow.placeholderText = "Filter actions"
+
+        subwindow.anchorTo(rect: screenRect)
+        subwindow.suggestionItems = suggestionItems
+
+        subwindow.onChangeSuggestionText = { [unowned subwindow] text in
+            subwindow.suggestionText = text
+        }
+        subwindow.onSelectIndex = { [unowned subwindow] index in
+            subwindow.selectedIndex = index
+        }
+
+        handleActivateElement(nil)
+        window.addChildWindow(subwindow, ordered: .above)
+        subwindow.focusSearchField()
+
+        func hideWindow() {
+            window.removeChildWindow(subwindow)
+            subwindow.setIsVisible(false)
+        }
+
+        subwindow.onRequestHide = hideWindow
+
+        subwindow.onSubmit = { [unowned self] index in
+            let item = menu.items.filter { !$0.isSeparatorItem }[index]
+            item.target!.performSelector(onMainThread: item.action!, with: item, waitUntilDone: true)
+
+            hideWindow()
+            self.update()
         }
     }
 }

@@ -13,7 +13,7 @@ public class SuggestionWindow: NSWindow {
 
     convenience init() {
         self.init(
-            contentRect: NSRect(origin: .zero, size: SuggestionWindow.defaultWindowSize),
+            contentRect: NSRect(origin: .zero, size: .zero),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false)
@@ -162,6 +162,10 @@ public class SuggestionWindow: NSWindow {
 
     // MARK: Public
 
+    public var defaultWindowSize = CGSize(width: 610, height: 380)
+
+    public var allowedShrinkingSize = CGSize(width: 180, height: 200)
+
     public var onRequestHide: (() -> Void)?
 
     public var onSubmit: ((Int) -> Void)?
@@ -276,13 +280,13 @@ public class SuggestionWindow: NSWindow {
 
     public func anchorTo(rect: NSRect, verticalOffset: CGFloat = 0) {
         var contentRect = NSRect(
-            origin: NSPoint(x: rect.minX, y: rect.minY - SuggestionWindow.defaultContentViewSize.height - verticalOffset),
-            size: SuggestionWindow.defaultWindowSize)
+            origin: NSPoint(x: rect.minX, y: rect.minY - defaultContentViewSize.height - verticalOffset),
+            size: defaultWindowSize)
 
         if let visibleFrame = NSScreen.main?.visibleFrame {
             if contentRect.maxX > visibleFrame.maxX {
                 let horizontalShrinkSize = min(
-                    contentRect.maxX - visibleFrame.maxX, SuggestionWindow.allowedShrinkingSize.width)
+                    contentRect.maxX - visibleFrame.maxX, allowedShrinkingSize.width)
 
                 contentRect.size.width = contentRect.width - horizontalShrinkSize + 16
                 contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width + 16)
@@ -290,7 +294,7 @@ public class SuggestionWindow: NSWindow {
 
             if contentRect.minY < visibleFrame.minY {
                 let verticalShrinkSize = visibleFrame.minY - contentRect.minY
-                if verticalShrinkSize < SuggestionWindow.allowedShrinkingSize.height {
+                if verticalShrinkSize < allowedShrinkingSize.height {
                     contentRect.size.height = contentRect.height - verticalShrinkSize
                     contentRect.origin.y += verticalShrinkSize
                 } else {
@@ -303,14 +307,10 @@ public class SuggestionWindow: NSWindow {
         setFrameOrigin(contentRect.origin)
     }
 
-    public static var defaultWindowSize = CGSize(width: 610, height: 380)
-
-    public static var allowedShrinkingSize = CGSize(width: 180, height: 200)
-
-    public static var defaultContentViewSize: CGSize {
+    public var defaultContentViewSize: CGSize {
         return CGSize(
-            width: defaultWindowSize.width - shadowViewMargin * 2,
-            height: defaultWindowSize.height - shadowViewMargin * 2)
+            width: defaultWindowSize.width - SuggestionWindow.shadowViewMargin * 2,
+            height: defaultWindowSize.height - SuggestionWindow.shadowViewMargin * 2)
     }
 
     private static var shadowViewMargin: CGFloat = 12

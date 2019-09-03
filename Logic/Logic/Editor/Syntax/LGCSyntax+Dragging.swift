@@ -41,15 +41,16 @@ extension LGCSyntaxNode {
     }
 
     /// Duplicate the selected node, returning the new root node
-    public func duplicate(id: UUID) -> LGCSyntaxNode? {
+    public func duplicate(id: UUID) -> (rootNode: LGCSyntaxNode, duplicatedNode: LGCSyntaxNode)? {
         guard let node = find(id: id) else { return nil }
 
         switch node {
         case .declaration:
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
                 let childIndex = targetParent.contents.children.firstIndex(of: node) {
-                let newParent = targetParent.insert(childNode: node.copy(deep: true), atIndex: childIndex + 1)
-                return self.replace(id: targetParent.uuid, with: newParent)
+                let childNode = node.copy(deep: true)
+                let newParent = targetParent.insert(childNode: childNode, atIndex: childIndex + 1)
+                return (self.replace(id: targetParent.uuid, with: newParent), childNode)
             } else {
                 break
             }
@@ -65,7 +66,7 @@ extension LGCSyntaxNode {
     }
 
     /// Insert a placeholder above the selected node, returning the new root node
-    public func insert(_ position: InsertPosition, id: UUID) -> LGCSyntaxNode? {
+    public func insert(_ position: InsertPosition, id: UUID) -> (rootNode: LGCSyntaxNode, insertedNode: LGCSyntaxNode)? {
         guard let node = find(id: id) else { return nil }
 
         switch node {
@@ -73,8 +74,9 @@ extension LGCSyntaxNode {
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
                 let childIndex = targetParent.contents.children.firstIndex(of: node) {
                 let newIndex = childIndex + (position == .above ? 0 : 1)
-                let newParent = targetParent.insert(childNode: .declaration(.makePlaceholder()), atIndex: newIndex)
-                return self.replace(id: targetParent.uuid, with: newParent)
+                let childNode: LGCSyntaxNode = .declaration(.makePlaceholder())
+                let newParent = targetParent.insert(childNode: childNode, atIndex: newIndex)
+                return (self.replace(id: targetParent.uuid, with: newParent), childNode)
             }
         default:
             break
