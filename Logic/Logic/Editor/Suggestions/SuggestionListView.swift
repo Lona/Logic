@@ -118,7 +118,7 @@ public class SuggestionListView: NSBox {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.target = self
-        tableView.doubleAction = #selector(handleDoubleAction)
+        tableView.action = #selector(handleDoubleAction)
         tableView.backgroundColor = .clear
 
         scrollView.hasVerticalScroller = true
