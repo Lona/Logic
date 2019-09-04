@@ -95,7 +95,7 @@ class Document: NSDocument {
 
         infoBar.dropdownValues = editorDisplayStyles.map { $0.displayName }
         infoBar.onChangeDropdownIndex = { [unowned self] index in
-            var newFormattingOptions = self.logicEditor.formattingOptions
+            let newFormattingOptions = self.logicEditor.formattingOptions
             newFormattingOptions.style = self.editorDisplayStyles[index]
             self.logicEditor.formattingOptions = newFormattingOptions
             self.infoBar.dropdownIndex = index
@@ -119,7 +119,7 @@ class Document: NSDocument {
 //            LGCTopLevelParameters(id: UUID(), parameters: .next(.placeholder(id: UUID()), .empty))
 //        )
 
-        let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
+//        let labelFont = TextStyle(family: "San Francisco", weight: .bold, size: 9).nsFont
 
         infoBar.dropdownIndex = 0
         logicEditor.formattingOptions = LogicFormattingOptions(
@@ -229,55 +229,14 @@ class Document: NSDocument {
         }
 
         logicEditor.onInsertBelow = { [unowned self] rootNode, node in
-            self.handleMenuAction(.insertBelow(node.uuid))
+            StandardConfiguration.handleMenuItem(logicEditor: self.logicEditor, action: .insertBelow(node.uuid))
         }
 
-        logicEditor.contextMenuForNode = { rootNode, node in
-            func makeContextMenu(for node: LGCSyntaxNode) -> [LogicEditor.MenuItem]? {
-                var menu: [LogicEditor.MenuItem] = [
-                    .init(row: .sectionHeader("ACTIONS"), action: {})
-                ]
-
-                func makeMenuItem(title: String, action: MenuAction) -> LogicEditor.MenuItem {
-                    return .init(
-                        row: .row(title, nil, false, nil),
-                        action: ({ [unowned self] in
-                            self.handleMenuAction(action)
-                        })
-                    )
-                }
-
-                switch node {
-                case .statement(.declaration(id: _, content: let declaration)):
-                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(declaration.uuid)))
-                    menu.append(makeMenuItem(title: "Duplicate", action: MenuAction.duplicate(node.uuid)))
-                    menu.append(makeMenuItem(title: "Delete", action: MenuAction.delete(node.uuid)))
-                case .declaration(let value):
-                    menu.append(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
-                    menu.append(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
-                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
-                    menu.append(makeMenuItem(title: "Duplicate", action: MenuAction.duplicate(node.uuid)))
-                    menu.append(makeMenuItem(title: "Delete", action: MenuAction.delete(node.uuid)))
-                case .enumerationCase(.enumerationCase(let value)):
-                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
-                case .functionParameter(.parameter(let value)):
-                    menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.id)))
-                default:
-                    return nil
-                }
-
-                menu.append(makeMenuItem(title: "Replace", action: MenuAction.replace(node.uuid)))
-
-                return menu
-            }
-
-            switch node {
-            case .pattern:
-                guard let parent = rootNode.contents.parentOf(target: node.uuid, includeTopLevel: false) else { return nil }
-                return makeContextMenu(for: parent)
-            default:
-                return makeContextMenu(for: node)
-            }
+        logicEditor.contextMenuForNode = { [unowned self] rootNode, node in
+            return StandardConfiguration.menu(rootNode: rootNode, node: node, allowComments: true, handleMenuAction: { [unowned self] action in
+                StandardConfiguration.handleMenuItem(logicEditor: self.logicEditor, action: action)
+                _ = self.evaluate(rootNode: self.logicEditor.rootNode)
+            })
         }
 
         let makeProgram: (LGCSyntaxNode) -> LGCSyntaxNode? = Memoize.one({ rootNode in
@@ -409,134 +368,6 @@ class Document: NSDocument {
         }
 
         logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
-    }
-
-    private enum MenuAction {
-        case addComment(UUID)
-        case duplicate(UUID)
-        case delete(UUID)
-        case insertAbove(UUID)
-        case insertBelow(UUID)
-        case replace(UUID)
-    }
-
-    private func handleMenuAction(_ action: MenuAction) {
-        switch action {
-        case .replace(let id):
-            logicEditor.select(nodeByID: id)
-        case .delete(let id):
-            logicEditor.rootNode = logicEditor.rootNode.delete(id: id)
-        case .duplicate(let id):
-            if let duplicated = logicEditor.rootNode.duplicate(id: id) {
-                logicEditor.rootNode = duplicated.rootNode
-                logicEditor.select(nodeByID: nil)
-            }
-        case .insertAbove(let id):
-            if let inserted = logicEditor.rootNode.insert(.above, id: id) {
-                logicEditor.rootNode = inserted.rootNode
-                logicEditor.select(nodeByID: inserted.insertedNode.uuid)
-            }
-        case .insertBelow(let id):
-            if let node = logicEditor.rootNode.find(id: id),
-                let contents = node.contents as? SyntaxNodePlaceholdable,
-                contents.isPlaceholder {
-                logicEditor.select(nodeByID: node.uuid)
-            } else if let inserted = logicEditor.rootNode.insert(.below, id: id) {
-                logicEditor.rootNode = inserted.rootNode
-                logicEditor.select(nodeByID: inserted.insertedNode.uuid)
-            }
-        case .addComment(let id):
-            guard let node = logicEditor.rootNode.find(id: id) else { return }
-
-            switch node {
-            case .functionParameter(.parameter(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .functionParameter(
-                        .parameter(
-                            id: UUID(),
-                            externalName: value.externalName,
-                            localName: value.localName,
-                            annotation: value.annotation,
-                            defaultValue: value.defaultValue,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            case .declaration(.variable(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .declaration(
-                        .variable(
-                            id: UUID(),
-                            name: value.name,
-                            annotation: value.annotation,
-                            initializer: value.initializer,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            case .declaration(.record(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .declaration(
-                        .record(
-                            id: UUID(),
-                            name: value.name,
-                            genericParameters: value.genericParameters,
-                            declarations: value.declarations,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            case .declaration(.enumeration(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .declaration(
-                        .enumeration(
-                            id: UUID(),
-                            name: value.name,
-                            genericParameters: value.genericParameters,
-                            cases: value.cases,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            case .declaration(.function(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .declaration(
-                        .function(
-                            id: UUID(),
-                            name: value.name,
-                            returnType: value.returnType,
-                            genericParameters: value.genericParameters,
-                            parameters: value.parameters,
-                            block: value.block,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            case .enumerationCase(.enumerationCase(let value)):
-                logicEditor.rootNode = logicEditor.rootNode.replace(
-                    id: id,
-                    with: .enumerationCase(
-                        .enumerationCase(
-                            id: UUID(),
-                            name: value.name,
-                            associatedValueTypes: value.associatedValueTypes,
-                            comment: value.comment ?? .init(id: UUID(), string: "A comment")
-                        )
-                    )
-                )
-            default:
-                break
-            }
-
-            break
-        }
-
-        _ = evaluate(rootNode: logicEditor.rootNode)
     }
 
 //    override func data(ofType typeName: String) throws -> Data {
