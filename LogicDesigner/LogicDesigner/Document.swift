@@ -255,7 +255,6 @@ class Document: NSDocument {
                 case .declaration(let value):
                     menu.append(makeMenuItem(title: "Insert above", action: MenuAction.insertAbove(node.uuid)))
                     menu.append(makeMenuItem(title: "Insert below", action: MenuAction.insertBelow(node.uuid)))
-//                    menu.append(.separator())
                     menu.append(makeMenuItem(title: "Add comment", action: MenuAction.addComment(value.uuid)))
                     menu.append(makeMenuItem(title: "Duplicate", action: MenuAction.duplicate(node.uuid)))
                     menu.append(makeMenuItem(title: "Delete", action: MenuAction.delete(node.uuid)))
@@ -266,6 +265,8 @@ class Document: NSDocument {
                 default:
                     return nil
                 }
+
+                menu.append(makeMenuItem(title: "Replace", action: MenuAction.replace(node.uuid)))
 
                 return menu
             }
@@ -416,10 +417,13 @@ class Document: NSDocument {
         case delete(UUID)
         case insertAbove(UUID)
         case insertBelow(UUID)
+        case replace(UUID)
     }
 
     private func handleMenuAction(_ action: MenuAction) {
         switch action {
+        case .replace(let id):
+            logicEditor.select(nodeByID: id)
         case .delete(let id):
             logicEditor.rootNode = logicEditor.rootNode.delete(id: id)
         case .duplicate(let id):
