@@ -125,6 +125,11 @@ open class LogicEditor: NSBox {
 
     public var showsFilterBar: Bool = false
 
+    public var showsLineButtons: Bool {
+        get { return canvasView.showsLineButtons }
+        set { canvasView.showsLineButtons = newValue }
+    }
+
     public var showsMinimap: Bool = false {
         didSet {
             if showsMinimap {
@@ -459,7 +464,8 @@ extension LogicEditor {
             let elements = self.rootNode.formatted(using: formattingOptions).elements
 
             if activatedIndex < elements.count {
-                self.select(nodeByID: elements[activatedIndex].syntaxNodeID)
+                let element = elements[activatedIndex]
+                self.select(nodeByID: element.syntaxNodeID ?? element.targetNodeId)
                 return
             }
         }
@@ -508,6 +514,8 @@ extension LogicEditor {
             let menu = contextMenuForNode(rootNode, sourceNode)
             else { return }
 
+        let actualRange = rootNode.elementRange(for: sourceNode.uuid, options: formattingOptions, includeTopLevel: false)
+
         let windowRect = canvasView.convert(rect, to: nil)
         let screenRect = window.convertToScreen(windowRect)
 
@@ -515,13 +523,13 @@ extension LogicEditor {
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
-        subwindow.defaultWindowSize = .init(width: 230, height: min(suggestionListHeight + 32 + 25, 400))
+        subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
         subwindow.suggestionView.showsSuggestionDetails = false
-        subwindow.suggestionView.suggestionListWidth = 230
+        subwindow.suggestionView.suggestionListWidth = 200
         subwindow.suggestionText = ""
         subwindow.placeholderText = "Filter actions"
 
-        subwindow.anchorTo(rect: screenRect)
+        subwindow.anchorHorizontallyTo(rect: screenRect, horizontalOffset: 4)
         subwindow.suggestionItems = suggestionItems
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
@@ -540,32 +548,42 @@ extension LogicEditor {
         }
 
         subwindow.onChangeSuggestionText = { [unowned subwindow] text in
-            subwindow.selectedIndex = 0
             subwindow.suggestionText = text
             subwindow.suggestionItems = filteredSuggestionItems(query: text).map { offset, item in item }
+            subwindow.selectedIndex = filteredSuggestionItems(query: text).firstIndex(where: { offset, item in item.isSelectable })
         }
         subwindow.onSelectIndex = { [unowned subwindow] index in
             subwindow.selectedIndex = index
         }
 
-        handleActivateElement(nil)
+//        handleActivateElement(nil)
+        canvasView.selectedRange = actualRange
         window.addChildWindow(subwindow, ordered: .above)
         subwindow.focusSearchField()
 
-        func hideWindow() {
-            window.removeChildWindow(subwindow)
-            subwindow.setIsVisible(false)
+        var didHide: Bool = false
+
+        let hideWindow = { [unowned self] in
+            if didHide { return }
+            didHide = true
+            window.removeChildWindow(self.subwindow)
+            self.subwindow.setIsVisible(false)
         }
 
+        subwindow.onPressEscapeKey = hideWindow
         subwindow.onRequestHide = hideWindow
 
         subwindow.onSubmit = { [unowned self] index in
-            let originalIndex = filteredSuggestionItems(query: self.subwindow.suggestionText).map { offset, item in offset }[index]
+            self.canvasView.selectedRange = nil
 
+            let originalIndex = filteredSuggestionItems(query: self.subwindow.suggestionText).map { offset, item in offset }[index]
             let item = menu[originalIndex]
             item.action()
 
             hideWindow()
+
+            didHide = true
+
             self.update()
         }
     }
@@ -698,6 +716,8 @@ extension LogicEditor {
     // to it each time we show it. Otherwise, we may be showing parameters set by another logic editor.
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode) {
         guard let window = self.window else { return }
+
+        canvasView.hasFocus = true
 
         let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions, includeTopLevel: false)
         let dropdownNodes = Array(syntaxNodePath)
@@ -860,5 +880,6 @@ extension LogicEditor {
 
         window.removeChildWindow(childWindow)
         childWindow.setIsVisible(false)
+        canvasView.hasFocus = false
     }
 }

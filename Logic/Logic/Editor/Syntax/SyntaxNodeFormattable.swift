@@ -583,7 +583,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         where identifier.string == Unification.T.color.name && options.style == .visual:
 
                         let colorInfo = options.getColor(initializer.uuid) ?? ("", NSColor.clear)
-                        let decoration: LogicElement = .colorPreview(colorInfo.0, colorInfo.1, value.id)
+                        let decoration: LogicElement = .colorPreview(colorInfo.0, colorInfo.1, value.id, targetId: initializer.uuid)
 
                         let formattedInitializer = initializer.formatted(using: options)
 
@@ -605,7 +605,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         where identifier.string == Unification.T.shadow.name && options.style == .visual:
 
                         let shadowInfo = options.getShadow(initializer.uuid) ?? NSShadow(color: .clear, offset: .zero, blur: 0)
-                        let decoration: LogicElement = .shadowPreview(shadowInfo, value.id)
+                        let decoration: LogicElement = .shadowPreview(shadowInfo, value.id, targetId: initializer.uuid)
 
                         let formattedInitializer = initializer.formatted(using: options)
 
@@ -626,7 +626,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         where identifier.string == Unification.T.textStyle.name && options.style == .visual:
 
                         let textStyleInfo = options.getTextStyle(initializer.uuid) ?? TextStyle()
-                        let decoration: LogicElement = .textStylePreview(textStyleInfo, value.name.name, value.id)
+                        let decoration: LogicElement = .textStylePreview(textStyleInfo, value.name.name, value.id, targetId: initializer.uuid)
 
                         let formattedInitializer = initializer.formatted(using: options)
 

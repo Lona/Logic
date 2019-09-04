@@ -37,9 +37,9 @@ public enum LogicElement {
     case coloredText(String, NSColor)
     case dropdown(UUID, String, DropdownStyle)
     case title(UUID, String)
-    case colorPreview(String, NSColor, UUID)
-    case shadowPreview(NSShadow, UUID)
-    case textStylePreview(TextStyle, String, UUID)
+    case colorPreview(String, NSColor, UUID, targetId: UUID)
+    case shadowPreview(NSShadow, UUID, targetId: UUID)
+    case textStylePreview(TextStyle, String, UUID, targetId: UUID)
     case indentGuide(UUID)
     case errorSummary(String, UUID)
 
@@ -100,9 +100,25 @@ public enum LogicElement {
             return nil
         case .title(let id, _),
              .dropdown(let id, _, _),
-             .colorPreview(_, _, let id),
-             .shadowPreview(_, let id),
-             .textStylePreview(_, _, let id):
+             .colorPreview(_, _, let id, _),
+             .shadowPreview(_, let id, _),
+             .textStylePreview(_, _, let id, _):
+            return id
+        }
+    }
+
+    public var targetNodeId: UUID? {
+        switch self {
+        case .text,
+             .coloredText,
+             .indentGuide,
+             .errorSummary,
+             .title,
+             .dropdown:
+            return nil
+        case .colorPreview(_, _, _, let id),
+             .shadowPreview(_, _, let id),
+             .textStylePreview(_, _, _, let id):
             return id
         }
     }
@@ -144,7 +160,7 @@ public enum LogicElement {
         switch self {
         case .text, .title, .errorSummary:
             return Colors.text
-        case .coloredText(_, let color), .colorPreview(_, let color, _):
+        case .coloredText(_, let color), .colorPreview(_, let color, _, _):
             return color
         case .dropdown(_, _, let dropdownStyle):
             return dropdownStyle.color

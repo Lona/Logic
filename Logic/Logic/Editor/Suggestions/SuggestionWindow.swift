@@ -307,6 +307,34 @@ public class SuggestionWindow: NSWindow {
         setFrameOrigin(contentRect.origin)
     }
 
+    public func anchorHorizontallyTo(rect: NSRect, horizontalOffset: CGFloat = 0) {
+        var contentRect = NSRect(
+            origin: NSPoint(
+                x: rect.minX - defaultContentViewSize.width - horizontalOffset,
+                y: rect.midY - defaultContentViewSize.height / 2
+            ),
+            size: defaultWindowSize)
+
+        if let visibleFrame = NSScreen.main?.visibleFrame {
+            if contentRect.minX < visibleFrame.minX {
+                contentRect.origin.x = visibleFrame.minX
+            }
+
+            if contentRect.minY < visibleFrame.minY {
+                let verticalShrinkSize = visibleFrame.minY - contentRect.minY
+                if verticalShrinkSize < allowedShrinkingSize.height {
+                    contentRect.size.height = contentRect.height - verticalShrinkSize
+                    contentRect.origin.y += verticalShrinkSize
+                } else {
+                    contentRect.origin.y = rect.maxY + horizontalOffset
+                }
+            }
+        }
+
+        setContentSize(contentRect.size)
+        setFrameOrigin(contentRect.origin)
+    }
+
     public var defaultContentViewSize: CGSize {
         return CGSize(
             width: defaultWindowSize.width - SuggestionWindow.shadowViewMargin * 2,

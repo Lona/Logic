@@ -18,13 +18,14 @@ public class LogicCanvasView: NSView {
         public var font = TextStyle(family: "San Francisco", size: 13).nsFont
         public var boldFont = TextStyle(family: "San Francisco", weight: NSFont.Weight.semibold, size: 13).nsFont
         public var textPadding = CGSize(width: 4, height: 3)
-        public var textMargin = CGSize(width: 42, height: 6)
+        public var textMargin = CGSize(width: 6, height: 6)
         public var textBackgroundRadius = CGSize(width: 2, height: 2)
         public var outlineWidth: CGFloat = 2.0
         public var textSpacing: CGFloat = 4.0
         public var lineSpacing: CGFloat = 6.0
         public var minimumLineHeight: CGFloat = 22.0
         public var textAlignment: TextAlignment = .left
+        public var lineButtonContainerWidth: CGFloat = 38.0
 
         public init() {}
     }
@@ -68,6 +69,7 @@ public class LogicCanvasView: NSView {
                 outlinedRange: nil,
                 errorRanges: [],
                 errorLines: [],
+                hasFocus: false,
                 style: self.style
             )
 
@@ -126,6 +128,16 @@ public class LogicCanvasView: NSView {
         }
     }
     public var errorRanges: [Range<Int>] = [] {
+        didSet {
+            update()
+        }
+    }
+    public var hasFocus: Bool = false {
+        didSet {
+            update()
+        }
+    }
+    public var showsLineButtons: Bool = true {
         didSet {
             update()
         }
@@ -227,7 +239,7 @@ public class LogicCanvasView: NSView {
         let point = convert(event.locationInWindow, from: nil)
         let line = logicalLineIndex(at: point, measuredFromMidpoint: false)
 
-        if getLineShowsButtons(line) {
+        if showsLineButtons && getLineShowsButtons(line) {
             hoveredLine = line
 
             if let hoveredLine = hoveredLine {
@@ -381,6 +393,7 @@ public class LogicCanvasView: NSView {
         outlinedRange: Range<Int>?,
         errorRanges: [Range<Int>],
         errorLines: [Int],
+        hasFocus: Bool,
         style: Style
         ) {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
@@ -446,16 +459,14 @@ public class LogicCanvasView: NSView {
                 yRadius: style.textBackgroundRadius.height)
             path.lineWidth = style.outlineWidth
             path.stroke()
-        } else {
-            if let range = selectedRange {
-                let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
-                let rect = measuredElements[clampedRange].filter { $0.element.isLogicalNode }.map { $0.backgroundRect }.union
-                Colors.highlightedCode.set()
-                NSBezierPath(
-                    roundedRect: rect,
-                    xRadius: style.textBackgroundRadius.width,
-                    yRadius: style.textBackgroundRadius.height).fill()
-            }
+        } else if let range = selectedRange {
+            let clampedRange = range.clamped(to: measuredElements.startIndex..<measuredElements.endIndex)
+            let rect = measuredElements[clampedRange].filter { $0.element.isLogicalNode }.map { $0.backgroundRect }.union
+            Colors.highlightedCode.set()
+            NSBezierPath(
+                roundedRect: rect,
+                xRadius: style.textBackgroundRadius.width,
+                yRadius: style.textBackgroundRadius.height).fill()
         }
 
         for range in errorRanges {
@@ -484,7 +495,7 @@ public class LogicCanvasView: NSView {
             let attributedString = measuredText.attributedString
 
             switch (text) {
-            case .colorPreview(_, let color, _):
+            case .colorPreview(_, let color, _, _):
                 color.setFill()
                 Colors.text.withAlphaComponent(0.1).setStroke()
 
@@ -498,7 +509,7 @@ public class LogicCanvasView: NSView {
 
                 backgroundBezier.fill()
                 outlineBezier.stroke()
-            case .shadowPreview(let shadow, _):
+            case .shadowPreview(let shadow, _, _):
                 NSColor.white.setFill()
                 Colors.text.withAlphaComponent(0.1).setStroke()
 
@@ -522,7 +533,7 @@ public class LogicCanvasView: NSView {
                 NSRect(x: backgroundRect.midX - 12, y: backgroundRect.midY - 12, width: 24, height: 24).fill()
 
                 NSGraphicsContext.restoreGraphicsState()
-            case .textStylePreview(let textStyle, let previewString, _):
+            case .textStylePreview(let textStyle, let previewString, _, _):
                 NSColor.white.setFill()
                 Colors.text.withAlphaComponent(0.1).setStroke()
 
@@ -589,7 +600,7 @@ public class LogicCanvasView: NSView {
                     dropdownStyle = .variable
                 }
 
-                let drawSelection = selected && outlinedRange == nil
+                let drawSelection = selected && outlinedRange == nil && hasFocus
                 let color = drawSelection ? NSColor.selectedMenuItemColor : dropdownStyle.color
 
                 let shadow = NSShadow()
@@ -621,9 +632,6 @@ public class LogicCanvasView: NSView {
                         Colors.textComment.setStroke()
 //                        color.setStroke()
                     }
-
-//                    let caret = NSBezierPath(downwardCaretWithin:
-//                        CGRect(x: rect.maxX, y: backgroundRect.midY, width: 5, height: 2.5))
 
                     let caret = NSBezierPath(
                         plusWithin: CGRect(
@@ -737,6 +745,7 @@ public class LogicCanvasView: NSView {
             outlinedRange: outlinedRange,
             errorRanges: errorRanges,
             errorLines: errorLines,
+            hasFocus: hasFocus,
             style: style
         )
 
@@ -824,8 +833,11 @@ public class LogicCanvasView: NSView {
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
         bounds: NSRect,
         selectedIndex: Int?,
+        showsLineButtons: Bool,
         style: Style
         ) -> [LogicMeasuredElement] {
+
+        let lineButtonContainerWidth = showsLineButtons ? style.lineButtonContainerWidth : 0
 
         var tempCache = decorationCache
 
@@ -844,7 +856,7 @@ public class LogicCanvasView: NSView {
                 ).backgroundRect.size
         }
 
-        let availableContentWidth = bounds.width - style.textMargin.width * 2
+        let availableContentWidth = bounds.width - lineButtonContainerWidth - style.textMargin.width * 2
 
         let formattedElementLines = formattedContent.print(
             width: availableContentWidth,
@@ -887,7 +899,7 @@ public class LogicCanvasView: NSView {
                 }
 
                 let offset = CGPoint(
-                    x: xOffset + formattedElement.x + style.textMargin.width,
+                    x: xOffset + formattedElement.x + style.textMargin.width + lineButtonContainerWidth,
                     y: yOffset + formattedElement.y)
 
                 var measured = formattedElement.element.measured(
@@ -928,6 +940,7 @@ public class LogicCanvasView: NSView {
             getElementDecoration: getElementDecoration,
             bounds: bounds,
             selectedIndex: selectedIndex,
+            showsLineButtons: showsLineButtons,
             style: style)
 
         _cachedMeasuredElements = measuredLine
@@ -1154,6 +1167,7 @@ extension LogicCanvasView {
             getElementDecoration: getElementDecoration,
             bounds: frame,
             selectedIndex: nil,
+            showsLineButtons: false,
             style: style
         )
 
@@ -1170,6 +1184,7 @@ extension LogicCanvasView {
             outlinedRange: nil,
             errorRanges: [],
             errorLines: [],
+            hasFocus: false,
             style: style
         )
 
