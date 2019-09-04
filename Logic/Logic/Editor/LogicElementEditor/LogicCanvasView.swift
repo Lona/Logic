@@ -32,6 +32,8 @@ public class LogicCanvasView: NSView {
     public enum Item: Equatable {
         case range(Range<Int>)
         case line(Int)
+        case moreButton(Int)
+        case plusButton(Int)
     }
 
     // MARK: Lifecycle
@@ -144,6 +146,7 @@ public class LogicCanvasView: NSView {
     public var onDuplicateCommand: (() -> Void)?
 
     public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
+    public var getLineShowsButtons: ((Int) -> Bool) = {_ in false}
 
     public func forceUpdate() {
         update()
@@ -222,16 +225,24 @@ public class LogicCanvasView: NSView {
 
     public override func mouseMoved(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
-        hoveredLine = logicalLineIndex(at: point, measuredFromMidpoint: false)
+        let line = logicalLineIndex(at: point, measuredFromMidpoint: false)
 
-        if let hoveredLine = hoveredLine {
-            if let rect = plusButtonRect(for: hoveredLine) {
-                hoveredPlusButton = rect.contains(point)
-            }
+        if getLineShowsButtons(line) {
+            hoveredLine = line
 
-            if let rect = moreButtonRect(for: hoveredLine) {
-                hoveredMoreButton = rect.contains(point)
+            if let hoveredLine = hoveredLine {
+                if let rect = plusButtonRect(for: hoveredLine) {
+                    hoveredPlusButton = rect.contains(point)
+                }
+
+                if let rect = moreButtonRect(for: hoveredLine) {
+                    hoveredMoreButton = rect.contains(point)
+                }
             }
+        } else {
+            hoveredLine = nil
+            hoveredPlusButton = false
+            hoveredMoreButton = false
         }
     }
 
@@ -249,16 +260,12 @@ public class LogicCanvasView: NSView {
         switch clickedItem {
         case .none:
             onActivate?(nil)
+        case .some(.moreButton), .some(.plusButton):
+            break
         case .some(.range(let range)):
             onActivate?(range.lowerBound)
         case .some(.line(let index)):
-            if let rect = plusButtonRect(for: index), rect.contains(point) {
-                return
-            } else if let rect = moreButtonRect(for: index), rect.contains(point) {
-                return
-            } else {
-                onActivateLine?(index)
-            }
+            onActivateLine?(index)
         }
     }
 
@@ -272,12 +279,16 @@ public class LogicCanvasView: NSView {
         switch clickedItem {
         case .none, .some(.range):
             break
-        case .some(.line(let index)):
+        case .some(.plusButton(let index)):
             if let rect = plusButtonRect(for: index), rect.contains(point) {
                 onClickLinePlus?(index, rect)
-            } else if let rect = moreButtonRect(for: index), rect.contains(point) {
+            }
+        case .some(.moreButton(let index)):
+            if let rect = moreButtonRect(for: index), rect.contains(point) {
                 onClickLineMore?(index, rect)
             }
+        case .some(.line):
+            break
         }
     }
 
@@ -977,9 +988,9 @@ public class LogicCanvasView: NSView {
         let selectedLine: Int
 
         switch draggedItem {
-        case .none, .some(.range):
+        case .none, .some(.range), .some(.plusButton):
             return
-        case .some(.line(let index)):
+        case .some(.line(let index)), .some(.moreButton(let index)):
             selectedLine = index
         }
 
@@ -1049,6 +1060,14 @@ public class LogicCanvasView: NSView {
 
 extension LogicCanvasView {
     private func item(at point: CGPoint) -> Item? {
+        if let hoveredLine = hoveredLine {
+            if let rect = plusButtonRect(for: hoveredLine), rect.contains(point) {
+                return .plusButton(hoveredLine)
+            } else if let rect = moreButtonRect(for: hoveredLine), rect.contains(point) {
+                return .moreButton(hoveredLine)
+            }
+        }
+
         if let index = measuredElements.firstIndex(where: { $0.backgroundRect.contains(point) }) {
             return .range(index..<index + 1)
         }

@@ -286,6 +286,7 @@ open class LogicEditor: NSBox {
         canvasView.onMoveLine = handleMoveLine
         canvasView.onBlur = handleBlur
         canvasView.onFocus = handleFocus
+        canvasView.getLineShowsButtons = handleLineShowsButtons
     }
 
     private func setUpConstraints() {
@@ -498,6 +499,15 @@ extension LogicEditor {
 //            menu.delegate = self
 //            menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
 //        }
+    }
+
+    private func handleLineShowsButtons(_ line: Int) -> Bool {
+        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
+            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid)
+            else { return false }
+
+        return contextMenuForNode(rootNode, sourceNode) != nil
     }
 
     private func handleClickPlus(_ line: Int, rect: NSRect) {
