@@ -276,7 +276,6 @@ open class LogicEditor: NSBox {
         canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
         canvasView.onActivate = handleActivateElement
         canvasView.onActivateLine = handleActivateLine
-        canvasView.onRightClick = handleRightClick
         canvasView.onClickLineMore = handleClickMore
         canvasView.onClickLinePlus = handleClickPlus
         canvasView.onPressTabKey = nextNode
@@ -474,31 +473,6 @@ extension LogicEditor {
         if supportsLineSelection {
             canvasView.selectedLine = activatedLineIndex
         }
-    }
-
-    private func handleRightClick(_ item: LogicCanvasView.Item?, _ point: NSPoint) {
-//        guard let item = item else { return }
-//
-//        switch item {
-//        case .line:
-//            break
-//        case .range(let range):
-//            guard let selectedNode = rootNode.topNodeWithEqualRange(
-//                as: range,
-//                options: formattingOptions,
-//                includeTopLevel: false
-//                ) else { return }
-//
-//            guard let menu = contextMenuForNode(rootNode, selectedNode),
-//                let firstItem = menu.items.first else { return }
-//
-//            hideSuggestionWindow()
-//
-//            canvasView.outlinedRange = rootNode.elementRange(for: selectedNode.uuid, options: formattingOptions, includeTopLevel: false)
-//
-//            menu.delegate = self
-//            menu.popUp(positioning: firstItem, at: convert(point, from: canvasView), in: self)
-//        }
     }
 
     private func draggableNode(atLine line: Int) -> LGCSyntaxNode? {
