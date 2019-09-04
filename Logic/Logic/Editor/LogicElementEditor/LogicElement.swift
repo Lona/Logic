@@ -270,7 +270,7 @@ extension LogicElement {
             )
 
             if value.isEmpty {
-                backgroundRect.size.width += value.isEmpty ? 5 : 11
+                backgroundRect.size.width += 11
             }
 
             switch decoration {

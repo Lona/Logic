@@ -618,17 +618,23 @@ public class LogicCanvasView: NSView {
                     if drawSelection {
                         NSColor.white.setStroke()
                     } else {
-                        color.setStroke()
+                        Colors.textComment.setStroke()
+//                        color.setStroke()
                     }
 
-                    let caret = NSBezierPath(downwardCaretWithin:
-                        CGRect(x: rect.maxX, y: backgroundRect.midY, width: 5, height: 2.5))
+//                    let caret = NSBezierPath(downwardCaretWithin:
+//                        CGRect(x: rect.maxX, y: backgroundRect.midY, width: 5, height: 2.5))
 
-//                    let caret = NSBezierPath(
-//                        plusWithin: CGRect(x: rect.maxX, y: backgroundRect.midY - 5, width: 10, height: 10),
-//                        lineWidth: 2,
-//                        margin: .init(width: 1, height: 1)
-//                    )
+                    let caret = NSBezierPath(
+                        plusWithin: CGRect(
+                            x: floor(backgroundRect.midX) - 17 / 2 + 0.5,
+                            y: floor(backgroundRect.midY) - 17 / 2 + 0.5,
+                            width: 17,
+                            height: 17
+                        ),
+                        lineWidth: 1,
+                        margin: .init(width: 3, height: 3)
+                    )
 
                     caret.stroke()
                 }
@@ -735,29 +741,29 @@ public class LogicCanvasView: NSView {
         )
 
         if let hoveredLine = hoveredLine, let rect = plusButtonRect(for: hoveredLine) {
-            let path = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+            let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
 
             if hoveredPlusButton {
                 Colors.divider.set()
-                path.fill()
+                backgroundPath.fill()
             }
 
-            let plusPath = NSBezierPath(plusWithin: rect, lineWidth: 1, margin: .init(width: 3, height: 3))
-            NSColor.black.withAlphaComponent(0.5).setStroke()
-            plusPath.stroke()
+            let path = NSBezierPath(plusWithin: rect, lineWidth: 1, margin: .init(width: 3, height: 3))
+            Colors.textComment.setStroke()
+            path.stroke()
         }
 
         if let hoveredLine = hoveredLine, let rect = moreButtonRect(for: hoveredLine) {
-            let path = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+            let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
 
             if hoveredMoreButton {
                 Colors.divider.set()
-                path.fill()
+                backgroundPath.fill()
             }
 
-            let plusPath = NSBezierPath(hamburgerWithin: rect, thickness: 1, margin: .init(width: 4, height: 5))
-            NSColor.black.withAlphaComponent(0.5).setStroke()
-            plusPath.stroke()
+            let path = NSBezierPath(hamburgerWithin: rect, thickness: 1, margin: .init(width: 4, height: 5))
+            Colors.textComment.setStroke()
+            path.stroke()
         }
     }
 
