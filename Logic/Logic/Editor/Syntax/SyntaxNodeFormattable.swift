@@ -762,7 +762,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 commentContents + [
                     .element(LogicElement.dropdown(value.id, "Record", .source)),
                     value.name.formatted(using: options),
-                    (value.genericParameters.isEmpty ? contents : .indent(
+                    (value.genericParameters.isEmpty || value.genericParameters.first?.isPlaceholder == true ? contents : .indent(
                         .concat(
                             [
                                 genericParameters(),
