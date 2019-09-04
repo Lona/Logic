@@ -501,20 +501,26 @@ extension LogicEditor {
 //        }
     }
 
-    private func handleLineShowsButtons(_ line: Int) -> Bool {
+    private func draggableNode(atLine line: Int) -> LGCSyntaxNode? {
         guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
             let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
             let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid)
-            else { return false }
+            else { return nil }
+        return sourceNode
+    }
+
+    private func handleLineShowsButtons(_ line: Int) -> Bool {
+        guard let sourceNode = draggableNode(atLine: line) else { return false }
+
+        // If the previous line has the same node, show line buttons on the previous line instead
+        let previousLine = line - 1
+        if previousLine >= 0 && draggableNode(atLine: previousLine) == sourceNode { return false }
 
         return contextMenuForNode(rootNode, sourceNode) != nil
     }
 
     private func handleClickPlus(_ line: Int, rect: NSRect) {
-        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
-            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
-            let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid)
-            else { return }
+        guard let sourceNode = draggableNode(atLine: line) else { return }
 
         onInsertBelow?(rootNode, sourceNode)
     }
