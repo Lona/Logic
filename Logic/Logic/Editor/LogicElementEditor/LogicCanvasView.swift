@@ -711,7 +711,7 @@ public class LogicCanvasView: NSView {
                 if drawSelection {
                     let attributedString = NSMutableAttributedString(attributedString: attributedString)
                     attributedString.addAttributes(
-                        [NSAttributedString.Key.foregroundColor: NSColor.white],
+                        [NSAttributedString.Key.foregroundColor: NSColor.white.withAlphaComponent(0.3)],
                         range: NSRange(location: 0, length: attributedString.length))
                     attributedString.draw(at: rect.origin)
                 } else {
