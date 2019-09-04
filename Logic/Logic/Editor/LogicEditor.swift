@@ -518,13 +518,29 @@ extension LogicEditor {
         subwindow.defaultWindowSize = .init(width: 230, height: min(suggestionListHeight + 32 + 25, 400))
         subwindow.suggestionView.showsSuggestionDetails = false
         subwindow.suggestionView.suggestionListWidth = 230
+        subwindow.suggestionText = ""
         subwindow.placeholderText = "Filter actions"
 
         subwindow.anchorTo(rect: screenRect)
         subwindow.suggestionItems = suggestionItems
 
+        func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
+            return suggestionItems.enumerated().filter { offset, item in
+                if text.isEmpty { return true }
+
+                switch item {
+                case .row(let title, _, _, _):
+                    return title.lowercased().contains(text.lowercased())
+                default:
+                    return false
+                }
+            }
+        }
+
         subwindow.onChangeSuggestionText = { [unowned subwindow] text in
+            subwindow.selectedIndex = 0
             subwindow.suggestionText = text
+            subwindow.suggestionItems = filteredSuggestionItems(query: text).map { offset, item in item }
         }
         subwindow.onSelectIndex = { [unowned subwindow] index in
             subwindow.selectedIndex = index
@@ -542,7 +558,9 @@ extension LogicEditor {
         subwindow.onRequestHide = hideWindow
 
         subwindow.onSubmit = { [unowned self] index in
-            let item = menu[index]
+            let originalIndex = filteredSuggestionItems(query: self.subwindow.suggestionText).map { offset, item in offset }[index]
+
+            let item = menu[originalIndex]
             item.action()
 
             hideWindow()
