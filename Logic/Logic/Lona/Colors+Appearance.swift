@@ -65,7 +65,7 @@ extension Colors {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
             case .some(.darkAqua):
-                return NSColor.white.withAlphaComponent(0.25)
+                return NSColor.white.withAlphaComponent(0.35)
             default:
                 break
             }
