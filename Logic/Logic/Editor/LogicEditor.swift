@@ -529,10 +529,12 @@ extension LogicEditor {
                 if text.isEmpty { return true }
 
                 switch item {
-                case .row(let title, _, _, _):
+                case .sectionHeader:
+                    return true
+                case .row(let title, _, _, _),
+                     .colorRow(name: let title, _, _, _),
+                     .textStyleRow(let title, _, _):
                     return title.lowercased().contains(text.lowercased())
-                default:
-                    return false
                 }
             }
         }
