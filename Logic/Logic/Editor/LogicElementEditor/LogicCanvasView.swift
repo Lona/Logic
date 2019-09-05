@@ -81,7 +81,7 @@ public class LogicCanvasView: NSView {
 
     private lazy var trackingArea = NSTrackingArea(
         rect: self.frame,
-        options: [.mouseEnteredAndExited, .activeAlways, .mouseMoved, .inVisibleRect],
+        options: [.mouseEnteredAndExited, .activeInKeyWindow, .mouseMoved, .inVisibleRect],
         owner: self)
 
     public required init?(coder aDecoder: NSCoder) {
