@@ -22,6 +22,8 @@
 		6B3414A222593E2000CC65D1 /* Array+Union.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414A122593E2000CC65D1 /* Array+Union.swift */; };
 		6B3414B6225D68E100CC65D1 /* ColorRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414B5225D68E000CC65D1 /* ColorRow.swift */; };
 		6B396128231DD5E400F27CB8 /* NSBezierPath+Plus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B396127231DD5E400F27CB8 /* NSBezierPath+Plus.swift */; };
+		6B39612A2321C39100F27CB8 /* SyntaxNodeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */; };
+		6B39612C2321CDA900F27CB8 /* FormatterContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B39612B2321CDA900F27CB8 /* FormatterContext.swift */; };
 		6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */; };
 		6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */; };
 		6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */; };
@@ -129,6 +131,8 @@
 		6B3414A122593E2000CC65D1 /* Array+Union.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Union.swift"; sourceTree = "<group>"; };
 		6B3414B5225D68E000CC65D1 /* ColorRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorRow.swift; sourceTree = "<group>"; };
 		6B396127231DD5E400F27CB8 /* NSBezierPath+Plus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSBezierPath+Plus.swift"; sourceTree = "<group>"; };
+		6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeContext.swift; sourceTree = "<group>"; };
+		6B39612B2321CDA900F27CB8 /* FormatterContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatterContext.swift; sourceTree = "<group>"; };
 		6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Formatter+LogicElement.swift"; sourceTree = "<group>"; };
 		6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSOutlineView+Dragging.swift"; sourceTree = "<group>"; };
 		6B4218CB223EEEAD0060CC9A /* LGCList+SyntaxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCList+SyntaxNode.swift"; sourceTree = "<group>"; };
@@ -311,6 +315,7 @@
 				6B44E170223B406800740318 /* Formatter.swift */,
 				6B4218B3223C2E440060CC9A /* Formatter+LogicElement.swift */,
 				6B44E193223C146400740318 /* Formatter+Test.swift */,
+				6B39612B2321CDA900F27CB8 /* FormatterContext.swift */,
 			);
 			path = Formatter;
 			sourceTree = "<group>";
@@ -340,6 +345,7 @@
 				6BBD0C122298945D00EB87A9 /* LGCSyntax+Selection.swift */,
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
 				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
+				6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */,
 				6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */,
 				6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */,
 				6B44E182223B40C900740318 /* SyntaxNodeProtocol.swift */,
@@ -628,6 +634,7 @@
 				6BBD0C032294DA1200EB87A9 /* KeyValueList.swift in Sources */,
 				6B34149B2256EF2F00CC65D1 /* BundleLocator.swift in Sources */,
 				6B44E18A223B40CF00740318 /* SyntaxNodeProtocol.swift in Sources */,
+				6B39612A2321C39100F27CB8 /* SyntaxNodeContext.swift in Sources */,
 				6B858C30229EEEEB00DE6216 /* LGCProgram+Builders.swift in Sources */,
 				6B44E153223B3DD000740318 /* Colors.swift in Sources */,
 				6BF7795922D24EE1009A4119 /* FilterLabel.swift in Sources */,
@@ -653,6 +660,7 @@
 				6B4218CC223EEEAD0060CC9A /* LGCList+SyntaxNode.swift in Sources */,
 				6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */,
 				6B858C27229DB29900DE6216 /* Compiler+ScopeContext.swift in Sources */,
+				6B39612C2321CDA900F27CB8 /* FormatterContext.swift in Sources */,
 				6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */,
 				6B9528D522A0C2710094D9C7 /* CSSColor.swift in Sources */,
 				6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */,

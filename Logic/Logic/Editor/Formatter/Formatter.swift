@@ -8,6 +8,8 @@
 
 import Foundation
 
+private var count = 0
+
 public indirect enum FormatterCommand<Element> {
     case element(Element)
     case line
@@ -39,6 +41,10 @@ public indirect enum FormatterCommand<Element> {
     }
 
     public var logicalRows: [[Element]] {
+        count += 1
+        Swift.print("print", count)
+
+
         var rows: [[Element]] = []
 
         var currentRow: [Element] = []
@@ -92,19 +98,6 @@ public indirect enum FormatterCommand<Element> {
         }
 
         return rows
-    }
-
-    func lineIndex(for elementIndex: Int) -> Int {
-        var elementCount = 0
-        for (offset, formattedLine) in logicalRows.enumerated() {
-            elementCount += formattedLine.count
-
-            if elementIndex < elementCount {
-                return offset
-            }
-        }
-
-        fatalError("Could not find line number for element index \(elementIndex)")
     }
 
     func elementIndexRange(for lineIndex: Int) -> Range<Int>? {

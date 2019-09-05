@@ -101,7 +101,7 @@ public class LogicCanvasView: NSView {
         }
     }
 
-    public var formattedContent: FormatterCommand<LogicElement> = .hardLine {
+    public var formattedContent: FormatterContext = .init(.hardLine) {
         didSet {
             update()
             invalidateIntrinsicContentSize()
@@ -381,7 +381,7 @@ public class LogicCanvasView: NSView {
     }
 
     private static func drawCommon(
-        formattedContent: FormatterCommand<LogicElement>,
+        formattedContent: FormatterContext,
         measuredElements: [LogicMeasuredElement],
         decorationCache: inout [UUID: LogicElement.Decoration?],
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
@@ -828,7 +828,7 @@ public class LogicCanvasView: NSView {
     }
 
     private static func makeMeasuredElements(
-        formattedContent: FormatterCommand<LogicElement>,
+        formattedContent: FormatterContext,
         decorationCache: inout [UUID: LogicElement.Decoration?],
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
         bounds: NSRect,
@@ -858,7 +858,7 @@ public class LogicCanvasView: NSView {
 
         let availableContentWidth = bounds.width - lineButtonContainerWidth - style.textMargin.width * 2
 
-        let formattedElementLines = formattedContent.print(
+        let formattedElementLines = formattedContent.formatted.print(
             width: availableContentWidth,
             spaceWidth: style.textSpacing,
             indentWidth: 20,
@@ -1136,7 +1136,7 @@ extension LogicCanvasView {
     public static func pdf(
         size: NSSize,
         mediaBox: NSRect? = nil,
-        formattedContent: FormatterCommand<LogicElement>,
+        formattedContent: FormatterContext,
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)? = nil,
         style: Style = Style()) -> Data? {
         let frame = CGRect(origin: .zero, size: size)

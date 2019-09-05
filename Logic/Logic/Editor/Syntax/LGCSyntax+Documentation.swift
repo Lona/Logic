@@ -161,7 +161,7 @@ public extension LGCSyntaxNode {
         container.cornerRadius = 4
 
         let editor = LogicCanvasView()
-        editor.formattedContent = formatted(using: options)
+        editor.formattedContent = .init(formatted(using: options))
 
         container.addSubview(editor)
 

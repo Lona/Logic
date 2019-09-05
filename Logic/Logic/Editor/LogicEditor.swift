@@ -26,8 +26,11 @@ open class LogicEditor: NSBox {
 
     // MARK: Lifecycle
 
-    public init(rootNode: LGCSyntaxNode = defaultRootNode) {
-        self.rootNode = rootNode
+    public init(
+        rootNode: LGCSyntaxNode = defaultRootNode,
+        formattingOptions: LogicFormattingOptions = LogicFormattingOptions.normal
+        ) {
+        self.context = .init(rootNode, options: formattingOptions)
 
         super.init(frame: .zero)
 
@@ -71,9 +74,9 @@ open class LogicEditor: NSBox {
         set { canvasView.getElementDecoration = newValue }
     }
 
-    public var rootNode: LGCSyntaxNode {
+    public var context: SyntaxNodeContext {
         didSet {
-            canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
+            canvasView.formattedContent = .init(rootNode.formatted(using: formattingOptions))
 
             if showsMinimap {
                 minimapScroller.setNeedsDisplay()
@@ -81,15 +84,23 @@ open class LogicEditor: NSBox {
         }
     }
 
-    public var formattingOptions = LogicFormattingOptions.normal {
-        didSet {
-            canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
+    public var rootNode: LGCSyntaxNode {
+        get { return context.syntaxNode }
+        set {
+            context = .init(newValue, options: formattingOptions)
+        }
+    }
+
+    public var formattingOptions: LogicFormattingOptions {
+        get { return context.formattingOptions }
+        set {
+            context = .init(rootNode, options: newValue)
         }
     }
 
     public var elementErrors: [ElementError] = [] {
         didSet {
-            let rows = rootNode.formatted(using: formattingOptions).logicalRows
+            let rows = context.formatted.logicalRows
 
             canvasView.errorLines = rows.map({ row in row.compactMap({ $0.syntaxNodeID }) }).enumerated().compactMap { line, ids in
                 if elementErrors.contains(where: { ids.contains($0.uuid) }) {
@@ -100,9 +111,9 @@ open class LogicEditor: NSBox {
             }
 
             canvasView.errorRanges = elementErrors.compactMap { error in
-//                let topNode = self.rootNode.topNodeWithEqualElements(as: error.uuid, options: formattingOptions, includeTopLevel: false)
+                //                let topNode = self.rootNode.topNodeWithEqualElements(as: error.uuid, options: formattingOptions, includeTopLevel: false)
 
-                if let selectedRange = self.rootNode.elementRange(for: error.uuid, options: formattingOptions, includeTopLevel: false) {
+                if let selectedRange = context.elementRange(for: error.uuid, includeTopLevel: false) {
                     return selectedRange
                 } else {
                     return nil
@@ -134,7 +145,7 @@ open class LogicEditor: NSBox {
         didSet {
             if showsMinimap {
                 minimapScroller.drawKnobSlot = canvasView.drawScrollerBackground
-                
+
                 scrollView.autohidesScrollers = false
                 scrollView.verticalScroller = minimapScroller
             } else {
@@ -174,7 +185,7 @@ open class LogicEditor: NSBox {
         LGCSyntaxNode,
         LGCSyntaxNode,
         String) -> [LogicSuggestionItem] = { rootNode, node, query in
-        return node.suggestions(within: rootNode, for: query)
+            return node.suggestions(within: rootNode, for: query)
     }
 
     public static let defaultDocumentationForSuggestion: (
@@ -278,7 +289,7 @@ open class LogicEditor: NSBox {
 
         addSubview(scrollView)
 
-        canvasView.formattedContent = rootNode.formatted(using: formattingOptions)
+        canvasView.formattedContent = context.formatted
         canvasView.onActivate = handleActivateElement
         canvasView.onActivateLine = handleActivateLine
         canvasView.onClickLineMore = handleClickMore
@@ -312,7 +323,7 @@ open class LogicEditor: NSBox {
 extension LogicEditor {
 
     private func handleFocus() {
-        if let firstIndex = rootNode.formatted(using: formattingOptions).elements.firstIndex(where: { $0.isActivatable }) {
+        if let firstIndex = context.formatted.elements.firstIndex(where: { $0.isActivatable }) {
             canvasView.selectedRange = firstIndex..<firstIndex + 1
         }
     }
@@ -322,7 +333,7 @@ extension LogicEditor {
     }
 
     private func handleDuplicateCommand() {
-        let formattedContent = rootNode.formatted(using: formattingOptions)
+        let formattedContent = context.formatted
         let elements = formattedContent.elements
 
         func range() -> Range<Int>? {
@@ -334,7 +345,7 @@ extension LogicEditor {
         }
 
         if let selectedRange = range(),
-            let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
+            let selectedNode = context.topNodeWithEqualRange(as: selectedRange, includeTopLevel: false) {
             let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
             if let newRootNode = rootNode.duplicate(id: targetNode.uuid) {
                 let shouldActivate = onChangeRootNode?(newRootNode.rootNode)
@@ -346,7 +357,7 @@ extension LogicEditor {
     }
 
     private func handleDelete() {
-        let formattedContent = rootNode.formatted(using: formattingOptions)
+        let formattedContent = context.formatted
         let elements = formattedContent.elements
 
         func range() -> Range<Int>? {
@@ -358,7 +369,7 @@ extension LogicEditor {
         }
 
         if let selectedRange = range(),
-            let selectedNode = self.rootNode.topNodeWithEqualRange(as: selectedRange, options: formattingOptions, includeTopLevel: false) {
+            let selectedNode = context.topNodeWithEqualRange(as: selectedRange, includeTopLevel: false) {
             let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
             let shouldActivate = onChangeRootNode?(rootNode.delete(id: targetNode.uuid))
             if shouldActivate == true {
@@ -370,22 +381,22 @@ extension LogicEditor {
     // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
     private func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
         let childRanges = parent.contents.children.map {
-            rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false, useOwnerId: true)
+            context.elementRange(for: $0.uuid, includeTopLevel: false, useOwnerId: true)
             }.compactMap { $0 }
 
         return childRanges.firstIndex(where: { $0.contains(index) })
     }
 
     private func handleMoveLine(_ sourceLineIndex: Int, _ destinationLineIndex: Int) {
-//        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
+        //        Swift.print(sourceLineIndex, "=>", destinationLineIndex)
 
-        let formattedContent = rootNode.formatted(using: formattingOptions)
+        let formattedContent = context.formatted
 
         if let sourceRange = formattedContent.elementIndexRange(for: sourceLineIndex),
             let destinationRange = formattedContent.elementIndexRange(for: destinationLineIndex),
-            let originalSourceNode = rootNode.topNodeWithEqualRange(as: sourceRange, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+            let originalSourceNode = context.topNodeWithEqualRange(as: sourceRange, includeTopLevel: false, useOwnerId: true),
             let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
-            let targetNode = rootNode.topNodeWithEqualRange(as: destinationRange, options: formattingOptions, includeTopLevel: true, useOwnerId: true) {
+            let targetNode = context.topNodeWithEqualRange(as: destinationRange, includeTopLevel: true, useOwnerId: true) {
 
             // Target is within source
             if let _ = sourceNode.find(id: targetNode.uuid) { return }
@@ -410,8 +421,8 @@ extension LogicEditor {
     }
 
     private func nextNode() {
-        if let index = rootNode.formatted(using: formattingOptions).nextActivatableElementIndex(after: self.canvasView.selectedRange?.lowerBound),
-            let id = self.rootNode.formatted(using: formattingOptions).elements[index].syntaxNodeID {
+        if let index = context.formatted.nextActivatableElementIndex(after: self.canvasView.selectedRange?.lowerBound),
+            let id = context.formatted.elements[index].syntaxNodeID {
 
             select(nodeByID: id)
         } else {
@@ -424,8 +435,8 @@ extension LogicEditor {
     }
 
     private func previousNode() {
-        if let index = rootNode.formatted(using: formattingOptions).previousActivatableElementIndex(before: self.canvasView.selectedRange?.lowerBound),
-            let id = self.rootNode.formatted(using: formattingOptions).elements[index].syntaxNodeID {
+        if let index = context.formatted.previousActivatableElementIndex(before: self.canvasView.selectedRange?.lowerBound),
+            let id = context.formatted.elements[index].syntaxNodeID {
 
             select(nodeByID: id)
         } else {
@@ -444,9 +455,9 @@ extension LogicEditor {
         self.suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
-            let topNode = self.rootNode.topNodeWithEqualElements(as: syntaxNodeId, options: formattingOptions, includeTopLevel: false)
+            let topNode = context.topNodeWithEqualElements(as: syntaxNodeId, includeTopLevel: false)
 
-            if let selectedRange = self.rootNode.elementRange(for: topNode.uuid, options: formattingOptions, includeTopLevel: false) {
+            if let selectedRange = context.elementRange(for: topNode.uuid, includeTopLevel: false) {
                 self.canvasView.selectedRange = selectedRange
                 self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
             } else {
@@ -461,7 +472,7 @@ extension LogicEditor {
 
     private func handleActivateElement(_ activatedIndex: Int?) {
         if let activatedIndex = activatedIndex {
-            let elements = self.rootNode.formatted(using: formattingOptions).elements
+            let elements = context.formatted.elements
 
             if activatedIndex < elements.count {
                 let element = elements[activatedIndex]
@@ -482,8 +493,8 @@ extension LogicEditor {
     }
 
     private func draggableNode(atLine line: Int) -> LGCSyntaxNode? {
-        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
-            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+        guard let range = context.formatted.elementIndexRange(for: line),
+            let originalSourceNode = context.topNodeWithEqualRange(as: range, includeTopLevel: false, useOwnerId: true),
             let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid)
             else { return nil }
         return sourceNode
@@ -508,13 +519,13 @@ extension LogicEditor {
     private func handleClickMore(_ line: Int, rect: NSRect) {
         guard let window = self.window else { return }
 
-        guard let range = rootNode.formatted(using: formattingOptions).elementIndexRange(for: line),
-            let originalSourceNode = rootNode.topNodeWithEqualRange(as: range, options: formattingOptions, includeTopLevel: false, useOwnerId: true),
+        guard let range = context.formatted.elementIndexRange(for: line),
+            let originalSourceNode = context.topNodeWithEqualRange(as: range, includeTopLevel: false, useOwnerId: true),
             let sourceNode = rootNode.findDragSource(id: originalSourceNode.uuid),
             let menu = contextMenuForNode(rootNode, sourceNode)
             else { return }
 
-        let actualRange = rootNode.elementRange(for: sourceNode.uuid, options: formattingOptions, includeTopLevel: false)
+        let actualRange = context.elementRange(for: sourceNode.uuid, includeTopLevel: false)
 
         let windowRect = canvasView.convert(rect, to: nil)
         let screenRect = window.convertToScreen(windowRect)
@@ -556,7 +567,7 @@ extension LogicEditor {
             subwindow.selectedIndex = index
         }
 
-//        handleActivateElement(nil)
+        //        handleActivateElement(nil)
         canvasView.selectedRange = actualRange
         window.addChildWindow(subwindow, ordered: .above)
         subwindow.focusSearchField()
@@ -650,10 +661,10 @@ extension LogicEditor {
     }
 
     private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
-        guard let range = rootNode.elementRange(for: syntaxNode.uuid, options: formattingOptions, includeTopLevel: false),
+        guard let range = context.elementRange(for: syntaxNode.uuid, includeTopLevel: false),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
-        let highestMatch = elementPath.first(where: { rootNode.elementRange(for: $0.uuid, options: formattingOptions, includeTopLevel: false) == range }) ?? syntaxNode
+        let highestMatch = elementPath.first(where: { context.elementRange(for: $0.uuid, includeTopLevel: false) == range }) ?? syntaxNode
 
         return suggestionsForNode(rootNode, highestMatch, prefix).filter {
             !showsFilterBar || ($0.suggestionFilters.isEmpty || $0.suggestionFilters.contains(suggestionFilter))
@@ -692,7 +703,7 @@ extension LogicEditor {
                 // We traverse up the tree to find the nearest parent that is.
                 if var path = self.rootNode.pathTo(id: suggestedNode.uuid) {
                     while let selectionNode = path.last {
-                        if let range = self.rootNode.elementRange(for: selectionNode.uuid, options: self.formattingOptions, includeTopLevel: false) {
+                        if let range = context.elementRange(for: selectionNode.uuid, includeTopLevel: false) {
                             self.canvasView.selectedRange = range
                             break
                         }
@@ -719,7 +730,7 @@ extension LogicEditor {
 
         canvasView.hasFocus = true
 
-        let syntaxNodePath = self.rootNode.uniqueElementPathTo(id: syntaxNode.uuid, options: formattingOptions, includeTopLevel: false)
+        let syntaxNodePath = context.uniqueElementPathTo(id: syntaxNode.uuid, includeTopLevel: false)
         let dropdownNodes = Array(syntaxNodePath)
 
         var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText)
@@ -809,7 +820,7 @@ extension LogicEditor {
         childWindow.onHighlightDropdownIndex = { [unowned self] highlightedIndex in
             if let highlightedIndex = highlightedIndex {
                 let selected = dropdownNodes[highlightedIndex]
-                let range = self.rootNode.elementRange(for: selected.uuid, options: self.formattingOptions, includeTopLevel: false)
+                let range = self.context.elementRange(for: selected.uuid, includeTopLevel: false)
 
                 self.canvasView.outlinedRange = range
             } else {
