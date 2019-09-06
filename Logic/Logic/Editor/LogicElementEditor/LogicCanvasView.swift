@@ -160,6 +160,9 @@ public class LogicCanvasView: NSView {
     public var getElementDecoration: ((UUID) -> LogicElement.Decoration?)?
     public var getLineShowsButtons: ((Int) -> Bool) = {_ in false}
 
+    public var plusButtonTooltip: String = "**Click** _to add below_"
+    public var moreButtonTooltip: String = "**Drag** _to move_\n**Click** _to open menu_"
+
     public func forceUpdate() {
         update()
         invalidateIntrinsicContentSize()
@@ -235,6 +238,16 @@ public class LogicCanvasView: NSView {
         }
     }
 
+    private func showToolTip(string: String, at point: NSPoint) {
+        guard let window = window else { return }
+        let windowPoint = convert(point, to: nil)
+        let screenPoint = window.convertPoint(toScreen: windowPoint)
+
+        if window.isKeyWindow {
+            TooltipManager.shared.showTooltip(string: string, point: screenPoint, delay: .milliseconds(120))
+        }
+    }
+
     public override func mouseMoved(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
         let line = logicalLineIndex(at: point, measuredFromMidpoint: false)
@@ -245,16 +258,34 @@ public class LogicCanvasView: NSView {
             if let hoveredLine = hoveredLine {
                 if let rect = plusButtonRect(for: hoveredLine) {
                     hoveredPlusButton = rect.contains(point)
+
+                    if hoveredPlusButton {
+                        showToolTip(
+                            string: plusButtonTooltip,
+                            at: NSPoint(x: rect.midX, y: rect.maxY + 4)
+                        )
+                    }
                 }
 
                 if let rect = moreButtonRect(for: hoveredLine) {
                     hoveredMoreButton = rect.contains(point)
+
+                    if hoveredMoreButton {
+                        showToolTip(
+                            string: moreButtonTooltip,
+                            at: NSPoint(x: rect.midX, y: rect.maxY + 4)
+                        )
+                    }
                 }
             }
         } else {
             hoveredLine = nil
             hoveredPlusButton = false
             hoveredMoreButton = false
+        }
+
+        if !hoveredPlusButton && !hoveredMoreButton {
+            TooltipManager.shared.hideTooltip()
         }
     }
 
@@ -997,6 +1028,8 @@ public class LogicCanvasView: NSView {
     }
 
     public override func mouseDragged(with event: NSEvent) {
+        TooltipManager.shared.hideTooltip()
+
         let point = convert(event.locationInWindow, from: nil)
 
         if abs(point.x - pressedPoint.x) < draggingThreshold && abs(point.y - pressedPoint.y) < draggingThreshold {

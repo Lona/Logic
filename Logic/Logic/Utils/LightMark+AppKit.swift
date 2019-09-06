@@ -175,7 +175,7 @@ extension LightMark.BlockElement {
             let icon = kind.icon ?? NSImage()
             let iconView = NSImageView(image: icon)
 
-            let blockView = LightMark.makeContentView(blocks, padding: 0, renderingOptions: renderingOptions)
+            let blockView = LightMark.makeContentView(blocks, padding: .init(top: 0, left: 0, bottom: 0, right: 0), renderingOptions: renderingOptions)
 
             container.addSubview(blockView)
             container.addSubview(iconView)
@@ -301,7 +301,7 @@ extension LightMark {
         return textField
     }
 
-    public static func makeContentView(_ blocks: [LightMark.BlockElement], padding: CGFloat, renderingOptions: RenderingOptions) -> NSView {
+    public static func makeContentView(_ blocks: [LightMark.BlockElement], padding: NSEdgeInsets, renderingOptions: RenderingOptions) -> NSView {
         let blockViews = blocks.map { $0.view(renderingOptions: renderingOptions) }
 
         let contentView = FlippedView()
@@ -312,18 +312,18 @@ extension LightMark {
                 contentView.addSubview(view)
 
                 view.translatesAutoresizingMaskIntoConstraints = false
-                view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding).isActive = true
-                view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding).isActive = true
+                view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding.left).isActive = true
+                view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding.right).isActive = true
 
                 if offset == 0 {
-                    view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding).isActive = true
+                    view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding.top).isActive = true
                 } else {
                     let margin = max(blocks[offset].marginTop, 8)
                     view.topAnchor.constraint(equalTo: blockViews[offset - 1].bottomAnchor, constant: margin).isActive = true
                 }
 
                 if offset == blockViews.count - 1 {
-                    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding).isActive = true
+                    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding.bottom).isActive = true
                 }
             }
         }
@@ -332,7 +332,7 @@ extension LightMark {
     }
 
     public static func makeScrollView(_ blocks: [LightMark.BlockElement], renderingOptions: RenderingOptions) -> NSScrollView {
-        let contentView = self.makeContentView(blocks, padding: 24, renderingOptions: renderingOptions)
+        let contentView = self.makeContentView(blocks, padding: .init(top: 24, left: 24, bottom: 24, right: 24), renderingOptions: renderingOptions)
 
         let scrollView = NSScrollView()
 

@@ -141,6 +141,17 @@ open class LogicEditor: NSBox {
         set { canvasView.showsLineButtons = newValue }
     }
 
+
+    public var plusButtonTooltip: String {
+        get { return canvasView.plusButtonTooltip }
+        set { canvasView.plusButtonTooltip = newValue }
+    }
+
+    public var moreButtonTooltip: String {
+        get { return canvasView.moreButtonTooltip }
+        set { canvasView.moreButtonTooltip = newValue }
+    }
+
     public var showsMinimap: Bool = false {
         didSet {
             if showsMinimap {
