@@ -284,8 +284,6 @@ class Document: NSDocument {
     func evaluate(rootNode: LGCSyntaxNode) -> Bool {
         successfulEvaluation = nil
 
-        let rootNode = self.logicEditor.rootNode
-
         guard let root = LGCProgram.make(from: rootNode) else {
             self.logicEditor.rootNode = rootNode
 
