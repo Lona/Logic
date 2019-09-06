@@ -284,11 +284,13 @@ class Document: NSDocument {
     func evaluate(rootNode: LGCSyntaxNode) -> Bool {
         successfulEvaluation = nil
 
-        self.logicEditor.rootNode = rootNode
-
         let rootNode = self.logicEditor.rootNode
 
-        guard let root = LGCProgram.make(from: rootNode) else { return true }
+        guard let root = LGCProgram.make(from: rootNode) else {
+            self.logicEditor.rootNode = rootNode
+
+            return true
+        }
 
         let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
@@ -320,6 +322,8 @@ class Document: NSDocument {
         let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
 
         guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
+            self.logicEditor.rootNode = rootNode
+
             return true
         }
 
@@ -351,6 +355,8 @@ class Document: NSDocument {
         case .failure(let error):
             Swift.print("Eval failure", error)
         }
+
+        self.logicEditor.rootNode = rootNode
 
         return true
     }
