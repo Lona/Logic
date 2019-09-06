@@ -8,8 +8,6 @@
 
 import Foundation
 
-private var count = 0
-
 public indirect enum FormatterCommand<Element> {
     case element(Element)
     case line
@@ -41,10 +39,6 @@ public indirect enum FormatterCommand<Element> {
     }
 
     public var logicalRows: [[Element]] {
-        count += 1
-        Swift.print("print", count)
-
-
         var rows: [[Element]] = []
 
         var currentRow: [Element] = []
