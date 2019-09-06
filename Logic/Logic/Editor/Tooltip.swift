@@ -11,6 +11,8 @@ import Foundation
 public class TooltipWindow: NSWindow {
     public static var shared = TooltipWindow()
 
+    public static var contentInsets: NSEdgeInsets = .init(top: 6, left: 8, bottom: 6, right: 8)
+
     public convenience init() {
         self.init(
             contentRect: NSRect(origin: .zero, size: .zero),
@@ -23,22 +25,6 @@ public class TooltipWindow: NSWindow {
         window.isOpaque = false
 
         contentView = container
-    }
-
-    public var markdownText: String = "" {
-        didSet {
-            tooltipView = LightMark.makeContentView(
-                LightMark.parse(markdownText),
-                padding: .init(top: 6, left: 8, bottom: 6, right: 8),
-                renderingOptions: .init(formattingOptions: .visual)
-            )
-        }
-    }
-
-    public var text: String = "" {
-        didSet {
-            tooltipView = textField
-        }
     }
 
     private lazy var container: NSBox = {
@@ -56,7 +42,17 @@ public class TooltipWindow: NSWindow {
         return container
     }()
 
-    private var tooltipView: NSView = NSView() {
+    public var markdownText: String = "" {
+        didSet {
+            tooltipView = LightMark.makeContentView(
+                LightMark.parse(markdownText),
+                padding: TooltipWindow.contentInsets,
+                renderingOptions: .init(formattingOptions: .visual)
+            )
+        }
+    }
+
+    public var tooltipView: NSView = NSView() {
         didSet {
             if oldValue == tooltipView { return }
 
@@ -73,10 +69,6 @@ public class TooltipWindow: NSWindow {
             setContentSize(tooltipView.fittingSize)
         }
     }
-
-    private lazy var textField = {
-        return NSTextField(labelWithString: self.text)
-    }()
 
     override public var ignoresMouseEvents: Bool {
         get { return true }
