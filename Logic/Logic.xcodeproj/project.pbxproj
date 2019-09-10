@@ -355,7 +355,7 @@
 			path = Syntax;
 			sourceTree = "<group>";
 		};
-		6B44E195223C19B100740318 /* Editor */ = {
+		6B44E195223C19B100740318 /* CodeEditor */ = {
 			isa = PBXGroup;
 			children = (
 				6B44E18F223B494600740318 /* LogicEditor.swift */,
@@ -368,7 +368,7 @@
 				6B44E183223B40C900740318 /* Syntax */,
 				6B1BFC762322CEE10060FD13 /* Tooltip.swift */,
 			);
-			path = Editor;
+			path = CodeEditor;
 			sourceTree = "<group>";
 		};
 		6B44E196223C19EF00740318 /* Utils */ = {
@@ -429,7 +429,7 @@
 				6B3414902254366C00CC65D1 /* LogicFile.swift */,
 				6B3414982256ECD900CC65D1 /* Assets.xcassets */,
 				6B44E163223B3E2C00740318 /* Controlled */,
-				6B44E195223C19B100740318 /* Editor */,
+				6B44E195223C19B100740318 /* CodeEditor */,
 				6B44E197223C1A0000740318 /* Lona */,
 				6B34148B225417E500CC65D1 /* Scripting */,
 				6B44E13B223B3C9000740318 /* Types */,
