@@ -9,7 +9,7 @@
 import AppKit
 import Logic
 
-class Document: NSDocument {
+class LogicDocument: NSDocument {
 
     override init() {
         super.init()
@@ -25,20 +25,6 @@ class Document: NSDocument {
                 )
             )
         )
-
-//        logicEditor.rootNode = .program(
-//            .init(
-//                id: UUID(),
-//                block: .init(
-//                    [
-//                        .declaration(id: UUID(), content:
-//                            .importDeclaration(id: UUID(), name: .init(id: UUID(), name: "Prelude"))
-//                        ),
-//                        .makePlaceholder()
-//                    ]
-//                )
-//            )
-//        )
     }
 
     override class var autosavesInPlace: Bool {
@@ -57,13 +43,25 @@ class Document: NSDocument {
     var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
     var successfulEvaluation: Compiler.EvaluationContext?
 
-    override func makeWindowControllers() {
+    func initializeWindowController(presenting contentView: NSView) {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
             styleMask: [.titled, .closable, .resizable],
             backing: .buffered,
             defer: false)
 
+        window.backgroundColor = Colors.background
+        window.center()
+        window.contentView = contentView
+
+        self.window = window
+
+        let windowController = NSWindowController(window: window)
+        windowController.showWindow(nil)
+        addWindowController(windowController)
+    }
+
+    override func makeWindowControllers() {
         containerView.boxType = .custom
         containerView.borderType = .noBorder
         containerView.contentViewMargins = .zero
@@ -270,15 +268,7 @@ class Document: NSDocument {
 
         _ = evaluate(rootNode: logicEditor.rootNode)
 
-        window.backgroundColor = Colors.background
-        window.center()
-        window.contentView = containerView
-
-        self.window = window
-
-        let windowController = NSWindowController(window: window)
-        windowController.showWindow(nil)
-        addWindowController(windowController)
+        initializeWindowController(presenting: containerView)
     }
 
     func evaluate(rootNode: LGCSyntaxNode) -> Bool {

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B00CA3323284411001907C6 /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3223284411001907C6 /* MarkdownDocument.swift */; };
 		6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C5E32218BD75005A808C /* AppDelegate.swift */; };
-		6B12C5E62218BD75005A808C /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C5E52218BD75005A808C /* Document.swift */; };
-		6B12C5E92218BD75005A808C /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5E72218BD75005A808C /* Document.xib */; };
+		6B12C5E62218BD75005A808C /* LogicDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C5E52218BD75005A808C /* LogicDocument.swift */; };
 		6B12C5EB2218BD77005A808C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5EA2218BD77005A808C /* Assets.xcassets */; };
 		6B12C5EE2218BD77005A808C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5EC2218BD77005A808C /* MainMenu.xib */; };
 		6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B44E13C223B3CED00740318 /* Logic.framework */; };
@@ -37,10 +37,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6B00CA3223284411001907C6 /* MarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocument.swift; sourceTree = "<group>"; };
 		6B12C5E02218BD75005A808C /* LogicDesigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LogicDesigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B12C5E32218BD75005A808C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6B12C5E52218BD75005A808C /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
-		6B12C5E82218BD75005A808C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = "<group>"; };
+		6B12C5E52218BD75005A808C /* LogicDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicDocument.swift; sourceTree = "<group>"; };
 		6B12C5EA2218BD77005A808C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6B12C5ED2218BD77005A808C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		6B12C5EF2218BD77005A808C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -90,9 +90,9 @@
 				6B12C5F02218BD77005A808C /* LogicDesigner.entitlements */,
 				6B12C5EF2218BD77005A808C /* Info.plist */,
 				6B12C5E32218BD75005A808C /* AppDelegate.swift */,
-				6B12C5E52218BD75005A808C /* Document.swift */,
+				6B12C5E52218BD75005A808C /* LogicDocument.swift */,
+				6B00CA3223284411001907C6 /* MarkdownDocument.swift */,
 				6B12C5EA2218BD77005A808C /* Assets.xcassets */,
-				6B12C5E72218BD75005A808C /* Document.xib */,
 				6B12C5EC2218BD77005A808C /* MainMenu.xib */,
 			);
 			path = LogicDesigner;
@@ -171,7 +171,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B12C5EB2218BD77005A808C /* Assets.xcassets in Resources */,
-				6B12C5E92218BD75005A808C /* Document.xib in Resources */,
 				6B12C5EE2218BD77005A808C /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -183,22 +182,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B12C5E62218BD75005A808C /* Document.swift in Sources */,
+				6B12C5E62218BD75005A808C /* LogicDocument.swift in Sources */,
 				6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */,
+				6B00CA3323284411001907C6 /* MarkdownDocument.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		6B12C5E72218BD75005A808C /* Document.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6B12C5E82218BD75005A808C /* Base */,
-			);
-			name = Document.xib;
-			sourceTree = "<group>";
-		};
 		6B12C5EC2218BD77005A808C /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
