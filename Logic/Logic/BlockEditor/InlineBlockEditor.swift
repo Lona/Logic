@@ -18,6 +18,8 @@ public class InlineBlockEditor: ControlledTextField {
 
         isBordered = false
 
+        font = TextStyle(size: 18).nsFont
+
         onChangeTextValue = { value in
             self.textValue = value
         }

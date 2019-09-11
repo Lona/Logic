@@ -11,6 +11,14 @@ import AppKit
 public class InlineToolbarWindow: NSWindow {
     static var shared = InlineToolbarWindow()
 
+    public override var canBecomeMain: Bool {
+        return false
+    }
+
+    public override var acceptsFirstResponder: Bool {
+        return false
+    }
+
     convenience init() {
         self.init(
             contentRect: NSRect(origin: .zero, size: .zero),
@@ -91,8 +99,6 @@ public class InlineToolbarWindow: NSWindow {
 
     // MARK: Public
 
-    public var defaultWindowSize = CGSize(width: 610, height: InlineToolbarWindow.shadowViewMargin * 2 + InlineToolbar.height)
-
     public var allowedShrinkingSize = CGSize(width: 180, height: 200)
 
     public var onRequestHide: (() -> Void)?
@@ -100,57 +106,22 @@ public class InlineToolbarWindow: NSWindow {
     public var onSubmit: ((Int) -> Void)?
 
     public func anchorTo(rect: NSRect, verticalOffset: CGFloat = 0) {
+        let contentViewSize = defaultContentViewSize
         var contentRect = NSRect(
-            origin: NSPoint(x: rect.minX, y: rect.minY - defaultContentViewSize.height - verticalOffset),
-            size: defaultWindowSize)
+            origin: NSPoint(x: rect.minX, y: rect.maxY + verticalOffset),
+            size: NSSize(
+                width: contentViewSize.width + InlineToolbarWindow.shadowViewMargin * 2,
+                height: contentViewSize.height + InlineToolbarWindow.shadowViewMargin * 2))
 
-        if let visibleFrame = NSScreen.main?.visibleFrame {
-            if contentRect.maxX > visibleFrame.maxX {
-                let horizontalShrinkSize = min(
-                    contentRect.maxX - visibleFrame.maxX, allowedShrinkingSize.width)
-
-                contentRect.size.width = contentRect.width - horizontalShrinkSize + 16
-                contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width + 16)
-            }
-
-            if contentRect.minY < visibleFrame.minY {
-                let verticalShrinkSize = visibleFrame.minY - contentRect.minY
-                if verticalShrinkSize < allowedShrinkingSize.height {
-                    contentRect.size.height = contentRect.height - verticalShrinkSize
-                    contentRect.origin.y += verticalShrinkSize
-                } else {
-                    contentRect.origin.y = rect.maxY + verticalOffset
-                }
-            }
-        }
-
-        setContentSize(contentRect.size)
-        setFrameOrigin(contentRect.origin)
-    }
-
-    public func anchorHorizontallyTo(rect: NSRect, horizontalOffset: CGFloat = 0) {
-        var contentRect = NSRect(
-            origin: NSPoint(
-                x: rect.minX - defaultContentViewSize.width - horizontalOffset,
-                y: rect.midY - defaultContentViewSize.height / 2
-            ),
-            size: defaultWindowSize)
-
-        if let visibleFrame = NSScreen.main?.visibleFrame {
-            if contentRect.minX < visibleFrame.minX {
-                contentRect.origin.x = visibleFrame.minX
-            }
-
-            if contentRect.minY < visibleFrame.minY {
-                let verticalShrinkSize = visibleFrame.minY - contentRect.minY
-                if verticalShrinkSize < allowedShrinkingSize.height {
-                    contentRect.size.height = contentRect.height - verticalShrinkSize
-                    contentRect.origin.y += verticalShrinkSize
-                } else {
-                    contentRect.origin.y = rect.maxY + horizontalOffset
-                }
-            }
-        }
+//        if let visibleFrame = NSScreen.main?.visibleFrame {
+//            if contentRect.maxX > visibleFrame.maxX {
+//                contentRect.origin.x = min(contentRect.minX, visibleFrame.maxX - contentRect.width + 16)
+//            }
+//
+//            if contentRect.minY < visibleFrame.minY {
+//                contentRect.origin.y = rect.maxY + verticalOffset
+//            }
+//        }
 
         setContentSize(contentRect.size)
         setFrameOrigin(contentRect.origin)

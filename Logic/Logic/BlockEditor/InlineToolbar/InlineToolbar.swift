@@ -54,7 +54,7 @@ public class InlineToolbar: NSView {
             }
 
             let image = NSImage(size: .init(width: width, height: InlineToolbar.height), flipped: false, drawingHandler: { rect in
-                let menuTextStyle = TextStyle(size: 14, lineHeight: 14, color: .black)
+                let menuTextStyle = TextStyle(size: 14, lineHeight: 16, color: .black)
                 let monospacedMenuTextStyle = TextStyle(family: "Andale Mono", size: 15, lineHeight: 15, kerning: -2, color: .black)
 
                 var string: NSAttributedString? = nil
@@ -165,6 +165,9 @@ public class InlineToolbar: NSView {
     }
 
     public override func mouseDown(with event: NSEvent) {
+        // https://stackoverflow.com/questions/18614974/how-to-prevent-focus-window-when-its-view-is-clicked-by-mouse-on-osx
+        NSApp.preventWindowOrdering()
+
         let point = convert(event.locationInWindow, from: nil)
         if let clickedIndex = index(at: point) {
             Swift.print("Clicked", InlineToolbar.commands[clickedIndex])
@@ -183,12 +186,17 @@ public class InlineToolbar: NSView {
         return false
     }
 
+    // https://stackoverflow.com/questions/18614974/how-to-prevent-focus-window-when-its-view-is-clicked-by-mouse-on-osx
+    public override func shouldDelayWindowOrdering(for event: NSEvent) -> Bool {
+        return true
+    }
+
     private func showToolTip(string: String, at point: NSPoint) {
         guard let window = window else { return }
         let windowPoint = convert(point, to: nil)
         let screenPoint = window.convertPoint(toScreen: windowPoint)
 
-        TooltipManager.shared.showTooltip(string: string, point: screenPoint, delay: .milliseconds(240))
+        TooltipManager.shared.showTooltip(string: string, point: screenPoint, preferredEdge: .top, delay: .milliseconds(240))
     }
 
     // MARK: Public
@@ -220,7 +228,7 @@ public class InlineToolbar: NSView {
 
                 if let index = hoveredIndex {
                     let rect = buttonRects[index]
-                    let midpoint =  NSPoint(x: rect.midX, y: rect.minY)
+                    let midpoint = NSPoint(x: rect.midX, y: rect.maxY + 4)
                     switch InlineToolbar.commands[index] {
                     case .bold:
                         showToolTip(string: "**Bold**\n⌘+B", at: midpoint)

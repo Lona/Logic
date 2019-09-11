@@ -77,6 +77,11 @@ public class TooltipWindow: NSWindow {
 }
 
 public class TooltipManager {
+
+    public enum PreferredEdge {
+        case top, bottom
+    }
+
     private var window: TooltipWindow
 
     public init(window: TooltipWindow) {
@@ -91,7 +96,7 @@ public class TooltipManager {
         window.orderOut(nil)
     }
 
-    public func showTooltip(string: String, point: NSPoint, delay: DispatchTimeInterval) -> Void {
+    public func showTooltip(string: String, point: NSPoint, preferredEdge: PreferredEdge = .bottom, delay: DispatchTimeInterval) -> Void {
         if let item = self.currentWorkItem, !item.isCancelled {
             item.cancel()
         }
@@ -102,10 +107,13 @@ public class TooltipManager {
             // Set text first, since this updates the window frame
             self.window.markdownText = string
 
-            let origin = NSPoint(
-                x: point.x - self.window.frame.width / 2,
-                y: point.y - self.window.frame.height
-            )
+            let origin = preferredEdge == .bottom
+                ? NSPoint(
+                    x: point.x - self.window.frame.width / 2,
+                    y: point.y - self.window.frame.height)
+                : NSPoint(
+                    x: point.x - self.window.frame.width / 2,
+                    y: point.y)
 
             self.window.setFrameOrigin(origin)
             self.window.orderFront(nil)
