@@ -9,73 +9,56 @@
 import Foundation
 
 public class InlineBlockEditor: ControlledTextField {
-    public override func becomeFirstResponder() -> Bool {
-        let result = super.becomeFirstResponder()
 
-        if result {
-//            Swift.print("Become")
-            placeholderString = "Type '/' for commands"
-            needsDisplay = true
-        }
-
-        return result
-    }
-
-//    public override func resignFirstResponder() -> Bool {
-//        let result = super.resignFirstResponder()
-//
-//        if result {
-//            Swift.print("Resign")
-//            placeholderString = "/"
-//            needsDisplay = true
-//        }
-//
-//        return result
-//    }
-
-    private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
-        InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
-        InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
-        InlineToolbarWindow.shared.isCodeEnabled = traits.contains(.code)
-    }
-
-    @objc public func addFontTrait(_ sender: AnyObject) {
-        guard let menuItem = sender as? NSMenuItem else { return }
-
-        if self.selectedRange.length > 0 {
-            switch menuItem.tag {
-            case 1:
-                InlineToolbarWindow.shared.onCommand?(.italic)
-            case 2:
-                InlineToolbarWindow.shared.onCommand?(.bold)
-            default:
-                break
-            }
-        } else {
-            // If there's no selection, we only update the NSAttributedString internally
-            NSFontManager.shared.addFontTrait(sender)
-        }
-    }
+    // MARK: Lifecycle
 
     public override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        allowsEditingTextAttributes = true
-
         delegate = self
+
+        allowsEditingTextAttributes = true
 
         isBordered = false
 
         font = TextStyle(size: 18).nsFont
 
-        onPressEscape = {
-            self.window?.makeFirstResponder(nil)
+        onPressEscape = { [unowned self] in
+            if self.commandPaletteIndex != nil {
+                self.commandPaletteIndex = nil
+
+                self.onHideCommandPalette?()
+            } else {
+                self.window?.makeFirstResponder(nil)
+
+                self.placeholderString = ""
+            }
         }
 
-        onChangeTextValue = { value in
+        onChangeTextValue = { [unowned self] value in
             self.textValue = value
 
-//            Swift.print("MD:", self.attributedStringValue.markdownString())
+            let location = self.selectedRange.location
+
+            let prefix = value.prefix(location)
+
+            if prefix.last == "/" {
+//                Swift.print("Typed /")
+
+                self.commandPaletteIndex = location
+
+                self.onSearchCommandPalette?("")
+            } else if let index = self.commandPaletteIndex, location > index {
+                let query = (value as NSString).substring(with: NSRange(location: index, length: location - index))
+
+//                Swift.print("Query", query)
+
+                self.onSearchCommandPalette?(query)
+            } else {
+                self.commandPaletteIndex = nil
+
+                self.onHideCommandPalette?()
+            }
         }
 
         onChangeSelectedRange = { [weak self] range in
@@ -92,6 +75,26 @@ public class InlineBlockEditor: ControlledTextField {
 
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: Public
+
+    public var onSearchCommandPalette: ((String) -> Void)?
+
+    public var onHideCommandPalette: (() -> Void)?
+
+    public func resetCommandPaletteIndex() {
+        commandPaletteIndex = nil
+    }
+
+    // MARK: Private
+
+    private var commandPaletteIndex: Int?
+
+    private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
+        InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
+        InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
+        InlineToolbarWindow.shared.isCodeEnabled = traits.contains(.code)
     }
 
     private func updateToolbar(for range: NSRange) {
@@ -136,4 +139,49 @@ public class InlineBlockEditor: ControlledTextField {
         InlineToolbarWindow.shared.anchorTo(rect: rect, verticalOffset: 4)
         self.window?.addChildWindow(InlineToolbarWindow.shared, ordered: .above)
     }
+
+    public override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+
+        if result {
+            //            Swift.print("Become")
+            placeholderString = "Type '/' for commands"
+            needsDisplay = true
+        }
+
+        return result
+    }
+
+    //    public override func resignFirstResponder() -> Bool {
+    //        let result = super.resignFirstResponder()
+    //
+    //        if result {
+    //            Swift.print("Resign")
+    //            placeholderString = "/"
+    //            needsDisplay = true
+    //        }
+    //
+    //        return result
+    //    }
+
+    // MARK: Menu Actions
+
+    @objc public func addFontTrait(_ sender: AnyObject) {
+        guard let menuItem = sender as? NSMenuItem else { return }
+
+        if self.selectedRange.length > 0 {
+            switch menuItem.tag {
+            case 1:
+                InlineToolbarWindow.shared.onCommand?(.italic)
+            case 2:
+                InlineToolbarWindow.shared.onCommand?(.bold)
+            default:
+                break
+            }
+        } else {
+            // If there's no selection, we only update the NSAttributedString internally
+            NSFontManager.shared.addFontTrait(sender)
+        }
+    }
+
 }
