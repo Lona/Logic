@@ -67,7 +67,7 @@ open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
     // The text and selection values prior to a change
     private var previousState = InternalState(textValue: "", selectedRange: NSRange(location: 0, length: 0))
 
-    private var selectedRange: NSRange {
+    public var selectedRange: NSRange {
         get { return currentEditor()?.selectedRange ?? NSRange(location: 0, length: 0) }
         set { currentEditor()?.selectedRange = newValue }
     }

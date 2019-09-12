@@ -30,6 +30,8 @@ public enum InlineTextTrait: Equatable {
         case .link: return "]"
         }
     }
+
+    static var monospacedFontFamily: String = "Menlo"
 }
 
 extension Array where Element == InlineTextTrait {
@@ -47,7 +49,7 @@ extension Array where Element == InlineTextTrait {
             if NSFontManager.shared.traits(of: font).contains(.italicFontMask) {
                 self.append(.italic)
             }
-            if NSFontManager.shared.traits(of: font).contains(.fixedPitchFontMask) {
+            if font.familyName == InlineTextTrait.monospacedFontFamily {
                 self.append(.code)
             }
         }
@@ -66,7 +68,7 @@ extension NSMutableAttributedString {
             let newFont = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
             addAttribute(.font, value: newFont, range: range)
         case .code:
-            let newFont = NSFontManager.shared.convert(font, toFamily: "Menlo")
+            let newFont = NSFontManager.shared.convert(font, toFamily: InlineTextTrait.monospacedFontFamily)
             addAttribute(.font, value: newFont, range: range)
         default:
             break

@@ -10,7 +10,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="LogicDesigner" customModuleProvider="target"/>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
@@ -356,12 +356,12 @@
                                         </menuItem>
                                         <menuItem title="Bold" tag="2" keyEquivalent="b" id="GB9-OM-e27">
                                             <connections>
-                                                <action selector="addFontTrait:" target="YLy-65-1bz" id="hqk-hr-sYV"/>
+                                                <action selector="addFontTrait:" target="-1" id="AJ1-nI-8Yq"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Italic" tag="1" keyEquivalent="i" id="Vjx-xi-njq">
                                             <connections>
-                                                <action selector="addFontTrait:" target="YLy-65-1bz" id="IHV-OB-c03"/>
+                                                <action selector="addFontTrait:" target="-1" id="tfO-3M-B3T"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Underline" keyEquivalent="u" id="WRG-CD-K1S">
