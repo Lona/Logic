@@ -9,6 +9,30 @@
 import Foundation
 
 public class InlineBlockEditor: ControlledTextField {
+    public override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+
+        if result {
+//            Swift.print("Become")
+            placeholderString = "Type '/' for commands"
+            needsDisplay = true
+        }
+
+        return result
+    }
+
+//    public override func resignFirstResponder() -> Bool {
+//        let result = super.resignFirstResponder()
+//
+//        if result {
+//            Swift.print("Resign")
+//            placeholderString = "/"
+//            needsDisplay = true
+//        }
+//
+//        return result
+//    }
+
     private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
         InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
         InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
@@ -44,6 +68,10 @@ public class InlineBlockEditor: ControlledTextField {
 
         font = TextStyle(size: 18).nsFont
 
+        onPressEscape = {
+            self.window?.makeFirstResponder(nil)
+        }
+
         onChangeTextValue = { value in
             self.textValue = value
 
@@ -60,8 +88,6 @@ public class InlineBlockEditor: ControlledTextField {
                 InlineToolbarWindow.shared.orderOut(nil)
             }
         }
-
-
     }
 
     required public init?(coder: NSCoder) {
