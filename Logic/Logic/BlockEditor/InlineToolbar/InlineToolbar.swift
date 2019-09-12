@@ -162,6 +162,10 @@ public class InlineToolbar: NSView {
     public override func mouseMoved(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
         hoveredIndex = index(at: point)
+
+        if hoveredIndex != clickedIndex {
+            clickedIndex = nil
+        }
     }
 
     public override func mouseDown(with event: NSEvent) {
@@ -170,7 +174,11 @@ public class InlineToolbar: NSView {
 
         let point = convert(event.locationInWindow, from: nil)
         if let clickedIndex = index(at: point) {
+            self.clickedIndex = clickedIndex
+            TooltipManager.shared.hideTooltip()
+
             Swift.print("Clicked", InlineToolbar.commands[clickedIndex])
+            onCommand?(InlineToolbar.commands[clickedIndex])
         }
     }
 
@@ -211,6 +219,22 @@ public class InlineToolbar: NSView {
         }
     }
 
+    public var isItalicEnabled: Bool = false {
+        didSet {
+            if oldValue != isItalicEnabled {
+                update()
+            }
+        }
+    }
+
+    public var isCodeEnabled: Bool = false {
+        didSet {
+            if oldValue != isCodeEnabled {
+                update()
+            }
+        }
+    }
+
     public var parameters: Parameters {
         didSet {
             if parameters != oldValue {
@@ -221,12 +245,14 @@ public class InlineToolbar: NSView {
 
     // MARK: Private
 
+    private var clickedIndex: Int?
+
     private var hoveredIndex: Int? {
         didSet {
             if oldValue != hoveredIndex {
                 update()
 
-                if let index = hoveredIndex {
+                if let index = hoveredIndex, clickedIndex != hoveredIndex {
                     let rect = buttonRects[index]
                     let midpoint = NSPoint(x: rect.midX, y: rect.maxY + 4)
                     switch InlineToolbar.commands[index] {
@@ -300,6 +326,10 @@ public class InlineToolbar: NSView {
             switch command {
             case .bold:
                 selected = isBoldEnabled
+            case .italic:
+                selected = isItalicEnabled
+            case .code:
+                selected = isCodeEnabled
             default:
                 break
             }
@@ -310,7 +340,7 @@ public class InlineToolbar: NSView {
         }
     }
 
-    public static var commands: [Command] = [.bold, .italic, .code, .link]
+    public static var commands: [Command] = [.bold, .italic, .code]
 
     public static var height: CGFloat = 28
 }

@@ -99,6 +99,26 @@ public class InlineToolbarWindow: NSWindow {
 
     // MARK: Public
 
+    public var onCommand: ((InlineToolbar.Command) -> Void)? {
+        get { return toolbarView.onCommand }
+        set { toolbarView.onCommand = newValue }
+    }
+
+    public var isBoldEnabled: Bool {
+        get { return toolbarView.isBoldEnabled }
+        set { toolbarView.isBoldEnabled = newValue }
+    }
+
+    public var isItalicEnabled: Bool {
+        get { return toolbarView.isItalicEnabled }
+        set { toolbarView.isItalicEnabled = newValue }
+    }
+
+    public var isCodeEnabled: Bool {
+        get { return toolbarView.isCodeEnabled }
+        set { toolbarView.isCodeEnabled = newValue }
+    }
+
     public var allowedShrinkingSize = CGSize(width: 180, height: 200)
 
     public var onRequestHide: (() -> Void)?
@@ -107,7 +127,7 @@ public class InlineToolbarWindow: NSWindow {
 
     public func anchorTo(rect: NSRect, verticalOffset: CGFloat = 0) {
         let contentViewSize = defaultContentViewSize
-        var contentRect = NSRect(
+        let contentRect = NSRect(
             origin: NSPoint(x: rect.minX, y: rect.maxY + verticalOffset),
             size: NSSize(
                 width: contentViewSize.width + InlineToolbarWindow.shadowViewMargin * 2,

@@ -112,4 +112,12 @@ extension Array where Element: Equatable {
 
         return result
     }
+
+    func intersect(_ other: Array) -> Array {
+        return self.intersect(other, where: { $0 == $1 })
+    }
+
+    func union(_ other: Array) -> Array {
+        return self.union(other, where: { $0 == $1 })
+    }
 }
