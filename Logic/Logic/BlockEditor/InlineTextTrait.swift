@@ -70,6 +70,7 @@ extension NSMutableAttributedString {
         case .code:
             let newFont = NSFontManager.shared.convert(font, toFamily: InlineTextTrait.monospacedFontFamily)
             addAttribute(.font, value: newFont, range: range)
+            addAttribute(.backgroundColor, value: Colors.commentBackground, range: range)
         default:
             break
         }
@@ -88,6 +89,7 @@ extension NSMutableAttributedString {
         case .code:
             let newFont = NSFontManager.shared.convert(font, toFamily: NSFont.systemFont(ofSize: NSFont.systemFontSize).familyName!)
             addAttribute(.font, value: newFont, range: range)
+            removeAttribute(.backgroundColor, range: range)
         default:
             break
         }

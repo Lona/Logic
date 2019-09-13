@@ -26,13 +26,6 @@ extension Sequence where Iterator.Element: NSAttributedString {
             return r
         }
     }
-
-    /// Returns a new attributed string by concatenating the elements of the sequence, adding the given separator between each element.
-    /// - parameters:
-    ///     - separator: A string to insert between each of the elements in this sequence. The default separator is an empty string.
-    func joined(separator: String = "") -> NSAttributedString {
-        return joined(separator: NSAttributedString(string: separator))
-    }
 }
 
 extension LightMark.HeadingLevel {
@@ -129,12 +122,12 @@ extension LightMark.InlineElement {
             return LightMark.makeTextStyle().apply(to: content)
         case .styledText(style: let style, content: let content):
             return LightMark.makeTextStyle(textStyle: style)
-                .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
+                .apply(to: content.map { $0.attributedString() }.joined())
         case .code(content: let content):
             return LightMark.makeTextStyle(isCode: true).apply(to: content)
         case .link(source: let source, content: let content):
             let attributedString = LightMark.makeTextStyle()
-                .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
+                .apply(to: content.map { $0.attributedString() }.joined())
             let string = attributedString.string
             let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
             let range = NSRange(string.startIndex..<string.endIndex, in: string)
@@ -161,7 +154,7 @@ extension LightMark.BlockElement {
         switch self {
         case .heading(let headingLevel, let content):
             let attributedString = LightMark.makeTextStyle(headingLevel: headingLevel)
-                .apply(to: content.map { $0.attributedString() }.joined(separator: ""))
+                .apply(to: content.map { $0.attributedString() }.joined())
 
             return LightMark.makeTextField(attributedString: attributedString)
         case .quote(kind: let kind, content: let blocks):
@@ -202,7 +195,7 @@ extension LightMark.BlockElement {
 
             return container
         case .paragraph(let elements):
-            let attributedString = elements.map { $0.attributedString() }.joined(separator: "")
+            let attributedString = elements.map { $0.attributedString() }.joined()
 
             return LightMark.makeTextField(attributedString: attributedString)
         case .block(language: "logic", content: let content),
@@ -292,6 +285,25 @@ private class FlippedView: NSView {
 }
 
 extension LightMark {
+    public static func makeInlineElements(attributedString: NSAttributedString) -> [InlineElement] {
+        let markdownString = attributedString.markdownString()
+
+        Swift.print("md string", markdownString)
+
+        let parsed = LightMark.parse(markdownString)
+        for blockElement in parsed {
+            switch blockElement {
+            case .paragraph(content: let inlineElements):
+                return inlineElements
+            default:
+                break
+            }
+        }
+
+        return []
+//        fatalError("Can't create inline elements")
+    }
+
     public static func makeTextField(attributedString: NSAttributedString) -> NSTextField {
         let textField = NSTextField(labelWithAttributedString: attributedString)
         textField.isEnabled = true

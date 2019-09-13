@@ -14,7 +14,7 @@ import Foundation
 open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
 
     private struct InternalState {
-        var textValue: String
+        var textValue: NSAttributedString
         var selectedRange: NSRange
     }
 
@@ -34,12 +34,12 @@ open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
 
     // MARK: Public
 
-    public var onChangeTextValue: ((String) -> Void)?
+    public var onChangeTextValue: ((NSAttributedString) -> Void)?
     public var onChangeSelectedRange: ((NSRange) -> Void)?
     public var onSubmit: (() -> Void)?
     public var onPressEscape: (() -> Void)?
 
-    public var textValue: String = "" {
+    public var textValue: NSAttributedString = .init() {
         didSet {
             textDidChangeInCallback = true
 
@@ -50,22 +50,25 @@ open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
         }
     }
 
+    public var handlesSubmit: Bool = true
+    public var handlesEscape: Bool = true
+
     // MARK: Private
 
     private var textDidChangeInCallback = false
 
     private var currentState: InternalState {
         get {
-            return InternalState(textValue: stringValue, selectedRange: selectedRange)
+            return InternalState(textValue: attributedStringValue, selectedRange: selectedRange)
         }
         set {
             selectedRange = newValue.selectedRange
-            stringValue = newValue.textValue
+            attributedStringValue = newValue.textValue
         }
     }
 
     // The text and selection values prior to a change
-    private var previousState = InternalState(textValue: "", selectedRange: NSRange(location: 0, length: 0))
+    private var previousState = InternalState(textValue: .init(), selectedRange: NSRange(location: 0, length: 0))
 
     public var selectedRange: NSRange {
         get { return currentEditor()?.selectedRange ?? NSRange(location: 0, length: 0) }
@@ -80,7 +83,7 @@ open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
             using: { notification in
                 guard let object = notification.object,
                     (object as? NSTextView) === self.currentEditor(),
-                    self.stringValue == self.previousState.textValue
+                    self.attributedStringValue == self.previousState.textValue
                     else { return }
                 if self.previousState.selectedRange != self.currentState.selectedRange {
                     self.previousState.selectedRange = self.currentState.selectedRange
@@ -116,7 +119,7 @@ extension ControlledTextField: NSTextFieldDelegate {
 
         textDidChangeInCallback = false
 
-        onChangeTextValue?(stringValue)
+        onChangeTextValue?(attributedStringValue)
 
         if textDidChangeInCallback {
             if previousState.selectedRange != currentState.selectedRange {
@@ -133,10 +136,10 @@ extension ControlledTextField: NSTextFieldDelegate {
     }
 
     open func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if (commandSelector == #selector(NSResponder.insertNewline(_:))) {
+        if handlesSubmit && commandSelector == #selector(NSResponder.insertNewline(_:)) {
             onSubmit?()
             return true
-        } else if (commandSelector == #selector(NSResponder.cancelOperation(_:))) {
+        } else if handlesEscape && commandSelector == #selector(NSResponder.cancelOperation(_:)) {
             onPressEscape?()
             return true
         }

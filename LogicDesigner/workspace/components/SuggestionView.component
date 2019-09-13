@@ -30,6 +30,30 @@
     {
       "assignee" : [
         "layers",
+        "Search Area",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsSeachBar"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "Divider",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsSeachBar"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "Detail Area",
         "visible"
       ],
@@ -681,6 +705,14 @@
         "type" : "Boolean"
       },
       "name" : "showsSuggestionDetails",
+      "type" : "Boolean"
+    },
+    {
+      "defaultValue" : {
+        "data" : true,
+        "type" : "Boolean"
+      },
+      "name" : "showsSeachBar",
       "type" : "Boolean"
     }
   ],

@@ -19,6 +19,8 @@ class MarkdownDocument: NSDocument {
         return false
     }
 
+    var markdownText = "**Hello**, world!"
+
     var window: NSWindow?
 
     let containerView = NSBox()
@@ -41,31 +43,46 @@ class MarkdownDocument: NSDocument {
         addWindowController(windowController)
     }
 
+    let blockEditor = BlockEditor()
+
     override func makeWindowControllers() {
         containerView.boxType = .custom
         containerView.borderType = .noBorder
         containerView.contentViewMargins = .zero
 
-        let inlineBlockEditor = BlockEditor()
-
-        inlineBlockEditor.blocks = [
-            .text("hello, world"),
-            .text("**bold** text")
-        ]
-
-        containerView.addSubview(inlineBlockEditor)
+        containerView.addSubview(blockEditor)
 
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        inlineBlockEditor.translatesAutoresizingMaskIntoConstraints = false
+        blockEditor.translatesAutoresizingMaskIntoConstraints = false
 
-        inlineBlockEditor.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
-        inlineBlockEditor.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
-        inlineBlockEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        inlineBlockEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+        blockEditor.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        blockEditor.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        blockEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        blockEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
 //        inlineBlockEditor.widthAnchor.constraint(equalToConstant: 400).isActive = true
 //        inlineBlockEditor.heightAnchor.constraint(equalToConstant: 300).isActive = true
 
         initializeWindowController(presenting: containerView)
+    }
+
+    override func data(ofType typeName: String) throws -> Data {
+        return markdownText.data(using: .utf8)!
+    }
+
+    override func read(from data: Data, ofType typeName: String) throws {
+        markdownText = String(data: data, encoding: .utf8)!
+
+        let parsed = LightMark.parse(markdownText)
+        let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
+            switch blockElement {
+            case .paragraph(content: let inlineElements):
+                return BlockEditor.Block.text(inlineElements)
+            default:
+                return nil
+            }
+        }
+
+        blockEditor.blocks = blocks
     }
 }

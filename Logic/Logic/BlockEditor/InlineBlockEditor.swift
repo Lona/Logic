@@ -104,11 +104,11 @@ public class InlineBlockEditor: ControlledTextField {
     }
 
     private func updateToolbar(for range: NSRange) {
-        var traits: [InlineTextTrait] = .init(attributes: self.attributedStringValue.fontAttributes(in: range))
+        var traits: [InlineTextTrait] = .init(attributes: self.textValue.fontAttributes(in: range))
         self.updateSharedToolbarWindow(traits: traits)
 
         InlineToolbarWindow.shared.onCommand = { [unowned self] command in
-            let mutable = NSMutableAttributedString(attributedString: self.attributedStringValue)
+            let mutable = NSMutableAttributedString(attributedString: self.textValue)
 
             func update(trait: InlineTextTrait) {
                 if traits.contains(trait) {
@@ -121,18 +121,18 @@ public class InlineBlockEditor: ControlledTextField {
             switch command {
             case .bold:
                 update(trait: .bold)
-                self.attributedStringValue = mutable
+                self.onChangeTextValue?(mutable)
             case .italic:
                 update(trait: .italic)
-                self.attributedStringValue = mutable
+                self.onChangeTextValue?(mutable)
             case .code:
                 update(trait: .code)
-                self.attributedStringValue = mutable
+                self.onChangeTextValue?(mutable)
             default:
                 break
             }
 
-            traits = .init(attributes: self.attributedStringValue.fontAttributes(in: range))
+            traits = .init(attributes: self.textValue.fontAttributes(in: range))
             self.updateSharedToolbarWindow(traits: traits)
         }
     }

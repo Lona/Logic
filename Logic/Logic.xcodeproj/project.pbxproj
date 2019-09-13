@@ -14,6 +14,8 @@
 		6B00CA3C2329C247001907C6 /* InlineTextTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */; };
 		6B00CA3E232AA3C4001907C6 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3D232AA3C4001907C6 /* OverlayWindow.swift */; };
 		6B00CA40232B0091001907C6 /* BlockEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3F232B0091001907C6 /* BlockEditor.swift */; };
+		6B00CA44232B1AF8001907C6 /* LightMark+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA43232B1AF8001907C6 /* LightMark+String.swift */; };
+		6B00CA46232BEB1F001907C6 /* BlockListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA45232BEB1F001907C6 /* BlockListView.swift */; };
 		6B10AC1C22A45FD00043E46A /* LogicValue+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */; };
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
 		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
@@ -131,6 +133,8 @@
 		6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineTextTrait.swift; sourceTree = "<group>"; };
 		6B00CA3D232AA3C4001907C6 /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		6B00CA3F232B0091001907C6 /* BlockEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditor.swift; sourceTree = "<group>"; };
+		6B00CA43232B1AF8001907C6 /* LightMark+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LightMark+String.swift"; sourceTree = "<group>"; };
+		6B00CA45232BEB1F001907C6 /* BlockListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListView.swift; sourceTree = "<group>"; };
 		6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+AppKit.swift"; sourceTree = "<group>"; };
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
 		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
@@ -259,6 +263,7 @@
 			isa = PBXGroup;
 			children = (
 				6B00CA3F232B0091001907C6 /* BlockEditor.swift */,
+				6B00CA45232BEB1F001907C6 /* BlockListView.swift */,
 				6B00CA30232841F6001907C6 /* InlineBlockEditor.swift */,
 				6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */,
 				6B00CA362328528A001907C6 /* InlineToolbar */,
@@ -417,6 +422,7 @@
 				6BBD0C012294DA1100EB87A9 /* KeyValueList.swift */,
 				6B1DE40422DAB9BE00FC565E /* LightMark.swift */,
 				6B44E141223B3D2200740318 /* LightMark+AppKit.swift */,
+				6B00CA43232B1AF8001907C6 /* LightMark+String.swift */,
 				6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */,
 				6B87001122ECB98A007C589C /* Memoize.swift */,
 				6BBD0C0622961B9C00EB87A9 /* NameGenerator.swift */,
@@ -684,6 +690,7 @@
 				6B00CA3A2328565C001907C6 /* InlineToolbar.swift in Sources */,
 				6B00CA31232841F6001907C6 /* InlineBlockEditor.swift in Sources */,
 				6B9528D322A0B35B0094D9C7 /* LGCProgram+Imports.swift in Sources */,
+				6B00CA44232B1AF8001907C6 /* LightMark+String.swift in Sources */,
 				6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */,
 				6B5B7562215B1ABE00CDC9C6 /* TypeCase.swift in Sources */,
 				6B44759F22AED58E009AE087 /* Divider.swift in Sources */,
@@ -693,6 +700,7 @@
 				6B44E186223B40CF00740318 /* LGCSyntax+Documentation.swift in Sources */,
 				6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */,
 				6B44E15A223B3DDA00740318 /* SuggestionView.swift in Sources */,
+				6B00CA46232BEB1F001907C6 /* BlockListView.swift in Sources */,
 				6B00CA3823285296001907C6 /* InlineToolbarWindow.swift in Sources */,
 				6B858C23229DB19200DE6216 /* Compiler.swift in Sources */,
 				6B858C2B229DB35B00DE6216 /* Compiler+UnificationContext.swift in Sources */,

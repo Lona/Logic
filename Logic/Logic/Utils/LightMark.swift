@@ -137,7 +137,7 @@ public enum LightMark {
         }
     }
 
-    public enum InlineElement {
+    public enum InlineElement: Equatable {
         case text(content: String)
         case styledText(style: TextStyle, content: [InlineElement])
         case image(source: String, description: String)
