@@ -46,7 +46,12 @@ class MarkdownDocument: NSDocument {
         containerView.borderType = .noBorder
         containerView.contentViewMargins = .zero
 
-        let inlineBlockEditor = InlineBlockEditor()
+        let inlineBlockEditor = BlockEditor()
+
+        inlineBlockEditor.blocks = [
+            .text("hello, world"),
+            .text("**bold** text")
+        ]
 
         containerView.addSubview(inlineBlockEditor)
 
@@ -58,8 +63,8 @@ class MarkdownDocument: NSDocument {
         inlineBlockEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         inlineBlockEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
-        inlineBlockEditor.widthAnchor.constraint(equalToConstant: 200).isActive = true
-        inlineBlockEditor.heightAnchor.constraint(equalToConstant: 200).isActive = true
+//        inlineBlockEditor.widthAnchor.constraint(equalToConstant: 400).isActive = true
+//        inlineBlockEditor.heightAnchor.constraint(equalToConstant: 300).isActive = true
 
         initializeWindowController(presenting: containerView)
     }

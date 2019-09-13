@@ -23,6 +23,12 @@ public class InlineBlockEditor: ControlledTextField {
 
         font = TextStyle(size: 18).nsFont
 
+        usesSingleLineMode = false
+
+        lineBreakMode = .byWordWrapping
+
+        focusRingType = .none
+
         onPressEscape = { [unowned self] in
             if self.commandPaletteIndex != nil {
                 self.commandPaletteIndex = nil
@@ -35,31 +41,31 @@ public class InlineBlockEditor: ControlledTextField {
             }
         }
 
-        onChangeTextValue = { [unowned self] value in
-            self.textValue = value
-
-            let location = self.selectedRange.location
-
-            let prefix = value.prefix(location)
-
-            if prefix.last == "/" {
-//                Swift.print("Typed /")
-
-                self.commandPaletteIndex = location
-
-                self.onSearchCommandPalette?("")
-            } else if let index = self.commandPaletteIndex, location > index {
-                let query = (value as NSString).substring(with: NSRange(location: index, length: location - index))
-
-//                Swift.print("Query", query)
-
-                self.onSearchCommandPalette?(query)
-            } else {
-                self.commandPaletteIndex = nil
-
-                self.onHideCommandPalette?()
-            }
-        }
+//        onChangeTextValue = { [unowned self] value in
+//            self.textValue = value
+//
+//            let location = self.selectedRange.location
+//
+//            let prefix = value.prefix(location)
+//
+//            if prefix.last == "/" {
+////                Swift.print("Typed /")
+//
+//                self.commandPaletteIndex = location
+//
+//                self.onSearchCommandPalette?("")
+//            } else if let index = self.commandPaletteIndex, location > index {
+//                let query = (value as NSString).substring(with: NSRange(location: index, length: location - index))
+//
+////                Swift.print("Query", query)
+//
+//                self.onSearchCommandPalette?(query)
+//            } else {
+//                self.commandPaletteIndex = nil
+//
+//                self.onHideCommandPalette?()
+//            }
+//        }
 
         onChangeSelectedRange = { [weak self] range in
             guard let self = self else { return }
@@ -184,4 +190,19 @@ public class InlineBlockEditor: ControlledTextField {
         }
     }
 
+    // MARK: Layout
+
+    override public var intrinsicContentSize: NSSize {
+        get {
+            var intrinsicSize = super.intrinsicContentSize
+
+            if let textView = self.window?.fieldEditor(false, for: self) as? NSTextView,
+                let textContainer = textView.textContainer,
+                let usedRect = textView.textContainer?.layoutManager?.usedRect(for: textContainer) {
+                intrinsicSize.height = usedRect.size.height
+            }
+
+            return intrinsicSize
+        }
+    }
 }

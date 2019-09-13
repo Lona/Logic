@@ -13,6 +13,7 @@
 		6B00CA3A2328565C001907C6 /* InlineToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA392328565C001907C6 /* InlineToolbar.swift */; };
 		6B00CA3C2329C247001907C6 /* InlineTextTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */; };
 		6B00CA3E232AA3C4001907C6 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3D232AA3C4001907C6 /* OverlayWindow.swift */; };
+		6B00CA40232B0091001907C6 /* BlockEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3F232B0091001907C6 /* BlockEditor.swift */; };
 		6B10AC1C22A45FD00043E46A /* LogicValue+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */; };
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
 		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
@@ -129,6 +130,7 @@
 		6B00CA392328565C001907C6 /* InlineToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineToolbar.swift; sourceTree = "<group>"; };
 		6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineTextTrait.swift; sourceTree = "<group>"; };
 		6B00CA3D232AA3C4001907C6 /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
+		6B00CA3F232B0091001907C6 /* BlockEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditor.swift; sourceTree = "<group>"; };
 		6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+AppKit.swift"; sourceTree = "<group>"; };
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
 		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
@@ -256,9 +258,10 @@
 		6B00CA2F23283C5F001907C6 /* BlockEditor */ = {
 			isa = PBXGroup;
 			children = (
-				6B00CA362328528A001907C6 /* InlineToolbar */,
+				6B00CA3F232B0091001907C6 /* BlockEditor.swift */,
 				6B00CA30232841F6001907C6 /* InlineBlockEditor.swift */,
 				6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */,
+				6B00CA362328528A001907C6 /* InlineToolbar */,
 			);
 			path = BlockEditor;
 			sourceTree = "<group>";
@@ -708,6 +711,7 @@
 				6B4218B7223D82B10060CC9A /* NSOutlineView+Dragging.swift in Sources */,
 				6B44759D22AED136009AE087 /* InfoBar.swift in Sources */,
 				6B44E157223B3DD000740318 /* NSImage+Resizing.swift in Sources */,
+				6B00CA40232B0091001907C6 /* BlockEditor.swift in Sources */,
 				6B5B7566215B1ABE00CDC9C6 /* TypeListEditor.swift in Sources */,
 				6B44E16D223B3E9E00740318 /* SuggestionDetailView.swift in Sources */,
 				6BBD0C1122988ED100EB87A9 /* NativeType.swift in Sources */,
@@ -889,7 +893,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.devinabbott.Logic;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -920,7 +924,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.devinabbott.Logic;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
