@@ -50,6 +50,10 @@ open class ControlledTextField: NSTextField, NSControlTextEditingDelegate {
         }
     }
 
+    open func handleChangeTextValue(_ value: NSAttributedString) -> Void {
+        onChangeTextValue?(value)
+    }
+
     public var handlesSubmit: Bool = true
     public var handlesEscape: Bool = true
 
@@ -119,7 +123,7 @@ extension ControlledTextField: NSTextFieldDelegate {
 
         textDidChangeInCallback = false
 
-        onChangeTextValue?(attributedStringValue)
+        handleChangeTextValue(attributedStringValue)
 
         if textDidChangeInCallback {
             if previousState.selectedRange != currentState.selectedRange {

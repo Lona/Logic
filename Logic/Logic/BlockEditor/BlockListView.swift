@@ -7,6 +7,7 @@
 //
 
 import AppKit
+import Differ
 
 private extension NSTableColumn {
     convenience init(
@@ -36,6 +37,10 @@ private extension NSTableColumn {
 // MARK: - BlockListView
 
 public class BlockListView: NSBox {
+
+    enum Action {
+        case focus(id: UUID)
+    }
 
     // MARK: Lifecycle
 
@@ -125,14 +130,44 @@ public class BlockListView: NSBox {
         }
     }
 
+    private func handlePressPlus(line: Int) {
+        TooltipManager.shared.hideTooltip()
+
+        if blocks[line].content == .text(.init()) {
+            focus(line: line)
+            return
+        }
+
+        handleAddBlock(line: line, text: .init())
+    }
+
+    private func handleAddBlock(line: Int, text: NSAttributedString) {
+        var clone = blocks
+
+        let id = UUID()
+        let emptyBlock: EditableBlock = .init(id: id, content: .text(text))
+        clone.insert(emptyBlock, at: line + 1)
+        actions.append(.focus(id: id))
+
+        onChangeBlocks?(clone)
+    }
+
+    private func handleDelete(line: Int) {
+        var clone = self.blocks
+        clone.remove(at: line)
+
+        self.onChangeBlocks?(clone)
+
+        let id = blocks[line > 0 ? line - 1 : line].id
+        actions.append(.focus(id: id))
+    }
+
     public override func mouseDown(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
 
         if let hoveredLine = hoveredLine {
             if plusButtonRect(for: hoveredLine).contains(point) {
-                var clone = blocks
-                clone.insert(.init(.text(.init())), at: hoveredLine + 1)
-                onChangeBlocks?(clone)
+                handlePressPlus(line: hoveredLine)
             }
 
             if moreButtonRect(for: hoveredLine).contains(point) {
@@ -143,43 +178,64 @@ public class BlockListView: NSBox {
 
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
-            update()
+            let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
+
+            if diff.isEmpty {
+                for index in 0..<blocks.count {
+                    let old = oldValue[index]
+                    let new = blocks[index]
+
+                    if old !== new {
+                        Swift.print("update", index)
+                        if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
+                            case .text(let value) = new.content {
+                            view.textValue = value
+                        }
+                    }
+                }
+            } else {
+                tableView.animateRowChanges(oldData: oldValue, newData: blocks)
+
+//                if diff.count == 1, let firstInserted = diff.elements.first(where: { element in
+//                    switch element {
+//                    case .insert:
+//                        return true
+//                    default:
+//                        return false
+//                    }
+//                }), case .insert(let index) = firstInserted {
+////                    Swift.print("index", index)
+//                    let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: true)
+//                    window?.makeFirstResponder(view)
+//                }
+            }
+
+            actions.forEach { action in
+                switch action {
+                case .focus(id: let id):
+                    guard let index = blocks.firstIndex(where: { $0.id == id }) else { return }
+
+                    Swift.print("Focus", index)
+
+                    focus(line: index)
+                }
+            }
+
+            actions = []
         }
     }
+
+    var actions: [Action] = []
 
     public var onChangeBlocks: (([BlockEditor.Block]) -> Void)?
-
-    public var selectedIndex: Int? {
-        didSet {
-            if let selectedIndex = selectedIndex {
-                tableView.selectRowIndexes(IndexSet(integer: selectedIndex), byExtendingSelection: false)
-
-                // Check that the view is currently visible, otherwise it will scroll to the bottom
-                if visibleRect != .zero {
-                    tableView.scrollRowToVisible(selectedIndex)
-                }
-
-                var reloadIndexSet = IndexSet(integer: selectedIndex)
-
-                if let oldValue = oldValue {
-                    reloadIndexSet.insert(oldValue)
-                }
-
-                tableView.reloadData(forRowIndexes: reloadIndexSet, columnIndexes: IndexSet(integer: 0))
-            } else {
-                tableView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
-            }
-        }
-    }
-
-    public var onSelectIndex: ((Int?) -> Void)?
-    public var onActivateIndex: ((Int) -> Void)?
 
     // MARK: Private
 
     private var tableView = BlockListTableView()
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
+
+    private var focusedLine: Int?
 
     private var hoveredLine: Int? {
         didSet {
@@ -193,6 +249,18 @@ public class BlockListView: NSBox {
 //                } else {
 //                    toolbarView.isHidden = true
 //                }
+            }
+        }
+    }
+
+    private func focus(line index: Int) {
+        let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: true)
+
+        guard let window = window else { return }
+
+        if let editable = view as? FieldEditable {
+            if window.firstResponder != view && !editable.isFieldEditorFirstResponder {
+                window.makeFirstResponder(view)
             }
         }
     }
@@ -242,12 +310,14 @@ public class BlockListView: NSBox {
     }
 
     private func update() {
-        blocks.forEach { block in
-            block.updateView()
-        }
+
+
+//        blocks.forEach { block in
+//            block.updateView()
+//        }
 
 //        tableView.reloadData()
-        tableView.sizeToFit()
+//        tableView.sizeToFit()
     }
 
     override public var acceptsFirstResponder: Bool {
@@ -312,7 +382,7 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width - lineButtonMargin,
-            y: rowRect.minY + 5,
+            y: rowRect.maxY - lineButtonSize.height - 4,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -324,12 +394,22 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
-            y: rowRect.minY + 5,
+            y: rowRect.maxY - lineButtonSize.height - 4,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
         return rect
     }
+
+    public static var commandPalette: SuggestionWindow = {
+        let suggestionWindow = SuggestionWindow()
+
+        suggestionWindow.onRequestHide = {
+            suggestionWindow.orderOut(nil)
+        }
+
+        return suggestionWindow
+    }()
 }
 
 // MARK: - Delegate
@@ -341,14 +421,53 @@ extension BlockListView: NSTableViewDelegate {
         switch item.content {
         case .text(let value):
             let view = item.view as! InlineBlockEditor
+
+            Swift.print("Row", row, view)
+
             view.textValue = value
             view.onChangeTextValue = { [unowned self] newValue in
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                self.blocks[row] = .init(id: item.id, content: .text(newValue))
+                var clone = self.blocks
+                clone[row] = .init(id: item.id, content: .text(newValue))
 
+                self.onChangeBlocks?(clone)
+
+////                self.actions.append(.focus(id: item.id))
+//
 //                view.textValue = newValue
 //                self.tableView.noteHeightOfRows(withIndexesChanged: .init(integer: row))
             }
+
+            view.onRequestCreateEditor = { [unowned self] newText in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.handleAddBlock(line: line, text: newText)
+            }
+
+            view.onRequestDeleteEditor = { [unowned self] in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.handleDelete(line: line)
+            }
+
+            view.onSearchCommandPalette = { [unowned self] query, rect in
+                guard let window = self.window else { return }
+
+                window.addChildWindow(BlockListView.commandPalette, ordered: .above)
+
+                BlockListView.commandPalette.anchorTo(rect: rect)
+            }
+
+            view.onHideCommandPalette = {
+                BlockListView.commandPalette.orderOut(nil)
+            }
+
+//            view.onFocus = { [unowned self] in
+//                let row = self.tableView.row(for: view)
+//                self.focusedLine = row
+//            }
+
             return view
         }
     }
@@ -361,9 +480,14 @@ extension BlockListView: NSTableViewDataSource {
         return blocks.count
     }
 
-    //    public func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-    //        return items[row].height
-    //    }
+//    public func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
+//        let item = blocks[row]
+//
+//        switch item.content {
+//        case .text(let value):
+//            return value.measure(width: tableView.bounds.width).height
+//        }
+//    }
 }
 
 // MARK: - BlockListTableView

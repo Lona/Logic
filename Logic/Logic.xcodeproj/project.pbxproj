@@ -16,6 +16,7 @@
 		6B00CA40232B0091001907C6 /* BlockEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3F232B0091001907C6 /* BlockEditor.swift */; };
 		6B00CA44232B1AF8001907C6 /* LightMark+String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA43232B1AF8001907C6 /* LightMark+String.swift */; };
 		6B00CA46232BEB1F001907C6 /* BlockListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA45232BEB1F001907C6 /* BlockListView.swift */; };
+		6B00CA48232C280B001907C6 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B00CA47232C280B001907C6 /* Differ.framework */; };
 		6B10AC1C22A45FD00043E46A /* LogicValue+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */; };
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
 		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
@@ -135,6 +136,7 @@
 		6B00CA3F232B0091001907C6 /* BlockEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditor.swift; sourceTree = "<group>"; };
 		6B00CA43232B1AF8001907C6 /* LightMark+String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LightMark+String.swift"; sourceTree = "<group>"; };
 		6B00CA45232BEB1F001907C6 /* BlockListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListView.swift; sourceTree = "<group>"; };
+		6B00CA47232C280B001907C6 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = ../Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
 		6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+AppKit.swift"; sourceTree = "<group>"; };
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
 		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B6F19D3230B3E1300E5AC60 /* Colors.framework in Frameworks */,
+				6B00CA48232C280B001907C6 /* Differ.framework in Frameworks */,
 				6B9F9D3B23049D140000A3BB /* SwiftGraph.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -554,6 +557,7 @@
 			isa = PBXGroup;
 			children = (
 				6B6F19D2230B3E1200E5AC60 /* Colors.framework */,
+				6B00CA47232C280B001907C6 /* Differ.framework */,
 				6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */,
 			);
 			name = Frameworks;

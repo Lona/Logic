@@ -47,32 +47,6 @@ public class InlineBlockEditor: ControlledTextField {
             }
         }
 
-//        onChangeTextValue = { [unowned self] value in
-//            self.textValue = value
-//
-//            let location = self.selectedRange.location
-//
-//            let prefix = value.prefix(location)
-//
-//            if prefix.last == "/" {
-////                Swift.print("Typed /")
-//
-//                self.commandPaletteIndex = location
-//
-//                self.onSearchCommandPalette?("")
-//            } else if let index = self.commandPaletteIndex, location > index {
-//                let query = (value as NSString).substring(with: NSRange(location: index, length: location - index))
-//
-////                Swift.print("Query", query)
-//
-//                self.onSearchCommandPalette?(query)
-//            } else {
-//                self.commandPaletteIndex = nil
-//
-//                self.onHideCommandPalette?()
-//            }
-//        }
-
         onChangeSelectedRange = { [weak self] range in
             guard let self = self else { return }
 
@@ -91,12 +65,41 @@ public class InlineBlockEditor: ControlledTextField {
 
     // MARK: Public
 
-    public var onSearchCommandPalette: ((String) -> Void)?
+    public var onFocus: (() -> Void)?
+
+    public var onRequestCreateEditor: ((NSAttributedString) -> Void)?
+
+    public var onRequestDeleteEditor: (() -> Void)?
+
+    public var onSearchCommandPalette: ((String, NSRect) -> Void)?
 
     public var onHideCommandPalette: (() -> Void)?
 
     public func resetCommandPaletteIndex() {
         commandPaletteIndex = nil
+    }
+
+    open override func handleChangeTextValue(_ value: NSAttributedString) {
+        super.handleChangeTextValue(value)
+
+        let range = self.selectedRange
+        let string = value.string
+        let location = range.location
+        let prefix = string.prefix(location)
+
+        guard let editor = self.currentEditor() as? NSTextView else { return }
+        let rect = editor.firstRect(forCharacterRange: range, actualRange: nil)
+
+        if prefix.last == "/" {
+            self.commandPaletteIndex = location
+            self.onSearchCommandPalette?("", rect)
+        } else if let index = self.commandPaletteIndex, location > index {
+            let query = (string as NSString).substring(with: NSRange(location: index, length: location - index))
+            self.onSearchCommandPalette?(query, rect)
+        } else {
+            self.commandPaletteIndex = nil
+            self.onHideCommandPalette?()
+        }
     }
 
     // MARK: Private
@@ -157,25 +160,57 @@ public class InlineBlockEditor: ControlledTextField {
 
         if result {
             //            Swift.print("Become")
-            placeholderString = "Type '/' for commands"
-            needsDisplay = true
+//            placeholderString = "Type '/' for commands"
+//            needsDisplay = true
+
+            selectedRange = .init(location: 0, length: 0)
+            onFocus?()
         }
 
         return result
     }
 
-        public override func resignFirstResponder() -> Bool {
-            let result = super.resignFirstResponder()
+    public override func resignFirstResponder() -> Bool {
+        let result = super.resignFirstResponder()
 
-            if result {
-                InlineToolbarWindow.shared.orderOut(nil)
-//                Swift.print("Resign")
-                placeholderString = " "
-                needsDisplay = true
-            }
-
-            return result
+        if result {
+            InlineToolbarWindow.shared.orderOut(nil)
+//            Swift.print("Resign")
+//
+//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
+//                guard let self = self, self.window?.firstResponder != self else { return }
+//
+//                Swift.print("Ps")
+//
+//                self.placeholderString = " "
+//                self.needsDisplay = true
+//            }
         }
+
+        return result
+    }
+
+    public override func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if commandSelector == #selector(NSResponder.deleteBackward(_:)) && selectedRange.location == 0 {
+            onRequestDeleteEditor?()
+
+            return true
+        } else if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+            let selectedRange = self.selectedRange
+            let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
+            let suffix = textValue.attributedSubstring(from: remainingRange)
+            let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
+
+            onRequestCreateEditor?(suffix)
+            onChangeTextValue?(prefix)
+
+            Swift.print("remainder", suffix.string)
+
+            return true
+        }
+
+        return super.control(control, textView: textView, doCommandBy: commandSelector)
+    }
 
     // MARK: Menu Actions
 
@@ -203,10 +238,15 @@ public class InlineBlockEditor: ControlledTextField {
         get {
             let intrinsicSize = super.intrinsicContentSize
 
-            let textSize = textValue.measure(width: bounds.width)
-            let placeholderSize = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
+            var size: NSSize
 
-            return .init(width: intrinsicSize.width, height: max(textSize.height, placeholderSize.height))
+            if textValue.length > 0 {
+                size = textValue.measure(width: bounds.width)
+            } else {
+                size = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
+            }
+
+            return .init(width: intrinsicSize.width, height: size.height)
         }
     }
 }
@@ -228,5 +268,18 @@ extension NSAttributedString {
         layoutManager.glyphRange(for: textContainer)
 
         return layoutManager.usedRect(for: textContainer).size
+    }
+}
+
+
+protocol FieldEditable {
+    var isFieldEditorFirstResponder: Bool { get }
+}
+
+extension InlineBlockEditor: FieldEditable {
+    var isFieldEditorFirstResponder: Bool {
+        guard let window = window, let currentEditor = currentEditor() else { return false }
+
+        return window.firstResponder == currentEditor
     }
 }
