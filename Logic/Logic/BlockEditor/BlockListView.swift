@@ -46,6 +46,8 @@ public class BlockListView: NSBox {
         setUpConstraints()
 
         update()
+
+        addTrackingArea(trackingArea)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -55,15 +57,97 @@ public class BlockListView: NSBox {
         setUpConstraints()
 
         update()
+
+        addTrackingArea(trackingArea)
+    }
+
+    private lazy var trackingArea = NSTrackingArea(
+        rect: self.frame,
+        options: [.mouseEnteredAndExited, .activeInActiveApp, .mouseMoved, .inVisibleRect],
+        owner: self)
+
+    deinit {
+        removeTrackingArea(trackingArea)
     }
 
     // MARK: Public
+
+    private func showToolTip(string: String, at point: NSPoint) {
+        guard let window = window else { return }
+        let windowPoint = convert(point, to: nil)
+        let screenPoint = window.convertPoint(toScreen: windowPoint)
+
+        if window.isKeyWindow {
+            TooltipManager.shared.showTooltip(string: string, point: screenPoint, delay: .milliseconds(120))
+        }
+    }
+
+    public var plusButtonTooltip: String = "**Click** _to add below_"
+    public var moreButtonTooltip: String = "**Drag** _to move_\n**Click** _to open menu_"
+
+    public override func mouseMoved(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+        let row = tableView.row(at: .init(x: 60, y: convert(point, from: tableView).y))
+
+        if row >= 0 {
+            hoveredLine = row
+        } else {
+            hoveredLine = nil
+        }
+
+        if let hoveredLine = hoveredLine {
+            let plusRect = plusButtonRect(for: hoveredLine)
+            hoveredPlusButton = plusRect.contains(point)
+
+            if hoveredPlusButton {
+                showToolTip(
+                    string: plusButtonTooltip,
+                    at: NSPoint(x: plusRect.midX, y: plusRect.minY - 4)
+                )
+            }
+
+            let moreRect = moreButtonRect(for: hoveredLine)
+            hoveredMoreButton = moreRect.contains(point)
+
+            if hoveredMoreButton {
+                showToolTip(
+                    string: moreButtonTooltip,
+                    at: NSPoint(x: moreRect.midX, y: moreRect.minY - 4)
+                )
+            }
+        } else {
+            hoveredPlusButton = false
+            hoveredMoreButton = false
+        }
+
+        if !hoveredPlusButton && !hoveredMoreButton {
+            TooltipManager.shared.hideTooltip()
+        }
+    }
+
+    public override func mouseDown(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+
+        if let hoveredLine = hoveredLine {
+            if plusButtonRect(for: hoveredLine).contains(point) {
+                var clone = blocks
+                clone.insert(.init(.text(.init())), at: hoveredLine + 1)
+                onChangeBlocks?(clone)
+            }
+
+            if moreButtonRect(for: hoveredLine).contains(point) {
+                Swift.print("Clicked more")
+            }
+        }
+    }
 
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
             update()
         }
     }
+
+    public var onChangeBlocks: (([BlockEditor.Block]) -> Void)?
 
     public var selectedIndex: Int? {
         didSet {
@@ -97,6 +181,22 @@ public class BlockListView: NSBox {
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
 
+    private var hoveredLine: Int? {
+        didSet {
+            if oldValue != hoveredLine {
+                needsDisplay = true
+//                if let row = hoveredLine {
+//                    toolbarView.isHidden = false
+//
+//                    let rect = convert(tableView.rect(ofRow: row), from: tableView)
+//                    toolbarView.frame.origin = .init(x: 20, y: rect.minY)
+//                } else {
+//                    toolbarView.isHidden = true
+//                }
+            }
+        }
+    }
+
     private func setUpViews() {
         boxType = .custom
         borderType = .noBorder
@@ -110,8 +210,8 @@ public class BlockListView: NSBox {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.target = self
-        //        tableView.action = #selector(handleDoubleAction)
         tableView.backgroundColor = .clear
+        tableView.selectionHighlightStyle = .none
 
         scrollView.hasVerticalScroller = true
         scrollView.hasHorizontalScroller = false
@@ -119,10 +219,16 @@ public class BlockListView: NSBox {
         scrollView.drawsBackground = false
         scrollView.documentView = tableView
 
+        scrollView.automaticallyAdjustsContentInsets = false
+        scrollView.contentInsets = .init(top: 20, left: 60, bottom: 20, right: 60)
+        scrollView.scrollerInsets = .init(top: -20, left: -60, bottom: -20, right: -60)
+
         addSubview(scrollView)
 
         tableView.reloadData()
         tableView.sizeToFit()
+
+        tableView.intercellSpacing = .init(width: 0, height: 6)
     }
 
     private func setUpConstraints() {
@@ -136,90 +242,116 @@ public class BlockListView: NSBox {
     }
 
     private func update() {
-        tableView.reloadData()
+        blocks.forEach { block in
+            block.updateView()
+        }
+
+//        tableView.reloadData()
         tableView.sizeToFit()
     }
 
     override public var acceptsFirstResponder: Bool {
         return false
     }
+
+    public override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+
+        if let hoveredLine = hoveredLine {
+            let rect = plusButtonRect(for: hoveredLine)
+            let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+
+            if hoveredPlusButton {
+                Colors.divider.set()
+                backgroundPath.fill()
+            }
+
+            let path = NSBezierPath(plusWithin: rect, lineWidth: 1, margin: .init(width: 3, height: 3))
+            Colors.textComment.setStroke()
+            path.stroke()
+        }
+
+        if let hoveredLine = hoveredLine {
+            let rect = moreButtonRect(for: hoveredLine)
+            let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
+
+            if hoveredMoreButton {
+                Colors.divider.set()
+                backgroundPath.fill()
+            }
+
+            let path = NSBezierPath(hamburgerWithin: rect, thickness: 1, margin: .init(width: 4, height: 5))
+            Colors.textComment.setStroke()
+            path.stroke()
+        }
+    }
+
+    public let lineButtonSize = NSSize(width: 19, height: 19)
+    public let lineButtonMargin: CGFloat = 2
+
+    private var hoveredPlusButton: Bool = false {
+        didSet {
+            if oldValue != hoveredPlusButton {
+                needsDisplay = true
+//                update()
+            }
+        }
+    }
+
+    private var hoveredMoreButton: Bool = false {
+        didSet {
+            if oldValue != hoveredMoreButton {
+                needsDisplay = true
+//                update()
+            }
+        }
+    }
+
+    private func plusButtonRect(for line: Int) -> CGRect {
+        let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
+
+        let rect = NSRect(
+            x: 60 - lineButtonSize.width - lineButtonMargin,
+            y: rowRect.minY + 5,
+            width: lineButtonSize.width,
+            height: lineButtonSize.height)
+
+        return rect
+    }
+
+    private func moreButtonRect(for line: Int) -> CGRect {
+        let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
+
+        let rect = NSRect(
+            x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
+            y: rowRect.minY + 5,
+            width: lineButtonSize.width,
+            height: lineButtonSize.height)
+
+        return rect
+    }
 }
-
-// MARK: - Target
-
-//extension BlockListView {
-//    @objc func handleDoubleAction(_ sender: AnyObject) {
-//        guard tableView.clickedRow > 0 else { return }
-//
-//        let item = self.items[tableView.clickedRow]
-//        if item.isSelectable {
-//            self.onActivateIndex?(tableView.clickedRow)
-//        }
-//    }
-//}
 
 // MARK: - Delegate
 
 extension BlockListView: NSTableViewDelegate {
-    //    public func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-    //        return items[row].isSelectable
-    //    }
-    //
-    //    public func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
-    //        return items[row].isGroupRow
-    //    }
-
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
 
-        //        var disabledBackgroundColor = Colors.greyBackground
-        //
-        //        if #available(OSX 10.14, *) {
-        //            disabledBackgroundColor = NSColor.unemphasizedSelectedContentBackgroundColor
-        //        }
-        //
-        //        func fillColor(disabled: Bool) -> NSColor {
-        //            return row != selectedIndex
-        //                ? NSColor.clear
-        //                : disabled
-        //                ? disabledBackgroundColor
-        //                : NSColor.selectedMenuItemColor
-        //        }
-
-        switch item {
+        switch item.content {
         case .text(let value):
-            let initialValue = value.map { $0.editableString }.joined()
-
-            let view = InlineBlockEditor(frame: .zero)
-            view.textValue = initialValue
+            let view = item.view as! InlineBlockEditor
+            view.textValue = value
             view.onChangeTextValue = { [unowned self] newValue in
-                view.textValue = newValue
+
+                self.blocks[row] = .init(id: item.id, content: .text(newValue))
+
+//                view.textValue = newValue
 //                self.tableView.noteHeightOfRows(withIndexesChanged: .init(integer: row))
             }
             return view
         }
     }
-
-//    public override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
-//        return true
-//    }
-
-    //    public func tableView(_ tableView: NSTableView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet {
-    //        DispatchQueue.main.async { [weak self] in
-    //            guard let self = self else { return }
-    //
-    //            if let proposedIndex = proposedSelectionIndexes.first {
-    //                let item = self.items[proposedIndex]
-    //                if item.isSelectable {
-    //                    self.onSelectIndex?(proposedIndex)
-    //                }
-    //            } else {
-    //                self.onSelectIndex?(nil)
-    //            }
-    //        }
-    //
-    //        return tableView.selectedRowIndexes
-    //    }
 }
 
 // MARK: - Data source
@@ -234,34 +366,15 @@ extension BlockListView: NSTableViewDataSource {
     //    }
 }
 
+// MARK: - BlockListTableView
+
 class BlockListTableView: NSTableView {
     override var acceptsFirstResponder: Bool {
         return false
     }
 
+    // Allows clicking into NSTextFields directly (otherwise the NSTableView captures the first click)
     override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
         return true
     }
-
-//    public override func hitTest(_ point: NSPoint) -> NSView? {
-//        let position = convert(point, from: nil)
-//
-//        let rows = self.rows(in: bounds)
-//
-//        //        Swift.print("rows", rows)
-//
-//        guard let range = Range(rows) else { return nil }
-//
-//        for index in range {
-//            let rect = self.rect(ofRow: index)
-//
-//            Swift.print(rect, position)
-//
-//            if rect.contains(position) {
-//                return self.rowView(atRow: index, makeIfNecessary: true)
-//            }
-//        }
-//
-//        return nil
-//    }
 }

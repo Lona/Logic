@@ -20,6 +20,8 @@ public class TooltipWindow: NSWindow {
             backing: .buffered,
             defer: false)
 
+        level = .floating
+
         let window = self
         window.backgroundColor = NSColor.clear
         window.isOpaque = false

@@ -8,82 +8,70 @@
 
 import AppKit
 
-//private class BlockListView: NSView {
-//
-//    override var isFlipped: Bool { return true }
-//
-//    public init() {
-//        super.init(frame: .zero)
-//    }
-//
-//    required init?(coder decoder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    public var blocks: [BlockEditor.Block] = [] {
-//        didSet {
-//            if blocks != oldValue {
-//                update()
-//            }
-//        }
-//    }
-//
-//    private var padding: NSEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
-//
-//    private func update() {
-//        subviews.forEach { $0.removeFromSuperview() }
-//
-//        let blockViews: [NSView] = blocks.map { block in
-//            switch block {
-//            case .text(let value):
-//                let view = InlineBlockEditor(frame: .zero)
-//                let initialValue = value.map { $0.editableString }.joined()
-//
-//                view.textValue = initialValue
-//
-//                view.onChangeTextValue = { [unowned self] newValue in
-//                    view.textValue = newValue
-//
-////                    view.textValue = LightMark.makeInlineElements(attributedString: newValue).map { $0.editableString }.joined()
-//                }
-//
-//                return view
-//            }
-//        }
-//
-//        let contentView = self
-//
-//        if blockViews.count > 0 {
-//            for (offset, view) in blockViews.enumerated() {
-//                contentView.addSubview(view)
-//
-//                view.translatesAutoresizingMaskIntoConstraints = false
-//                view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding.left).isActive = true
-//                view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding.right).isActive = true
-//
-//                if offset == 0 {
-//                    view.topAnchor.constraint(equalTo: contentView.topAnchor, constant: padding.top).isActive = true
-//                } else {
-//                    let margin: CGFloat = 8
-//                    view.topAnchor.constraint(equalTo: blockViews[offset - 1].bottomAnchor, constant: margin).isActive = true
-//                }
-//
-//                if offset == blockViews.count - 1 {
-//                    view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -padding.bottom).isActive = true
-//                }
-//            }
-//        }
-//    }
-//}
+public class EditableBlock: Equatable {
+    public let id: UUID
+    public let content: EditableBlockContent
 
+    public init(id: UUID, content: EditableBlockContent) {
+        self.id = id
+        self.content = content
+    }
+
+    public convenience init(_ content: EditableBlockContent) {
+        self.init(id: UUID(), content: content)
+    }
+
+    public static func == (lhs: EditableBlock, rhs: EditableBlock) -> Bool {
+        return lhs.id == rhs.id && lhs.content == rhs.content
+    }
+
+    private func makeView() -> NSView {
+        switch self.content {
+        case .text:
+            return InlineBlockEditor()
+        }
+    }
+
+    private func configure(view: NSView) {
+        switch self.content {
+        case .text(let value):
+            let view = view as! InlineBlockEditor
+            view.textValue = value
+        }
+    }
+
+    public var view: NSView {
+        if let view = EditableBlock.viewCache[id] {
+            configure(view: view)
+            return view
+        }
+
+        let view = makeView()
+        configure(view: view)
+        EditableBlock.viewCache[id] = view
+        return view
+    }
+
+    public func updateView() {
+        configure(view: view)
+    }
+
+    static var viewCache: [UUID: NSView] = [:]
+
+    deinit {
+        EditableBlock.viewCache.removeValue(forKey: id)
+    }
+}
+
+public enum EditableBlockContent: Equatable {
+    case text(NSAttributedString)
+}
 
 // MARK: - BlockEditor
 
 public class BlockEditor: NSBox {
 
-    public enum Block: Equatable {
-        case text([LightMark.InlineElement])
-    }
+    public typealias Block = EditableBlock
 
     // MARK: Lifecycle
 
@@ -123,6 +111,11 @@ public class BlockEditor: NSBox {
         }
     }
 
+    public var onChangeBlocks: (([Block]) -> Void)? {
+        get { return blockListView.onChangeBlocks }
+        set { blockListView.onChangeBlocks = newValue }
+    }
+
     public var parameters: Parameters {
         didSet {
             if parameters != oldValue {
@@ -133,47 +126,28 @@ public class BlockEditor: NSBox {
 
     // MARK: Private
 
-//    private let scrollView = NSScrollView()
-    private let canvasView = BlockListView()
+    private let blockListView = BlockListView()
 
     private func setUpViews() {
         boxType = .custom
         borderType = .noBorder
         contentViewMargins = .zero
 
-        addSubview(canvasView)
-
-//        addSubview(scrollView)
-//
-//        scrollView.hasVerticalScroller = true
-//        scrollView.hasHorizontalScroller = false
-//        scrollView.autohidesScrollers = true
-//        scrollView.drawsBackground = false
-//        scrollView.documentView = canvasView
+        addSubview(blockListView)
     }
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
-//        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        canvasView.translatesAutoresizingMaskIntoConstraints = false
-//
-//        scrollView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-//        scrollView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-//        scrollView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-//        scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-//
-//        canvasView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor).isActive = true
-//        canvasView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor).isActive = true
-//        canvasView.trailingAnchor.constraint(equalTo: scrollView.contentView.trailingAnchor).isActive = true
+        blockListView.translatesAutoresizingMaskIntoConstraints = false
 
-        canvasView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        canvasView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        canvasView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        canvasView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        blockListView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        blockListView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        blockListView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        blockListView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
     }
 
     private func update() {
-        canvasView.blocks = blocks
+        blockListView.blocks = blocks
     }
 }
 

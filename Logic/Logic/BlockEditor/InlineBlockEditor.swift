@@ -8,6 +8,8 @@
 
 import Foundation
 
+private var defaultTextStyle = TextStyle(size: 18, lineHeight: 22)
+
 public class InlineBlockEditor: ControlledTextField {
 
     // MARK: Lifecycle
@@ -21,7 +23,11 @@ public class InlineBlockEditor: ControlledTextField {
 
         isBordered = false
 
-        font = TextStyle(size: 18).nsFont
+        font = defaultTextStyle.nsFont
+
+        attributedStringValue = defaultTextStyle.apply(to: "")
+
+        placeholderString = " "
 
         usesSingleLineMode = false
 
@@ -37,7 +43,7 @@ public class InlineBlockEditor: ControlledTextField {
             } else {
                 self.window?.makeFirstResponder(nil)
 
-                self.placeholderString = ""
+                self.placeholderString = " "
             }
         }
 
@@ -158,17 +164,18 @@ public class InlineBlockEditor: ControlledTextField {
         return result
     }
 
-    //    public override func resignFirstResponder() -> Bool {
-    //        let result = super.resignFirstResponder()
-    //
-    //        if result {
-    //            Swift.print("Resign")
-    //            placeholderString = "/"
-    //            needsDisplay = true
-    //        }
-    //
-    //        return result
-    //    }
+        public override func resignFirstResponder() -> Bool {
+            let result = super.resignFirstResponder()
+
+            if result {
+                InlineToolbarWindow.shared.orderOut(nil)
+//                Swift.print("Resign")
+                placeholderString = " "
+                needsDisplay = true
+            }
+
+            return result
+        }
 
     // MARK: Menu Actions
 
@@ -194,15 +201,32 @@ public class InlineBlockEditor: ControlledTextField {
 
     override public var intrinsicContentSize: NSSize {
         get {
-            var intrinsicSize = super.intrinsicContentSize
+            let intrinsicSize = super.intrinsicContentSize
 
-            if let textView = self.window?.fieldEditor(false, for: self) as? NSTextView,
-                let textContainer = textView.textContainer,
-                let usedRect = textView.textContainer?.layoutManager?.usedRect(for: textContainer) {
-                intrinsicSize.height = usedRect.size.height
-            }
+            let textSize = textValue.measure(width: bounds.width)
+            let placeholderSize = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
 
-            return intrinsicSize
+            return .init(width: intrinsicSize.width, height: max(textSize.height, placeholderSize.height))
         }
+    }
+}
+
+extension NSAttributedString {
+    func measure(width: CGFloat, maxNumberOfLines: Int = -1) -> NSSize {
+        let textContainer = NSTextContainer(containerSize: NSSize(width: width, height: CGFloat.greatestFiniteMagnitude))
+        textContainer.lineBreakMode = .byTruncatingTail
+        textContainer.lineFragmentPadding = 0.0
+        if maxNumberOfLines > -1 {
+            textContainer.maximumNumberOfLines = maxNumberOfLines
+        }
+
+        let textStorage = NSTextStorage(attributedString: self)
+
+        let layoutManager = NSLayoutManager()
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        layoutManager.glyphRange(for: textContainer)
+
+        return layoutManager.usedRect(for: textContainer).size
     }
 }

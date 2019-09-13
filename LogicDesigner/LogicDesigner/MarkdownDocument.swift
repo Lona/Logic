@@ -52,6 +52,10 @@ class MarkdownDocument: NSDocument {
 
         containerView.addSubview(blockEditor)
 
+        blockEditor.onChangeBlocks = { [unowned self] blocks in
+            self.blockEditor.blocks = blocks
+        }
+
         containerView.translatesAutoresizingMaskIntoConstraints = false
         blockEditor.translatesAutoresizingMaskIntoConstraints = false
 
@@ -77,7 +81,8 @@ class MarkdownDocument: NSDocument {
         let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
             switch blockElement {
             case .paragraph(content: let inlineElements):
-                return BlockEditor.Block.text(inlineElements)
+                let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
+                return BlockEditor.Block(.text(value))
             default:
                 return nil
             }
