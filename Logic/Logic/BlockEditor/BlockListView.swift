@@ -9,6 +9,27 @@
 import AppKit
 import Differ
 
+private enum BlockListSelection: Equatable {
+    case none
+    case item(Int, NSRange)
+    case blocks(NSRange)
+}
+
+private enum BlockListItem: Equatable {
+    case background
+    case moreButton(Int)
+    case plusButton(Int)
+    case item(Int, NSPoint)
+}
+
+private extension NSRange {
+    init(between a: Int, and b: Int) {
+        self = .init(location: min(a, b), length: abs(a - b))
+    }
+
+    static var empty: NSRange = .init(location: 0, length: 0)
+}
+
 private extension NSPoint {
     func distance(to: NSPoint) -> CGFloat {
         return sqrt((x - to.x) * (x - to.x) + (y - to.y) * (y - to.y))
@@ -41,7 +62,13 @@ private extension NSTableColumn {
 }
 
 public class BlockListRowView: NSTableRowView {
-    public var isBlockSelected: Bool = false
+    public var isBlockSelected: Bool = false {
+        didSet {
+            if oldValue != isBlockSelected {
+                needsDisplay = true
+            }
+        }
+    }
 
     public override func drawBackground(in dirtyRect: NSRect) {
         if isBlockSelected {
@@ -154,6 +181,7 @@ public class BlockListView: NSBox {
                         if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
                             case .text(let value) = new.content {
                             view.textValue = value
+                            view.needsDisplay = true
                         }
                     }
                 }
@@ -200,6 +228,44 @@ public class BlockListView: NSBox {
 
     // MARK: Private
 
+    private var selection: BlockListSelection = .none {
+        didSet {
+            switch oldValue {
+            case .none:
+                break
+            case .item(let row, _):
+                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+
+                if let view = view as? InlineBlockEditor {
+                    view.setSelectedRanges([NSValue(range: .empty)], affinity: .downstream, stillSelecting: false)
+                    view.needsDisplay = true
+                }
+            case .blocks(let range):
+                for index in range.lowerBound...range.upperBound {
+                    let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
+                    rowView?.isBlockSelected = false
+                }
+            }
+
+            switch selection {
+            case .none:
+                break
+            case .item(let row, let range):
+                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+
+                if let view = view as? InlineBlockEditor {
+                    view.setSelectedRanges([NSValue(range: range)], affinity: .downstream, stillSelecting: false)
+                    view.needsDisplay = true
+                }
+            case .blocks(let range):
+                for index in range.lowerBound...range.upperBound {
+                    let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
+                    rowView?.isBlockSelected = true
+                }
+            }
+        }
+    }
+
     private var tableView = BlockListTableView()
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
@@ -223,14 +289,19 @@ public class BlockListView: NSBox {
     }
 
     private func focus(line index: Int) {
-        let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: true)
+        selection = .item(index, .empty)
 
         guard let window = window else { return }
 
-        if let editable = view as? FieldEditable {
-            if window.firstResponder != view && !editable.isFieldEditorFirstResponder {
+        switch selection {
+        case .item(let row, _):
+            let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
+
+            if view.acceptsFirstResponder {
                 window.makeFirstResponder(view)
             }
+        default:
+            break
         }
     }
 
@@ -453,6 +524,8 @@ public class BlockListView: NSBox {
         guard let window = window else { return }
 
         var isDragging: Bool = false
+        var initialRow: Int? = nil
+        var initialIndex: Int? = nil
 
         trackingLoop: while true {
             let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
@@ -464,14 +537,24 @@ public class BlockListView: NSBox {
 
                 if row >= 0 {
                     let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
-                    if let view = view as? InlineBlockEditor {
-                        let characterIndex = view.characterIndex(at: position)
-                        Swift.print("index", characterIndex)
+
+                    if let initialRow = initialRow, initialRow != row {
+                        selection = .blocks(NSRange(between: row, and: initialRow))
+                    } else {
+                        initialRow = row
+
+                        if let view = view as? InlineBlockEditor {
+                            let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
+                            
+                            if let initialIndex = initialIndex {
+                                selection = .item(row, NSRange(between: initialIndex, and: characterIndex))
+                            } else {
+                                initialIndex = characterIndex
+                                selection = .item(row, NSRange(location: characterIndex, length: 0))
+                            }
+                        }
                     }
                 }
-
-
-//                Swift.print("moved")
 
                 if initialPosition.distance(to: position) > 5 {
                     isDragging = true
@@ -479,6 +562,17 @@ public class BlockListView: NSBox {
             case .leftMouseUp:
                 if !isDragging {
                     handleMouseClick(point: position)
+                }
+
+                switch selection {
+                case .item(let row, _):
+                    let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
+
+                    if view.acceptsFirstResponder {
+                        window.makeFirstResponder(view)
+                    }
+                default:
+                    break
                 }
 
                 break trackingLoop
@@ -493,14 +587,44 @@ public class BlockListView: NSBox {
     }
 
     public func handleMouseClick(point: NSPoint) {
+        selection = .none
+
+        switch item(at: point) {
+        case .plusButton(let line):
+            handlePressPlus(line: line)
+        case .moreButton(let line):
+            break
+        case .item(let line, let point):
+            if let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false) as? InlineBlockEditor {
+                let characterIndex = view.characterIndexForInsertion(at: convert(point, to: view))
+                selection = .item(line, NSRange(location: characterIndex, length: 0))
+
+                if view.acceptsFirstResponder {
+                    window?.makeFirstResponder(view)
+                }
+            }
+        case .background:
+            break
+        }
+    }
+
+    private func item(at point: NSPoint) -> BlockListItem {
         if let hoveredLine = hoveredLine {
             if plusButtonRect(for: hoveredLine).contains(point) {
-                handlePressPlus(line: hoveredLine)
+                return .plusButton(hoveredLine)
             }
 
             if moreButtonRect(for: hoveredLine).contains(point) {
-                Swift.print("Clicked more")
+                return .moreButton(hoveredLine)
             }
+        }
+
+        let row = tableView.row(at: convert(point, to: tableView))
+
+        if row >= 0 {
+            return .item(row, point)
+        } else {
+            return .background
         }
     }
 }
@@ -523,7 +647,7 @@ extension BlockListView: NSTableViewDelegate {
         case .text(let value):
             let view = item.view as! InlineBlockEditor
 
-            Swift.print("Row", row, view)
+//            Swift.print("Row", row, view)
 
             view.textValue = value
             view.onChangeTextValue = { [unowned self] newValue in

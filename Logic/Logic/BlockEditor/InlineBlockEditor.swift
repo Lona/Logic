@@ -10,7 +10,7 @@ import Foundation
 
 private var defaultTextStyle = TextStyle(size: 18, lineHeight: 22)
 
-public class InlineBlockEditor: ControlledTextField {
+public class InlineBlockEditor: AttributedTextView {
 
 //    public override func hitTest(_ point: NSPoint) -> NSView? {
 //        return nil
@@ -18,24 +18,28 @@ public class InlineBlockEditor: ControlledTextField {
 
     // MARK: Lifecycle
 
-    public override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
+    public override func sharedInit() {
+        super.sharedInit()
+
+//        selectedTextAttributes = [
+//            NSAttributedString.Key.backgroundColor: NSColor.green
+//        ]
 
         delegate = self
 
-        allowsEditingTextAttributes = true
-
-        isBordered = false
+//        allowsEditingTextAttributes = true
+//
+//        isBordered = false
 
         font = defaultTextStyle.nsFont
 
-        attributedStringValue = defaultTextStyle.apply(to: "")
-
-        placeholderString = " "
-
-        usesSingleLineMode = false
-
-        lineBreakMode = .byWordWrapping
+//        attributedStringValue = defaultTextStyle.apply(to: "")
+//
+//        placeholderString = " "
+//
+//        usesSingleLineMode = false
+//
+//        lineBreakMode = .byWordWrapping
 
         focusRingType = .none
 
@@ -51,7 +55,7 @@ public class InlineBlockEditor: ControlledTextField {
             } else {
                 self.window?.makeFirstResponder(nil)
 
-                self.placeholderString = " "
+//                self.placeholderString = " "
             }
         }
 
@@ -65,10 +69,6 @@ public class InlineBlockEditor: ControlledTextField {
                 InlineToolbarWindow.shared.orderOut(nil)
             }
         }
-    }
-
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: Public
@@ -95,8 +95,7 @@ public class InlineBlockEditor: ControlledTextField {
         let location = range.location
         let prefix = string.prefix(location)
 
-        guard let editor = self.currentEditor() as? NSTextView else { return }
-        let rect = editor.firstRect(forCharacterRange: range, actualRange: nil)
+        let rect = firstRect(forCharacterRange: range, actualRange: nil)
 
         if prefix.last == "/" {
             self.commandPaletteIndex = location
@@ -108,12 +107,6 @@ public class InlineBlockEditor: ControlledTextField {
             self.commandPaletteIndex = nil
             self.onHideCommandPalette?()
         }
-    }
-
-    public func characterIndex(at point: NSPoint) -> Int? {
-        guard let editor = self.currentEditor() as? NSTextView else { return nil }
-
-        return editor.characterIndexForInsertion(at: point)
     }
 
     // MARK: Private
@@ -161,28 +154,26 @@ public class InlineBlockEditor: ControlledTextField {
     }
 
     private func showToolbar(for range: NSRange) {
-        guard let editor = self.currentEditor() as? NSTextView else { return }
-
-        let rect = editor.firstRect(forCharacterRange: range, actualRange: nil)
+        let rect = firstRect(forCharacterRange: range, actualRange: nil)
 
         InlineToolbarWindow.shared.anchorTo(rect: rect, verticalOffset: 4)
         self.window?.addChildWindow(InlineToolbarWindow.shared, ordered: .above)
     }
 
-    public override func becomeFirstResponder() -> Bool {
-        let result = super.becomeFirstResponder()
-
-        if result {
-            //            Swift.print("Become")
-//            placeholderString = "Type '/' for commands"
-//            needsDisplay = true
-
-            selectedRange = .init(location: 0, length: 0)
-            onFocus?()
-        }
-
-        return result
-    }
+//    public override func becomeFirstResponder() -> Bool {
+//        let result = super.becomeFirstResponder()
+//
+//        if result {
+//            //            Swift.print("Become")
+////            placeholderString = "Type '/' for commands"
+////            needsDisplay = true
+//
+//            selectedRange = .init(location: 0, length: 0)
+//            onFocus?()
+//        }
+//
+//        return result
+//    }
 
     public override func resignFirstResponder() -> Bool {
         let result = super.resignFirstResponder()
@@ -204,12 +195,11 @@ public class InlineBlockEditor: ControlledTextField {
         return result
     }
 
-    public override func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if commandSelector == #selector(NSResponder.deleteBackward(_:)) && selectedRange.location == 0 {
+    public override func doCommand(by selector: Selector) {
+        if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange.location == 0 {
             onRequestDeleteEditor?()
-
-            return true
-        } else if commandSelector == #selector(NSResponder.insertNewline(_:)) {
+            return
+        } else if selector == #selector(NSResponder.insertNewline(_:)) {
             let selectedRange = self.selectedRange
             let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
             let suffix = textValue.attributedSubstring(from: remainingRange)
@@ -220,10 +210,10 @@ public class InlineBlockEditor: ControlledTextField {
 
             Swift.print("remainder", suffix.string)
 
-            return true
+            return
         }
 
-        return super.control(control, textView: textView, doCommandBy: commandSelector)
+        return super.doCommand(by: selector)
     }
 
     // MARK: Menu Actions
@@ -257,12 +247,26 @@ public class InlineBlockEditor: ControlledTextField {
             if textValue.length > 0 {
                 size = textValue.measure(width: bounds.width)
             } else {
-                size = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
+                size = NSAttributedString(string: " ", attributes: [.font: defaultTextStyle.nsFont]).measure(width: bounds.width)
+//                size = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
             }
 
             return .init(width: intrinsicSize.width, height: size.height)
         }
     }
+
+//    public override func setSelectedRanges(
+//        _ ranges: [NSValue],
+//        affinity: NSSelectionAffinity,
+//        stillSelecting stillSelectingFlag: Bool) {
+//
+//        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
+//
+//        for value in ranges {
+//            let range = value.rangeValue
+//            layoutManager?.addTemporaryAttribute(.backgroundColor, value: NSColor.selectedTextBackgroundColor, forCharacterRange: range)
+//        }
+//    }
 }
 
 extension NSAttributedString {
@@ -292,8 +296,8 @@ protocol FieldEditable {
 
 extension InlineBlockEditor: FieldEditable {
     var isFieldEditorFirstResponder: Bool {
-        guard let window = window, let currentEditor = currentEditor() else { return false }
+//        guard let window = window, let currentEditor = currentEditor() else { return false }
 
-        return window.firstResponder == currentEditor
+        return window?.firstResponder == self
     }
 }
