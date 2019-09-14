@@ -156,10 +156,11 @@ public class BlockListView: NSBox {
         var clone = self.blocks
         clone.remove(at: line)
 
-        self.onChangeBlocks?(clone)
-
         let id = blocks[line > 0 ? line - 1 : line].id
+
         actions.append(.focus(id: id))
+
+        self.onChangeBlocks?(clone)
     }
 
     public override func mouseDown(with event: NSEvent) {
@@ -194,7 +195,12 @@ public class BlockListView: NSBox {
                     }
                 }
             } else {
-                tableView.animateRowChanges(oldData: oldValue, newData: blocks)
+                tableView.animateRowChanges(
+                    oldData: oldValue,
+                    newData: blocks
+//                    deletionAnimation: .effectFade,
+//                    insertionAnimation: .effectFade
+                )
 
 //                if diff.count == 1, let firstInserted = diff.elements.first(where: { element in
 //                    switch element {
