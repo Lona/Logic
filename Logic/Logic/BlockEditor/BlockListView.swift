@@ -181,6 +181,7 @@ public class BlockListView: NSBox {
                         if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
                             case .text(let value) = new.content {
                             view.textValue = value
+                            view.needsLayout = true
                             view.needsDisplay = true
                         }
                     }
@@ -239,6 +240,7 @@ public class BlockListView: NSBox {
                 if let view = view as? InlineBlockEditor {
                     view.setSelectedRanges([NSValue(range: .empty)], affinity: .downstream, stillSelecting: false)
                     view.needsDisplay = true
+                    view.setPlaceholder(string: " ")
                 }
             case .blocks(let range):
                 for index in range.lowerBound...range.upperBound {
@@ -256,6 +258,7 @@ public class BlockListView: NSBox {
                 if let view = view as? InlineBlockEditor {
                     view.setSelectedRanges([NSValue(range: range)], affinity: .downstream, stillSelecting: false)
                     view.needsDisplay = true
+                    view.setPlaceholder(string: "Type '/' for commands")
                 }
             case .blocks(let range):
                 for index in range.lowerBound...range.upperBound {
@@ -657,11 +660,6 @@ extension BlockListView: NSTableViewDelegate {
                 clone[row] = .init(id: item.id, content: .text(newValue))
 
                 self.onChangeBlocks?(clone)
-
-////                self.actions.append(.focus(id: item.id))
-//
-//                view.textValue = newValue
-//                self.tableView.noteHeightOfRows(withIndexesChanged: .init(integer: row))
             }
 
             view.onRequestCreateEditor = { [unowned self] newText in

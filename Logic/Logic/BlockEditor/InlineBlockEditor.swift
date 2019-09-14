@@ -9,8 +9,19 @@
 import Foundation
 
 private var defaultTextStyle = TextStyle(size: 18, lineHeight: 22)
+private var placeholderTextStyle = TextStyle(size: 18, lineHeight: 22, color: Colors.textComment)
 
 public class InlineBlockEditor: AttributedTextView {
+
+    public func setPlaceholder(string: String) {
+        placeholderAttributedString = placeholderTextStyle.apply(to: string)
+    }
+
+    @objc private var placeholderAttributedString: NSAttributedString? {
+        didSet {
+            needsDisplay = true
+        }
+    }
 
 //    public override func hitTest(_ point: NSPoint) -> NSView? {
 //        return nil
@@ -20,6 +31,20 @@ public class InlineBlockEditor: AttributedTextView {
 
     public override func sharedInit() {
         super.sharedInit()
+
+        setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+//        setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+//        setContentHuggingPriority(.defaultLow, for: .horizontal)
+//        setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+
+//        textContainer?.maximumNumberOfLines = -1
+//        textContainer?.lineBreakMode = .byWordWrapping
+//        textContainer?.widthTracksTextView = true
+//        textContainer?.heightTracksTextView = true
+//
+//        isVerticallyResizable = true
 
 //        selectedTextAttributes = [
 //            NSAttributedString.Key.backgroundColor: NSColor.green
@@ -238,21 +263,45 @@ public class InlineBlockEditor: AttributedTextView {
 
     // MARK: Layout
 
+//    override public var intrinsicContentSize: NSSize {
+//        get {
+//            let intrinsicSize = super.intrinsicContentSize
+//
+//            var size: NSSize
+//
+//            if textValue.length > 0 {
+//                size = textValue.measure(width: bounds.width)
+//            } else if let placeholder = placeholderAttributedString {
+//                size = placeholder.measure(width: bounds.width)
+//            } else {
+//                size = NSAttributedString(string: " ", attributes: [.font: defaultTextStyle.nsFont]).measure(width: bounds.width)
+//            }
+//
+//            Swift.print(size)
+//
+//            return .init(width: intrinsicSize.width, height: size.height)
+//        }
+//    }
+
     override public var intrinsicContentSize: NSSize {
-        get {
-            let intrinsicSize = super.intrinsicContentSize
-
-            var size: NSSize
-
-            if textValue.length > 0 {
-                size = textValue.measure(width: bounds.width)
-            } else {
-                size = NSAttributedString(string: " ", attributes: [.font: defaultTextStyle.nsFont]).measure(width: bounds.width)
-//                size = defaultTextStyle.apply(to: placeholderString ?? " ").measure(width: bounds.width)
-            }
-
-            return .init(width: intrinsicSize.width, height: size.height)
+        guard let container = textContainer, let manager = container.layoutManager else {
+            return super.intrinsicContentSize
         }
+        manager.ensureLayout(for: container)
+        let size = manager.usedRect(for: container).size
+//        Swift.print(string, size, container.containerSize, container.size)
+        return size
+    }
+
+    func textDidChange(_ notification: Notification) {
+        invalidateIntrinsicContentSize()
+    }
+
+    public override func layout() {
+        super.layout()
+
+        // Workaround to fix extra blank line on first render
+        invalidateIntrinsicContentSize()
     }
 
 //    public override func setSelectedRanges(
@@ -301,3 +350,4 @@ extension InlineBlockEditor: FieldEditable {
         return window?.firstResponder == self
     }
 }
+
