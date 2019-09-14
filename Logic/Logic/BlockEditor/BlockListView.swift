@@ -9,6 +9,12 @@
 import AppKit
 import Differ
 
+private extension NSPoint {
+    func distance(to: NSPoint) -> CGFloat {
+        return sqrt((x - to.x) * (x - to.x) + (y - to.y) * (y - to.y))
+    }
+}
+
 private extension NSTableColumn {
     convenience init(
         title: String,
@@ -30,6 +36,17 @@ private extension NSTableColumn {
 
         if let maxWidth = maxWidth {
             self.maxWidth = maxWidth
+        }
+    }
+}
+
+public class BlockListRowView: NSTableRowView {
+    public var isBlockSelected: Bool = false
+
+    public override func drawBackground(in dirtyRect: NSRect) {
+        if isBlockSelected {
+            NSColor.selectedTextBackgroundColor.setFill()
+            dirtyRect.fill()
         }
     }
 }
@@ -90,46 +107,6 @@ public class BlockListView: NSBox {
     public var plusButtonTooltip: String = "**Click** _to add below_"
     public var moreButtonTooltip: String = "**Drag** _to move_\n**Click** _to open menu_"
 
-    public override func mouseMoved(with event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
-        let row = tableView.row(at: .init(x: 60, y: convert(point, from: tableView).y))
-
-        if row >= 0 {
-            hoveredLine = row
-        } else {
-            hoveredLine = nil
-        }
-
-        if let hoveredLine = hoveredLine {
-            let plusRect = plusButtonRect(for: hoveredLine)
-            hoveredPlusButton = plusRect.contains(point)
-
-            if hoveredPlusButton {
-                showToolTip(
-                    string: plusButtonTooltip,
-                    at: NSPoint(x: plusRect.midX, y: plusRect.minY - 4)
-                )
-            }
-
-            let moreRect = moreButtonRect(for: hoveredLine)
-            hoveredMoreButton = moreRect.contains(point)
-
-            if hoveredMoreButton {
-                showToolTip(
-                    string: moreButtonTooltip,
-                    at: NSPoint(x: moreRect.midX, y: moreRect.minY - 4)
-                )
-            }
-        } else {
-            hoveredPlusButton = false
-            hoveredMoreButton = false
-        }
-
-        if !hoveredPlusButton && !hoveredMoreButton {
-            TooltipManager.shared.hideTooltip()
-        }
-    }
-
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
 
@@ -161,20 +138,6 @@ public class BlockListView: NSBox {
         actions.append(.focus(id: id))
 
         self.onChangeBlocks?(clone)
-    }
-
-    public override func mouseDown(with event: NSEvent) {
-        let point = convert(event.locationInWindow, from: nil)
-
-        if let hoveredLine = hoveredLine {
-            if plusButtonRect(for: hoveredLine).contains(point) {
-                handlePressPlus(line: hoveredLine)
-            }
-
-            if moreButtonRect(for: hoveredLine).contains(point) {
-                Swift.print("Clicked more")
-            }
-        }
     }
 
     public var blocks: [BlockEditor.Block] = [] {
@@ -327,7 +290,7 @@ public class BlockListView: NSBox {
     }
 
     override public var acceptsFirstResponder: Bool {
-        return false
+        return true
     }
 
     public override func draw(_ dirtyRect: NSRect) {
@@ -416,11 +379,143 @@ public class BlockListView: NSBox {
 
         return suggestionWindow
     }()
+
+    // MARK: Event handling
+
+    public override func hitTest(_ point: NSPoint) -> NSView? {
+        if bounds.contains(point) {
+            return self
+        }
+
+        return nil
+    }
+
+    public override func mouseDown(with event: NSEvent) {
+        Swift.print("mouseDown")
+
+        let point = convert(event.locationInWindow, from: nil)
+
+        trackMouse(startingAt: point)
+    }
+
+    public override func mouseMoved(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+        let row = tableView.row(at: .init(x: 60, y: convert(point, from: tableView).y))
+
+        if row >= 0 {
+            hoveredLine = row
+        } else {
+            hoveredLine = nil
+        }
+
+        if let hoveredLine = hoveredLine {
+            let plusRect = plusButtonRect(for: hoveredLine)
+            hoveredPlusButton = plusRect.contains(point)
+
+            if hoveredPlusButton {
+                showToolTip(
+                    string: plusButtonTooltip,
+                    at: NSPoint(x: plusRect.midX, y: plusRect.minY - 4)
+                )
+            }
+
+            let moreRect = moreButtonRect(for: hoveredLine)
+            hoveredMoreButton = moreRect.contains(point)
+
+            if hoveredMoreButton {
+                showToolTip(
+                    string: moreButtonTooltip,
+                    at: NSPoint(x: moreRect.midX, y: moreRect.minY - 4)
+                )
+            }
+        } else {
+            hoveredPlusButton = false
+            hoveredMoreButton = false
+        }
+
+        if !hoveredPlusButton && !hoveredMoreButton {
+            TooltipManager.shared.hideTooltip()
+        }
+    }
+
+//    public override func hitTest(_ point: NSPoint) -> NSView? {
+//        if bounds.contains(point) {
+//            trackMouse(startingAt: point)
+//            return self
+//        }
+//
+//        return nil
+//    }
+
+    public func trackMouse(startingAt initialPosition: NSPoint) {
+        Swift.print("Start tracking")
+
+        guard let window = window else { return }
+
+        var isDragging: Bool = false
+
+        trackingLoop: while true {
+            let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
+            let position = convert(event.locationInWindow, from: nil)
+
+            switch event.type {
+            case .leftMouseDragged:
+                let row = tableView.row(at: convert(position, to: tableView))
+
+                if row >= 0 {
+                    let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+                    if let view = view as? InlineBlockEditor {
+                        let characterIndex = view.characterIndex(at: position)
+                        Swift.print("index", characterIndex)
+                    }
+                }
+
+
+//                Swift.print("moved")
+
+                if initialPosition.distance(to: position) > 5 {
+                    isDragging = true
+                }
+            case .leftMouseUp:
+                if !isDragging {
+                    handleMouseClick(point: position)
+                }
+
+                break trackingLoop
+            case .mouseExited:
+                Swift.print("exit")
+            default:
+                break
+            }
+        }
+
+        Swift.print("Done tracking")
+    }
+
+    public func handleMouseClick(point: NSPoint) {
+        if let hoveredLine = hoveredLine {
+            if plusButtonRect(for: hoveredLine).contains(point) {
+                handlePressPlus(line: hoveredLine)
+            }
+
+            if moreButtonRect(for: hoveredLine).contains(point) {
+                Swift.print("Clicked more")
+            }
+        }
+    }
 }
 
 // MARK: - Delegate
 
 extension BlockListView: NSTableViewDelegate {
+    public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
+        let rowView = BlockListRowView()
+
+//        rowView.isBlockSelected = row == 0
+
+        return rowView
+    }
+
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
 

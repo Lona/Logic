@@ -12,6 +12,10 @@ private var defaultTextStyle = TextStyle(size: 18, lineHeight: 22)
 
 public class InlineBlockEditor: ControlledTextField {
 
+//    public override func hitTest(_ point: NSPoint) -> NSView? {
+//        return nil
+//    }
+
     // MARK: Lifecycle
 
     public override init(frame frameRect: NSRect) {
@@ -34,6 +38,10 @@ public class InlineBlockEditor: ControlledTextField {
         lineBreakMode = .byWordWrapping
 
         focusRingType = .none
+
+        drawsBackground = true
+
+        backgroundColor = .clear
 
         onPressEscape = { [unowned self] in
             if self.commandPaletteIndex != nil {
@@ -100,6 +108,12 @@ public class InlineBlockEditor: ControlledTextField {
             self.commandPaletteIndex = nil
             self.onHideCommandPalette?()
         }
+    }
+
+    public func characterIndex(at point: NSPoint) -> Int? {
+        guard let editor = self.currentEditor() as? NSTextView else { return nil }
+
+        return editor.characterIndexForInsertion(at: point)
     }
 
     // MARK: Private
