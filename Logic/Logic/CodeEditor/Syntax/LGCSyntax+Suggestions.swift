@@ -102,7 +102,7 @@ public struct LogicSuggestionCategory {
 
     public var suggestionListItems: [SuggestionListItem] {
         let sectionHeader = SuggestionListItem.sectionHeader(title)
-        let rows = items.map { SuggestionListItem.row($0.title, $0.subtitle, $0.disabled, $0.badge) }
+        let rows = items.map { SuggestionListItem.row($0.title, $0.subtitle, $0.disabled, $0.badge, nil) }
         return Array([[sectionHeader], rows].joined())
     }
 }

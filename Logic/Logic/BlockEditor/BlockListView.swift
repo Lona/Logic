@@ -753,8 +753,8 @@ extension BlockListView: NSTableViewDelegate {
 
         let suggestionItems: [SuggestionListItem] = [
             .sectionHeader("COMMANDS"),
-            .row("Text", "Write plain text", false, nil),
-            .row("Token", "Define a design token variable", false, nil)
+            .row("Text", "Write plain text", false, nil, nil),
+            .row("Token", "Define a design token variable", false, nil, nil)
         ]
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
@@ -775,7 +775,7 @@ extension BlockListView: NSTableViewDelegate {
                 switch item {
                 case .sectionHeader:
                     return true
-                case .row(let title, _, _, _),
+                case .row(let title, _, _, _, _),
                      .colorRow(name: let title, _, _, _),
                      .textStyleRow(let title, _, _):
                     return title.lowercased().contains(text.lowercased())

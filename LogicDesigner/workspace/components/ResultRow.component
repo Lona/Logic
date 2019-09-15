@@ -15,6 +15,7 @@
       "name" : "Default",
       "params" : {
         "badgeText" : null,
+        "image" : null,
         "subtitleText" : null
       }
     },
@@ -101,6 +102,45 @@
           "subtitleText"
         ],
         "id" : "subtitle",
+        "type" : "VarDeclExpr"
+      },
+      "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Image",
+            "image"
+          ],
+          "content" : [
+            "image"
+          ],
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "Image",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "content" : [
+          "parameters",
+          "image"
+        ],
+        "id" : "image",
         "type" : "VarDeclExpr"
       },
       "type" : "IfExpr"
@@ -310,10 +350,26 @@
     {
       "name" : "badgeText",
       "type" : "String?"
+    },
+    {
+      "name" : "image",
+      "type" : "URL?"
     }
   ],
   "root" : {
     "children" : [
+      {
+        "id" : "Image",
+        "params" : {
+          "backgroundColor" : "raisedBackground",
+          "borderRadius" : 4,
+          "height" : 32,
+          "marginRight" : 8,
+          "visible" : false,
+          "width" : 32
+        },
+        "type" : "Lona:Image"
+      },
       {
         "children" : [
           {

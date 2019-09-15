@@ -857,7 +857,7 @@ public enum StandardConfiguration {
             ]
 
             func makeMenuItem(title: String, action: MenuAction) -> LogicEditor.MenuItem {
-                return .init(row: .row(title, nil, false, nil), action: { handleMenuAction(action) })
+                return .init(row: .row(title, nil, false, nil, nil), action: { handleMenuAction(action) })
             }
 
             switch node {

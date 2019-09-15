@@ -562,7 +562,7 @@ extension LogicEditor {
                 switch item {
                 case .sectionHeader:
                     return true
-                case .row(let title, _, _, _),
+                case .row(let title, _, _, _, _),
                      .colorRow(name: let title, _, _, _),
                      .textStyleRow(let title, _, _):
                     return title.lowercased().contains(text.lowercased())
@@ -648,7 +648,7 @@ extension LogicEditor {
                     suggestionListItems.append(
                         (
                             logicItem.offset,
-                            .row(logicItem.item.title, logicItem.item.subtitle, logicItem.item.disabled, logicItem.item.badge)
+                            .row(logicItem.item.title, logicItem.item.subtitle, logicItem.item.disabled, logicItem.item.badge, nil)
                         )
                     )
                 case .colorPreview(code: let code, let color):

@@ -10,7 +10,7 @@ import Foundation
 
 public enum SuggestionListItem {
     case sectionHeader(String)
-    case row(String, String?, Bool, String?)
+    case row(String, String?, Bool, String?, NSImage?)
     case colorRow(name: String, code: String, NSColor, Bool)
     case textStyleRow(String, TextStyle, Bool)
 
@@ -34,9 +34,9 @@ public enum SuggestionListItem {
 
     public var height: CGFloat {
         switch self {
-        case .row(_, .none, _, _):
+        case .row(_, .none, _, _, .none):
             return 26
-        case .row(_, .some, _, _):
+        case .row(_, _, _, _, _):
             return 40
         case .colorRow:
             return 40

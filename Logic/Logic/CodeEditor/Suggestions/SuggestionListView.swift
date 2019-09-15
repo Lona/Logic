@@ -190,8 +190,8 @@ extension SuggestionListView: NSTableViewDelegate {
         }
 
         switch item {
-        case .row(let value, let subtitle, let disabled, let badge):
-            let rowView = ResultRow(titleText: value, subtitleText: subtitle, selected: row == selectedIndex, disabled: disabled, badgeText: badge)
+        case .row(let value, let subtitle, let disabled, let badge, let image):
+            let rowView = ResultRow(titleText: value, subtitleText: subtitle, selected: row == selectedIndex, disabled: disabled, badgeText: badge, image: image)
             rowView.fillColor = fillColor(disabled: disabled)
             return rowView
         case .colorRow(name: let value, code: let code, let color, let disabled):

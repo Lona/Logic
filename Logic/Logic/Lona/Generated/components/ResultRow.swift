@@ -3,6 +3,19 @@
 import AppKit
 import Foundation
 
+// MARK: - ImageWithBackgroundColor
+
+private class ImageWithBackgroundColor: LNAImageView {
+  var fillColor = NSColor.clear
+
+  override func draw(_ dirtyRect: NSRect) {
+    fillColor.set()
+    bounds.fill()
+    super.draw(dirtyRect)
+  }
+}
+
+
 // MARK: - ResultRow
 
 public class ResultRow: NSBox {
@@ -25,7 +38,8 @@ public class ResultRow: NSBox {
     subtitleText: String?,
     selected: Bool,
     disabled: Bool,
-    badgeText: String?)
+    badgeText: String?,
+    image: NSImage?)
   {
     self
       .init(
@@ -34,7 +48,8 @@ public class ResultRow: NSBox {
           subtitleText: subtitleText,
           selected: selected,
           disabled: disabled,
-          badgeText: badgeText))
+          badgeText: badgeText,
+          image: image))
   }
 
   public convenience init() {
@@ -99,6 +114,15 @@ public class ResultRow: NSBox {
     }
   }
 
+  public var image: NSImage? {
+    get { return parameters.image }
+    set {
+      if parameters.image != newValue {
+        parameters.image = newValue
+      }
+    }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -109,6 +133,7 @@ public class ResultRow: NSBox {
 
   // MARK: Private
 
+  private var imageView = ImageWithBackgroundColor()
   private var contentViewView = NSBox()
   private var textView = LNATextField(labelWithString: "")
   private var subtitleTextView = LNATextField(labelWithString: "")
@@ -119,12 +144,15 @@ public class ResultRow: NSBox {
   private var subtitleTextViewTextStyle = TextStyles.sectionHeader
   private var badgeTextViewTextStyle = TextStyles.sectionHeader
 
+  private var contentViewViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
   private var contentViewViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
   private var textViewBottomAnchorContentViewViewBottomAnchorConstraint: NSLayoutConstraint?
-  private var subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint: NSLayoutConstraint?
-  private var subtitleTextViewTopAnchorTextViewBottomAnchorConstraint: NSLayoutConstraint?
-  private var subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint: NSLayoutConstraint?
-  private var subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var imageViewHeightAnchorParentConstraint: NSLayoutConstraint?
+  private var imageViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
+  private var imageViewCenterYAnchorCenterYAnchorConstraint: NSLayoutConstraint?
+  private var contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var imageViewHeightAnchorConstraint: NSLayoutConstraint?
+  private var imageViewWidthAnchorConstraint: NSLayoutConstraint?
   private var badgeViewViewHeightAnchorParentConstraint: NSLayoutConstraint?
   private var badgeViewViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
   private var badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint: NSLayoutConstraint?
@@ -134,6 +162,10 @@ public class ResultRow: NSBox {
   private var badgeTextViewTrailingAnchorBadgeViewViewTrailingAnchorConstraint: NSLayoutConstraint?
   private var badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint: NSLayoutConstraint?
   private var badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var subtitleTextViewTopAnchorTextViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint: NSLayoutConstraint?
+  private var subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint: NSLayoutConstraint?
 
   private func setUpViews() {
     boxType = .custom
@@ -149,17 +181,21 @@ public class ResultRow: NSBox {
     subtitleTextView.lineBreakMode = .byWordWrapping
     badgeTextView.lineBreakMode = .byWordWrapping
 
+    addSubview(imageView)
     addSubview(contentViewView)
     addSubview(badgeViewView)
     contentViewView.addSubview(textView)
     contentViewView.addSubview(subtitleTextView)
     badgeViewView.addSubview(badgeTextView)
 
+    imageView.fillColor = Colors.raisedBackground
+    imageView.cornerRadius = 4
     badgeViewView.cornerRadius = 4
   }
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
+    imageView.translatesAutoresizingMaskIntoConstraints = false
     contentViewView.translatesAutoresizingMaskIntoConstraints = false
     badgeViewView.translatesAutoresizingMaskIntoConstraints = false
     textView.translatesAutoresizingMaskIntoConstraints = false
@@ -169,9 +205,6 @@ public class ResultRow: NSBox {
     let contentViewViewHeightAnchorParentConstraint = contentViewView
       .heightAnchor
       .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
-    let contentViewViewLeadingAnchorConstraint = contentViewView
-      .leadingAnchor
-      .constraint(equalTo: leadingAnchor, constant: 12)
     let contentViewViewTopAnchorConstraint = contentViewView.topAnchor.constraint(equalTo: topAnchor, constant: 4)
     let contentViewViewCenterYAnchorConstraint = contentViewView.centerYAnchor.constraint(equalTo: centerYAnchor)
     let contentViewViewBottomAnchorConstraint = contentViewView
@@ -182,24 +215,27 @@ public class ResultRow: NSBox {
     let textViewTrailingAnchorConstraint = textView
       .trailingAnchor
       .constraint(lessThanOrEqualTo: contentViewView.trailingAnchor)
+    let contentViewViewLeadingAnchorLeadingAnchorConstraint = contentViewView
+      .leadingAnchor
+      .constraint(equalTo: leadingAnchor, constant: 12)
     let contentViewViewTrailingAnchorTrailingAnchorConstraint = contentViewView
       .trailingAnchor
       .constraint(equalTo: trailingAnchor, constant: -12)
     let textViewBottomAnchorContentViewViewBottomAnchorConstraint = textView
       .bottomAnchor
       .constraint(equalTo: contentViewView.bottomAnchor)
-    let subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint = subtitleTextView
-      .bottomAnchor
-      .constraint(equalTo: contentViewView.bottomAnchor)
-    let subtitleTextViewTopAnchorTextViewBottomAnchorConstraint = subtitleTextView
-      .topAnchor
-      .constraint(equalTo: textView.bottomAnchor)
-    let subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint = subtitleTextView
+    let imageViewHeightAnchorParentConstraint = imageView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
+    let imageViewLeadingAnchorLeadingAnchorConstraint = imageView
       .leadingAnchor
-      .constraint(equalTo: contentViewView.leadingAnchor)
-    let subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint = subtitleTextView
-      .trailingAnchor
-      .constraint(lessThanOrEqualTo: contentViewView.trailingAnchor)
+      .constraint(equalTo: leadingAnchor, constant: 12)
+    let imageViewCenterYAnchorCenterYAnchorConstraint = imageView.centerYAnchor.constraint(equalTo: centerYAnchor)
+    let contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint = contentViewView
+      .leadingAnchor
+      .constraint(equalTo: imageView.trailingAnchor, constant: 8)
+    let imageViewHeightAnchorConstraint = imageView.heightAnchor.constraint(equalToConstant: 32)
+    let imageViewWidthAnchorConstraint = imageView.widthAnchor.constraint(equalToConstant: 32)
     let badgeViewViewHeightAnchorParentConstraint = badgeViewView
       .heightAnchor
       .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
@@ -225,21 +261,34 @@ public class ResultRow: NSBox {
     let badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint = badgeTextView
       .bottomAnchor
       .constraint(equalTo: badgeViewView.bottomAnchor)
+    let subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint = subtitleTextView
+      .bottomAnchor
+      .constraint(equalTo: contentViewView.bottomAnchor)
+    let subtitleTextViewTopAnchorTextViewBottomAnchorConstraint = subtitleTextView
+      .topAnchor
+      .constraint(equalTo: textView.bottomAnchor)
+    let subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint = subtitleTextView
+      .leadingAnchor
+      .constraint(equalTo: contentViewView.leadingAnchor)
+    let subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint = subtitleTextView
+      .trailingAnchor
+      .constraint(lessThanOrEqualTo: contentViewView.trailingAnchor)
 
     contentViewViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    imageViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
     badgeViewViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
 
+    self.contentViewViewLeadingAnchorLeadingAnchorConstraint = contentViewViewLeadingAnchorLeadingAnchorConstraint
     self.contentViewViewTrailingAnchorTrailingAnchorConstraint = contentViewViewTrailingAnchorTrailingAnchorConstraint
     self.textViewBottomAnchorContentViewViewBottomAnchorConstraint =
       textViewBottomAnchorContentViewViewBottomAnchorConstraint
-    self.subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint =
-      subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint
-    self.subtitleTextViewTopAnchorTextViewBottomAnchorConstraint =
-      subtitleTextViewTopAnchorTextViewBottomAnchorConstraint
-    self.subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint =
-      subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint
-    self.subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint =
-      subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint
+    self.imageViewHeightAnchorParentConstraint = imageViewHeightAnchorParentConstraint
+    self.imageViewLeadingAnchorLeadingAnchorConstraint = imageViewLeadingAnchorLeadingAnchorConstraint
+    self.imageViewCenterYAnchorCenterYAnchorConstraint = imageViewCenterYAnchorCenterYAnchorConstraint
+    self.contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint =
+      contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint
+    self.imageViewHeightAnchorConstraint = imageViewHeightAnchorConstraint
+    self.imageViewWidthAnchorConstraint = imageViewWidthAnchorConstraint
     self.badgeViewViewHeightAnchorParentConstraint = badgeViewViewHeightAnchorParentConstraint
     self.badgeViewViewTrailingAnchorTrailingAnchorConstraint = badgeViewViewTrailingAnchorTrailingAnchorConstraint
     self.badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint =
@@ -253,11 +302,18 @@ public class ResultRow: NSBox {
     self.badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint = badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint
     self.badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint =
       badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint
+    self.subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint =
+      subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint
+    self.subtitleTextViewTopAnchorTextViewBottomAnchorConstraint =
+      subtitleTextViewTopAnchorTextViewBottomAnchorConstraint
+    self.subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint =
+      subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint
+    self.subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint =
+      subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint
 
     NSLayoutConstraint.activate(
       [
         contentViewViewHeightAnchorParentConstraint,
-        contentViewViewLeadingAnchorConstraint,
         contentViewViewTopAnchorConstraint,
         contentViewViewCenterYAnchorConstraint,
         contentViewViewBottomAnchorConstraint,
@@ -267,32 +323,39 @@ public class ResultRow: NSBox {
       ] +
         conditionalConstraints(
           badgeViewViewIsHidden: badgeViewView.isHidden,
+          imageViewIsHidden: imageView.isHidden,
           subtitleTextViewIsHidden: subtitleTextView.isHidden))
   }
 
   private func conditionalConstraints(
     badgeViewViewIsHidden: Bool,
+    imageViewIsHidden: Bool,
     subtitleTextViewIsHidden: Bool) -> [NSLayoutConstraint]
   {
     var constraints: [NSLayoutConstraint?]
 
-    switch (badgeViewViewIsHidden, subtitleTextViewIsHidden) {
-      case (true, true):
+    switch (badgeViewViewIsHidden, imageViewIsHidden, subtitleTextViewIsHidden) {
+      case (true, true, true):
         constraints = [
+          contentViewViewLeadingAnchorLeadingAnchorConstraint,
           contentViewViewTrailingAnchorTrailingAnchorConstraint,
           textViewBottomAnchorContentViewViewBottomAnchorConstraint
         ]
-      case (true, false):
+      case (true, false, true):
         constraints = [
+          imageViewHeightAnchorParentConstraint,
+          imageViewLeadingAnchorLeadingAnchorConstraint,
+          imageViewCenterYAnchorCenterYAnchorConstraint,
           contentViewViewTrailingAnchorTrailingAnchorConstraint,
-          subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint,
-          subtitleTextViewTopAnchorTextViewBottomAnchorConstraint,
-          subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint,
-          subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint
+          contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint,
+          imageViewHeightAnchorConstraint,
+          imageViewWidthAnchorConstraint,
+          textViewBottomAnchorContentViewViewBottomAnchorConstraint
         ]
-      case (false, true):
+      case (false, true, true):
         constraints = [
           badgeViewViewHeightAnchorParentConstraint,
+          contentViewViewLeadingAnchorLeadingAnchorConstraint,
           badgeViewViewTrailingAnchorTrailingAnchorConstraint,
           badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint,
           badgeViewViewCenterYAnchorCenterYAnchorConstraint,
@@ -303,12 +366,77 @@ public class ResultRow: NSBox {
           badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint,
           badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint
         ]
-      case (false, false):
+      case (true, true, false):
         constraints = [
+          contentViewViewLeadingAnchorLeadingAnchorConstraint,
+          contentViewViewTrailingAnchorTrailingAnchorConstraint,
+          subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint,
+          subtitleTextViewTopAnchorTextViewBottomAnchorConstraint,
+          subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint,
+          subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint
+        ]
+      case (true, false, false):
+        constraints = [
+          imageViewHeightAnchorParentConstraint,
+          imageViewLeadingAnchorLeadingAnchorConstraint,
+          imageViewCenterYAnchorCenterYAnchorConstraint,
+          contentViewViewTrailingAnchorTrailingAnchorConstraint,
+          contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint,
+          imageViewHeightAnchorConstraint,
+          imageViewWidthAnchorConstraint,
+          subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint,
+          subtitleTextViewTopAnchorTextViewBottomAnchorConstraint,
+          subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint,
+          subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint
+        ]
+      case (false, false, true):
+        constraints = [
+          imageViewHeightAnchorParentConstraint,
           badgeViewViewHeightAnchorParentConstraint,
+          imageViewLeadingAnchorLeadingAnchorConstraint,
+          imageViewCenterYAnchorCenterYAnchorConstraint,
+          contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint,
           badgeViewViewTrailingAnchorTrailingAnchorConstraint,
           badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint,
           badgeViewViewCenterYAnchorCenterYAnchorConstraint,
+          imageViewHeightAnchorConstraint,
+          imageViewWidthAnchorConstraint,
+          textViewBottomAnchorContentViewViewBottomAnchorConstraint,
+          badgeViewViewHeightAnchorConstraint,
+          badgeTextViewLeadingAnchorBadgeViewViewLeadingAnchorConstraint,
+          badgeTextViewTrailingAnchorBadgeViewViewTrailingAnchorConstraint,
+          badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint,
+          badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint
+        ]
+      case (false, true, false):
+        constraints = [
+          badgeViewViewHeightAnchorParentConstraint,
+          contentViewViewLeadingAnchorLeadingAnchorConstraint,
+          badgeViewViewTrailingAnchorTrailingAnchorConstraint,
+          badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint,
+          badgeViewViewCenterYAnchorCenterYAnchorConstraint,
+          subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint,
+          subtitleTextViewTopAnchorTextViewBottomAnchorConstraint,
+          subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint,
+          subtitleTextViewTrailingAnchorContentViewViewTrailingAnchorConstraint,
+          badgeViewViewHeightAnchorConstraint,
+          badgeTextViewLeadingAnchorBadgeViewViewLeadingAnchorConstraint,
+          badgeTextViewTrailingAnchorBadgeViewViewTrailingAnchorConstraint,
+          badgeTextViewTopAnchorBadgeViewViewTopAnchorConstraint,
+          badgeTextViewBottomAnchorBadgeViewViewBottomAnchorConstraint
+        ]
+      case (false, false, false):
+        constraints = [
+          imageViewHeightAnchorParentConstraint,
+          badgeViewViewHeightAnchorParentConstraint,
+          imageViewLeadingAnchorLeadingAnchorConstraint,
+          imageViewCenterYAnchorCenterYAnchorConstraint,
+          contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint,
+          badgeViewViewTrailingAnchorTrailingAnchorConstraint,
+          badgeViewViewLeadingAnchorContentViewViewTrailingAnchorConstraint,
+          badgeViewViewCenterYAnchorCenterYAnchorConstraint,
+          imageViewHeightAnchorConstraint,
+          imageViewWidthAnchorConstraint,
           subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint,
           subtitleTextViewTopAnchorTextViewBottomAnchorConstraint,
           subtitleTextViewLeadingAnchorContentViewViewLeadingAnchorConstraint,
@@ -326,6 +454,7 @@ public class ResultRow: NSBox {
 
   private func update() {
     let badgeViewViewIsHidden = badgeViewView.isHidden
+    let imageViewIsHidden = imageView.isHidden
     let subtitleTextViewIsHidden = subtitleTextView.isHidden
 
     badgeTextView.attributedStringValue = badgeTextViewTextStyle.apply(to: "Badge")
@@ -333,6 +462,8 @@ public class ResultRow: NSBox {
     badgeTextView.attributedStringValue = badgeTextViewTextStyle.apply(to: badgeTextView.attributedStringValue)
     badgeViewView.isHidden = !false
     badgeViewView.fillColor = Colors.raisedBackground
+    imageView.isHidden = !false
+    imageView.image = NSImage()
     subtitleTextView.isHidden = !false
     subtitleTextView.attributedStringValue = subtitleTextViewTextStyle.apply(to: "Text goes here")
     subtitleTextViewTextStyle = TextStyles.sectionHeader
@@ -343,6 +474,10 @@ public class ResultRow: NSBox {
     if let subtitle = subtitleText {
       subtitleTextView.attributedStringValue = subtitleTextViewTextStyle.apply(to: subtitle)
       subtitleTextView.isHidden = !true
+    }
+    if let image = image {
+      imageView.image = image
+      imageView.isHidden = !true
     }
     if selected {
       textViewTextStyle = TextStyles.rowInverse
@@ -366,14 +501,19 @@ public class ResultRow: NSBox {
       badgeTextView.attributedStringValue = badgeTextViewTextStyle.apply(to: badgeText)
     }
 
-    if badgeViewView.isHidden != badgeViewViewIsHidden || subtitleTextView.isHidden != subtitleTextViewIsHidden {
+    if
+    badgeViewView.isHidden != badgeViewViewIsHidden ||
+      imageView.isHidden != imageViewIsHidden || subtitleTextView.isHidden != subtitleTextViewIsHidden
+    {
       NSLayoutConstraint.deactivate(
         conditionalConstraints(
           badgeViewViewIsHidden: badgeViewViewIsHidden,
+          imageViewIsHidden: imageViewIsHidden,
           subtitleTextViewIsHidden: subtitleTextViewIsHidden))
       NSLayoutConstraint.activate(
         conditionalConstraints(
           badgeViewViewIsHidden: badgeViewView.isHidden,
+          imageViewIsHidden: imageView.isHidden,
           subtitleTextViewIsHidden: subtitleTextView.isHidden))
     }
   }
@@ -388,29 +528,33 @@ extension ResultRow {
     public var selected: Bool
     public var disabled: Bool
     public var badgeText: String?
+    public var image: NSImage?
 
     public init(
       titleText: String,
       subtitleText: String? = nil,
       selected: Bool,
       disabled: Bool,
-      badgeText: String? = nil)
+      badgeText: String? = nil,
+      image: NSImage? = nil)
     {
       self.titleText = titleText
       self.subtitleText = subtitleText
       self.selected = selected
       self.disabled = disabled
       self.badgeText = badgeText
+      self.image = image
     }
 
     public init() {
-      self.init(titleText: "", subtitleText: nil, selected: false, disabled: false, badgeText: nil)
+      self.init(titleText: "", subtitleText: nil, selected: false, disabled: false, badgeText: nil, image: nil)
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
       return lhs.titleText == rhs.titleText &&
         lhs.subtitleText == rhs.subtitleText &&
-          lhs.selected == rhs.selected && lhs.disabled == rhs.disabled && lhs.badgeText == rhs.badgeText
+          lhs.selected == rhs.selected &&
+            lhs.disabled == rhs.disabled && lhs.badgeText == rhs.badgeText && lhs.image == rhs.image
     }
   }
 }
@@ -439,7 +583,8 @@ extension ResultRow {
       subtitleText: String? = nil,
       selected: Bool,
       disabled: Bool,
-      badgeText: String? = nil)
+      badgeText: String? = nil,
+      image: NSImage? = nil)
     {
       self
         .init(
@@ -448,11 +593,12 @@ extension ResultRow {
             subtitleText: subtitleText,
             selected: selected,
             disabled: disabled,
-            badgeText: badgeText))
+            badgeText: badgeText,
+            image: image))
     }
 
     public init() {
-      self.init(titleText: "", subtitleText: nil, selected: false, disabled: false, badgeText: nil)
+      self.init(titleText: "", subtitleText: nil, selected: false, disabled: false, badgeText: nil, image: nil)
     }
   }
 }
