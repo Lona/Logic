@@ -434,7 +434,7 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width - lineButtonMargin,
-            y: rowRect.maxY - lineButtonSize.height - 4,
+            y: rowRect.maxY - lineButtonSize.height - 3,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -446,7 +446,7 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
-            y: rowRect.maxY - lineButtonSize.height - 4,
+            y: rowRect.maxY - lineButtonSize.height - 3,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 

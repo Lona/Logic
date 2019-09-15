@@ -18,6 +18,8 @@
 		6B00CA46232BEB1F001907C6 /* BlockListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA45232BEB1F001907C6 /* BlockListView.swift */; };
 		6B00CA48232C280B001907C6 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B00CA47232C280B001907C6 /* Differ.framework */; };
 		6B00CA52232D797A001907C6 /* AttributedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA51232D797A001907C6 /* AttributedTextView.swift */; };
+		6B00CA54232EA0F9001907C6 /* BlockProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA53232EA0F9001907C6 /* BlockProtocol.swift */; };
+		6B00CA57232EA65B001907C6 /* TextBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA56232EA65B001907C6 /* TextBlock.swift */; };
 		6B10AC1C22A45FD00043E46A /* LogicValue+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */; };
 		6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1D22A45FFB0043E46A /* LogicValue.swift */; };
 		6B10AC2022A461B90043E46A /* Unification+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10AC1F22A461B90043E46A /* Unification+Core.swift */; };
@@ -139,6 +141,8 @@
 		6B00CA45232BEB1F001907C6 /* BlockListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListView.swift; sourceTree = "<group>"; };
 		6B00CA47232C280B001907C6 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = ../Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
 		6B00CA51232D797A001907C6 /* AttributedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedTextView.swift; sourceTree = "<group>"; };
+		6B00CA53232EA0F9001907C6 /* BlockProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockProtocol.swift; sourceTree = "<group>"; };
+		6B00CA56232EA65B001907C6 /* TextBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBlock.swift; sourceTree = "<group>"; };
 		6B10AC1B22A45FD00043E46A /* LogicValue+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LogicValue+AppKit.swift"; sourceTree = "<group>"; };
 		6B10AC1D22A45FFB0043E46A /* LogicValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicValue.swift; sourceTree = "<group>"; };
 		6B10AC1F22A461B90043E46A /* Unification+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Unification+Core.swift"; sourceTree = "<group>"; };
@@ -267,6 +271,7 @@
 		6B00CA2F23283C5F001907C6 /* BlockEditor */ = {
 			isa = PBXGroup;
 			children = (
+				6B00CA55232EA63E001907C6 /* Blocks */,
 				6B00CA3F232B0091001907C6 /* BlockEditor.swift */,
 				6B00CA45232BEB1F001907C6 /* BlockListView.swift */,
 				6B00CA30232841F6001907C6 /* InlineBlockEditor.swift */,
@@ -283,6 +288,15 @@
 				6B00CA392328565C001907C6 /* InlineToolbar.swift */,
 			);
 			path = InlineToolbar;
+			sourceTree = "<group>";
+		};
+		6B00CA55232EA63E001907C6 /* Blocks */ = {
+			isa = PBXGroup;
+			children = (
+				6B00CA53232EA0F9001907C6 /* BlockProtocol.swift */,
+				6B00CA56232EA65B001907C6 /* TextBlock.swift */,
+			);
+			path = Blocks;
 			sourceTree = "<group>";
 		};
 		6B34148B225417E500CC65D1 /* Scripting */ = {
@@ -654,6 +668,7 @@
 				6B3414B6225D68E100CC65D1 /* ColorRow.swift in Sources */,
 				6B44E17A223B40BA00740318 /* LogicMeasuredElement.swift in Sources */,
 				6B44E160223B3DFF00740318 /* ForeignTypes.swift in Sources */,
+				6B00CA54232EA0F9001907C6 /* BlockProtocol.swift in Sources */,
 				6B6F19DD230B56C900E5AC60 /* LGCSyntax+Dragging.swift in Sources */,
 				6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */,
 				6B44E15E223B3DF300740318 /* TextStyle.swift in Sources */,
@@ -732,6 +747,7 @@
 				6BBD0C1122988ED100EB87A9 /* NativeType.swift in Sources */,
 				6B00CA52232D797A001907C6 /* AttributedTextView.swift in Sources */,
 				6B44E155223B3DD000740318 /* LNATextField.swift in Sources */,
+				6B00CA57232EA65B001907C6 /* TextBlock.swift in Sources */,
 				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
