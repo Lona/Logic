@@ -681,7 +681,13 @@ extension BlockListView: NSTableViewDelegate {
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
 
+
         switch item {
+        case .image(let value):
+            let view = value.view
+
+            return view
+
 //        case .tokens(let syntaxNode):
 //            let view = item.view as! LogicEditor
 //

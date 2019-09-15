@@ -26,7 +26,7 @@ public struct TextBlock: BlockProtocol {
 
     public var id: UUID
 
-    public var view: View = InlineBlockEditor()
+    public var view: View = View()
 
     public var parameters: Parameters {
         get { return view.textValue }
