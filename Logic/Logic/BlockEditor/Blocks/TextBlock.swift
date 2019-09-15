@@ -14,13 +14,14 @@ extension NSAttributedString: BlockParameters {}
 
 extension NSRange: BlockSelection {}
 
-struct TextBlock: BlockProtocol {
-    typealias View = InlineBlockEditor
-    typealias Parameters = NSAttributedString
-    typealias Selection = NSRange
+public struct TextBlock: BlockProtocol {
+    public typealias View = InlineBlockEditor
+    public typealias Parameters = NSAttributedString
+    public typealias Selection = NSRange
 
-    public init(id: UUID) {
+    public init(id: UUID, parameters: Parameters) {
         self.id = id
+        self.parameters = parameters
     }
 
     public var id: UUID

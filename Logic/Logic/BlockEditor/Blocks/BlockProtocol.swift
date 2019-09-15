@@ -23,7 +23,7 @@ protocol BlockProtocol {
     associatedtype Parameters: BlockParameters
     associatedtype Selection: BlockSelection
 
-    init(id: UUID)
+    init(id: UUID, parameters: Parameters)
 
     var id: UUID { get }
     var view: View { get }
@@ -34,13 +34,13 @@ protocol BlockProtocol {
 }
 
 extension BlockProtocol {
-    init(id: UUID, parameters: Parameters) {
-        self.init(id: id)
-        self.parameters = parameters
+    init(_ parameters: Parameters) {
+        self.init(id: UUID(), parameters: parameters)
     }
 
-    init(_ parameters: Parameters) {
-        self.init(id: UUID())
-        self.parameters = parameters
+    init() {
+        let parameters: Parameters = Parameters.init()
+        self.init(id: UUID(), parameters: parameters)
     }
 }
+
