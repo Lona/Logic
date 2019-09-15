@@ -84,15 +84,24 @@ public class InlineBlockEditor: AttributedTextView {
             }
         }
 
-        onChangeSelectedRange = { [weak self] range in
-            guard let self = self else { return }
+//        onChangeSelectedRange = { [weak self] range in
+//            guard let self = self else { return }
+//
+//            if range.length > 0 {
+//                self.updateToolbar(for: range)
+//                self.showToolbar(for: range)
+//            } else {
+//                InlineToolbarWindow.shared.orderOut(nil)
+//            }
+//        }
+    }
 
-            if range.length > 0 {
-                self.updateToolbar(for: range)
-                self.showToolbar(for: range)
-            } else {
-                InlineToolbarWindow.shared.orderOut(nil)
-            }
+    public func showInlineToolbar(for range: NSRange) {
+        if range.length > 0 {
+            self.updateToolbar(for: range)
+            self.showToolbar(for: range)
+        } else {
+            InlineToolbarWindow.shared.orderOut(nil)
         }
     }
 
@@ -117,10 +126,12 @@ public class InlineBlockEditor: AttributedTextView {
 
         let range = self.selectedRange
         let string = value.string
-        let location = range.location
+        let location = range.location + 1
         let prefix = string.prefix(location)
 
         let rect = firstRect(forCharacterRange: range, actualRange: nil)
+
+        Swift.print("prefix", prefix)
 
         if prefix.last == "/" {
             self.commandPaletteIndex = location
@@ -304,17 +315,66 @@ public class InlineBlockEditor: AttributedTextView {
         invalidateIntrinsicContentSize()
     }
 
+//    public override func setSelectedRange(_ charRange: NSRange) {
+//        Swift.print("Called")
+//    }
+//
+//    public override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
+//        Swift.print("called")
+//    }
+
+//    public override var selectedRanges: [NSValue] {
+//        didSet {
+//            layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
+//
+//            for value in selectedRanges {
+//                let range = value.rangeValue
+//                layoutManager?.addTemporaryAttribute(.underlineStyle, value: NSUnderlineStyle.double, forCharacterRange: range)
+//            }
+//        }
+//    }
+
+    public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
+        super.setSelectedRanges(ranges, affinity: .downstream, stillSelecting: true)
+    }
+
+//    public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
+////        if selectedRanges == ranges {
+////            return
+////        }
+//
+////        Swift.print("flag", stillSelectingFlag)
+//
+//        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: true)
+//
+////        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
+////
+////        for value in ranges {
+////            let range = value.rangeValue
+////            layoutManager?.addTemporaryAttribute(.foregroundColor, value: NSColor.green, forCharacterRange: range)
+////        }
+//    }
+
 //    public override func setSelectedRanges(
 //        _ ranges: [NSValue],
 //        affinity: NSSelectionAffinity,
 //        stillSelecting stillSelectingFlag: Bool) {
 //
-//        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
+//        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelectingFlag)
 //
-//        for value in ranges {
-//            let range = value.rangeValue
-//            layoutManager?.addTemporaryAttribute(.backgroundColor, value: NSColor.selectedTextBackgroundColor, forCharacterRange: range)
-//        }
+////        layoutManager?.setTemporaryAttributes([:], forCharacterRange: NSRange(location: 0, length: string.count))
+////
+////        for value in selectedRanges {
+////            let range = value.rangeValue
+////            layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: range)
+////        }
+////
+////        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
+////
+////        for value in ranges {
+////            let range = value.rangeValue
+////            layoutManager?.addTemporaryAttribute(.foregroundColor, value: NSColor.green, forCharacterRange: range)
+////        }
 //    }
 }
 

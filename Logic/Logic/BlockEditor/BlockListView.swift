@@ -238,7 +238,7 @@ public class BlockListView: NSBox {
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
                 if let view = view as? InlineBlockEditor {
-                    view.setSelectedRanges([NSValue(range: .empty)], affinity: .downstream, stillSelecting: false)
+                    view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
                     view.needsDisplay = true
                     view.setPlaceholder(string: " ")
                 }
@@ -256,8 +256,8 @@ public class BlockListView: NSBox {
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
                 if let view = view as? InlineBlockEditor {
-                    view.setSelectedRanges([NSValue(range: range)], affinity: .downstream, stillSelecting: false)
-                    view.needsDisplay = true
+                    view.setSelectedRangesWithoutNotification([NSValue(range: range)])
+//                    view.needsDisplay = true
                     view.setPlaceholder(string: "Type '/' for commands")
                 }
             case .blocks(let range):
@@ -465,7 +465,9 @@ public class BlockListView: NSBox {
     }
 
     public override func mouseDown(with event: NSEvent) {
-        Swift.print("mouseDown")
+//        Swift.print("mouseDown")
+
+        BlockListView.commandPalette.orderOut(nil)
 
         let point = convert(event.locationInWindow, from: nil)
 
@@ -522,13 +524,14 @@ public class BlockListView: NSBox {
 //    }
 
     public func trackMouse(startingAt initialPosition: NSPoint) {
-        Swift.print("Start tracking")
+//        Swift.print("Start tracking")
 
         guard let window = window else { return }
 
         var isDragging: Bool = false
         var initialRow: Int? = nil
         var initialIndex: Int? = nil
+        var didChangeInsertionColor = false
 
         trackingLoop: while true {
             let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
@@ -555,6 +558,12 @@ public class BlockListView: NSBox {
                                 initialIndex = characterIndex
                                 selection = .item(row, NSRange(location: characterIndex, length: 0))
                             }
+
+                            if view.acceptsFirstResponder {
+                                window.makeFirstResponder(view)
+                                view.insertionPointColor = .clear
+                                didChangeInsertionColor = true
+                            }
                         }
                     }
                 }
@@ -568,34 +577,46 @@ public class BlockListView: NSBox {
                 }
 
                 switch selection {
-                case .item(let row, _):
+                case .item(let row, let range):
                     let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
 
                     if view.acceptsFirstResponder {
                         window.makeFirstResponder(view)
                     }
+
+                    if range.length > 0 {
+                        (view as? InlineBlockEditor)?.showInlineToolbar(for: range)
+                    }
                 default:
-                    break
+                    window.makeFirstResponder(self)
                 }
 
                 break trackingLoop
-            case .mouseExited:
-                Swift.print("exit")
             default:
                 break
             }
         }
 
-        Swift.print("Done tracking")
+        if didChangeInsertionColor, let row = initialRow {
+            let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+
+            if let view = view as? InlineBlockEditor {
+                view.insertionPointColor = NSColor.textColor
+            }
+        }
+
+//        Swift.print("Done tracking")
     }
 
     public func handleMouseClick(point: NSPoint) {
         selection = .none
 
+        BlockListView.commandPalette.orderOut(nil)
+
         switch item(at: point) {
         case .plusButton(let line):
             handlePressPlus(line: line)
-        case .moreButton(let line):
+        case .moreButton(_):
             break
         case .item(let line, let point):
             if let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false) as? InlineBlockEditor {
@@ -662,6 +683,20 @@ extension BlockListView: NSTableViewDelegate {
                 self.onChangeBlocks?(clone)
             }
 
+            view.onChangeSelectedRange = { [unowned self] range in
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.selection = .item(row, range)
+
+                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? InlineBlockEditor {
+                    if range.length > 0 {
+                        view.showInlineToolbar(for: range)
+                    } else {
+                        InlineToolbarWindow.shared.orderOut(nil)
+                    }
+                }
+            }
+
             view.onRequestCreateEditor = { [unowned self] newText in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
@@ -678,6 +713,11 @@ extension BlockListView: NSTableViewDelegate {
                 guard let window = self.window else { return }
 
                 window.addChildWindow(BlockListView.commandPalette, ordered: .above)
+
+                BlockListView.commandPalette.suggestionItems = [
+                    .row("Text", "Write plain text", false, nil),
+                    .row("Token", "Define a design token variable", false, nil)
+                ]
 
                 BlockListView.commandPalette.anchorTo(rect: rect)
             }
