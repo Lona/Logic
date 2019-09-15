@@ -85,7 +85,7 @@ class MarkdownDocument: NSDocument {
 
         if parsed.count == 0 {
             return [
-                .init(.text(.init()))
+                EditableBlock.makeEmptyBlock()
             ]
         }
 
@@ -93,7 +93,7 @@ class MarkdownDocument: NSDocument {
             switch blockElement {
             case .paragraph(content: let inlineElements):
                 let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(value))
+                return BlockEditor.Block(.text(value, .paragraph))
             default:
                 return nil
             }

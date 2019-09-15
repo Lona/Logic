@@ -141,29 +141,21 @@ public class BlockListView: NSBox {
     private func handlePressMore(line: Int) {
         TooltipManager.shared.hideTooltip()
 
-        selection = .blocks(NSRange(location: line, length: 0))
+        selection = .blocks(NSRange(location: line, length: 1))
     }
 
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
 
-        if blocks[line].content == .text(.init()) {
+        if blocks[line].content == .text(.init(), .paragraph) {
             focus(line: line)
             return
         }
 
-        handleAddBlock(line: line, text: .init())
-    }
+        let id = UUID()
+        let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
 
-    private func handleAddBlock(line: Int, block: EditableBlock) {
-        var clone = blocks
-
-        clone.insert(block, at: line + 1)
-
-        if handleChangeBlocks(clone) {
-            focus(id: block.id)
-            guard let addedLine = self.line(forBlock: block.id) else { return }
-
+        if ok, let addedLine = self.line(forBlock: id) {
             guard let window = window else { return }
             let rect = window.convertToScreen(tableView.convert(tableView.rect(ofRow: addedLine), to: nil))
 
@@ -171,8 +163,22 @@ public class BlockListView: NSBox {
         }
     }
 
-    private func handleAddBlock(line: Int, text: NSAttributedString) {
-        handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text)))
+    private func handleAddBlock(line: Int, block: EditableBlock) -> Bool {
+        var clone = blocks
+
+        clone.insert(block, at: line + 1)
+
+        let ok = handleChangeBlocks(clone)
+
+        if ok {
+            focus(id: block.id)
+        }
+
+        return ok
+    }
+
+    private func handleAddBlock(line: Int, text: NSAttributedString) -> Bool {
+        return handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text, .h1)))
     }
 
     private func handleDelete(line: Int) {
@@ -198,8 +204,9 @@ public class BlockListView: NSBox {
                     if old !== new {
                         Swift.print("update", index)
                         if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
-                            case .text(let value) = new.content {
-                            view.textValue = value
+                            case .text(let attributedString, let sizeLevel) = new.content {
+                            view.textValue = attributedString
+                            view.sizeLevel = sizeLevel
                             view.needsLayout = true
                             view.needsDisplay = true
                         }
@@ -262,7 +269,7 @@ public class BlockListView: NSBox {
                     view.setPlaceholder(string: " ")
                 }
             case .blocks(let range):
-                for index in range.lowerBound...range.upperBound {
+                for index in range.lowerBound..<range.upperBound {
                     let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
                     rowView?.isBlockSelected = false
                 }
@@ -280,7 +287,7 @@ public class BlockListView: NSBox {
                     view.setPlaceholder(string: "Type '/' for commands")
                 }
             case .blocks(let range):
-                for index in range.lowerBound...range.upperBound {
+                for index in range.lowerBound..<range.upperBound {
                     let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
                     rowView?.isBlockSelected = true
                 }
@@ -452,9 +459,11 @@ public class BlockListView: NSBox {
     private func plusButtonRect(for line: Int) -> CGRect {
         let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
 
+        let alignmentHeight = blocks[line].lineButtonAlignmentHeight
+
         let rect = NSRect(
             x: 60 - lineButtonSize.width - lineButtonMargin,
-            y: rowRect.maxY - lineButtonSize.height - 3,
+            y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -464,9 +473,11 @@ public class BlockListView: NSBox {
     private func moreButtonRect(for line: Int) -> CGRect {
         let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
 
+        let alignmentHeight = blocks[line].lineButtonAlignmentHeight
+
         let rect = NSRect(
             x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
-            y: rowRect.maxY - lineButtonSize.height - 3,
+            y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -487,6 +498,25 @@ public class BlockListView: NSBox {
     }()
 
     // MARK: Event handling
+
+    public override func keyDown(with event: NSEvent) {
+        let characters = event.charactersIgnoringModifiers!
+
+        if characters == String(Character(UnicodeScalar(NSEvent.SpecialKey.delete.rawValue)!)) {
+            switch selection {
+            case .blocks(let range):
+                Swift.print("delete selection", range)
+                Swift.print("keeping", 0..<range.location, range.location+range.length..<blocks.count)
+                let newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
+
+                selection = .none
+
+                _ = handleChangeBlocks(newBlocks)
+            default:
+                break
+            }
+        }
+    }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
         if bounds.contains(point) {
@@ -578,7 +608,12 @@ public class BlockListView: NSBox {
                     let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
                     if let initialRow = initialRow, initialRow != row {
-                        selection = .blocks(NSRange(between: row, and: initialRow))
+                        if initialRow < row {
+                            selection = .blocks(NSRange(location: initialRow, length: row - initialRow + 1))
+                        } else {
+                            selection = .blocks(NSRange(location: row, length: initialRow - row + 1))
+                        }
+                        Swift.print("sel", selection)
                     } else {
                         initialRow = row
 
@@ -709,17 +744,18 @@ extension BlockListView: NSTableViewDelegate {
             let view = item.view as! LogicEditor
 
             return view
-        case .text(let value):
+        case .text(let textValue, let sizeLevel):
             let view = item.view as! InlineBlockEditor
 
 //            Swift.print("Row", row, view)
 
-            view.textValue = value
+            view.textValue = textValue
+            view.sizeLevel = sizeLevel
             view.onChangeTextValue = { [unowned self] newValue in
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                 var clone = self.blocks
-                clone[row] = .init(id: item.id, content: .text(newValue))
+                clone[row] = .init(id: item.id, content: .text(newValue, sizeLevel))
 
                 _ = self.handleChangeBlocks(clone)
             }

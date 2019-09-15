@@ -45,9 +45,10 @@ public class EditableBlock: Equatable {
 
     private func configure(view: NSView) {
         switch self.content {
-        case .text(let value):
+        case .text(let attributedString, let sizeLevel):
             let view = view as! InlineBlockEditor
-            view.textValue = value
+            view.textValue = attributedString
+            view.sizeLevel = sizeLevel
         case .tokens(let value):
             let view = view as! LogicEditor
             view.rootNode = value
@@ -75,11 +76,28 @@ public class EditableBlock: Equatable {
     deinit {
         EditableBlock.viewCache.removeValue(forKey: id)
     }
+
+    public static func makeEmptyBlock() -> EditableBlock {
+        return .init(.text(.init(), .paragraph))
+    }
+
+    public var lineButtonAlignmentHeight: CGFloat {
+        return content.lineButtonAlignmentHeight
+    }
 }
 
 public enum EditableBlockContent: Equatable {
-    case text(NSAttributedString)
+    case text(NSAttributedString, InlineBlockEditor.SizeLevel)
     case tokens(LGCSyntaxNode)
+
+    var lineButtonAlignmentHeight: CGFloat {
+        switch self {
+        case .text(_, let sizeLevel):
+            return sizeLevel.fontSize
+        case .tokens:
+            return 18
+        }
+    }
 }
 
 // MARK: - BlockEditor

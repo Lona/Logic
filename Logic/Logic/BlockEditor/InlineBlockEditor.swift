@@ -9,9 +9,61 @@
 import Foundation
 
 private var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
-private var placeholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: Colors.textComment)
+private var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: Colors.textComment)
 
 public class InlineBlockEditor: AttributedTextView {
+
+    public enum SizeLevel {
+        case h1
+        case h2
+        case h3
+        case h4
+        case h5
+        case h6
+        case paragraph
+
+        var fontSize: CGFloat {
+            switch self {
+            case .paragraph: return 16
+            case .h6, .h5, .h4: return 16
+            case .h3: return 24
+            case .h2: return 28
+            case .h1: return 32
+            }
+        }
+    }
+
+    public var sizeLevel: SizeLevel = .paragraph {
+        didSet {
+            Swift.print("set size level", sizeLevel)
+
+            if oldValue == sizeLevel { return }
+
+            font = textStyle.nsFont
+
+            if let placeholderAttributedString = self.placeholderAttributedString {
+                self.placeholderAttributedString = placeholderTextStyle.apply(to: placeholderAttributedString)
+            }
+
+            //            let newTextValue = NSMutableAttributedString(attributedString: textValue)
+
+            //            newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
+//                let font = value as! NSFont
+//                guard let newFont = NSFont(descriptor: font.fontDescriptor, size: sizeLevel.fontSize) else { return }
+//                newTextValue.addAttribute(.font, value: newFont, range: range)
+//            })
+
+//            textValue = newTextValue
+        }
+    }
+
+    private var textStyle: TextStyle {
+        return defaultTextStyle.with(size: sizeLevel.fontSize)
+    }
+
+    private var placeholderTextStyle: TextStyle {
+        return defaultPlaceholderTextStyle.with(size: sizeLevel.fontSize)
+    }
 
     public func setPlaceholder(string: String) {
         placeholderAttributedString = placeholderTextStyle.apply(to: string)
