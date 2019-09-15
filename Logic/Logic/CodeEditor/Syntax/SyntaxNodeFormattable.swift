@@ -548,8 +548,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         ]
                     )
                 }
-
-            case .variable, .enumeration, .namespace, .placeholder:
+            default:
                 fatalError("TODO")
             }
         }

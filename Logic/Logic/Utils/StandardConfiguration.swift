@@ -496,6 +496,8 @@ public enum StandardConfiguration {
                                         break
                                     }
                                 }
+                            default:
+                                break
                             }
                         }
                     default:

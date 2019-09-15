@@ -44,3 +44,36 @@ extension BlockProtocol {
     }
 }
 
+public enum BlockType: Equatable {
+    public static func == (lhs: BlockType, rhs: BlockType) -> Bool {
+        switch (lhs, rhs) {
+        case let (.text(lhs), .text(rhs)):
+            return lhs.id == rhs.id && lhs.parameters == rhs.parameters
+        default:
+            return false
+        }
+    }
+
+    case text(TextBlock)
+
+    var id: UUID {
+        switch self {
+        case .text(let value):
+            return value.id
+        }
+    }
+
+    var view: BlockView {
+        switch self {
+        case .text(let value):
+            return value.view
+        }
+    }
+
+    var parameters: BlockParameters {
+        switch self {
+        case .text(let value):
+            return value.parameters
+        }
+    }
+}

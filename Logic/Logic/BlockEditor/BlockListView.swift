@@ -137,7 +137,7 @@ public class BlockListView: NSBox {
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
 
-        if blocks[line].content == .text(.init()) {
+        if blocks[line] == BlockType.text(.init()) {
             focus(line: line)
             return
         }
@@ -145,7 +145,7 @@ public class BlockListView: NSBox {
         handleAddBlock(line: line, text: .init())
     }
 
-    private func handleAddBlock(line: Int, block: EditableBlock) {
+    private func handleAddBlock(line: Int, block: BlockEditor.Block) {
         var clone = blocks
 
         clone.insert(block, at: line + 1)
@@ -158,7 +158,7 @@ public class BlockListView: NSBox {
         var clone = blocks
 
         let id = UUID()
-        let emptyBlock: EditableBlock = .init(id: id, content: .text(text))
+        let emptyBlock = BlockType.text(.init(id: id, parameters: text))
         clone.insert(emptyBlock, at: line + 1)
         actions.append(.focus(id: id))
 
@@ -185,11 +185,11 @@ public class BlockListView: NSBox {
                     let old = oldValue[index]
                     let new = blocks[index]
 
-                    if old !== new {
+                    if old != new {
                         Swift.print("update", index)
                         if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
-                            case .text(let value) = new.content {
-                            view.textValue = value
+                            case .text(let value) = new {
+                            view.textValue = value.parameters
                             view.needsLayout = true
                             view.needsDisplay = true
                         }
@@ -681,22 +681,22 @@ extension BlockListView: NSTableViewDelegate {
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
 
-        switch item.content {
-        case .tokens(let syntaxNode):
-            let view = item.view as! LogicEditor
-
-            return view
+        switch item {
+//        case .tokens(let syntaxNode):
+//            let view = item.view as! LogicEditor
+//
+//            return view
         case .text(let value):
             let view = item.view as! InlineBlockEditor
 
 //            Swift.print("Row", row, view)
 
-            view.textValue = value
+            view.textValue = value.parameters
             view.onChangeTextValue = { [unowned self] newValue in
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                 var clone = self.blocks
-                clone[row] = .init(id: item.id, content: .text(newValue))
+                clone[row] = BlockType.text(.init(id: item.id, parameters: newValue))
 
                 self.onChangeBlocks?(clone)
             }
@@ -813,19 +813,20 @@ extension BlockListView: NSTableViewDelegate {
 
             if originalIndex == 1 {
                 self.handleAddBlock(line: line, text: .init())
-            } else if originalIndex == 2 {
-                let defaultTokens = LGCSyntaxNode.declaration(
-                    .variable(
-                        id: UUID(),
-                        name: .init(id: UUID(), name: "token"),
-                        annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
-                        initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
-                        comment: nil
-                    )
-                )
-
-                self.handleAddBlock(line: line, block: .init(.tokens(defaultTokens)))
             }
+//            else if originalIndex == 2 {
+//                let defaultTokens = LGCSyntaxNode.declaration(
+//                    .variable(
+//                        id: UUID(),
+//                        name: .init(id: UUID(), name: "token"),
+//                        annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+//                        initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+//                        comment: nil
+//                    )
+//                )
+//
+//                self.handleAddBlock(line: line, block: .init(.tokens(defaultTokens)))
+//            }
 
 //            self.update()
         }

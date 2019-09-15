@@ -8,85 +8,29 @@
 
 import AppKit
 
-public class EditableBlock: Equatable {
-    public let id: UUID
-    public let content: EditableBlockContent
-
-    public init(id: UUID, content: EditableBlockContent) {
-        self.id = id
-        self.content = content
-    }
-
-    public convenience init(_ content: EditableBlockContent) {
-        self.init(id: UUID(), content: content)
-    }
-
-    public static func == (lhs: EditableBlock, rhs: EditableBlock) -> Bool {
-        return lhs.id == rhs.id && lhs.content == rhs.content
-    }
-
-    private func makeView() -> NSView {
-        switch self.content {
-        case .text:
-            return InlineBlockEditor()
-        case .tokens(let syntaxNode):
-            let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
-
-            var style = view.canvasStyle
-            style.textMargin = .zero
-            view.canvasStyle = style
-
-            view.scrollsVertically = false
-            view.showsMinimap = false
-            view.showsLineButtons = false
-            return view
-        }
-    }
-
-    private func configure(view: NSView) {
-        switch self.content {
-        case .text(let value):
-            let view = view as! InlineBlockEditor
-            view.textValue = value
-        case .tokens(let value):
-            let view = view as! LogicEditor
-            view.rootNode = value
-        }
-    }
-
-    public var view: NSView {
-        if let view = EditableBlock.viewCache[id] {
-            configure(view: view)
-            return view
-        }
-
-        let view = makeView()
-        configure(view: view)
-        EditableBlock.viewCache[id] = view
-        return view
-    }
-
-    public func updateView() {
-        configure(view: view)
-    }
-
-    static var viewCache: [UUID: NSView] = [:]
-
-    deinit {
-        EditableBlock.viewCache.removeValue(forKey: id)
-    }
-}
-
-public enum EditableBlockContent: Equatable {
-    case text(NSAttributedString)
-    case tokens(LGCSyntaxNode)
-}
+//private func makeView() -> NSView {
+//    switch self.content {
+//    case .text:
+//        return InlineBlockEditor()
+//    case .tokens(let syntaxNode):
+//        let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
+//
+//        var style = view.canvasStyle
+//        style.textMargin = .zero
+//        view.canvasStyle = style
+//
+//        view.scrollsVertically = false
+//        view.showsMinimap = false
+//        view.showsLineButtons = false
+//        return view
+//    }
+//}
 
 // MARK: - BlockEditor
 
 public class BlockEditor: NSBox {
 
-    public typealias Block = EditableBlock
+    public typealias Block = BlockType
 
     // MARK: Lifecycle
 
