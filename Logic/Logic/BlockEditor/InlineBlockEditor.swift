@@ -8,8 +8,8 @@
 
 import Foundation
 
-private var defaultTextStyle = TextStyle(size: 18, lineHeight: 22)
-private var placeholderTextStyle = TextStyle(size: 18, lineHeight: 22, color: Colors.textComment)
+private var defaultTextStyle = TextStyle(size: 16)
+private var placeholderTextStyle = TextStyle(size: 16, color: Colors.textComment)
 
 public class InlineBlockEditor: AttributedTextView {
 
@@ -136,7 +136,7 @@ public class InlineBlockEditor: AttributedTextView {
         if prefix.last == "/" {
             self.commandPaletteIndex = location
             self.onSearchCommandPalette?("", rect)
-        } else if let index = self.commandPaletteIndex, location > index {
+        } else if let index = self.commandPaletteIndex, location > index, string.count > location {
             let query = (string as NSString).substring(with: NSRange(location: index, length: location - index))
             self.onSearchCommandPalette?(query, rect)
         } else {
@@ -232,7 +232,7 @@ public class InlineBlockEditor: AttributedTextView {
     }
 
     public override func doCommand(by selector: Selector) {
-        if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange.location == 0 {
+        if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange == .empty {
             onRequestDeleteEditor?()
             return
         } else if selector == #selector(NSResponder.insertNewline(_:)) {

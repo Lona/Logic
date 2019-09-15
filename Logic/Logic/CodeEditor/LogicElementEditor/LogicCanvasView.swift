@@ -297,6 +297,12 @@ public class LogicCanvasView: NSView {
             pressedPoint = point
         }
 
+        handlePress(locationInWindow: event.locationInWindow)
+    }
+
+    public func handlePress(locationInWindow location: NSPoint) {
+        let point = convert(location, from: nil)
+
         let clickedItem = item(at: point)
 
         // Activate on mouseDown so the UI feels more responsive

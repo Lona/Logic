@@ -239,7 +239,8 @@ open class LogicEditor: NSBox {
 
     private lazy var subwindow = SuggestionWindow()
 
-    private let canvasView = LogicCanvasView()
+    // TODO: Make private when we know how we use it in the blockeditor
+    public let canvasView = LogicCanvasView()
     private let scrollView = NSScrollView()
     private let minimapScroller = MinimapScroller(frame: .zero)
 

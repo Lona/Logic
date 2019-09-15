@@ -22,12 +22,12 @@ private enum BlockListItem: Equatable {
     case item(Int, NSPoint)
 }
 
-private extension NSRange {
-    init(between a: Int, and b: Int) {
+extension NSRange {
+    public init(between a: Int, and b: Int) {
         self = .init(location: min(a, b), length: abs(a - b))
     }
 
-    static var empty: NSRange = .init(location: 0, length: 0)
+    public static var empty: NSRange = .init(location: 0, length: 0)
 }
 
 private extension NSPoint {
@@ -143,6 +143,15 @@ public class BlockListView: NSBox {
         }
 
         handleAddBlock(line: line, text: .init())
+    }
+
+    private func handleAddBlock(line: Int, block: EditableBlock) {
+        var clone = blocks
+
+        clone.insert(block, at: line + 1)
+        actions.append(.focus(id: block.id))
+
+        onChangeBlocks?(clone)
     }
 
     private func handleAddBlock(line: Int, text: NSAttributedString) {
@@ -468,6 +477,7 @@ public class BlockListView: NSBox {
 //        Swift.print("mouseDown")
 
         BlockListView.commandPalette.orderOut(nil)
+        InlineToolbarWindow.shared.orderOut(nil)
 
         let point = convert(event.locationInWindow, from: nil)
 
@@ -619,13 +629,17 @@ public class BlockListView: NSBox {
         case .moreButton(_):
             break
         case .item(let line, let point):
-            if let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false) as? InlineBlockEditor {
+            let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
+
+            if let view = view as? InlineBlockEditor {
                 let characterIndex = view.characterIndexForInsertion(at: convert(point, to: view))
                 selection = .item(line, NSRange(location: characterIndex, length: 0))
 
                 if view.acceptsFirstResponder {
                     window?.makeFirstResponder(view)
                 }
+            } else if let view = view as? LogicEditor {
+                view.canvasView.handlePress(locationInWindow: point)
             }
         case .background:
             break
@@ -668,6 +682,10 @@ extension BlockListView: NSTableViewDelegate {
         let item = blocks[row]
 
         switch item.content {
+        case .tokens(let syntaxNode):
+            let view = item.view as! LogicEditor
+
+            return view
         case .text(let value):
             let view = item.view as! InlineBlockEditor
 
@@ -710,16 +728,9 @@ extension BlockListView: NSTableViewDelegate {
             }
 
             view.onSearchCommandPalette = { [unowned self] query, rect in
-                guard let window = self.window else { return }
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                window.addChildWindow(BlockListView.commandPalette, ordered: .above)
-
-                BlockListView.commandPalette.suggestionItems = [
-                    .row("Text", "Write plain text", false, nil),
-                    .row("Token", "Define a design token variable", false, nil)
-                ]
-
-                BlockListView.commandPalette.anchorTo(rect: rect)
+                self.showCommandPalette(line: line, query: query, rect: rect)
             }
 
             view.onHideCommandPalette = {
@@ -732,6 +743,91 @@ extension BlockListView: NSTableViewDelegate {
 //            }
 
             return view
+        }
+    }
+
+    func showCommandPalette(line: Int, query: String, rect: NSRect) {
+        guard let window = self.window else { return }
+
+        let subwindow = BlockListView.commandPalette
+
+        let suggestionItems: [SuggestionListItem] = [
+            .sectionHeader("COMMANDS"),
+            .row("Text", "Write plain text", false, nil),
+            .row("Token", "Define a design token variable", false, nil)
+        ]
+
+        let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
+
+        subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
+        subwindow.suggestionView.showsSuggestionDetails = false
+        subwindow.suggestionView.suggestionListWidth = 200
+        subwindow.suggestionText = ""
+        subwindow.placeholderText = "Filter actions"
+
+        subwindow.anchorTo(rect: rect, verticalOffset: 4)
+        subwindow.suggestionItems = suggestionItems
+
+        func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
+            return suggestionItems.enumerated().filter { offset, item in
+                if text.isEmpty { return true }
+
+                switch item {
+                case .sectionHeader:
+                    return true
+                case .row(let title, _, _, _),
+                     .colorRow(name: let title, _, _, _),
+                     .textStyleRow(let title, _, _):
+                    return title.lowercased().contains(text.lowercased())
+                }
+            }
+        }
+
+        subwindow.onChangeSuggestionText = { [unowned subwindow] text in
+            subwindow.suggestionText = text
+            subwindow.suggestionItems = filteredSuggestionItems(query: text).map { offset, item in item }
+            subwindow.selectedIndex = filteredSuggestionItems(query: text).firstIndex(where: { offset, item in item.isSelectable })
+        }
+        subwindow.onSelectIndex = { [unowned subwindow] index in
+            subwindow.selectedIndex = index
+        }
+
+        window.addChildWindow(subwindow, ordered: .above)
+        subwindow.focusSearchField()
+
+        let hideWindow = { [unowned self] in
+            subwindow.orderOut(nil)
+        }
+
+        subwindow.onPressEscapeKey = hideWindow
+        subwindow.onRequestHide = hideWindow
+
+        subwindow.onSubmit = { [unowned self] index in
+            let originalIndex = filteredSuggestionItems(query: subwindow.suggestionText).map { offset, item in offset }[index]
+//            let item = menu[originalIndex]
+//            item.action()
+
+            hideWindow()
+
+            Swift.print("choose item", originalIndex)
+
+            if originalIndex == 1 {
+                self.handleAddBlock(line: line, text: .init())
+            } else if originalIndex == 2 {
+                let defaultTokens = LGCSyntaxNode.declaration(
+                    .variable(
+                        id: UUID(),
+                        name: .init(id: UUID(), name: "token"),
+                        annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+                        initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                        comment: nil
+                    )
+                )
+
+                self.handleAddBlock(line: line, block: .init(.tokens(defaultTokens)))
+            }
+
+//            self.update()
         }
     }
 }

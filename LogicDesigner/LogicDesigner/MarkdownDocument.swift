@@ -19,7 +19,7 @@ class MarkdownDocument: NSDocument {
         return false
     }
 
-    var markdownText = "**Hello**, world!"
+    var markdownString = ""
 
     var window: NSWindow?
 
@@ -52,6 +52,8 @@ class MarkdownDocument: NSDocument {
 
         containerView.addSubview(blockEditor)
 
+        blockEditor.blocks = MarkdownDocument.makeBlocks(from: markdownString)
+
         blockEditor.onChangeBlocks = { [unowned self] blocks in
             self.blockEditor.blocks = blocks
         }
@@ -64,20 +66,28 @@ class MarkdownDocument: NSDocument {
         blockEditor.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         blockEditor.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
 
-//        inlineBlockEditor.widthAnchor.constraint(equalToConstant: 400).isActive = true
-//        inlineBlockEditor.heightAnchor.constraint(equalToConstant: 300).isActive = true
-
         initializeWindowController(presenting: containerView)
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        return markdownText.data(using: .utf8)!
+        return markdownString.data(using: .utf8)!
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        markdownText = String(data: data, encoding: .utf8)!
+        markdownString = String(data: data, encoding: .utf8)!
 
-        let parsed = LightMark.parse(markdownText)
+        blockEditor.blocks = MarkdownDocument.makeBlocks(from: markdownString)
+    }
+
+    private static func makeBlocks(from markdownString: String) -> [BlockEditor.Block] {
+        let parsed = LightMark.parse(markdownString)
+
+        if parsed.count == 0 {
+            return [
+                .init(.text(.init()))
+            ]
+        }
+
         let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
             switch blockElement {
             case .paragraph(content: let inlineElements):
@@ -87,7 +97,6 @@ class MarkdownDocument: NSDocument {
                 return nil
             }
         }
-
-        blockEditor.blocks = blocks
+        return blocks
     }
 }

@@ -29,6 +29,17 @@ public class EditableBlock: Equatable {
         switch self.content {
         case .text:
             return InlineBlockEditor()
+        case .tokens(let syntaxNode):
+            let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
+
+            var style = view.canvasStyle
+            style.textMargin = .zero
+            view.canvasStyle = style
+
+            view.scrollsVertically = false
+            view.showsMinimap = false
+            view.showsLineButtons = false
+            return view
         }
     }
 
@@ -37,6 +48,9 @@ public class EditableBlock: Equatable {
         case .text(let value):
             let view = view as! InlineBlockEditor
             view.textValue = value
+        case .tokens(let value):
+            let view = view as! LogicEditor
+            view.rootNode = value
         }
     }
 
@@ -65,6 +79,7 @@ public class EditableBlock: Equatable {
 
 public enum EditableBlockContent: Equatable {
     case text(NSAttributedString)
+    case tokens(LGCSyntaxNode)
 }
 
 // MARK: - BlockEditor
