@@ -121,6 +121,10 @@ public class BlockListView: NSBox {
 
     // MARK: Public
 
+    open func handleChangeBlocks(_ blocks: [BlockEditor.Block]) -> Bool {
+        return onChangeBlocks?(blocks) ?? false
+    }
+
     private func showToolTip(string: String, at point: NSPoint) {
         guard let window = window else { return }
         let windowPoint = convert(point, to: nil)
@@ -133,6 +137,12 @@ public class BlockListView: NSBox {
 
     public var plusButtonTooltip: String = "**Click** _to add below_"
     public var moreButtonTooltip: String = "**Drag** _to move_\n**Click** _to open menu_"
+
+    private func handlePressMore(line: Int) {
+        TooltipManager.shared.hideTooltip()
+
+        selection = .blocks(NSRange(location: line, length: 0))
+    }
 
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
@@ -149,20 +159,20 @@ public class BlockListView: NSBox {
         var clone = blocks
 
         clone.insert(block, at: line + 1)
-        actions.append(.focus(id: block.id))
 
-        onChangeBlocks?(clone)
+        if handleChangeBlocks(clone) {
+            focus(id: block.id)
+            guard let addedLine = self.line(forBlock: block.id) else { return }
+
+            guard let window = window else { return }
+            let rect = window.convertToScreen(tableView.convert(tableView.rect(ofRow: addedLine), to: nil))
+
+            showCommandPalette(line: addedLine, query: "", rect: rect)
+        }
     }
 
     private func handleAddBlock(line: Int, text: NSAttributedString) {
-        var clone = blocks
-
-        let id = UUID()
-        let emptyBlock: EditableBlock = .init(id: id, content: .text(text))
-        clone.insert(emptyBlock, at: line + 1)
-        actions.append(.focus(id: id))
-
-        onChangeBlocks?(clone)
+        handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text)))
     }
 
     private func handleDelete(line: Int) {
@@ -171,9 +181,9 @@ public class BlockListView: NSBox {
 
         let id = blocks[line > 0 ? line - 1 : line].id
 
-        actions.append(.focus(id: id))
-
-        self.onChangeBlocks?(clone)
+        if handleChangeBlocks(clone) {
+            focus(id: id)
+        }
     }
 
     public var blocks: [BlockEditor.Block] = [] {
@@ -234,7 +244,7 @@ public class BlockListView: NSBox {
 
     var actions: [Action] = []
 
-    public var onChangeBlocks: (([BlockEditor.Block]) -> Void)?
+    public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
 
     // MARK: Private
 
@@ -298,6 +308,16 @@ public class BlockListView: NSBox {
 //                }
             }
         }
+    }
+
+    private func line(forBlock id: UUID) -> Int? {
+        return blocks.firstIndex(where: { $0.id == id })
+    }
+
+    private func focus(id: UUID) {
+        guard let line = line(forBlock: id) else { return }
+
+        focus(line: line)
     }
 
     private func focus(line index: Int) {
@@ -434,7 +454,7 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width - lineButtonMargin,
-            y: rowRect.maxY - lineButtonSize.height - 4,
+            y: rowRect.maxY - lineButtonSize.height - 3,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -446,7 +466,7 @@ public class BlockListView: NSBox {
 
         let rect = NSRect(
             x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
-            y: rowRect.maxY - lineButtonSize.height - 4,
+            y: rowRect.maxY - lineButtonSize.height - 3,
             width: lineButtonSize.width,
             height: lineButtonSize.height)
 
@@ -455,6 +475,9 @@ public class BlockListView: NSBox {
 
     public static var commandPalette: SuggestionWindow = {
         let suggestionWindow = SuggestionWindow()
+
+        suggestionWindow.showsSearchBar = false
+        suggestionWindow.suggestionView.showsSuggestionDetails = false
 
         suggestionWindow.onRequestHide = {
             suggestionWindow.orderOut(nil)
@@ -626,8 +649,8 @@ public class BlockListView: NSBox {
         switch item(at: point) {
         case .plusButton(let line):
             handlePressPlus(line: line)
-        case .moreButton(_):
-            break
+        case .moreButton(let line):
+            handlePressMore(line: line)
         case .item(let line, let point):
             let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
 
@@ -698,7 +721,7 @@ extension BlockListView: NSTableViewDelegate {
                 var clone = self.blocks
                 clone[row] = .init(id: item.id, content: .text(newValue))
 
-                self.onChangeBlocks?(clone)
+                _ = self.handleChangeBlocks(clone)
             }
 
             view.onChangeSelectedRange = { [unowned self] range in
@@ -760,7 +783,6 @@ extension BlockListView: NSTableViewDelegate {
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
         subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
-        subwindow.suggestionView.showsSuggestionDetails = false
         subwindow.suggestionView.suggestionListWidth = 200
         subwindow.suggestionText = ""
         subwindow.placeholderText = "Filter actions"
@@ -793,7 +815,8 @@ extension BlockListView: NSTableViewDelegate {
         }
 
         window.addChildWindow(subwindow, ordered: .above)
-        subwindow.focusSearchField()
+        window.makeMain()
+//        subwindow.focusSearchField()
 
         let hideWindow = { [unowned self] in
             subwindow.orderOut(nil)

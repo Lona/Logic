@@ -56,6 +56,7 @@ class MarkdownDocument: NSDocument {
 
         blockEditor.onChangeBlocks = { [unowned self] blocks in
             self.blockEditor.blocks = blocks
+            return true
         }
 
         containerView.translatesAutoresizingMaskIntoConstraints = false

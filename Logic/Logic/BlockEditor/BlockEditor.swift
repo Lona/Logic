@@ -126,7 +126,7 @@ public class BlockEditor: NSBox {
         }
     }
 
-    public var onChangeBlocks: (([Block]) -> Void)? {
+    public var onChangeBlocks: (([Block]) -> Bool)? {
         get { return blockListView.onChangeBlocks }
         set { blockListView.onChangeBlocks = newValue }
     }

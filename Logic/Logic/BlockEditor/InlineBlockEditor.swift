@@ -8,8 +8,8 @@
 
 import Foundation
 
-private var defaultTextStyle = TextStyle(size: 16)
-private var placeholderTextStyle = TextStyle(size: 16, color: Colors.textComment)
+private var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
+private var placeholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: Colors.textComment)
 
 public class InlineBlockEditor: AttributedTextView {
 

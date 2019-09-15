@@ -212,6 +212,11 @@ public class SuggestionWindow: NSWindow {
         set { suggestionView.onChangeSearchText = newValue }
     }
 
+    public var showsSearchBar: Bool {
+        get { return suggestionView.showsSeachBar }
+        set { suggestionView.showsSeachBar = newValue }
+    }
+
     // MARK: Filter bar
 
     public var suggestionFilter: SuggestionView.SuggestionFilter {
@@ -268,6 +273,10 @@ public class SuggestionWindow: NSWindow {
     }
 
     // MARK: Focus
+
+    public override var acceptsFirstResponder: Bool {
+        return showsSearchBar
+    }
 
     public func focusSearchField() {
         makeKey()
