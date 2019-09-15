@@ -22,16 +22,11 @@ public class SuggestionWindow: NSWindow {
         window.backgroundColor = NSColor.clear
         window.isOpaque = false
 
-        let shadow = NSShadow()
-        shadow.shadowBlurRadius = 4
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
-        shadow.shadowOffset = NSSize(width: 0, height: -2)
-
         shadowView.boxType = .custom
         shadowView.borderType = .noBorder
         shadowView.contentViewMargins = .zero
         shadowView.fillColor = Colors.suggestionWindowBackground
-        shadowView.shadow = shadow
+        shadowView.shadow = OverlayWindow.shadow
         shadowView.cornerRadius = 4
 
         let view = NSView()

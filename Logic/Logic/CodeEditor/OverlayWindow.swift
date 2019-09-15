@@ -49,16 +49,11 @@ public class OverlayWindow: NSWindow {
         backgroundColor = NSColor.clear
         isOpaque = false
 
-        let shadow = NSShadow()
-        shadow.shadowBlurRadius = 4
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
-        shadow.shadowOffset = NSSize(width: 0, height: -2)
-
         shadowView.boxType = .custom
         shadowView.borderType = .noBorder
         shadowView.contentViewMargins = .zero
         shadowView.fillColor = Colors.suggestionWindowBackground
-        shadowView.shadow = shadow
+        shadowView.shadow = OverlayWindow.shadow
         shadowView.cornerRadius = 4
 
         contentContainerView.addSubview(shadowView)
@@ -144,5 +139,24 @@ public class OverlayWindow: NSWindow {
     public override func setFrameOrigin(_ point: NSPoint) {
         let offsetOrigin = NSPoint(x: point.x - OverlayWindow.shadowViewMargin, y: point.y - OverlayWindow.shadowViewMargin)
         super.setFrameOrigin(offsetOrigin)
+    }
+
+    public static var shadow: NSShadow {
+        let shadow = NSShadow()
+        shadow.shadowBlurRadius = 4
+        shadow.shadowOffset = NSSize(width: 0, height: -2)
+
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
+                shadow.shadowColor = NSColor.black.withAlphaComponent(0.8)
+                return shadow
+            default:
+                break
+            }
+        }
+
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
+        return shadow
     }
 }
