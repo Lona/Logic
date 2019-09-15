@@ -182,10 +182,12 @@ public class BlockListView: NSBox {
     }
 
     private func handleDelete(line: Int) {
+        if blocks.count <= 1 { return }
+
         var clone = self.blocks
         clone.remove(at: line)
 
-        let id = blocks[line > 0 ? line - 1 : line].id
+        let id = clone[line > 0 ? line - 1 : line].id
 
         if handleChangeBlocks(clone) {
             focus(id: id)
@@ -261,6 +263,8 @@ public class BlockListView: NSBox {
             case .none:
                 break
             case .item(let row, _):
+                if row >= blocks.count { return }
+
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
                 if let view = view as? InlineBlockEditor {
@@ -279,6 +283,8 @@ public class BlockListView: NSBox {
             case .none:
                 break
             case .item(let row, let range):
+                if row >= blocks.count { return }
+
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
                 if let view = view as? InlineBlockEditor {
