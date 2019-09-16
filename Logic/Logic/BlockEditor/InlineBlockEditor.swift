@@ -26,11 +26,35 @@ public class InlineBlockEditor: AttributedTextView {
             switch self {
             case .paragraph: return 16
             case .h6, .h5, .h4: return 16
-            case .h3: return 24
+            case .h3: return 22
             case .h2: return 28
-            case .h1: return 32
+            case .h1: return 36
             }
         }
+
+        public var prefix: String? {
+            switch self {
+            case .paragraph: return nil
+            case .h6, .h5, .h4: return nil
+            case .h3: return "###"
+            case .h2: return "##"
+            case .h1: return "#"
+            }
+        }
+
+        func apply(to textValue: NSAttributedString) -> NSAttributedString {
+            let newTextValue = NSMutableAttributedString(attributedString: textValue)
+
+            newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
+                let font = value as! NSFont
+                guard let newFont = NSFont(descriptor: font.fontDescriptor, size: self.fontSize) else { return }
+                newTextValue.addAttribute(.font, value: newFont, range: range)
+            })
+
+            return newTextValue
+        }
+
+        public static let headings: [SizeLevel] = [.h1, .h2, .h3, .h4, .h5, .h6]
     }
 
     public var sizeLevel: SizeLevel = .paragraph {

@@ -178,7 +178,7 @@ public class BlockListView: NSBox {
     }
 
     private func handleAddBlock(line: Int, text: NSAttributedString) -> Bool {
-        return handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text, .h1)))
+        return handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text, .paragraph)))
     }
 
     private func handleDelete(line: Int) {
@@ -248,6 +248,8 @@ public class BlockListView: NSBox {
             }
 
             actions = []
+
+            needsDisplay = true
         }
     }
 
@@ -760,8 +762,22 @@ extension BlockListView: NSTableViewDelegate {
             view.onChangeTextValue = { [unowned self] newValue in
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
+                for heading in InlineBlockEditor.SizeLevel.headings {
+                    if let prefix = heading.prefix, newValue.string.starts(with: prefix + " ") && !textValue.string.starts(with: prefix + " ") {
+                        let prefixLength = prefix.count + 1
+                        let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
+
+                        var clone = self.blocks
+                        clone[row] = .init(id: item.id, content: .text(heading.apply(to: remainder), heading))
+
+                        _ = self.handleChangeBlocks(clone)
+
+                        return
+                    }
+                }
+
                 var clone = self.blocks
-                clone[row] = .init(id: item.id, content: .text(newValue, sizeLevel))
+                clone[row] = .init(id: item.id, content: .text(newValue, view.sizeLevel))
 
                 _ = self.handleChangeBlocks(clone)
             }
