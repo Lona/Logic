@@ -149,7 +149,7 @@ public class OverlayWindow: NSWindow {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
             case .some(.darkAqua):
-                shadow.shadowColor = NSColor.black.withAlphaComponent(0.8)
+                shadow.shadowColor = NSColor.black.withAlphaComponent(0.85)
                 return shadow
             default:
                 break

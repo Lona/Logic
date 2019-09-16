@@ -204,7 +204,7 @@ public class BlockListView: NSBox {
                     let new = blocks[index]
 
                     if old !== new {
-                        Swift.print("update", index)
+//                        Swift.print("update", index)
                         if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
                             case .text(let attributedString, let sizeLevel) = new.content {
                             view.textValue = attributedString
@@ -414,7 +414,7 @@ public class BlockListView: NSBox {
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        if let hoveredLine = hoveredLine {
+        if let hoveredLine = hoveredLine, hoveredLine < blocks.count {
             let rect = plusButtonRect(for: hoveredLine)
             let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
 
@@ -428,7 +428,7 @@ public class BlockListView: NSBox {
             path.stroke()
         }
 
-        if let hoveredLine = hoveredLine {
+        if let hoveredLine = hoveredLine, hoveredLine < blocks.count {
             let rect = moreButtonRect(for: hoveredLine)
             let backgroundPath = NSBezierPath(roundedRect: rect, xRadius: 4, yRadius: 4)
 
@@ -621,12 +621,13 @@ public class BlockListView: NSBox {
                         } else {
                             selection = .blocks(NSRange(location: row, length: initialRow - row + 1))
                         }
-                        Swift.print("sel", selection)
                     } else {
                         initialRow = row
 
                         if let view = view as? InlineBlockEditor {
                             let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
+
+                            Swift.print(characterIndex, position, convert(position, to: view))
                             
                             if let initialIndex = initialIndex {
                                 selection = .item(row, NSRange(between: initialIndex, and: characterIndex))
@@ -793,6 +794,35 @@ extension BlockListView: NSTableViewDelegate {
                     } else {
                         InlineToolbarWindow.shared.orderOut(nil)
                     }
+                }
+            }
+
+            view.onMoveUp = { [unowned self] rect in
+                switch self.selection {
+                case .blocks(let range):
+                    self.selection = .blocks(NSRange(location: max(range.location - 1, 0), length: 1))
+                case .item(let line, _):
+                    let nextLine = line - 1
+
+                    if line == 0 {
+                        self.selection = .item(0, .empty)
+                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? InlineBlockEditor {
+                        let lastLine = nextView.lineRects.last!
+                        let windowRect = self.window!.convertFromScreen(rect)
+                        let convertedRect = nextView.convert(windowRect, from: nil)
+
+                        let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: convertedRect.origin.x, y: lastLine.midY))
+
+                        self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
+
+                        if nextView.acceptsFirstResponder {
+                            self.window?.makeFirstResponder(nextView)
+                        }
+                    } else {
+                        self.focus(line: nextLine)
+                    }
+                case .none:
+                    break
                 }
             }
 

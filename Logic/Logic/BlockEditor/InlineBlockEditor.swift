@@ -32,6 +32,18 @@ public class InlineBlockEditor: AttributedTextView {
             }
         }
 
+        var fontWeight: NSFont.Weight {
+            // This affects bold trait detection
+            return .regular
+//            switch self {
+//            case .paragraph: return .light
+//            case .h6, .h5, .h4: return .regular
+//            case .h3: return .medium
+//            case .h2: return .medium
+//            case .h1: return .medium
+//            }
+        }
+
         public var prefix: String? {
             switch self {
             case .paragraph: return nil
@@ -59,7 +71,7 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var sizeLevel: SizeLevel = .paragraph {
         didSet {
-            Swift.print("set size level", sizeLevel)
+//            Swift.print("set size level", sizeLevel)
 
             if oldValue == sizeLevel { return }
 
@@ -68,25 +80,15 @@ public class InlineBlockEditor: AttributedTextView {
             if let placeholderAttributedString = self.placeholderAttributedString {
                 self.placeholderAttributedString = placeholderTextStyle.apply(to: placeholderAttributedString)
             }
-
-            //            let newTextValue = NSMutableAttributedString(attributedString: textValue)
-
-            //            newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
-//                let font = value as! NSFont
-//                guard let newFont = NSFont(descriptor: font.fontDescriptor, size: sizeLevel.fontSize) else { return }
-//                newTextValue.addAttribute(.font, value: newFont, range: range)
-//            })
-
-//            textValue = newTextValue
         }
     }
 
     private var textStyle: TextStyle {
-        return defaultTextStyle.with(size: sizeLevel.fontSize)
+        return defaultTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
     }
 
     private var placeholderTextStyle: TextStyle {
-        return defaultPlaceholderTextStyle.with(size: sizeLevel.fontSize)
+        return defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
     }
 
     public func setPlaceholder(string: String) {
@@ -193,6 +195,8 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var onHideCommandPalette: (() -> Void)?
 
+    public var onMoveUp: ((NSRect) -> Void)?
+
     public func resetCommandPaletteIndex() {
         commandPaletteIndex = nil
     }
@@ -207,7 +211,7 @@ public class InlineBlockEditor: AttributedTextView {
 
         let rect = firstRect(forCharacterRange: range, actualRange: nil)
 
-        Swift.print("prefix", prefix)
+//        Swift.print("prefix", prefix)
 
         if prefix.last == "/" {
             self.commandPaletteIndex = location
@@ -292,16 +296,6 @@ public class InlineBlockEditor: AttributedTextView {
 
         if result {
             InlineToolbarWindow.shared.orderOut(nil)
-//            Swift.print("Resign")
-//
-//            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
-//                guard let self = self, self.window?.firstResponder != self else { return }
-//
-//                Swift.print("Ps")
-//
-//                self.placeholderString = " "
-//                self.needsDisplay = true
-//            }
         }
 
         return result
@@ -320,9 +314,16 @@ public class InlineBlockEditor: AttributedTextView {
             onRequestCreateEditor?(suffix)
             onChangeTextValue?(prefix)
 
-            Swift.print("remainder", suffix.string)
+//            Swift.print("remainder", suffix.string)
 
             return
+        } else if selector == #selector(NSResponder.moveUp) {
+            if currentLineFragmentIndex == 0 {
+                Swift.print("move up")
+                let rect = firstRect(forCharacterRange: selectedRange(), actualRange: nil)
+                onMoveUp?(rect)
+                return
+            }
         }
 
         return super.doCommand(by: selector)
@@ -391,67 +392,9 @@ public class InlineBlockEditor: AttributedTextView {
         invalidateIntrinsicContentSize()
     }
 
-//    public override func setSelectedRange(_ charRange: NSRange) {
-//        Swift.print("Called")
-//    }
-//
-//    public override func setSelectedRange(_ charRange: NSRange, affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
-//        Swift.print("called")
-//    }
-
-//    public override var selectedRanges: [NSValue] {
-//        didSet {
-//            layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
-//
-//            for value in selectedRanges {
-//                let range = value.rangeValue
-//                layoutManager?.addTemporaryAttribute(.underlineStyle, value: NSUnderlineStyle.double, forCharacterRange: range)
-//            }
-//        }
-//    }
-
     public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
         super.setSelectedRanges(ranges, affinity: .downstream, stillSelecting: true)
     }
-
-//    public override func setSelectedRanges(_ ranges: [NSValue], affinity: NSSelectionAffinity, stillSelecting stillSelectingFlag: Bool) {
-////        if selectedRanges == ranges {
-////            return
-////        }
-//
-////        Swift.print("flag", stillSelectingFlag)
-//
-//        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: true)
-//
-////        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
-////
-////        for value in ranges {
-////            let range = value.rangeValue
-////            layoutManager?.addTemporaryAttribute(.foregroundColor, value: NSColor.green, forCharacterRange: range)
-////        }
-//    }
-
-//    public override func setSelectedRanges(
-//        _ ranges: [NSValue],
-//        affinity: NSSelectionAffinity,
-//        stillSelecting stillSelectingFlag: Bool) {
-//
-//        super.setSelectedRanges(ranges, affinity: affinity, stillSelecting: stillSelectingFlag)
-//
-////        layoutManager?.setTemporaryAttributes([:], forCharacterRange: NSRange(location: 0, length: string.count))
-////
-////        for value in selectedRanges {
-////            let range = value.rangeValue
-////            layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: range)
-////        }
-////
-////        layoutManager?.removeTemporaryAttribute(.backgroundColor, forCharacterRange: NSRange(location: 0, length: string.count))
-////
-////        for value in ranges {
-////            let range = value.rangeValue
-////            layoutManager?.addTemporaryAttribute(.foregroundColor, value: NSColor.green, forCharacterRange: range)
-////        }
-//    }
 }
 
 extension NSAttributedString {
@@ -474,16 +417,44 @@ extension NSAttributedString {
     }
 }
 
+extension NSTextView {
+    var lineRects: [NSRect] {
+        guard let container = textContainer, let manager = container.layoutManager else { return [] }
 
-protocol FieldEditable {
-    var isFieldEditorFirstResponder: Bool { get }
-}
+        let fullGlyphRange = manager.glyphRange(for: container)
+        var rects: [NSRect] = []
 
-extension InlineBlockEditor: FieldEditable {
-    var isFieldEditorFirstResponder: Bool {
-//        guard let window = window, let currentEditor = currentEditor() else { return false }
+        manager.enumerateLineFragments(forGlyphRange: fullGlyphRange) { (rect, usedRect, textContainer, glyphRange, boolPointer) in
+            rects.append(rect)
+        }
 
-        return window?.firstResponder == self
+        if manager.extraLineFragmentRect.height > 4 {
+            rects.append(manager.extraLineFragmentRect)
+        }
+
+        return rects
+    }
+
+    var currentLineFragmentIndex: Int? {
+        guard let container = textContainer, let manager = container.layoutManager else { return nil }
+
+        let selectedGlyphRange = manager.glyphRange(forCharacterRange: selectedRange(), actualCharacterRange: nil)
+        let selectedGlyphRect = manager.boundingRect(forGlyphRange: selectedGlyphRange, in: container)
+
+        for (line, rect) in lineRects.enumerated() {
+            if rect.minY <= selectedGlyphRect.midY && selectedGlyphRect.midY <= rect.maxY {
+                return line
+            }
+        }
+
+        return nil
+    }
+
+    public func nearestCharacter(at point: NSPoint) -> Int? {
+        guard let container = textContainer, let manager = container.layoutManager else { return nil }
+
+        let glyph = manager.glyphIndex(for: point, in: container, fractionOfDistanceThroughGlyph: nil)
+
+        return manager.characterIndexForGlyph(at: glyph)
     }
 }
-
