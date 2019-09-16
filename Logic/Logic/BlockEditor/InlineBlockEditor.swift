@@ -399,7 +399,9 @@ public class InlineBlockEditor: AttributedTextView {
         manager.ensureLayout(for: container)
         let size = manager.usedRect(for: container).size
 //        Swift.print(string, size, container.containerSize, container.size)
-        return size
+//        return size
+
+        return .init(width: size.width, height: ceil(size.height + sizeLevel.fontSize * 0.2))
     }
 
     func textDidChange(_ notification: Notification) {

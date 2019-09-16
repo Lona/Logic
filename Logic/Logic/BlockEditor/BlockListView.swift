@@ -99,10 +99,6 @@ public class BlockListRowView: NSTableRowView {
 
 public class BlockListView: NSBox {
 
-    enum Action {
-        case focus(id: UUID)
-    }
-
     // MARK: Lifecycle
 
     public init() {
@@ -253,28 +249,15 @@ public class BlockListView: NSBox {
 //                }
             }
 
-            actions.forEach { action in
-                switch action {
-                case .focus(id: let id):
-                    guard let index = blocks.firstIndex(where: { $0.id == id }) else { return }
-
-                    Swift.print("Focus", index)
-
-                    focus(line: index)
-                }
-            }
-
-            actions = []
-
             needsDisplay = true
         }
     }
 
-    var actions: [Action] = []
-
     public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
 
     // MARK: Private
+
+    private var commandPaletteAnchor: (line: Int, character: Int)?
 
     private var selection: BlockListSelection = .none {
         didSet {
