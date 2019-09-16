@@ -614,6 +614,10 @@ public class BlockListView: NSBox {
 //    }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
+        if let scroller = scrollView.verticalScroller, let view = scroller.hitTest(point) {
+            return view
+        }
+
         if bounds.contains(point) {
             return self
         }
@@ -622,8 +626,6 @@ public class BlockListView: NSBox {
     }
 
     public override func mouseDown(with event: NSEvent) {
-//        Swift.print("mouseDown")
-
         BlockListView.commandPalette.orderOut(nil)
         InlineToolbarWindow.shared.orderOut(nil)
 
