@@ -545,7 +545,7 @@ public class BlockListView: NSBox {
             case .blocks(let range, _):
                 let newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
 
-                selection = .none
+                selection = .blocks(.init(location: range.location, length: 0), anchor: range.location)
 
                 _ = handleChangeBlocks(newBlocks)
             default:
@@ -943,6 +943,25 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 }
             }
+
+            let handleSelect: () -> Void = { [unowned self] in
+                switch self.selection {
+                case .blocks:
+                    fatalError("Invalid selection when inside text block")
+                    break
+                case .item(let line, _):
+                    if self.acceptsFirstResponder {
+                        self.window?.makeFirstResponder(self)
+                    }
+
+                    self.selection = .blocks(.init(location: line, length: 1), anchor: line)
+                case .none:
+                    break
+                }
+            }
+
+            view.onSelectUp = handleSelect
+            view.onSelectDown = handleSelect
 
             view.onRequestCreateEditor = { [unowned self] newText in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }

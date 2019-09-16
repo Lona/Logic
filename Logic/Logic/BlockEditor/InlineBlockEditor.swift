@@ -199,6 +199,10 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var onMoveDown: ((NSRect) -> Void)?
 
+    public var onSelectUp: (() -> Void)?
+
+    public var onSelectDown: (() -> Void)?
+
     public func resetCommandPaletteIndex() {
         commandPaletteIndex = nil
     }
@@ -321,16 +325,24 @@ public class InlineBlockEditor: AttributedTextView {
             return
         } else if selector == #selector(NSResponder.moveUp) {
             if currentLineFragmentIndex == 0 {
-                Swift.print("move up")
                 let rect = firstRect(forCharacterRange: selectedRange(), actualRange: nil)
                 onMoveUp?(rect)
                 return
             }
+        } else if selector == #selector(NSResponder.moveUpAndModifySelection) {
+            if currentLineFragmentIndex == 0 {
+                onSelectUp?()
+                return
+            }
         } else if selector == #selector(NSResponder.moveDown) {
             if currentLineFragmentIndex == lineRects.count - 1 {
-                Swift.print("move down")
                 let rect = firstRect(forCharacterRange: selectedRange(), actualRange: nil)
                 onMoveDown?(rect)
+                return
+            }
+        } else if selector == #selector(NSResponder.moveDownAndModifySelection) {
+            if currentLineFragmentIndex == lineRects.count - 1 {
+                onSelectDown?()
                 return
             }
         }
