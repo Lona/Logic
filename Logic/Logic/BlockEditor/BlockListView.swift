@@ -12,7 +12,11 @@ import Differ
 private enum BlockListSelection: Equatable {
     case none
     case item(Int, NSRange)
-    case blocks(NSRange)
+    case blocks(NSRange, anchor: Int)
+
+    static func blocks(_ range: NSRange) -> BlockListSelection {
+        return .blocks(range, anchor: range.location)
+    }
 }
 
 private enum BlockListItem: Equatable {
@@ -28,6 +32,19 @@ extension NSRange {
     }
 
     public static var empty: NSRange = .init(location: 0, length: 0)
+
+    public static func merge(ranges: [NSRange]) -> NSRange {
+        if ranges.isEmpty { fatalError("Cannot merge 0 ranges") }
+
+        let location = ranges.map { $0.location }.min()!
+        let length = ranges.map { $0.upperBound }.max()! - location
+
+        return .init(location: location, length: length)
+    }
+
+    func removing(range: NSRange) -> NSRange {
+        return .init(location: lowerBound, length: max(0, range.lowerBound - lowerBound))
+    }
 }
 
 private extension NSPoint {
@@ -274,7 +291,7 @@ public class BlockListView: NSBox {
                     view.needsDisplay = true
                     view.setPlaceholder(string: " ")
                 }
-            case .blocks(let range):
+            case .blocks(let range, _):
                 for index in range.lowerBound..<range.upperBound {
                     let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
                     rowView?.isBlockSelected = false
@@ -294,7 +311,7 @@ public class BlockListView: NSBox {
 //                    view.needsDisplay = true
                     view.setPlaceholder(string: "Type '/' for commands")
                 }
-            case .blocks(let range):
+            case .blocks(let range, _):
                 for index in range.lowerBound..<range.upperBound {
                     let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
                     rowView?.isBlockSelected = true
@@ -508,13 +525,24 @@ public class BlockListView: NSBox {
     // MARK: Event handling
 
     public override func keyDown(with event: NSEvent) {
-        let characters = event.charactersIgnoringModifiers!
+        let isShiftEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
+//        let isCommandEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.command)
 
-        if characters == String(Character(UnicodeScalar(NSEvent.SpecialKey.delete.rawValue)!)) {
+//        switch (event.characters) {
+//        case "d" where isShiftEnabled && isCommandEnabled:
+//            onDuplicateCommand?()
+//        default:
+//            break
+//        }
+
+        switch Int(event.keyCode) {
+        case 36: // Enter
+            break
+        case 48: // Tab
+            break
+        case 51: // Delete
             switch selection {
-            case .blocks(let range):
-                Swift.print("delete selection", range)
-                Swift.print("keeping", 0..<range.location, range.location+range.length..<blocks.count)
+            case .blocks(let range, _):
                 let newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
 
                 selection = .none
@@ -523,8 +551,67 @@ public class BlockListView: NSBox {
             default:
                 break
             }
+        case 123: // Left
+            fallthrough
+        case 126: // Up
+            switch selection {
+            case .blocks(let range, let anchor):
+                let newRange = NSRange(location: max(0, range.location - 1), length: 1)
+
+                if isShiftEnabled {
+                    if anchor > range.lowerBound {
+                        selection = .blocks(.init(location: range.location, length: range.length - 1), anchor: anchor - 1)
+                    } else {
+                        selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                    }
+                } else {
+                    selection = .blocks(newRange)
+                }
+            default:
+                break
+            }
+        case 124: // Right
+            fallthrough
+        case 125: // Down
+            switch selection {
+            case .blocks(let range, let anchor):
+                let newRange = NSRange(location: min(blocks.count - 1, range.upperBound), length: 1)
+
+                if isShiftEnabled {
+                    if anchor < range.upperBound - 1 {
+                        selection = .blocks(.init(location: range.location + 1, length: range.length - 1), anchor: anchor + 1)
+                    } else {
+                        selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                    }
+                } else {
+                    selection = .blocks(newRange, anchor: newRange.location)
+                }
+            default:
+                break
+            }
+        default:
+            break
         }
     }
+
+//    public override func keyDown(with event: NSEvent) {
+//        let characters = event.charactersIgnoringModifiers!
+//
+//        if characters == String(Character(UnicodeScalar(NSEvent.SpecialKey.delete.rawValue)!)) {
+//            switch selection {
+//            case .blocks(let range):
+//                Swift.print("delete selection", range)
+//                Swift.print("keeping", 0..<range.location, range.location+range.length..<blocks.count)
+//                let newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
+//
+//                selection = .none
+//
+//                _ = handleChangeBlocks(newBlocks)
+//            default:
+//                break
+//            }
+//        }
+//    }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
         if bounds.contains(point) {
@@ -627,8 +714,8 @@ public class BlockListView: NSBox {
                         if let view = view as? InlineBlockEditor {
                             let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
-                            Swift.print(characterIndex, position, convert(position, to: view))
-                            
+//                            Swift.print(characterIndex, position, convert(position, to: view))
+
                             if let initialIndex = initialIndex {
                                 selection = .item(row, NSRange(between: initialIndex, and: characterIndex))
                             } else {
@@ -799,8 +886,9 @@ extension BlockListView: NSTableViewDelegate {
 
             view.onMoveUp = { [unowned self] rect in
                 switch self.selection {
-                case .blocks(let range):
-                    self.selection = .blocks(NSRange(location: max(range.location - 1, 0), length: 1))
+                case .blocks: // This should never happen
+                    fatalError("Invalid selection when inside text block")
+                    break
                 case .item(let line, _):
                     let nextLine = line - 1
 
