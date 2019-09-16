@@ -84,6 +84,15 @@ public class EditableBlock: Equatable {
     public var lineButtonAlignmentHeight: CGFloat {
         return content.lineButtonAlignmentHeight
     }
+
+    public var lastSelectionRange: NSRange {
+        switch content {
+        case .tokens:
+            return .empty
+        case .text(let text, _):
+            return .init(location: text.length, length: 0)
+        }
+    }
 }
 
 public enum EditableBlockContent: Equatable {

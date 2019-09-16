@@ -886,7 +886,7 @@ extension BlockListView: NSTableViewDelegate {
 
             view.onMoveUp = { [unowned self] rect in
                 switch self.selection {
-                case .blocks: // This should never happen
+                case .blocks:
                     fatalError("Invalid selection when inside text block")
                     break
                 case .item(let line, _):
@@ -895,11 +895,41 @@ extension BlockListView: NSTableViewDelegate {
                     if line == 0 {
                         self.selection = .item(0, .empty)
                     } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? InlineBlockEditor {
-                        let lastLine = nextView.lineRects.last!
+                        let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
 
-                        let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: convertedRect.origin.x, y: lastLine.midY))
+                        let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: convertedRect.origin.x, y: lineRect.midY))
+
+                        self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
+
+                        if nextView.acceptsFirstResponder {
+                            self.window?.makeFirstResponder(nextView)
+                        }
+                    } else {
+                        self.focus(line: nextLine)
+                    }
+                case .none:
+                    break
+                }
+            }
+
+            view.onMoveDown = { [unowned self] rect in
+                switch self.selection {
+                case .blocks:
+                    fatalError("Invalid selection when inside text block")
+                    break
+                case .item(let line, _):
+                    let nextLine = line + 1
+
+                    if line >= self.blocks.count - 1 {
+                        self.selection = .item(self.blocks.count - 1, self.blocks[line].lastSelectionRange)
+                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? InlineBlockEditor {
+                        let lineRect = nextView.lineRects.first!
+                        let windowRect = self.window!.convertFromScreen(rect)
+                        let convertedRect = nextView.convert(windowRect, from: nil)
+
+                        let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: convertedRect.origin.x, y: lineRect.midY))
 
                         self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
 
