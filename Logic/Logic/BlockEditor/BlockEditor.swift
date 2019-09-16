@@ -33,7 +33,7 @@ public class EditableBlock: Equatable {
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
 
             var style = view.canvasStyle
-            style.textMargin = .zero
+            style.textMargin = .init(width: 0, height: 2)
             view.canvasStyle = style
 
             view.scrollsVertically = false

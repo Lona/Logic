@@ -46,6 +46,7 @@ public class SuggestionWindow: NSWindow {
         suggestionView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
         suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
+        suggestionView.showsSeachBar = true
         suggestionView.suggestionListWidth = 200
         suggestionView.showsSuggestionDetails = true
         suggestionView.searchInput.isBordered = false
