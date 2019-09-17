@@ -150,17 +150,17 @@ public class InlineBlockEditor: AttributedTextView {
 
         backgroundColor = .clear
 
-        onPressEscape = { [unowned self] in
-            if self.commandPaletteIndex != nil {
-                self.commandPaletteIndex = nil
-
-                self.onHideCommandPalette?()
-            } else {
-                self.window?.makeFirstResponder(nil)
-
-//                self.placeholderString = " "
-            }
-        }
+//        onPressEscape = { [unowned self] in
+//            if self.commandPaletteIndex != nil {
+//                self.commandPaletteIndex = nil
+//
+//                self.onHideCommandPalette?()
+//            } else {
+//                self.window?.makeFirstResponder(nil)
+//
+////                self.placeholderString = " "
+//            }
+//        }
 
 //        onChangeSelectedRange = { [weak self] range in
 //            guard let self = self else { return }
@@ -191,9 +191,9 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var onRequestDeleteEditor: (() -> Void)?
 
-    public var onSearchCommandPalette: ((String, NSRect) -> Void)?
+    public var onPressUp: (() -> Void)?
 
-    public var onHideCommandPalette: (() -> Void)?
+    public var onPressDown: (() -> Void)?
 
     public var onMoveUp: ((NSRect) -> Void)?
 
@@ -203,37 +203,7 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var onSelectDown: (() -> Void)?
 
-    public func resetCommandPaletteIndex() {
-        commandPaletteIndex = nil
-    }
-
-    open override func handleChangeTextValue(_ value: NSAttributedString) {
-        super.handleChangeTextValue(value)
-
-        let range = self.selectedRange
-        let string = value.string
-        let location = range.location + 1
-        let prefix = string.prefix(location)
-
-        let rect = firstRect(forCharacterRange: range, actualRange: nil)
-
-//        Swift.print("prefix", prefix)
-
-        if prefix.last == "/" {
-            self.commandPaletteIndex = location
-            self.onSearchCommandPalette?("", rect)
-        } else if let index = self.commandPaletteIndex, location > index, string.count > location {
-            let query = (string as NSString).substring(with: NSRange(location: index, length: location - index))
-            self.onSearchCommandPalette?(query, rect)
-        } else {
-            self.commandPaletteIndex = nil
-            self.onHideCommandPalette?()
-        }
-    }
-
     // MARK: Private
-
-    private var commandPaletteIndex: Int?
 
     private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
         InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
@@ -311,19 +281,21 @@ public class InlineBlockEditor: AttributedTextView {
         if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange == .empty {
             onRequestDeleteEditor?()
             return
-        } else if selector == #selector(NSResponder.insertNewline(_:)) {
-            let selectedRange = self.selectedRange
-            let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
-            let suffix = textValue.attributedSubstring(from: remainingRange)
-            let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
-
-            onRequestCreateEditor?(suffix)
-            onChangeTextValue?(prefix)
-
-//            Swift.print("remainder", suffix.string)
-
-            return
+//        } else if selector == #selector(NSResponder.insertNewline(_:)) {
+//            let selectedRange = self.selectedRange
+//            let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
+//            let suffix = textValue.attributedSubstring(from: remainingRange)
+//            let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
+//
+//            onRequestCreateEditor?(suffix)
+//            onChangeTextValue?(prefix)
+//
+////            Swift.print("remainder", suffix.string)
+//
+//            return
         } else if selector == #selector(NSResponder.moveUp) {
+            onPressUp?()
+
             if currentLineFragmentIndex == 0 {
                 let rect = firstRect(forCharacterRange: selectedRange(), actualRange: nil)
                 onMoveUp?(rect)
@@ -335,6 +307,8 @@ public class InlineBlockEditor: AttributedTextView {
                 return
             }
         } else if selector == #selector(NSResponder.moveDown) {
+            onPressDown?()
+
             if currentLineFragmentIndex == lineRects.count - 1 {
                 let rect = firstRect(forCharacterRange: selectedRange(), actualRange: nil)
                 onMoveDown?(rect)

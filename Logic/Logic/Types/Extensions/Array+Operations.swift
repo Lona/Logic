@@ -90,10 +90,16 @@ extension Array {
         return copy
     }
 
-    func replacing(itemAt position: Int, with item: Element) -> Array {
+    func replacing(elementAt position: Int, with item: Element) -> Array {
         var copy = self
         copy.remove(at: position)
         copy.insert(item, at: position)
+        return copy
+    }
+
+    func inserting(_ element: Element, at position: Int) -> Array {
+        var copy = self
+        copy.insert(element, at: position)
         return copy
     }
 }

@@ -85,7 +85,7 @@ class MarkdownDocument: NSDocument {
 
         if parsed.count == 0 {
             return [
-                EditableBlock.makeEmptyBlock()
+                EditableBlock.makeDefaultEmptyBlock()
             ]
         }
 

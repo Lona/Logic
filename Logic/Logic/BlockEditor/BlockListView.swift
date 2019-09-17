@@ -172,6 +172,7 @@ public class BlockListView: NSBox {
             guard let window = window else { return }
             let rect = window.convertToScreen(tableView.convert(tableView.rect(ofRow: addedLine), to: nil))
 
+            commandPaletteAnchor = (addedLine, 0, rect)
             showCommandPalette(line: addedLine, query: "", rect: rect)
         }
     }
@@ -188,10 +189,6 @@ public class BlockListView: NSBox {
         }
 
         return ok
-    }
-
-    private func handleAddBlock(line: Int, text: NSAttributedString) -> Bool {
-        return handleAddBlock(line: line, block: .init(id: UUID(), content: .text(text, .paragraph)))
     }
 
     private func handleDelete(line: Int) {
@@ -256,8 +253,6 @@ public class BlockListView: NSBox {
     public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
 
     // MARK: Private
-
-    private var commandPaletteAnchor: (line: Int, character: Int)?
 
     private var selection: BlockListSelection = .none {
         didSet {
@@ -492,15 +487,15 @@ public class BlockListView: NSBox {
         return rect
     }
 
+    private var commandPaletteAnchor: (line: Int, character: Int, rect: NSRect)?
+
+    public static var commandPaletteVisible: Bool = false
+
     public static var commandPalette: SuggestionWindow = {
         let suggestionWindow = SuggestionWindow()
 
         suggestionWindow.showsSearchBar = false
         suggestionWindow.suggestionView.showsSuggestionDetails = false
-
-        suggestionWindow.onRequestHide = {
-            suggestionWindow.orderOut(nil)
-        }
 
         return suggestionWindow
     }()
@@ -609,8 +604,8 @@ public class BlockListView: NSBox {
     }
 
     public override func mouseDown(with event: NSEvent) {
-        BlockListView.commandPalette.orderOut(nil)
-        InlineToolbarWindow.shared.orderOut(nil)
+        hideCommandPalette()
+        hideInlineToolbarWindow()
 
         let point = convert(event.locationInWindow, from: nil)
 
@@ -760,7 +755,7 @@ public class BlockListView: NSBox {
     public func handleMouseClick(point: NSPoint) {
         selection = .none
 
-        BlockListView.commandPalette.orderOut(nil)
+        hideCommandPalette()
 
         switch item(at: point) {
         case .plusButton(let line):
@@ -835,6 +830,7 @@ extension BlockListView: NSTableViewDelegate {
             view.onChangeTextValue = { [unowned self] newValue in
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
+                // Automatically create headings
                 for heading in InlineBlockEditor.SizeLevel.headings {
                     if let prefix = heading.prefix, newValue.string.starts(with: prefix + " ") && !textValue.string.starts(with: prefix + " ") {
                         let prefixLength = prefix.count + 1
@@ -849,6 +845,27 @@ extension BlockListView: NSTableViewDelegate {
                     }
                 }
 
+                // If the string has changed, check if we want to open the command palette
+                if newValue.string != view.textValue.string {
+                    let range = view.selectedRange
+                    let string = newValue.string
+                    let location = range.location + 1
+                    let prefix = string.prefix(location)
+                    let rect = view.firstRect(forCharacterRange: NSRange(location: range.location, length: 1), actualRange: nil)
+
+                    if prefix.last == "/" {
+                        self.commandPaletteAnchor = (row, location, rect)
+                        self.showCommandPalette(line: row, query: "", rect: rect)
+                    } else if let anchor = self.commandPaletteAnchor, location > anchor.character, string.count >= location {
+                        let query = (string as NSString).substring(with: NSRange(location: anchor.character, length: location - anchor.character))
+                        self.showCommandPalette(line: row, query: query, rect: anchor.rect)
+                    } else {
+                        self.commandPaletteAnchor = nil
+                        self.hideCommandPalette()
+                    }
+                }
+
+                // Update the text
                 var clone = self.blocks
                 clone[row] = .init(id: item.id, content: .text(newValue, view.sizeLevel))
 
@@ -864,12 +881,14 @@ extension BlockListView: NSTableViewDelegate {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
                     } else {
-                        InlineToolbarWindow.shared.orderOut(nil)
+                        self.hideInlineToolbarWindow()
                     }
                 }
             }
 
             view.onMoveUp = { [unowned self] rect in
+                if BlockListView.commandPaletteVisible { return }
+
                 switch self.selection {
                 case .blocks:
                     fatalError("Invalid selection when inside text block")
@@ -900,6 +919,8 @@ extension BlockListView: NSTableViewDelegate {
             }
 
             view.onMoveDown = { [unowned self] rect in
+                if BlockListView.commandPaletteVisible { return }
+
                 switch self.selection {
                 case .blocks:
                     fatalError("Invalid selection when inside text block")
@@ -948,11 +969,48 @@ extension BlockListView: NSTableViewDelegate {
             view.onSelectUp = handleSelect
             view.onSelectDown = handleSelect
 
-            view.onRequestCreateEditor = { [unowned self] newText in
+            view.onPressDown = { [unowned self] in
+                if !BlockListView.commandPaletteVisible { return }
+                self.handleCommandPaletteDown()
+            }
+
+            view.onPressUp = { [unowned self] in
+                if !BlockListView.commandPaletteVisible { return }
+                self.handleCommandPaletteUp()
+            }
+
+            view.onSubmit = { [unowned self] in
+                if BlockListView.commandPaletteVisible {
+                    self.handleCommandPaletteSubmit()
+                    return
+                }
+
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                self.handleAddBlock(line: line, text: newText)
+                let textValue = view.textValue
+                let selectedRange = view.selectedRange
+                let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
+                let suffix = textValue.attributedSubstring(from: remainingRange)
+                let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
+
+                var clone = self.blocks
+                clone[line] = .init(id: item.id, content: .text(prefix, view.sizeLevel))
+
+                let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, .paragraph))
+                clone.insert(nextBlock, at: line + 1)
+
+                let ok = self.handleChangeBlocks(clone)
+
+                if ok {
+                    self.focus(id: nextBlock.id)
+                }
             }
+
+//            view.onRequestCreateEditor = { [unowned self] newText in
+//                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+//
+//                self.handleAddBlock(line: line, text: newText)
+//            }
 
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
@@ -960,15 +1018,15 @@ extension BlockListView: NSTableViewDelegate {
                 self.handleDelete(line: line)
             }
 
-            view.onSearchCommandPalette = { [unowned self] query, rect in
-                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+//            view.onSearchCommandPalette = { [unowned self] query, rect in
+//                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+//
+//                self.showCommandPalette(line: line, query: query, rect: rect)
+//            }
 
-                self.showCommandPalette(line: line, query: query, rect: rect)
-            }
-
-            view.onHideCommandPalette = {
-                BlockListView.commandPalette.orderOut(nil)
-            }
+//            view.onHideCommandPalette = {
+//                BlockListView.commandPalette.orderOut(nil)
+//            }
 
 //            view.onFocus = { [unowned self] in
 //                let row = self.tableView.row(for: view)
@@ -979,26 +1037,91 @@ extension BlockListView: NSTableViewDelegate {
         }
     }
 
+    func hideInlineToolbarWindow() {
+        InlineToolbarWindow.shared.orderOut(nil)
+    }
+
+    func hideCommandPalette() {
+        Swift.print("hide cp")
+        BlockListView.commandPalette.orderOut(nil)
+        BlockListView.commandPaletteVisible = false
+        commandPaletteAnchor = nil
+    }
+
+    func handleCommandPaletteDown() {
+        if let index = BlockListView.commandPalette.selectedIndex {
+            BlockListView.commandPalette.selectedIndex = min(index + 1, BlockListView.commandPalette.suggestionItems.count - 1)
+        } else {
+            BlockListView.commandPalette.selectedIndex = 0
+        }
+    }
+
+    func handleCommandPaletteUp() {
+        if let index = BlockListView.commandPalette.selectedIndex {
+            BlockListView.commandPalette.selectedIndex = max(index - 1, 0)
+        } else {
+            BlockListView.commandPalette.selectedIndex = 0
+        }
+    }
+
+    func handleCommandPaletteSubmit() {
+        if let index = BlockListView.commandPalette.selectedIndex {
+            BlockListView.commandPalette.onSubmit?(index)
+        }
+    }
+
     func showCommandPalette(line: Int, query: String, rect: NSRect) {
         guard let window = self.window else { return }
 
+        Swift.print("show cp")
+
+        BlockListView.commandPaletteVisible = true
+
+        let menuItems: [(SuggestionListItem, EditableBlock)] = [
+            (
+                SuggestionListItem.row("Text", "Write plain text", false, nil, nil),
+                EditableBlock(id: UUID(), content: .text(.init(), .paragraph))
+            ),
+            (
+                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, nil),
+                EditableBlock(id: UUID(), content: .text(.init(), .h1))
+            ),
+            (
+                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, nil),
+                EditableBlock(id: UUID(), content: .text(.init(), .h2))
+            ),
+            (
+                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, nil),
+                EditableBlock(id: UUID(), content: .text(.init(), .h3))
+            ),
+            (
+                SuggestionListItem.row("Token", "Define a design token variable", false, nil, nil),
+                EditableBlock(
+                    id: UUID(),
+                    content: .tokens(
+                        LGCSyntaxNode.declaration(
+                            .variable(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "token"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+                                initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                                comment: nil
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+
         let subwindow = BlockListView.commandPalette
 
-        let suggestionItems: [SuggestionListItem] = [
-            .sectionHeader("COMMANDS"),
-            .row("Text", "Write plain text", false, nil, nil),
-            .row("Token", "Define a design token variable", false, nil, nil)
-        ]
+        let suggestionItems: [SuggestionListItem] = menuItems.map { $0.0 }
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
         subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
         subwindow.suggestionView.suggestionListWidth = 200
-        subwindow.suggestionText = ""
-        subwindow.placeholderText = "Filter actions"
-
         subwindow.anchorTo(rect: rect, verticalOffset: 4)
-        subwindow.suggestionItems = suggestionItems
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
             return suggestionItems.enumerated().filter { offset, item in
@@ -1015,52 +1138,71 @@ extension BlockListView: NSTableViewDelegate {
             }
         }
 
-        subwindow.onChangeSuggestionText = { [unowned subwindow] text in
-            subwindow.suggestionText = text
-            subwindow.suggestionItems = filteredSuggestionItems(query: text).map { offset, item in item }
-            subwindow.selectedIndex = filteredSuggestionItems(query: text).firstIndex(where: { offset, item in item.isSelectable })
-        }
+        subwindow.suggestionText = query
+        subwindow.suggestionItems = filteredSuggestionItems(query: query).map { offset, item in item }
+        subwindow.selectedIndex = filteredSuggestionItems(query: query).firstIndex(where: { offset, item in item.isSelectable })
+
         subwindow.onSelectIndex = { [unowned subwindow] index in
             subwindow.selectedIndex = index
         }
 
         window.addChildWindow(subwindow, ordered: .above)
         window.makeMain()
-//        subwindow.focusSearchField()
 
-        let hideWindow = { [unowned self] in
-            subwindow.orderOut(nil)
-        }
-
-        subwindow.onPressEscapeKey = hideWindow
-        subwindow.onRequestHide = hideWindow
+        subwindow.onRequestHide = self.hideCommandPalette
+        subwindow.onPressEscapeKey = self.hideCommandPalette
 
         subwindow.onSubmit = { [unowned self] index in
             let originalIndex = filteredSuggestionItems(query: subwindow.suggestionText).map { offset, item in offset }[index]
 //            let item = menu[originalIndex]
 //            item.action()
 
-            hideWindow()
+            Swift.print("choose item", originalIndex, "filtered: (\(index))")
 
-            Swift.print("choose item", originalIndex)
+            let newBlock = menuItems[originalIndex].1
 
-            if originalIndex == 1 {
-                self.handleAddBlock(line: line, text: .init())
-            } else if originalIndex == 2 {
-                let defaultTokens = LGCSyntaxNode.declaration(
-                    .variable(
-                        id: UUID(),
-                        name: .init(id: UUID(), name: "token"),
-                        annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
-                        initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
-                        comment: nil
-                    )
-                )
+            Swift.print("new block", newBlock)
 
-                self.handleAddBlock(line: line, block: .init(.tokens(defaultTokens)))
+            var replacementBlock: EditableBlock?
+
+            switch self.blocks[line].content {
+            case .text(let textValue, let sizeLevel):
+                let mutable = NSMutableAttributedString()
+                guard let anchorIndex = self.commandPaletteAnchor?.character else {
+                    fatalError("No anchor index")
+                }
+                mutable.append(textValue.attributedSubstring(from: NSRange(location: 0, length: max(anchorIndex - 1, 0))))
+                let queryEndIndex = anchorIndex + query.count
+                mutable.append(textValue.attributedSubstring(from: NSRange(location: queryEndIndex, length: textValue.length - queryEndIndex)))
+
+                if mutable.length > 1 {
+                    replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel))
+                }
+            case .tokens:
+                break
             }
 
-//            self.update()
+            if let replacementBlock = replacementBlock {
+                let clone = self.blocks
+                    .replacing(elementAt: line, with: replacementBlock)
+                    .inserting(newBlock, at: line + 1)
+
+                let ok = self.handleChangeBlocks(clone)
+
+                if ok {
+                    self.focus(id: newBlock.id)
+                }
+            } else {
+                let clone = self.blocks.replacing(elementAt: line, with: newBlock)
+
+                let ok = self.handleChangeBlocks(clone)
+
+                if ok {
+                    self.focus(id: newBlock.id)
+                }
+            }
+
+            self.hideCommandPalette()
         }
     }
 }

@@ -77,7 +77,7 @@ public class EditableBlock: Equatable {
         EditableBlock.viewCache.removeValue(forKey: id)
     }
 
-    public static func makeEmptyBlock() -> EditableBlock {
+    public static func makeDefaultEmptyBlock() -> EditableBlock {
         return .init(.text(.init(), .paragraph))
     }
 
@@ -91,6 +91,27 @@ public class EditableBlock: Equatable {
             return .empty
         case .text(let text, _):
             return .init(location: text.length, length: 0)
+        }
+    }
+
+    public var isEmpty: Bool {
+        switch content {
+        case .tokens:
+            return false
+        case .text(let text, _):
+            let string = text.string
+            return string.isEmpty || string == "/"
+        }
+    }
+}
+
+extension EditableBlock: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        switch content {
+        case .text(let textValue, let sizeLevel):
+            return "text:\(sizeLevel):\(textValue.string)"
+        case .tokens(let syntaxNode):
+            return "tokens:\(syntaxNode.nodeTypeDescription)"
         }
     }
 }

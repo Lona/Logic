@@ -121,7 +121,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
         case .enumType(var genericType):
             if path.count > 1 {
                 genericType.cases = genericType.cases.replacing(
-                    itemAt: path[0],
+                    elementAt: path[0],
                     with: genericType.cases[path[0]].appending(item: item, atPath: Array(path.dropFirst()))
                 )
             } else {
@@ -140,7 +140,7 @@ public enum TypeEntity: Codable & Equatable, CustomDebugStringConvertible {
         case .enumType(var genericType):
             if path.count > 1 {
                 genericType.cases = genericType.cases.replacing(
-                    itemAt: path[0],
+                    elementAt: path[0],
                     with: genericType.cases[path[0]].inserting(item: item, atPath: Array(path.dropFirst()))
                 )
             } else {
