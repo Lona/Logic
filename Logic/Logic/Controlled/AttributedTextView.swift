@@ -50,7 +50,7 @@ open class AttributedTextView: NSTextView {
     public var onSubmit: (() -> Void)?
     public var onPressEscape: (() -> Void)?
 
-    public var textValue: NSAttributedString = .init() {
+    private var _textValue: NSAttributedString = .init() {
         didSet {
             if currentlyHandlingTextChange {
                 pendingTextChange = textValue
@@ -70,8 +70,19 @@ open class AttributedTextView: NSTextView {
         }
     }
 
+    public var textValue: NSAttributedString {
+        get { return _textValue }
+        set {
+            _textValue = prepareTextValue(newValue)
+        }
+    }
+
     open func handleChangeTextValue(_ value: NSAttributedString) {
         onChangeTextValue?(value)
+    }
+
+    open func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
+        return value
     }
 
     // MARK: Private

@@ -205,6 +205,22 @@ public class InlineBlockEditor: AttributedTextView {
 
     // MARK: Private
 
+//    public override func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
+//        let mutable = NSMutableAttributedString(attributedString: value)
+//
+//        let style = NSMutableParagraphStyle()
+//
+//        style.lineSpacing = 10
+//
+//        mutable.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: value.length))
+//
+//        return mutable
+//    }
+//
+//    public override func handleChangeTextValue(_ value: NSAttributedString) {
+//        super.handleChangeTextValue(value)
+//    }
+
     private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
         InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
         InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
