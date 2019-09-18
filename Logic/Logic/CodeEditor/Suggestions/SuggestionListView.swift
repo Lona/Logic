@@ -150,9 +150,10 @@ public class SuggestionListView: NSBox {
 }
 
 // MARK: - Target
+
 extension SuggestionListView {
     @objc func handleDoubleAction(_ sender: AnyObject) {
-        guard tableView.clickedRow > 0 else { return }
+        guard tableView.clickedRow >= 0 else { return }
 
         let item = self.items[tableView.clickedRow]
         if item.isSelectable {

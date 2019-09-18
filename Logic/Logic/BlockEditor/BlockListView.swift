@@ -665,8 +665,6 @@ public class BlockListView: NSBox {
 //    }
 
     public func trackMouse(startingAt initialPosition: NSPoint) {
-//        Swift.print("Start tracking")
-
         guard let window = window else { return }
 
         var isDragging: Bool = false

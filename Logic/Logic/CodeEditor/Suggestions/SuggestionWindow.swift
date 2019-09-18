@@ -351,7 +351,7 @@ public class SuggestionWindow: NSWindow {
     // MARK: Overrides
 
     public override var canBecomeKey: Bool {
-        return true
+        return showsSearchBar
     }
 
     // Offset the origin to account for the shadow view's margin
