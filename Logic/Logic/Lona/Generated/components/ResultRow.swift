@@ -3,19 +3,6 @@
 import AppKit
 import Foundation
 
-// MARK: - ImageWithBackgroundColor
-
-private class ImageWithBackgroundColor: LNAImageView {
-  var fillColor = NSColor.clear
-
-  override func draw(_ dirtyRect: NSRect) {
-    fillColor.set()
-    bounds.fill()
-    super.draw(dirtyRect)
-  }
-}
-
-
 // MARK: - ResultRow
 
 public class ResultRow: NSBox {
@@ -133,7 +120,7 @@ public class ResultRow: NSBox {
 
   // MARK: Private
 
-  private var imageView = ImageWithBackgroundColor()
+  private var imageView = LNAImageView()
   private var contentViewView = NSBox()
   private var textView = LNATextField(labelWithString: "")
   private var subtitleTextView = LNATextField(labelWithString: "")
@@ -188,7 +175,6 @@ public class ResultRow: NSBox {
     contentViewView.addSubview(subtitleTextView)
     badgeViewView.addSubview(badgeTextView)
 
-    imageView.fillColor = Colors.raisedBackground
     imageView.cornerRadius = 4
     badgeViewView.cornerRadius = 4
   }

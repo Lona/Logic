@@ -361,7 +361,6 @@
       {
         "id" : "Image",
         "params" : {
-          "backgroundColor" : "raisedBackground",
           "borderRadius" : 4,
           "height" : 32,
           "marginRight" : 8,

@@ -499,6 +499,7 @@ public class BlockListView: NSBox {
 
         suggestionWindow.showsSearchBar = false
         suggestionWindow.suggestionView.showsSuggestionDetails = false
+        suggestionWindow.suggestionView.suggestionListWidth = 260
 
         return suggestionWindow
     }()
@@ -1085,27 +1086,33 @@ extension BlockListView: NSTableViewDelegate {
 
         Swift.print("show cp")
 
+        func image(named name: String) -> NSImage? {
+            let bundle = BundleLocator.getBundle()
+            guard let url = bundle.url(forResource: name, withExtension: "png") else { return nil }
+            return NSImage(byReferencing: url)
+        }
+
         BlockListView.commandPaletteVisible = true
 
         let menuItems: [(SuggestionListItem, EditableBlock)] = [
             (
-                SuggestionListItem.row("Text", "Write plain text", false, nil, nil),
+                SuggestionListItem.row("Text", "Write plain text", false, nil, image(named: "menu-thumbnail-paragraph")),
                 EditableBlock(id: UUID(), content: .text(.init(), .paragraph))
             ),
             (
-                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, nil),
+                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, image(named: "menu-thumbnail-h1")),
                 EditableBlock(id: UUID(), content: .text(.init(), .h1))
             ),
             (
-                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, nil),
+                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, image(named: "menu-thumbnail-h2")),
                 EditableBlock(id: UUID(), content: .text(.init(), .h2))
             ),
             (
-                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, nil),
+                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, image(named: "menu-thumbnail-h3")),
                 EditableBlock(id: UUID(), content: .text(.init(), .h3))
             ),
             (
-                SuggestionListItem.row("Token", "Define a design token variable", false, nil, nil),
+                SuggestionListItem.row("Token", "Define a design token variable", false, nil, image(named: "menu-thumbnail-tokens")),
                 EditableBlock(
                     id: UUID(),
                     content: .tokens(
@@ -1136,8 +1143,10 @@ extension BlockListView: NSTableViewDelegate {
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
-        subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
-        subwindow.suggestionView.suggestionListWidth = 200
+        subwindow.defaultWindowSize = .init(
+            width: subwindow.suggestionView.suggestionListWidth,
+            height: min(suggestionListHeight + 25, 400)
+        )
         subwindow.anchorTo(rect: rect, verticalOffset: 4)
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {

@@ -41,7 +41,11 @@ extension LightMark.InlineElement {
             return textStyle.apply(to: value)
         case .styledText(style: let style, content: let content):
             let values: [NSAttributedString] = content.map { $0.editableString }
-            let mutable = NSMutableAttributedString(attributedString: values.joined())
+            let joined = values.joined()
+
+            if joined.length == 0 { return joined }
+
+            let mutable = NSMutableAttributedString(attributedString: joined)
 
             switch style {
             case .emphasis:

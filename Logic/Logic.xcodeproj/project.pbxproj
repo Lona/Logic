@@ -125,6 +125,11 @@
 		6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */; };
 		6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13522A713FA00905664 /* StandardConfiguration.swift */; };
 		6BF7795922D24EE1009A4119 /* FilterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF7795822D24EE1009A4119 /* FilterLabel.swift */; };
+		6BFA8A592332B0460016FC7B /* menu-thumbnail-h1.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */; };
+		6BFA8A5A2332B0460016FC7B /* menu-thumbnail-h2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */; };
+		6BFA8A5B2332B0460016FC7B /* menu-thumbnail-h3.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A562332B0460016FC7B /* menu-thumbnail-h3.png */; };
+		6BFA8A5C2332B0460016FC7B /* menu-thumbnail-tokens.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */; };
+		6BFA8A5D2332B0460016FC7B /* menu-thumbnail-paragraph.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -248,6 +253,11 @@
 		6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeFormattable.swift; sourceTree = "<group>"; };
 		6BEEA13522A713FA00905664 /* StandardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardConfiguration.swift; sourceTree = "<group>"; };
 		6BF7795822D24EE1009A4119 /* FilterLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterLabel.swift; sourceTree = "<group>"; };
+		6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-h1.png"; sourceTree = "<group>"; };
+		6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-h2.png"; sourceTree = "<group>"; };
+		6BFA8A562332B0460016FC7B /* menu-thumbnail-h3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-h3.png"; sourceTree = "<group>"; };
+		6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-tokens.png"; sourceTree = "<group>"; };
+		6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-paragraph.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -330,6 +340,7 @@
 				6B44E14A223B3DB700740318 /* NSImage+Resizing.swift */,
 				6B44E14B223B3DB700740318 /* Shadows.swift */,
 				6B44E14C223B3DB700740318 /* TextStyles.swift */,
+				6BFA8A532332B0460016FC7B /* assets */,
 				6B44E150223B3DB700740318 /* components */,
 			);
 			path = Generated;
@@ -566,6 +577,18 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6BFA8A532332B0460016FC7B /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */,
+				6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */,
+				6BFA8A562332B0460016FC7B /* menu-thumbnail-h3.png */,
+				6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */,
+				6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */,
+			);
+			path = assets;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -636,9 +659,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B858C2E229EEEAD00DE6216 /* Prelude.logic in Resources */,
+				6BFA8A5D2332B0460016FC7B /* menu-thumbnail-paragraph.png in Resources */,
 				6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */,
 				6B4E260222E7B39500F0076A /* Shadow.logic in Resources */,
+				6BFA8A592332B0460016FC7B /* menu-thumbnail-h1.png in Resources */,
 				6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */,
+				6BFA8A5A2332B0460016FC7B /* menu-thumbnail-h2.png in Resources */,
+				6BFA8A5B2332B0460016FC7B /* menu-thumbnail-h3.png in Resources */,
+				6BFA8A5C2332B0460016FC7B /* menu-thumbnail-tokens.png in Resources */,
 				6B4E260022E7B27000F0076A /* Color.logic in Resources */,
 				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
 			);
