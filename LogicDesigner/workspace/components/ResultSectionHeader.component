@@ -60,7 +60,7 @@
           "flex" : 1,
           "paddingLeft" : 12,
           "paddingRight" : 12,
-          "paddingTop" : 2
+          "paddingTop" : 4
         },
         "type" : "Lona:View"
       }

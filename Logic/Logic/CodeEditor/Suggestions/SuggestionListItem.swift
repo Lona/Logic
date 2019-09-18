@@ -41,7 +41,7 @@ public enum SuggestionListItem {
         case .colorRow:
             return 40
         case .sectionHeader:
-            return 18
+            return 21
         case .textStyleRow(let value, let style, _):
             return 8 + style.apply(to: value).size().height
         }
