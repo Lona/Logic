@@ -305,8 +305,6 @@ public class BlockListView: NSBox {
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
 
-    private var focusedLine: Int?
-
     private var hoveredLine: Int? {
         didSet {
             if oldValue != hoveredLine {
@@ -1018,32 +1016,11 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
-//            view.onRequestCreateEditor = { [unowned self] newText in
-//                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
-//
-//                self.handleAddBlock(line: line, text: newText)
-//            }
-
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                 self.handleDelete(line: line)
             }
-
-//            view.onSearchCommandPalette = { [unowned self] query, rect in
-//                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
-//
-//                self.showCommandPalette(line: line, query: query, rect: rect)
-//            }
-
-//            view.onHideCommandPalette = {
-//                BlockListView.commandPalette.orderOut(nil)
-//            }
-
-//            view.onFocus = { [unowned self] in
-//                let row = self.tableView.row(for: view)
-//                self.focusedLine = row
-//            }
 
             return view
         }

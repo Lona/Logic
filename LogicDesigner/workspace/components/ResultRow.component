@@ -3,10 +3,6 @@
     {
       "deviceId" : "iPhone SE",
       "heightMode" : "At Least"
-    },
-    {
-      "deviceId" : "Pixel 2",
-      "heightMode" : "At Least"
     }
   ],
   "examples" : [
