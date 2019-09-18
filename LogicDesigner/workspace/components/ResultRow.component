@@ -24,6 +24,7 @@
       "name" : "Subtitle",
       "params" : {
         "badgeText" : null,
+        "image" : "file:\/\/\/Users\/devinabbott\/Projects\/Logic\/LogicDesigner\/workspace\/assets\/menu-thumbnail-tokens.png",
         "subtitleText" : "Subtitle"
       }
     },
@@ -362,10 +363,10 @@
         "id" : "Image",
         "params" : {
           "borderRadius" : 4,
-          "height" : 32,
+          "height" : 40,
           "marginRight" : 8,
           "visible" : false,
-          "width" : 32
+          "width" : 40
         },
         "type" : "Lona:Image"
       },
@@ -391,7 +392,9 @@
         ],
         "id" : "ContentView",
         "params" : {
-          "flex" : 1
+          "flex" : 1,
+          "paddingBottom" : 4,
+          "paddingTop" : 3
         },
         "type" : "Lona:View"
       },
@@ -425,10 +428,10 @@
       "alignItems" : "center",
       "alignSelf" : "stretch",
       "flexDirection" : "row",
-      "paddingBottom" : 4,
+      "paddingBottom" : 6,
       "paddingLeft" : 12,
       "paddingRight" : 12,
-      "paddingTop" : 4
+      "paddingTop" : 6
     },
     "type" : "Lona:View"
   }

@@ -35,9 +35,9 @@ public enum SuggestionListItem {
     public var height: CGFloat {
         switch self {
         case .row(_, .none, _, _, .none):
-            return 26
+            return 26 + 4 + 6
         case .row(_, _, _, _, _):
-            return 40
+            return 40 + 12
         case .colorRow:
             return 40
         case .sectionHeader:

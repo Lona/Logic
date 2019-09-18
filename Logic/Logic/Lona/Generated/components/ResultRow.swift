@@ -190,13 +190,13 @@ public class ResultRow: NSBox {
 
     let contentViewViewHeightAnchorParentConstraint = contentViewView
       .heightAnchor
-      .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
-    let contentViewViewTopAnchorConstraint = contentViewView.topAnchor.constraint(equalTo: topAnchor, constant: 4)
+      .constraint(lessThanOrEqualTo: heightAnchor, constant: -12)
+    let contentViewViewTopAnchorConstraint = contentViewView.topAnchor.constraint(equalTo: topAnchor, constant: 6)
     let contentViewViewCenterYAnchorConstraint = contentViewView.centerYAnchor.constraint(equalTo: centerYAnchor)
     let contentViewViewBottomAnchorConstraint = contentViewView
       .bottomAnchor
-      .constraint(equalTo: bottomAnchor, constant: -4)
-    let textViewTopAnchorConstraint = textView.topAnchor.constraint(equalTo: contentViewView.topAnchor)
+      .constraint(equalTo: bottomAnchor, constant: -6)
+    let textViewTopAnchorConstraint = textView.topAnchor.constraint(equalTo: contentViewView.topAnchor, constant: 3)
     let textViewLeadingAnchorConstraint = textView.leadingAnchor.constraint(equalTo: contentViewView.leadingAnchor)
     let textViewTrailingAnchorConstraint = textView
       .trailingAnchor
@@ -209,10 +209,10 @@ public class ResultRow: NSBox {
       .constraint(equalTo: trailingAnchor, constant: -12)
     let textViewBottomAnchorContentViewViewBottomAnchorConstraint = textView
       .bottomAnchor
-      .constraint(equalTo: contentViewView.bottomAnchor)
+      .constraint(equalTo: contentViewView.bottomAnchor, constant: -4)
     let imageViewHeightAnchorParentConstraint = imageView
       .heightAnchor
-      .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
+      .constraint(lessThanOrEqualTo: heightAnchor, constant: -12)
     let imageViewLeadingAnchorLeadingAnchorConstraint = imageView
       .leadingAnchor
       .constraint(equalTo: leadingAnchor, constant: 12)
@@ -220,11 +220,11 @@ public class ResultRow: NSBox {
     let contentViewViewLeadingAnchorImageViewTrailingAnchorConstraint = contentViewView
       .leadingAnchor
       .constraint(equalTo: imageView.trailingAnchor, constant: 8)
-    let imageViewHeightAnchorConstraint = imageView.heightAnchor.constraint(equalToConstant: 32)
-    let imageViewWidthAnchorConstraint = imageView.widthAnchor.constraint(equalToConstant: 32)
+    let imageViewHeightAnchorConstraint = imageView.heightAnchor.constraint(equalToConstant: 40)
+    let imageViewWidthAnchorConstraint = imageView.widthAnchor.constraint(equalToConstant: 40)
     let badgeViewViewHeightAnchorParentConstraint = badgeViewView
       .heightAnchor
-      .constraint(lessThanOrEqualTo: heightAnchor, constant: -8)
+      .constraint(lessThanOrEqualTo: heightAnchor, constant: -12)
     let badgeViewViewTrailingAnchorTrailingAnchorConstraint = badgeViewView
       .trailingAnchor
       .constraint(equalTo: trailingAnchor, constant: -12)
@@ -249,7 +249,7 @@ public class ResultRow: NSBox {
       .constraint(equalTo: badgeViewView.bottomAnchor)
     let subtitleTextViewBottomAnchorContentViewViewBottomAnchorConstraint = subtitleTextView
       .bottomAnchor
-      .constraint(equalTo: contentViewView.bottomAnchor)
+      .constraint(equalTo: contentViewView.bottomAnchor, constant: -4)
     let subtitleTextViewTopAnchorTextViewBottomAnchorConstraint = subtitleTextView
       .topAnchor
       .constraint(equalTo: textView.bottomAnchor)
