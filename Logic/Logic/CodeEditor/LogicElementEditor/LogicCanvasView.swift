@@ -62,6 +62,7 @@ public class LogicCanvasView: NSView {
                 decorationCache: &self._cachedElementDecorations,
                 getElementDecoration: self.getElementDecoration,
                 bounds: rect,
+                hoveredItem: nil,
                 dragDestinationLineIndex: nil,
                 selectedIndex: nil,
                 selectedLine: nil,
@@ -137,7 +138,7 @@ public class LogicCanvasView: NSView {
             update()
         }
     }
-    public var showsLineButtons: Bool = true {
+    public var showsLineButtons: Bool = false {
         didSet {
             update()
         }
@@ -214,6 +215,14 @@ public class LogicCanvasView: NSView {
     private var pressed = false
     private var pressedPoint = CGPoint.zero
 
+    private var hoveredItem: Item? {
+        didSet {
+            if oldValue != hoveredItem {
+                update()
+            }
+        }
+    }
+
     private var hoveredLine: Int? {
         didSet {
             if oldValue != hoveredLine {
@@ -251,6 +260,8 @@ public class LogicCanvasView: NSView {
     public override func mouseMoved(with event: NSEvent) {
         let point = convert(event.locationInWindow, from: nil)
         let line = logicalLineIndex(at: point, measuredFromMidpoint: false)
+
+        hoveredItem = item(at: point)
 
         if showsLineButtons && getLineShowsButtons(line) {
             hoveredLine = line
@@ -423,6 +434,7 @@ public class LogicCanvasView: NSView {
         decorationCache: inout [UUID: LogicElement.Decoration?],
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
         bounds: NSRect,
+        hoveredItem: Item?,
         dragDestinationLineIndex: Int?,
         selectedIndex: Int?,
         selectedLine: Int?,
@@ -650,6 +662,8 @@ public class LogicCanvasView: NSView {
                     color.setFill()
                 } else if let backgroundColor = text.backgroundColor {
                     backgroundColor.setFill()
+                } else if case .some(.range(let range)) = hoveredItem, range.lowerBound == textIndex {
+                    Colors.divider.setFill()
                 } else {
                     NSColor.clear.setFill()
                 }
@@ -775,6 +789,7 @@ public class LogicCanvasView: NSView {
             decorationCache: &_cachedElementDecorations,
             getElementDecoration: getElementDecoration,
             bounds: bounds,
+            hoveredItem: hoveredItem,
             dragDestinationLineIndex: dragDestinationLineIndex,
             selectedIndex: selectedIndex,
             selectedLine: selectedLine,
@@ -1216,6 +1231,7 @@ extension LogicCanvasView {
             decorationCache: &decorationCache,
             getElementDecoration: getElementDecoration,
             bounds: frame,
+            hoveredItem: nil,
             dragDestinationLineIndex: nil,
             selectedIndex: nil,
             selectedLine: nil,
