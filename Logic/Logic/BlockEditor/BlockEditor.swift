@@ -110,7 +110,7 @@ public class EditableBlock: Equatable {
             if let prefix = sizeLevel.prefix {
                 return prefix + " " + textValue.markdownString() + "\n"
             } else {
-                return textValue.markdownString()
+                return textValue.markdownString() + "\n"
             }
         case .tokens(let rootNode):
             let encoder = JSONEncoder()

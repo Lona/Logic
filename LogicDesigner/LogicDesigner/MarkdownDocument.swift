@@ -96,7 +96,8 @@ class MarkdownDocument: NSDocument {
         let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
             switch blockElement {
             case .lineBreak:
-                return BlockEditor.Block.makeDefaultEmptyBlock()
+//                return BlockEditor.Block.makeDefaultEmptyBlock()
+                return nil
             case .heading(level: let level, content: let inlineElements):
                 func sizeLevel() -> InlineBlockEditor.SizeLevel {
                     switch level {
