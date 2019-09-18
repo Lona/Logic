@@ -215,12 +215,15 @@ public class BlockListView: NSBox {
 
                     if old !== new {
 //                        Swift.print("update", index)
-                        if let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? InlineBlockEditor,
-                            case .text(let attributedString, let sizeLevel) = new.content {
+                        let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false)
+
+                        if let view = view as? InlineBlockEditor, case .text(let attributedString, let sizeLevel) = new.content {
                             view.textValue = attributedString
                             view.sizeLevel = sizeLevel
                             view.needsLayout = true
                             view.needsDisplay = true
+                        } else if let view = view as? LogicEditor, case .tokens(let rootNode) = new.content {
+                            view.rootNode = rootNode
                         }
                     }
                 }
@@ -819,6 +822,16 @@ extension BlockListView: NSTableViewDelegate {
         case .tokens(let syntaxNode):
             let view = item.view as! LogicEditor
 
+            view.onChangeRootNode = { [unowned self] newRootNode in
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return false }
+
+                let newBlock: BlockEditor.Block = .init(id: item.id, content: .tokens(newRootNode))
+
+                _ = self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock))
+
+                return true
+            }
+
             return view
         case .text(let textValue, let sizeLevel):
             let view = item.view as! InlineBlockEditor
@@ -1042,7 +1055,6 @@ extension BlockListView: NSTableViewDelegate {
     }
 
     func hideCommandPalette() {
-        Swift.print("hide cp")
         BlockListView.commandPalette.orderOut(nil)
         BlockListView.commandPaletteVisible = false
         commandPaletteAnchor = nil
@@ -1099,13 +1111,20 @@ extension BlockListView: NSTableViewDelegate {
                 EditableBlock(
                     id: UUID(),
                     content: .tokens(
-                        LGCSyntaxNode.declaration(
-                            .variable(
+                        LGCSyntaxNode.topLevelDeclarations(
+                            .init(
                                 id: UUID(),
-                                name: .init(id: UUID(), name: "token"),
-                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
-                                initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
-                                comment: nil
+                                declarations: .init(
+                                    [
+                                        .variable(
+                                            id: UUID(),
+                                            name: .init(id: UUID(), name: "token"),
+                                            annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+                                            initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                                            comment: nil
+                                        )
+                                    ]
+                                )
                             )
                         )
                     )

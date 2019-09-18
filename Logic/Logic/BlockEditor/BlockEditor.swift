@@ -103,6 +103,24 @@ public class EditableBlock: Equatable {
             return string.isEmpty || string == "/"
         }
     }
+
+    public var markdownString: String {
+        switch content {
+        case .text(let textValue, let sizeLevel):
+            if let prefix = sizeLevel.prefix {
+                return prefix + " " + textValue.markdownString() + "\n"
+            } else {
+                return textValue.markdownString()
+            }
+        case .tokens(let rootNode):
+            let encoder = JSONEncoder()
+            guard let data = try? encoder.encode(rootNode) else { return "FAILED TO SERIALIZE TOKENS" }
+            guard let xml = LogicFile.convert(data, kind: .logic, to: .xml) else { return "FAILED TO CONVERT TOKENS TO XML" }
+            let code = String(data: xml, encoding: .utf8)!
+
+            return "```tokens\n\(code)\n```"
+        }
+    }
 }
 
 extension EditableBlock: CustomDebugStringConvertible {

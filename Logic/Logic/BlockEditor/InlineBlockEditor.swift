@@ -58,9 +58,13 @@ public class InlineBlockEditor: AttributedTextView {
             let newTextValue = NSMutableAttributedString(attributedString: textValue)
 
             newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
-                let font = value as! NSFont
+                let font = (value as? NSFont) ?? defaultTextStyle.nsFont
                 guard let newFont = NSFont(descriptor: font.fontDescriptor, size: self.fontSize) else { return }
-                newTextValue.addAttribute(.font, value: newFont, range: range)
+//                newTextValue.addAttribute(.font, value: newFont, range: range)
+                newTextValue.addAttributes(
+                    [.font: newFont, .foregroundColor: NSColor.textColor],
+                    range: range
+                )
             })
 
             return newTextValue
@@ -205,7 +209,8 @@ public class InlineBlockEditor: AttributedTextView {
 
     // MARK: Private
 
-//    public override func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
+    public override func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
+        return sizeLevel.apply(to: value)
 //        let mutable = NSMutableAttributedString(attributedString: value)
 //
 //        let style = NSMutableParagraphStyle()
@@ -215,8 +220,8 @@ public class InlineBlockEditor: AttributedTextView {
 //        mutable.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: value.length))
 //
 //        return mutable
-//    }
-//
+    }
+
 //    public override func handleChangeTextValue(_ value: NSAttributedString) {
 //        super.handleChangeTextValue(value)
 //    }
