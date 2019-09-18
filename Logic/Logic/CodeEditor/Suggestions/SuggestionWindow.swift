@@ -213,6 +213,11 @@ public class SuggestionWindow: NSWindow {
         set { suggestionView.showsSeachBar = newValue }
     }
 
+    public var showsSuggestionDetails: Bool {
+        get { return suggestionView.showsSuggestionDetails }
+        set { suggestionView.showsSuggestionDetails = newValue }
+    }
+
     // MARK: Filter bar
 
     public var suggestionFilter: SuggestionView.SuggestionFilter {
@@ -308,6 +313,10 @@ public class SuggestionWindow: NSWindow {
             }
         }
 
+        if !showsSuggestionDetails {
+            suggestionView.suggestionListWidth = defaultContentViewSize.width
+        }
+
         setContentSize(contentRect.size)
         setFrameOrigin(contentRect.origin)
     }
@@ -334,6 +343,10 @@ public class SuggestionWindow: NSWindow {
                     contentRect.origin.y = rect.maxY + horizontalOffset
                 }
             }
+        }
+
+        if !showsSuggestionDetails {
+            suggestionView.suggestionListWidth = defaultContentViewSize.width
         }
 
         setContentSize(contentRect.size)

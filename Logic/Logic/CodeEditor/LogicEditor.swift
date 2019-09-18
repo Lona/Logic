@@ -130,7 +130,13 @@ open class LogicEditor: NSBox {
 
     public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
 
-    public var showsDropdown: Bool = true
+    public var defaultSuggestionWindowSize = CGSize(width: 610, height: 380)
+
+    public var showsSearchBar: Bool = true
+
+    public var showsSuggestionDetails: Bool = true
+
+    public var showsDropdown: Bool = false
 
     public var placeholderText: String? = nil
 
@@ -785,8 +791,17 @@ extension LogicEditor {
             )
         }
 
-        childWindow.placeholderText = placeholderText
+        switch syntaxNode {
+        case .pattern:
+            childWindow.placeholderText = "Type a new name and press Enter"
+        default:
+            childWindow.placeholderText = placeholderText
+        }
+
+        childWindow.defaultWindowSize = defaultSuggestionWindowSize
         childWindow.showsDropdown = showsDropdown
+        childWindow.showsSearchBar = showsSearchBar
+        childWindow.showsSuggestionDetails = showsSuggestionDetails
         childWindow.showsFilterBar = showsFilterBar
         childWindow.onRequestHide = hideSuggestionWindow
         childWindow.selectedIndex = initialIndex

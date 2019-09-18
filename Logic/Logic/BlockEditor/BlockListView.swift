@@ -496,13 +496,16 @@ public class BlockListView: NSBox {
         let suggestionWindow = SuggestionWindow()
 
         suggestionWindow.showsSearchBar = false
-        suggestionWindow.suggestionView.showsSuggestionDetails = false
-        suggestionWindow.suggestionView.suggestionListWidth = 260
+        suggestionWindow.showsSuggestionDetails = false
 
         return suggestionWindow
     }()
 
     // MARK: Event handling
+
+    public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        return true
+    }
 
     public override func keyDown(with event: NSEvent) {
         let isShiftEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
@@ -1135,7 +1138,7 @@ extension BlockListView: NSTableViewDelegate {
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
         subwindow.defaultWindowSize = .init(
-            width: subwindow.suggestionView.suggestionListWidth,
+            width: 260,
             height: min(suggestionListHeight + OverlayWindow.shadowViewMargin * 2, 400)
         )
         subwindow.anchorTo(rect: rect, verticalOffset: 4)
