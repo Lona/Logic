@@ -1037,18 +1037,24 @@ extension BlockListView: NSTableViewDelegate {
     }
 
     func handleCommandPaletteDown() {
-        if let index = BlockListView.commandPalette.selectedIndex {
-            BlockListView.commandPalette.selectedIndex = min(index + 1, BlockListView.commandPalette.suggestionItems.count - 1)
+        let items = BlockListView.commandPalette.suggestionItems.enumerated().filter { $0.element.isSelectable }
+
+        if let index = BlockListView.commandPalette.selectedIndex,
+            let next = items.first(where: { $0.offset > index }) ?? items.last {
+            BlockListView.commandPalette.selectedIndex = next.offset
         } else {
-            BlockListView.commandPalette.selectedIndex = 0
+            BlockListView.commandPalette.selectedIndex = items.first?.offset
         }
     }
 
     func handleCommandPaletteUp() {
-        if let index = BlockListView.commandPalette.selectedIndex {
-            BlockListView.commandPalette.selectedIndex = max(index - 1, 0)
+        let items = BlockListView.commandPalette.suggestionItems.enumerated().filter { $0.element.isSelectable }
+
+        if let index = BlockListView.commandPalette.selectedIndex,
+            let prev = items.last(where: { $0.offset < index }) ?? items.first {
+            BlockListView.commandPalette.selectedIndex = prev.offset
         } else {
-            BlockListView.commandPalette.selectedIndex = 0
+            BlockListView.commandPalette.selectedIndex = items.first?.offset
         }
     }
 
@@ -1073,6 +1079,10 @@ extension BlockListView: NSTableViewDelegate {
 
         let menuItems: [(SuggestionListItem, EditableBlock)] = [
             (
+                SuggestionListItem.sectionHeader("DOCUMENTATION"),
+                EditableBlock.makeDefaultEmptyBlock()
+            ),
+            (
                 SuggestionListItem.row("Text", "Write plain text", false, nil, image(named: "menu-thumbnail-paragraph")),
                 EditableBlock(id: UUID(), content: .text(.init(), .paragraph))
             ),
@@ -1087,6 +1097,10 @@ extension BlockListView: NSTableViewDelegate {
             (
                 SuggestionListItem.row("Heading 3", "Small section heading", false, nil, image(named: "menu-thumbnail-h3")),
                 EditableBlock(id: UUID(), content: .text(.init(), .h3))
+            ),
+            (
+                SuggestionListItem.sectionHeader("TOKENS"),
+                EditableBlock.makeDefaultEmptyBlock()
             ),
             (
                 SuggestionListItem.row("Token", "Define a design token variable", false, nil, image(named: "menu-thumbnail-tokens")),
@@ -1122,7 +1136,7 @@ extension BlockListView: NSTableViewDelegate {
 
         subwindow.defaultWindowSize = .init(
             width: subwindow.suggestionView.suggestionListWidth,
-            height: min(suggestionListHeight + 25, 400)
+            height: min(suggestionListHeight + OverlayWindow.shadowViewMargin * 2, 400)
         )
         subwindow.anchorTo(rect: rect, verticalOffset: 4)
 
