@@ -664,6 +664,8 @@ public class LogicCanvasView: NSView {
                     backgroundColor.setFill()
                 } else if case .some(.range(let range)) = hoveredItem, range.lowerBound == textIndex {
                     Colors.divider.setFill()
+
+                    NSShadow(color: .clear, offset: .zero, blur: 0).set()
                 } else {
                     NSColor.clear.setFill()
                 }

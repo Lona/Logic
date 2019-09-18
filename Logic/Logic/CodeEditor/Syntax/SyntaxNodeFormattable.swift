@@ -568,7 +568,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
             case .js:
                 break
             case .natural, .visual:
-                contents.append(.element(LogicElement.dropdown(value.id, "Let", .source)))
+                contents.append(.element(LogicElement.dropdown(value.id, "Variable", .source)))
             }
 
             contents.append(value.name.formatted(using: options))

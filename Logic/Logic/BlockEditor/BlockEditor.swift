@@ -31,7 +31,7 @@ public class EditableBlock: Equatable {
             return InlineBlockEditor()
         case .tokens(let syntaxNode):
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
-            view.fillColor = Colors.raisedBackground
+            view.fillColor = Colors.blockBackground
             view.cornerRadius = 4
             view.borderType = .lineBorder
             view.borderWidth = 1

@@ -46,7 +46,8 @@ public class SuggestionWindow: NSWindow {
         suggestionView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
         suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
-        suggestionView.showsSeachBar = true
+        suggestionView.showsSearchBar = true
+        suggestionView.showsSuggestionArea = true
         suggestionView.suggestionListWidth = 200
         suggestionView.showsSuggestionDetails = true
         suggestionView.searchInput.isBordered = false
@@ -209,13 +210,18 @@ public class SuggestionWindow: NSWindow {
     }
 
     public var showsSearchBar: Bool {
-        get { return suggestionView.showsSeachBar }
-        set { suggestionView.showsSeachBar = newValue }
+        get { return suggestionView.showsSearchBar }
+        set { suggestionView.showsSearchBar = newValue }
     }
 
     public var showsSuggestionDetails: Bool {
         get { return suggestionView.showsSuggestionDetails }
         set { suggestionView.showsSuggestionDetails = newValue }
+    }
+
+    public var showsSuggestionArea: Bool {
+        get { return suggestionView.showsSuggestionArea }
+        set { suggestionView.showsSuggestionArea = newValue }
     }
 
     // MARK: Filter bar

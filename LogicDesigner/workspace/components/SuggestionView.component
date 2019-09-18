@@ -30,26 +30,96 @@
     {
       "assignee" : [
         "layers",
-        "Search Area",
+        "Suggestion Area",
         "visible"
       ],
       "content" : [
         "parameters",
-        "showsSeachBar"
+        "showsSuggestionArea"
       ],
       "type" : "AssignExpr"
     },
     {
       "assignee" : [
         "layers",
-        "Divider",
+        "Search Area",
         "visible"
       ],
       "content" : [
         "parameters",
-        "showsSeachBar"
+        "showsSearchBar"
       ],
       "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Divider",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : false,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : false,
+            "type" : "Boolean"
+          }
+        },
+        "op" : "==",
+        "right" : [
+          "parameters",
+          "showsSuggestionArea"
+        ],
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Divider",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : false,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : false,
+            "type" : "Boolean"
+          }
+        },
+        "op" : "==",
+        "right" : [
+          "parameters",
+          "showsSearchBar"
+        ],
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
     },
     {
       "assignee" : [
@@ -712,7 +782,15 @@
         "data" : true,
         "type" : "Boolean"
       },
-      "name" : "showsSeachBar",
+      "name" : "showsSearchBar",
+      "type" : "Boolean"
+    },
+    {
+      "defaultValue" : {
+        "data" : true,
+        "type" : "Boolean"
+      },
+      "name" : "showsSuggestionArea",
       "type" : "Boolean"
     }
   ],
