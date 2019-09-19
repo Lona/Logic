@@ -9,7 +9,7 @@
 import Foundation
 
 private var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
-private var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: Colors.textComment)
+private var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: NSColor.placeholderTextColor)
 
 public class InlineBlockEditor: AttributedTextView {
 
