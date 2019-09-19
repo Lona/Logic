@@ -794,7 +794,7 @@ extension LogicEditor {
         switch syntaxNode {
         case .pattern:
             childWindow.placeholderText = "Type a new name and press Enter"
-            childWindow.defaultWindowSize = .init(width: 400, height: 57)
+            childWindow.defaultWindowSize = .init(width: 400, height: 32 + OverlayWindow.shadowViewMargin * 2)
             childWindow.showsSuggestionArea = false
         default:
             childWindow.placeholderText = placeholderText
