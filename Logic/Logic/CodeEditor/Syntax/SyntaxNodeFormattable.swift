@@ -131,7 +131,9 @@ extension LGCComment: SyntaxNodeFormattable {
 
 extension LGCIdentifier: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
-        let element: FormatterCommand<LogicElement> = .element(LogicElement.dropdown(id, string, isPlaceholder ? .placeholder : .variable))
+        let element: FormatterCommand<LogicElement> = .element(
+            LogicElement.dropdown(id, isPlaceholder ? "" : string, isPlaceholder ? .placeholder : .variable)
+        )
 
         if let errorMessage = options.getError(id) {
             return .concat(
