@@ -1070,8 +1070,6 @@ extension BlockListView: NSTableViewDelegate {
     func showCommandPalette(line: Int, query: String, rect: NSRect) {
         guard let window = self.window else { return }
 
-        Swift.print("show cp")
-
         func image(named name: String) -> NSImage? {
             let bundle = BundleLocator.getBundle()
             guard let url = bundle.url(forResource: name, withExtension: "png") else { return nil }
@@ -1110,20 +1108,13 @@ extension BlockListView: NSTableViewDelegate {
                 EditableBlock(
                     id: UUID(),
                     content: .tokens(
-                        LGCSyntaxNode.topLevelDeclarations(
-                            .init(
+                        LGCSyntaxNode.declaration(
+                            .variable(
                                 id: UUID(),
-                                declarations: .init(
-                                    [
-                                        .variable(
-                                            id: UUID(),
-                                            name: .init(id: UUID(), name: "token"),
-                                            annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
-                                            initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
-                                            comment: nil
-                                        )
-                                    ]
-                                )
+                                name: .init(id: UUID(), name: "variable1"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+                                initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                                comment: nil
                             )
                         )
                     )

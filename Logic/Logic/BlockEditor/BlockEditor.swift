@@ -78,9 +78,9 @@ public class EditableBlock: Equatable {
 
     static var viewCache: [UUID: NSView] = [:]
 
-    deinit {
-        EditableBlock.viewCache.removeValue(forKey: id)
-    }
+//    deinit {
+//        EditableBlock.viewCache.removeValue(forKey: id)
+//    }
 
     public static func makeDefaultEmptyBlock() -> EditableBlock {
         return .init(.text(.init(), .paragraph))
@@ -267,5 +267,29 @@ extension BlockEditor {
         public init() {
             self.init(Parameters())
         }
+    }
+}
+
+extension Sequence where Iterator.Element: EditableBlock {
+    public var topLevelDeclarations: LGCTopLevelDeclarations {
+        let nodes: [LGCSyntaxNode] = self.compactMap {
+            switch $0.content {
+            case .tokens(let rootNode):
+                return rootNode
+            default:
+                return nil
+            }
+        }
+
+        let declarations: [LGCDeclaration] = nodes.compactMap {
+            switch $0 {
+            case .declaration(let declaration):
+                return declaration
+            default:
+                return nil
+            }
+        }
+
+        return LGCTopLevelDeclarations(id: UUID(), declarations: .init(declarations))
     }
 }

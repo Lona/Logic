@@ -1972,3 +1972,13 @@ extension LGCSyntaxNode {
         }
     }
 }
+
+extension LGCSyntaxNode {
+    public func hierarchyDescription(indent: Int = 2, initialIndent: Int = 0) -> String {
+        let childrenDescription = self.subnodes.map {
+           String(repeating: " ", count: initialIndent + indent) + $0.hierarchyDescription(indent: indent, initialIndent: initialIndent + indent)
+        }
+        let description = "\(nodeTypeDescription)(\(uuid))"
+        return ([description] + childrenDescription).joined(separator: "\n")
+    }
+}
