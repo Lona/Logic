@@ -687,9 +687,11 @@ public class BlockListView: NSBox {
 
                     if let initialRow = initialRow, initialRow != row {
                         if initialRow < row {
-                            selection = .blocks(NSRange(location: initialRow, length: row - initialRow + 1))
+                            let newRange = NSRange(location: initialRow, length: row - initialRow + 1)
+                            selection = .blocks(newRange, anchor: newRange.upperBound - 1)
                         } else {
-                            selection = .blocks(NSRange(location: row, length: initialRow - row + 1))
+                            let newRange = NSRange(location: row, length: initialRow - row + 1)
+                            selection = .blocks(newRange, anchor: newRange.lowerBound)
                         }
                     } else {
                         initialRow = row
