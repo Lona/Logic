@@ -113,8 +113,6 @@ class MarkdownDocument: NSDocument {
 
             errors.append(contentsOf: Array(cycleErrors.joined()))
 
-            Swift.print("Eval ok")
-
             return (errors, (unificationContext, substitution), evaluationContext)
         case .failure(let error):
             Swift.print("Eval failure", error)
@@ -219,8 +217,10 @@ class MarkdownDocument: NSDocument {
         containerView.addSubview(blockEditor)
 
         blockEditor.onChangeBlocks = { [unowned self] blocks in
-            self.blockEditor.blocks = blocks
-            self.configure(blocks: blocks)
+            let newBlocks = blocks.isEmpty ? [EditableBlock.makeDefaultEmptyBlock()] : blocks
+
+            self.blockEditor.blocks = newBlocks
+            self.configure(blocks: newBlocks)
             return true
         }
 
