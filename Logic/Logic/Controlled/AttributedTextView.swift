@@ -50,6 +50,8 @@ open class AttributedTextView: NSTextView {
     public var onSubmit: (() -> Void)?
     public var onPressEscape: (() -> Void)?
 
+    private var currentlyChangingText = false
+
     private var _textValue: NSAttributedString = .init() {
         didSet {
             if currentlyHandlingTextChange {
@@ -61,11 +63,15 @@ open class AttributedTextView: NSTextView {
                 let previousSelection = selectedRanges
                 let sameString = attributedString().string == textValue.string
 
+                currentlyChangingText = true
+
                 textStorage?.setAttributedString(textValue)
 
                 if sameString {
                     setSelectedRanges(previousSelection, affinity: .downstream, stillSelecting: false)
                 }
+
+                currentlyChangingText = false
             }
         }
     }
@@ -100,7 +106,10 @@ open class AttributedTextView: NSTextView {
                 guard let self = self,
                     let object = notification.object as? NSTextView,
                     object === self else { return }
-                self.onChangeSelectedRange?(self.selectedRange())
+
+                if !self.currentlyChangingText {
+                    self.onChangeSelectedRange?(self.selectedRange())
+                }
             })
         )
     }

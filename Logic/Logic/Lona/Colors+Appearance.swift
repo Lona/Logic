@@ -91,6 +91,19 @@ extension Colors {
         if #available(OSX 10.14, *) {
             switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
             case .some(.darkAqua):
+                return NSColor.black.withAlphaComponent(0.08)
+            default:
+                break
+            }
+        }
+
+        return NSColor.black.withAlphaComponent(0.03)
+    }()
+
+    public static let blockBackgroundSubtle: NSColor = {
+        if #available(OSX 10.14, *) {
+            switch NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) {
+            case .some(.darkAqua):
                 return NSColor.black.withAlphaComponent(0.05)
             default:
                 break

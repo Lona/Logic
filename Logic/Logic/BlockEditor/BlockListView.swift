@@ -148,6 +148,22 @@ public class BlockListView: NSBox {
         }
     }
 
+    private func handleMoveBlocks(range: NSRange, insertionIndex: Int) -> Bool {
+        var normalizedIndex = min(insertionIndex + 1, blocks.count)
+
+        if normalizedIndex > range.location {
+            normalizedIndex -= range.length
+        }
+
+        let targetBlocks = blocks[range.lowerBound..<range.upperBound]
+
+        var newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
+
+        newBlocks.insert(contentsOf: targetBlocks, at: normalizedIndex)
+
+        return handleChangeBlocks(newBlocks)
+    }
+
     public var plusButtonTooltip: String = "**Click** _to add below_"
     public var moreButtonTooltip: String = "**Drag** _to move_\n**Click** _to open menu_"
 
@@ -228,25 +244,26 @@ public class BlockListView: NSBox {
                     }
                 }
             } else {
-                tableView.animateRowChanges(
-                    oldData: oldValue,
-                    newData: blocks
-//                    deletionAnimation: .effectFade,
-//                    insertionAnimation: .effectFade
-                )
+                var containsMoves = false
 
-//                if diff.count == 1, let firstInserted = diff.elements.first(where: { element in
-//                    switch element {
-//                    case .insert:
-//                        return true
-//                    default:
-//                        return false
-//                    }
-//                }), case .insert(let index) = firstInserted {
-////                    Swift.print("index", index)
-//                    let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: true)
-//                    window?.makeFirstResponder(view)
-//                }
+                outer: for element in diff {
+                    switch element {
+                        case .move:
+                            containsMoves = true
+                            break outer
+                        default:
+                            break
+                    }
+                }
+
+                // Reloading can currently break item selection, but it works with block selection.
+                // By calling reload only if we make a move, this solves the problem for now, since we
+                // never move at the same time when doing an insert or delete
+                if containsMoves {
+                    tableView.reloadData()
+                } else {
+                    tableView.animateRowChanges(oldData: oldValue, newData: blocks)
+                }
             }
 
             needsDisplay = true
@@ -259,6 +276,10 @@ public class BlockListView: NSBox {
 
     private var selection: BlockListSelection = .none {
         didSet {
+            if oldValue == selection {
+                return
+            }
+
             switch oldValue {
             case .none:
                 break
@@ -304,6 +325,14 @@ public class BlockListView: NSBox {
     private var tableView = BlockListTableView()
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
+
+    private var dragTargetLine: Int? {
+        didSet {
+            if oldValue != dragTargetLine {
+                needsDisplay = true
+            }
+        }
+    }
 
     private var hoveredLine: Int? {
         didSet {
@@ -409,6 +438,22 @@ public class BlockListView: NSBox {
 
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+
+        if let dragTargetLine = dragTargetLine {
+            let rect: NSRect
+
+            if dragTargetLine == -1 {
+                let rowRect = convert(tableView.rect(ofRow: 0), from: tableView)
+                rect = NSRect(x: rowRect.origin.x, y: rowRect.maxY, width: rowRect.width, height: 2)
+            } else {
+                let rowRect = convert(tableView.rect(ofRow: dragTargetLine), from: tableView)
+                rect = NSRect(x: rowRect.origin.x, y: rowRect.minY, width: rowRect.width, height: 2)
+            }
+
+            NSColor.selectedMenuItemColor.setFill()
+
+            rect.fill()
+        }
 
         if let hoveredLine = hoveredLine, hoveredLine < blocks.count {
             let rect = plusButtonRect(for: hoveredLine)
@@ -669,92 +714,171 @@ public class BlockListView: NSBox {
     public func trackMouse(startingAt initialPosition: NSPoint) {
         guard let window = window else { return }
 
-        var isDragging: Bool = false
-        var initialRow: Int? = nil
-        var initialIndex: Int? = nil
-        var didChangeInsertionColor = false
+        let clickedItem = item(at: initialPosition)
 
-        trackingLoop: while true {
-            let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
-            let position = convert(event.locationInWindow, from: nil)
+        TooltipManager.shared.hideTooltip()
 
-            switch event.type {
-            case .leftMouseDragged:
-                let row = tableView.row(at: convert(position, to: tableView))
+        switch clickedItem {
+        case .moreButton(let line):
+            var isDragging: Bool = false
 
-                if row >= 0 {
-                    let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+            let tableViewRect = convert(tableView.frame, from: tableView)
 
-                    if let initialRow = initialRow, initialRow != row {
-                        if initialRow < row {
-                            let newRange = NSRange(location: initialRow, length: row - initialRow + 1)
-                            selection = .blocks(newRange, anchor: newRange.upperBound - 1)
+            trackingLoop: while true {
+                let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
+                let position = convert(event.locationInWindow, from: nil)
+
+                switch event.type {
+                case .leftMouseDragged:
+                    if !isDragging && initialPosition.distance(to: position) > 5 {
+                        isDragging = true
+
+                        switch selection {
+                        case .blocks(let range, anchor: _):
+                            if !range.contains(line) {
+                                selection = .blocks(.init(location: line, length: 1))
+                            }
+                        default:
+                            selection = .blocks(.init(location: line, length: 1))
+                        }
+                    }
+
+                    if isDragging {
+                        let normalizedPoint = convert(NSPoint(x: tableViewRect.minX, y: position.y), to: tableView)
+                        var targetRow = tableView.row(at: normalizedPoint)
+
+                        if targetRow == -1 {
+                            if normalizedPoint.y >= tableViewRect.minY {
+                                targetRow = blocks.count - 1
+                            }
                         } else {
-                            let newRange = NSRange(location: row, length: initialRow - row + 1)
-                            selection = .blocks(newRange, anchor: newRange.lowerBound)
-                        }
-                    } else {
-                        initialRow = row
+                            let targetRect = tableView.rect(ofRow: targetRow)
 
-                        if let view = view as? InlineBlockEditor {
-                            let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
-
-//                            Swift.print(characterIndex, position, convert(position, to: view))
-
-                            if let initialIndex = initialIndex {
-                                selection = .item(row, NSRange(between: initialIndex, and: characterIndex))
-                            } else {
-                                initialIndex = characterIndex
-                                selection = .item(row, NSRange(location: characterIndex, length: 0))
-                            }
-
-                            if view.acceptsFirstResponder {
-                                window.makeFirstResponder(view)
-                                view.insertionPointColor = .clear
-                                didChangeInsertionColor = true
+                            if normalizedPoint.y < targetRect.midY {
+                                targetRow = targetRow - 1
                             }
                         }
+
+                        dragTargetLine = targetRow
                     }
-                }
-
-                if initialPosition.distance(to: position) > 5 {
-                    isDragging = true
-                }
-            case .leftMouseUp:
-                if !isDragging {
-                    handleMouseClick(point: position)
-                }
-
-                switch selection {
-                case .item(let row, let range):
-                    let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
-
-                    if view.acceptsFirstResponder {
-                        window.makeFirstResponder(view)
+                case .leftMouseUp:
+                    if !isDragging {
+                        handleMouseClick(point: position)
                     }
 
-                    if range.length > 0 {
-                        (view as? InlineBlockEditor)?.showInlineToolbar(for: range)
+                    if let dragTargetLine = dragTargetLine {
+                        var currentSelectionRange: NSRange
+
+                        switch selection {
+                        case .blocks(let range, anchor: _):
+                            currentSelectionRange = range
+                        default:
+                            currentSelectionRange = NSRange(location: line, length: 1)
+                        }
+
+                        let selectedId = blocks[currentSelectionRange.location].id
+
+                        // We don't allow moving the range inside itself
+                        if !currentSelectionRange.contains(dragTargetLine) {
+                            _ = handleMoveBlocks(range: currentSelectionRange, insertionIndex: dragTargetLine)
+
+                            if let selectedIndex = blocks.firstIndex(where: { $0.id == selectedId }) {
+                                selection = .blocks(NSRange(location: selectedIndex, length: currentSelectionRange.length))
+                            }
+                        }
                     }
+
+                    break trackingLoop
                 default:
-                    window.makeFirstResponder(self)
+                    break
                 }
+            }
 
-                break trackingLoop
-            default:
-                break
+            dragTargetLine = nil
+        default:
+            var isDragging: Bool = false
+            var initialRow: Int? = nil
+            var initialIndex: Int? = nil
+            var didChangeInsertionColor = false
+
+            trackingLoop: while true {
+                let event = window.nextEvent(matching: [.leftMouseUp, .leftMouseDragged])!
+                let position = convert(event.locationInWindow, from: nil)
+
+                switch event.type {
+                case .leftMouseDragged:
+                    let row = tableView.row(at: convert(position, to: tableView))
+
+                    if row >= 0 {
+                        let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+
+                        if let initialRow = initialRow, initialRow != row {
+                            if initialRow < row {
+                                let newRange = NSRange(location: initialRow, length: row - initialRow + 1)
+                                selection = .blocks(newRange, anchor: newRange.upperBound - 1)
+                            } else {
+                                let newRange = NSRange(location: row, length: initialRow - row + 1)
+                                selection = .blocks(newRange, anchor: newRange.lowerBound)
+                            }
+                        } else {
+                            initialRow = row
+
+                            if let view = view as? InlineBlockEditor {
+                                let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
+
+                                if let initialIndex = initialIndex {
+                                    selection = .item(row, NSRange(between: initialIndex, and: characterIndex))
+                                } else {
+                                    initialIndex = characterIndex
+                                    selection = .item(row, NSRange(location: characterIndex, length: 0))
+                                }
+
+                                if view.acceptsFirstResponder {
+                                    window.makeFirstResponder(view)
+                                    view.insertionPointColor = .clear
+                                    didChangeInsertionColor = true
+                                }
+                            }
+                        }
+                    }
+
+                    if initialPosition.distance(to: position) > 5 {
+                        isDragging = true
+                    }
+                case .leftMouseUp:
+                    if !isDragging {
+                        handleMouseClick(point: position)
+                    }
+
+                    switch selection {
+                    case .item(let row, let range):
+                        let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
+
+                        if view.acceptsFirstResponder {
+                            window.makeFirstResponder(view)
+                        }
+
+                        if range.length > 0 {
+                            (view as? InlineBlockEditor)?.showInlineToolbar(for: range)
+                        }
+                    default:
+                        window.makeFirstResponder(self)
+                    }
+
+                    break trackingLoop
+                default:
+                    break
+                }
+            }
+
+            if didChangeInsertionColor, let row = initialRow {
+                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+
+                if let view = view as? InlineBlockEditor {
+                    view.insertionPointColor = NSColor.textColor
+                }
             }
         }
-
-        if didChangeInsertionColor, let row = initialRow {
-            let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
-
-            if let view = view as? InlineBlockEditor {
-                view.insertionPointColor = NSColor.textColor
-            }
-        }
-
-//        Swift.print("Done tracking")
     }
 
     public func handleMouseClick(point: NSPoint) {
@@ -812,7 +936,12 @@ extension BlockListView: NSTableViewDelegate {
     public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BlockListRowView()
 
-//        rowView.isBlockSelected = row == 0
+        switch selection {
+        case .blocks(let range, _):
+            rowView.isBlockSelected = range.contains(row)
+        default:
+            break
+        }
 
         return rowView
     }
@@ -821,7 +950,7 @@ extension BlockListView: NSTableViewDelegate {
         let item = blocks[row]
 
         switch item.content {
-        case .tokens(let syntaxNode):
+        case .tokens:
             let view = item.view as! LogicEditor
 
             view.onChangeRootNode = { [unowned self] newRootNode in

@@ -33,9 +33,9 @@ public class EditableBlock: Equatable {
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
             view.cornerRadius = 4
-            view.borderType = .lineBorder
-            view.borderWidth = 1
-            view.borderColor = Colors.divider
+//            view.borderType = .lineBorder
+//            view.borderWidth = 1
+//            view.borderColor = Colors.divider
 
             var style = view.canvasStyle
             style.textMargin = .init(width: 5, height: 6)
