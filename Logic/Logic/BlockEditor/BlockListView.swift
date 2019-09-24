@@ -207,19 +207,6 @@ public class BlockListView: NSBox {
         return ok
     }
 
-    private func handleDelete(line: Int) {
-        if blocks.count <= 1 { return }
-
-        var clone = self.blocks
-        clone.remove(at: line)
-
-        let id = clone[line > 0 ? line - 1 : line].id
-
-        if handleChangeBlocks(clone) {
-            focus(id: id)
-        }
-    }
-
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
             let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
@@ -1153,9 +1140,7 @@ extension BlockListView: NSTableViewDelegate {
                 let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, .paragraph))
                 clone.insert(nextBlock, at: line + 1)
 
-                let ok = self.handleChangeBlocks(clone)
-
-                if ok {
+                if self.handleChangeBlocks(clone) {
                     self.focus(id: nextBlock.id)
                 }
             }
@@ -1163,7 +1148,33 @@ extension BlockListView: NSTableViewDelegate {
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                self.handleDelete(line: line)
+                if line == 0 { return }
+
+                let textValue = view.textValue
+                let previousLine = line - 1
+                let previousBlock = self.blocks[previousLine]
+
+                var clone = self.blocks
+
+                switch previousBlock.content {
+                case .text(let previousTextValue, let previousSizeLevel):
+                    let mergedTextValue = [previousTextValue, textValue].joined()
+
+                    clone.remove(at: line)
+                    clone[previousLine] = .init(id: previousBlock.id, content: .text(mergedTextValue, previousSizeLevel))
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: previousBlock.id)
+                        self.selection = .item(previousLine, .init(location: previousTextValue.length, length: 0))
+                    }
+                case .tokens:
+                    clone.remove(at: previousLine)
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: item.id)
+                        self.selection = .item(previousLine, .init(location: 0, length: 0))
+                    }
+                }
             }
 
             return view
