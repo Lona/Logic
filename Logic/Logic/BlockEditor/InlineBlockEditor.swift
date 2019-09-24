@@ -61,8 +61,9 @@ public class InlineBlockEditor: AttributedTextView {
                 let font = (value as? NSFont) ?? defaultTextStyle.nsFont
                 guard let newFont = NSFont(descriptor: font.fontDescriptor, size: self.fontSize) else { return }
 //                newTextValue.addAttribute(.font, value: newFont, range: range)
+
                 newTextValue.addAttributes(
-                    [.font: newFont, .foregroundColor: NSColor.textColor],
+                    [.font: newFont, .foregroundColor: NSColor.textColor.withAlphaComponent(0.8)],
                     range: range
                 )
             })
@@ -82,7 +83,7 @@ public class InlineBlockEditor: AttributedTextView {
             font = textStyle.nsFont
 
             if let placeholderAttributedString = self.placeholderAttributedString {
-                self.placeholderAttributedString = placeholderTextStyle.apply(to: placeholderAttributedString)
+                self.placeholderAttributedString = NSAttributedString(string: placeholderAttributedString.string, attributes: placeholderTextStyle)
             }
         }
     }
@@ -91,12 +92,16 @@ public class InlineBlockEditor: AttributedTextView {
         return defaultTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
     }
 
-    private var placeholderTextStyle: TextStyle {
-        return defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
+    private var placeholderTextStyle: [NSAttributedString.Key: Any] {
+        let ps = NSMutableParagraphStyle()
+        ps.lineHeightMultiple = InlineBlockEditor.lineHeightMultiple - 0.25
+        var attributes = defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize).attributeDictionary
+        attributes[.paragraphStyle] = ps
+        return attributes
     }
 
     public func setPlaceholder(string: String) {
-        placeholderAttributedString = placeholderTextStyle.apply(to: string)
+        placeholderAttributedString = NSAttributedString(string: string, attributes: placeholderTextStyle)
     }
 
     @objc private var placeholderAttributedString: NSAttributedString? {
@@ -113,6 +118,15 @@ public class InlineBlockEditor: AttributedTextView {
 
     public override func sharedInit() {
         super.sharedInit()
+
+        let layoutManager = InlineBlockLayoutManager()
+        layoutManager.getFont = { [weak self] in
+            guard let self = self else { return nil }
+            return self.textStyle.nsFont
+        }
+        layoutManager.delegate = self
+
+        textContainer?.replaceLayoutManager(layoutManager)
 
         setContentHuggingPriority(.defaultHigh, for: .vertical)
 
@@ -215,6 +229,8 @@ public class InlineBlockEditor: AttributedTextView {
             }
         }
     }
+
+    public static var lineHeightMultiple: CGFloat = 1.44
 
     // MARK: Private
 
@@ -408,7 +424,10 @@ public class InlineBlockEditor: AttributedTextView {
         manager.ensureLayout(for: container)
         let size = manager.usedRect(for: container).size
 
-        return .init(width: size.width, height: ceil(size.height + sizeLevel.fontSize * 0.2))
+//        let marginBottom = sizeLevel.fontSize * 0.2
+        let marginBottom: CGFloat = 10
+
+        return .init(width: size.width, height: ceil(size.height + marginBottom))
     }
 
     func textDidChange(_ notification: Notification) {
@@ -486,5 +505,74 @@ extension NSTextView {
         let glyph = manager.glyphIndex(for: point, in: container, fractionOfDistanceThroughGlyph: nil)
 
         return manager.characterIndexForGlyph(at: glyph)
+    }
+}
+
+// MARK: - NSLayoutManagerDelegate
+
+// https://christiantietze.de/posts/2017/07/nstextview-proper-line-height/
+
+extension InlineBlockEditor: NSLayoutManagerDelegate {
+
+    public func layoutManager(
+        _ layoutManager: NSLayoutManager,
+        shouldSetLineFragmentRect lineFragmentRect: UnsafeMutablePointer<NSRect>,
+        lineFragmentUsedRect: UnsafeMutablePointer<NSRect>,
+        baselineOffset: UnsafeMutablePointer<CGFloat>,
+        in textContainer: NSTextContainer,
+        forGlyphRange glyphRange: NSRange) -> Bool {
+
+        let fontLineHeight = layoutManager.defaultLineHeight(for: textStyle.nsFont)
+        let lineHeight = fontLineHeight * InlineBlockEditor.lineHeightMultiple
+        let baselineNudge = (lineHeight - fontLineHeight)
+            // The following factor is a result of experimentation:
+            * 0.5
+
+        var rect = lineFragmentRect.pointee
+        rect.size.height = lineHeight
+
+        var usedRect = lineFragmentUsedRect.pointee
+        usedRect.size.height = max(lineHeight, usedRect.size.height) // keep emoji sizes
+
+        lineFragmentRect.pointee = rect
+        lineFragmentUsedRect.pointee = usedRect
+        baselineOffset.pointee = baselineOffset.pointee + baselineNudge
+
+        return true
+    }
+}
+
+class InlineBlockLayoutManager: NSLayoutManager {
+
+    var getFont: (() -> NSFont?) = { return nil }
+
+    private var font: NSFont {
+        return getFont() ?? defaultTextStyle.nsFont
+    }
+
+    private var lineHeight: CGFloat {
+        let fontLineHeight = self.defaultLineHeight(for: font)
+        let lineHeight = fontLineHeight * InlineBlockEditor.lineHeightMultiple
+        return lineHeight
+    }
+
+    // Takes care only of the last empty newline in the text backing
+    // store, or totally empty text views.
+    override func setExtraLineFragmentRect(
+        _ fragmentRect: NSRect,
+        usedRect: NSRect,
+        textContainer container: NSTextContainer) {
+
+        // This is only called when editing, and re-computing the
+        // `lineHeight` isn't that expensive, so I do no caching.
+        let lineHeight = self.lineHeight
+        var fragmentRect = fragmentRect
+        fragmentRect.size.height = lineHeight
+        var usedRect = usedRect
+        usedRect.size.height = lineHeight
+
+        super.setExtraLineFragmentRect(fragmentRect,
+            usedRect: usedRect,
+            textContainer: container)
     }
 }

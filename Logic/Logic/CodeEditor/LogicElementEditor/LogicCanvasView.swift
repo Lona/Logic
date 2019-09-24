@@ -428,6 +428,8 @@ public class LogicCanvasView: NSView {
         return NSSize(width: NSView.noIntrinsicMetric, height: minHeight)
     }
 
+    // MARK: Drawing
+
     private static func drawCommon(
         formattedContent: FormatterContext,
         measuredElements: [LogicMeasuredElement],

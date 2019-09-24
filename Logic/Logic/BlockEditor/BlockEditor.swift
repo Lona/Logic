@@ -146,7 +146,7 @@ public enum EditableBlockContent: Equatable {
     var lineButtonAlignmentHeight: CGFloat {
         switch self {
         case .text(_, let sizeLevel):
-            return sizeLevel.fontSize
+            return sizeLevel.fontSize * InlineBlockEditor.lineHeightMultiple
         case .tokens:
             return 18
         }
