@@ -836,7 +836,7 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                 ]
             )
         case .placeholder(let value):
-            return .element(LogicElement.dropdown(value, "", .empty))
+            return .element(LogicElement.dropdown(value, "", .placeholder))
         }
     }
 }
