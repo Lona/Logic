@@ -418,16 +418,22 @@ public class InlineBlockEditor: AttributedTextView {
 //    }
 
     override public var intrinsicContentSize: NSSize {
-        guard let container = textContainer, let manager = container.layoutManager else {
-            return super.intrinsicContentSize
-        }
-        manager.ensureLayout(for: container)
-        let size = manager.usedRect(for: container).size
+        let size = lineRects.union.size
 
-//        let marginBottom = sizeLevel.fontSize * 0.2
         let marginBottom: CGFloat = 10
 
         return .init(width: size.width, height: ceil(size.height + marginBottom))
+
+//        guard let container = textContainer, let manager = container.layoutManager else {
+//            return super.intrinsicContentSize
+//        }
+//        manager.ensureLayout(for: container)
+//        let size = manager.usedRect(for: container).size
+//
+////        let marginBottom = sizeLevel.fontSize * 0.2
+//        let marginBottom: CGFloat = 10
+//
+//        return .init(width: size.width, height: ceil(size.height + marginBottom))
     }
 
     func textDidChange(_ notification: Notification) {
