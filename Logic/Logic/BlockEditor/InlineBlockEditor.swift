@@ -397,43 +397,12 @@ public class InlineBlockEditor: AttributedTextView {
 
     // MARK: Layout
 
-//    override public var intrinsicContentSize: NSSize {
-//        get {
-//            let intrinsicSize = super.intrinsicContentSize
-//
-//            var size: NSSize
-//
-//            if textValue.length > 0 {
-//                size = textValue.measure(width: bounds.width)
-//            } else if let placeholder = placeholderAttributedString {
-//                size = placeholder.measure(width: bounds.width)
-//            } else {
-//                size = NSAttributedString(string: " ", attributes: [.font: defaultTextStyle.nsFont]).measure(width: bounds.width)
-//            }
-//
-//            Swift.print(size)
-//
-//            return .init(width: intrinsicSize.width, height: size.height)
-//        }
-//    }
-
     override public var intrinsicContentSize: NSSize {
         let size = lineRects.union.size
 
         let marginBottom: CGFloat = 10
 
         return .init(width: size.width, height: ceil(size.height + marginBottom))
-
-//        guard let container = textContainer, let manager = container.layoutManager else {
-//            return super.intrinsicContentSize
-//        }
-//        manager.ensureLayout(for: container)
-//        let size = manager.usedRect(for: container).size
-//
-////        let marginBottom = sizeLevel.fontSize * 0.2
-//        let marginBottom: CGFloat = 10
-//
-//        return .init(width: size.width, height: ceil(size.height + marginBottom))
     }
 
     func textDidChange(_ notification: Notification) {
@@ -449,26 +418,6 @@ public class InlineBlockEditor: AttributedTextView {
 
     public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
         super.setSelectedRanges(ranges, affinity: .downstream, stillSelecting: true)
-    }
-}
-
-extension NSAttributedString {
-    func measure(width: CGFloat, maxNumberOfLines: Int = -1) -> NSSize {
-        let textContainer = NSTextContainer(containerSize: NSSize(width: width, height: CGFloat.greatestFiniteMagnitude))
-        textContainer.lineBreakMode = .byTruncatingTail
-        textContainer.lineFragmentPadding = 0.0
-        if maxNumberOfLines > -1 {
-            textContainer.maximumNumberOfLines = maxNumberOfLines
-        }
-
-        let textStorage = NSTextStorage(attributedString: self)
-
-        let layoutManager = NSLayoutManager()
-        layoutManager.addTextContainer(textContainer)
-        textStorage.addLayoutManager(layoutManager)
-        layoutManager.glyphRange(for: textContainer)
-
-        return layoutManager.usedRect(for: textContainer).size
     }
 }
 
