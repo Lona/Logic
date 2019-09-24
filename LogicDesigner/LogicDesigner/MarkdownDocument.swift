@@ -44,7 +44,7 @@ class MarkdownDocument: NSDocument {
     var blockEditor: BlockEditor = {
         let blockEditor = BlockEditor()
 
-        blockEditor.blocks = MarkdownDocument.makeBlocks(from: "")
+        blockEditor.blocks = MarkdownFile.makeBlocks("")
 
         return blockEditor
     }()
@@ -196,7 +196,8 @@ class MarkdownDocument: NSDocument {
 
                 logicEditor.suggestionsForNode = suggestionsForNode
 
-                logicEditor.elementErrors = errors
+                // Only show the errors for nodes within this rootNode
+                logicEditor.elementErrors = errors.filter { logicEditor.rootNode.find(id: $0.uuid) != nil }
 
                 logicEditor.willSelectNode = { rootNode, nodeId in
                     guard let nodeId = nodeId else { return nil }
@@ -236,61 +237,12 @@ class MarkdownDocument: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        let markdownString = blockEditor.blocks.map { $0.markdownString }.joined(separator: "\n")
-
-        return markdownString.data(using: .utf8)!
+        return MarkdownFile.makeMarkdownData(blockEditor.blocks)!
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        let markdownString = String(data: data, encoding: .utf8)!
-
-        blockEditor.blocks = MarkdownDocument.makeBlocks(from: markdownString)
-    }
-
-    private static func makeBlocks(from markdownString: String) -> [BlockEditor.Block] {
-        let parsed = LightMark.parse(markdownString)
-
-        if parsed.count == 0 {
-            return [
-                EditableBlock.makeDefaultEmptyBlock()
-            ]
-        }
-
-        let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
-            switch blockElement {
-            case .lineBreak:
-//                return BlockEditor.Block.makeDefaultEmptyBlock()
-                return nil
-            case .heading(level: let level, content: let inlineElements):
-                func sizeLevel() -> InlineBlockEditor.SizeLevel {
-                    switch level {
-                    case .level1: return .h1
-                    case .level2: return .h2
-                    case .level3: return .h3
-                    case .level4: return .h4
-                    case .level5: return .h5
-                    case .level6: return .h6
-                    }
-                }
-
-                let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(value, sizeLevel()))
-            case .paragraph(content: let inlineElements):
-                let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(value, .paragraph))
-            case .block(language: "tokens", content: let code):
-                guard let data = code.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
-
-                guard let rootNode = LGCSyntaxNode(data: data) else {
-                    Swift.print("Failed to create code block from", code)
-                    return nil
-                }
-
-                return BlockEditor.Block(.tokens(rootNode))
-            default:
-                return nil
-            }
-        }
-        return blocks
+        let blocks = MarkdownFile.makeBlocks(data)!
+        blockEditor.blocks = blocks
+        configure(blocks: blocks)
     }
 }
