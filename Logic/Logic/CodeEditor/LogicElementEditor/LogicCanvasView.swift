@@ -418,7 +418,11 @@ public class LogicCanvasView: NSView {
         }
     }
 
-    private var heightConstraint: NSLayoutConstraint = NSLayoutConstraint()
+    private lazy var heightConstraint: NSLayoutConstraint = {
+        let constraint = self.heightAnchor.constraint(equalToConstant: 0)
+        constraint.isActive = true
+        return constraint
+    }()
 
     public override var isFlipped: Bool {
         return true
@@ -1035,6 +1039,12 @@ public class LogicCanvasView: NSView {
             previousHeight = minHeight
             invalidateIntrinsicContentSize()
         }
+    }
+
+    public override func invalidateIntrinsicContentSize() {
+        super.invalidateIntrinsicContentSize()
+
+        heightConstraint.constant = minHeight
     }
 
     private func clearCache() {
