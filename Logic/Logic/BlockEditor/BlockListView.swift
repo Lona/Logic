@@ -436,6 +436,16 @@ public class BlockListView: NSBox {
         return true
     }
 
+    public override func layout() {
+        super.layout()
+
+        tableView.enumerateAvailableRowViews { rowView, row in
+            if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? InlineBlockEditor {
+                view.width = tableView.bounds.width
+            }
+        }
+    }
+
     public override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 

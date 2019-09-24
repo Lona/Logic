@@ -207,7 +207,21 @@ public class InlineBlockEditor: AttributedTextView {
 
     public var onSelectDown: (() -> Void)?
 
+    public var width: CGFloat = 0 {
+        didSet {
+            widthConstraint.constant = width
+            if !widthConstraint.isActive {
+                widthConstraint.isActive = true
+            }
+        }
+    }
+
     // MARK: Private
+
+    private lazy var widthConstraint: NSLayoutConstraint = {
+        let constraint = self.widthAnchor.constraint(equalToConstant: self.width)
+        return constraint
+    }()
 
     public override func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
         return sizeLevel.apply(to: value)
@@ -393,8 +407,6 @@ public class InlineBlockEditor: AttributedTextView {
         }
         manager.ensureLayout(for: container)
         let size = manager.usedRect(for: container).size
-//        Swift.print(string, size, container.containerSize, container.size)
-//        return size
 
         return .init(width: size.width, height: ceil(size.height + sizeLevel.fontSize * 0.2))
     }
