@@ -813,20 +813,34 @@ extension LGCDeclaration: SyntaxNodeFormattable {
                         )
                     ]
                 )
-            case .visual:
-                return .concat(
-                    [
-                        .spacer(20),
-                        .element(LogicElement.title(value.name.id, value.name.name)),
-                        .horizontalFloat(
-                            decoration: .indentGuide(value.id),
-                            margins: NSEdgeInsets(top: 4, left: 4, bottom: 4, right: 8),
-                            .join(with: .hardLine) {
-                                value.declarations.map { $0.formatted(using: options) }
-                            }
-                        )
-                    ]
-                )
+                case .visual:
+                    return .concat(
+                        [
+                            .element(LogicElement.dropdown(value.id, "Group", .source)),
+                            value.name.formatted(using: options),
+                            .horizontalFloat(
+                                decoration: .indentGuide(value.id),
+                                margins: NSEdgeInsets(top: 4, left: 4, bottom: 4, right: 8),
+                                .join(with: .hardLine) {
+                                    value.declarations.map { $0.formatted(using: options) }
+                                }
+                            )
+                        ]
+                    )
+//            case .visual:
+//                return .concat(
+//                    [
+//                        .spacer(20),
+//                        .element(LogicElement.title(value.name.id, value.name.name)),
+//                        .horizontalFloat(
+//                            decoration: .indentGuide(value.id),
+//                            margins: NSEdgeInsets(top: 4, left: 4, bottom: 4, right: 8),
+//                            .join(with: .hardLine) {
+//                                value.declarations.map { $0.formatted(using: options) }
+//                            }
+//                        )
+//                    ]
+//                )
             }
         case .importDeclaration(let value):
             return .concat(
