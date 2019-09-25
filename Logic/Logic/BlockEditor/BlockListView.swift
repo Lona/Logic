@@ -899,7 +899,7 @@ public class BlockListView: NSBox {
                     window?.makeFirstResponder(view)
                 }
             } else if let view = view as? LogicEditor {
-                view.canvasView.handlePress(locationInWindow: point)
+                view.canvasView.handlePress(locationInWindow: convert(point, to: nil))
             }
         case .background:
             break
