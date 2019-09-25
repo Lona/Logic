@@ -45,6 +45,11 @@ public class InlineToolbarWindow: OverlayWindow {
         set { toolbarView.isCodeEnabled = newValue }
     }
 
+    public var isStrikethroughEnabled: Bool {
+        get { return toolbarView.isStrikethroughEnabled }
+        set { toolbarView.isStrikethroughEnabled = newValue }
+    }
+
     public var onSubmit: ((Int) -> Void)?
 
     // MARK: Overrides

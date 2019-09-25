@@ -15,7 +15,7 @@ public enum InlineTextTrait: Equatable {
         switch self {
         case .bold: return "**"
         case .italic: return "_"
-        case .strikethrough: return "~"
+        case .strikethrough: return "~~"
         case .code: return "`"
         case .link: return "["
         }
@@ -25,7 +25,7 @@ public enum InlineTextTrait: Equatable {
         switch self {
         case .bold: return "**"
         case .italic: return "_"
-        case .strikethrough: return "~"
+        case .strikethrough: return "~~"
         case .code: return "`"
         case .link: return "]"
         }
@@ -53,6 +53,10 @@ extension Array where Element == InlineTextTrait {
                 self.append(.code)
             }
         }
+
+        if let strikethrough = attributes[.strikethroughStyle] as? Int, strikethrough != 0 {
+            self.append(.strikethrough)
+        }
     }
 }
 
@@ -67,6 +71,8 @@ extension NSMutableAttributedString {
         case .italic:
             let newFont = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
             addAttribute(.font, value: newFont, range: range)
+        case .strikethrough:
+            addAttribute(.strikethroughStyle, value: 1, range: range)
         case .code:
             let newFont = NSFontManager.shared.convert(font, toFamily: InlineTextTrait.monospacedFontFamily)
             addAttribute(.font, value: newFont, range: range)
@@ -86,6 +92,8 @@ extension NSMutableAttributedString {
         case .italic:
             let newFont = NSFontManager.shared.convert(font, toNotHaveTrait: .italicFontMask)
             addAttribute(.font, value: newFont, range: range)
+        case .strikethrough:
+            removeAttribute(.strikethroughStyle, range: range)
         case .code:
             let newFont = NSFontManager.shared.convert(font, toFamily: NSFont.systemFont(ofSize: NSFont.systemFontSize).familyName!)
             addAttribute(.font, value: newFont, range: range)
@@ -100,7 +108,7 @@ extension NSAttributedString {
 //    public func att
 
     public func markdownString() -> String {
-        var characterTraits: [[InlineTextTrait]] = (0..<self.length).map { index in
+        let characterTraits: [[InlineTextTrait]] = (0..<self.length).map { index in
             return .init(attributes: self.attributes(at: index, effectiveRange: nil))
         }
 

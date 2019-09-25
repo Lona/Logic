@@ -260,6 +260,7 @@ public class InlineBlockEditor: AttributedTextView {
         InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
         InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
         InlineToolbarWindow.shared.isCodeEnabled = traits.contains(.code)
+        InlineToolbarWindow.shared.isStrikethroughEnabled = traits.contains(.strikethrough)
     }
 
     private func updateToolbar(for range: NSRange) {
@@ -283,6 +284,9 @@ public class InlineBlockEditor: AttributedTextView {
                 self.onChangeTextValue?(mutable)
             case .italic:
                 update(trait: .italic)
+                self.onChangeTextValue?(mutable)
+            case .strikethrough:
+                update(trait: .strikethrough)
                 self.onChangeTextValue?(mutable)
             case .code:
                 update(trait: .code)

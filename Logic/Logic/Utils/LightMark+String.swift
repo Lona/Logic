@@ -46,14 +46,15 @@ extension LightMark.InlineElement {
             if joined.length == 0 { return joined }
 
             let mutable = NSMutableAttributedString(attributedString: joined)
+            let range: NSRange = .init(location: 0, length: mutable.length)
 
             switch style {
             case .emphasis:
-                mutable.add(trait: .italic, range: .init(location: 0, length: mutable.length))
+                mutable.add(trait: .italic, range: range)
             case .strong:
-                mutable.add(trait: .bold, range: .init(location: 0, length: mutable.length))
+                mutable.add(trait: .bold, range: range)
             case .strikethrough:
-                fatalError("Not supported")
+                mutable.addAttribute(.strikethroughStyle, value: 1, range: range)
             }
 
             return mutable

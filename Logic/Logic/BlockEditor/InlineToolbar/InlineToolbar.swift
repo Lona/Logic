@@ -29,7 +29,7 @@ private extension NSImage {
 public class InlineToolbar: NSView {
 
     public enum Command {
-        case divider, blockType, bold, italic, code, link
+        case divider, blockType, bold, italic, strikethrough, code, link
 
         var width: CGFloat {
             switch self {
@@ -37,9 +37,7 @@ public class InlineToolbar: NSView {
                 return 1
             case .blockType:
                 return 80
-            case .bold:
-                return 24
-            case .italic:
+            case .bold, .italic, .strikethrough:
                 return 24
             case .code:
                 return 24
@@ -70,6 +68,12 @@ public class InlineToolbar: NSView {
                     let mutable = NSMutableAttributedString(attributedString: menuTextStyle.apply(to: "i"))
                     mutable.addAttributes([.font: font], range: NSRange(location: 0, length: mutable.length))
                     string = mutable
+                case .strikethrough:
+                    string = menuTextStyle.apply(to: "s")
+
+                    // A single character with a strikethrough doesn't look very clear, so we draw our own
+                    NSColor.black.setFill()
+                    NSRect(x: rect.midX - 6, y: rect.midY - 2, width: 12, height: 1).fill()
                 case .code:
                     string = monospacedMenuTextStyle.apply(to: "<>")
                 default:
@@ -148,7 +152,7 @@ public class InlineToolbar: NSView {
     }
 
     func index(at point: NSPoint) -> Int? {
-        var buttonRects = self.buttonRects
+        let buttonRects = self.buttonRects
 
         for index in 0..<InlineToolbar.commands.count {
             if buttonRects[index].contains(point) {
@@ -227,6 +231,14 @@ public class InlineToolbar: NSView {
         }
     }
 
+    public var isStrikethroughEnabled: Bool = false {
+        didSet {
+            if oldValue != isStrikethroughEnabled {
+                update()
+            }
+        }
+    }
+
     public var isCodeEnabled: Bool = false {
         didSet {
             if oldValue != isCodeEnabled {
@@ -260,6 +272,8 @@ public class InlineToolbar: NSView {
                         showToolTip(string: "**Bold**\n⌘+B", at: midpoint)
                     case .italic:
                         showToolTip(string: "**Italic**\n⌘+I", at: midpoint)
+                    case .strikethrough:
+                        showToolTip(string: "**Strikethrough**\n⌘+Shift+S", at: midpoint)
                     case .code:
                         showToolTip(string: "**Code**\n⌘+E", at: midpoint)
                     default:
@@ -328,6 +342,8 @@ public class InlineToolbar: NSView {
                 selected = isBoldEnabled
             case .italic:
                 selected = isItalicEnabled
+            case .strikethrough:
+                selected = isStrikethroughEnabled
             case .code:
                 selected = isCodeEnabled
             default:
@@ -340,7 +356,7 @@ public class InlineToolbar: NSView {
         }
     }
 
-    public static var commands: [Command] = [.bold, .italic, .code]
+    public static var commands: [Command] = [.bold, .italic, .strikethrough, .code]
 
     public static var height: CGFloat = 28
 }
