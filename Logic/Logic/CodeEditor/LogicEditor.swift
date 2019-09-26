@@ -796,10 +796,12 @@ extension LogicEditor {
             childWindow.placeholderText = "Type a new name and press Enter"
             childWindow.defaultWindowSize = .init(width: 400, height: 32 + OverlayWindow.shadowViewMargin * 2)
             childWindow.showsSuggestionArea = false
+            childWindow.showsFilterBar = false
         default:
             childWindow.placeholderText = placeholderText
             childWindow.defaultWindowSize = defaultSuggestionWindowSize
             childWindow.showsSuggestionArea = true
+            childWindow.showsFilterBar = showsFilterBar
         }
 
         childWindow.showsDropdown = showsDropdown

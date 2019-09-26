@@ -181,15 +181,20 @@ public class BlockListView: NSBox {
             return
         }
 
+        if line + 1 < blocks.count, blocks[line + 1].content == .text(.init(), .paragraph) {
+            focus(line: line + 1)
+            return
+        }
+
         let id = UUID()
         let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
 
-        if ok, let addedLine = self.line(forBlock: id) {
-            guard let window = window else { return }
-            let rect = window.convertToScreen(tableView.convert(tableView.rect(ofRow: addedLine), to: nil))
+        if ok, let addedLine = self.line(forBlock: id), let view = blocks[addedLine].view as? InlineBlockEditor {
+            let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
 
             commandPaletteAnchor = (addedLine, 0, rect)
             showCommandPalette(line: addedLine, query: "", rect: rect)
+            view.setPlaceholder(string: "Type to filter commands")
         }
     }
 
@@ -986,31 +991,31 @@ extension BlockListView: NSTableViewDelegate {
                     }
                 }
 
-                // If the string has changed, check if we want to open the command palette
-                if newValue.string != view.textValue.string {
-                    let range = view.selectedRange
-                    let string = newValue.string
-                    let location = range.location + 1
-                    let prefix = string.prefix(location)
-                    let rect = view.firstRect(forCharacterRange: NSRange(location: range.location, length: 1), actualRange: nil)
-
-                    if prefix.last == "/" {
-                        self.commandPaletteAnchor = (row, location, rect)
-                        self.showCommandPalette(line: row, query: "", rect: rect)
-                    } else if let anchor = self.commandPaletteAnchor, location > anchor.character, string.count >= location {
-                        let query = (string as NSString).substring(with: NSRange(location: anchor.character, length: location - anchor.character))
-                        self.showCommandPalette(line: row, query: query, rect: anchor.rect)
-                    } else {
-                        self.commandPaletteAnchor = nil
-                        self.hideCommandPalette()
-                    }
-                }
-
                 // Update the text
                 var clone = self.blocks
                 clone[row] = .init(id: item.id, content: .text(newValue, view.sizeLevel))
 
                 _ = self.handleChangeBlocks(clone)
+            }
+
+            // If the string has changed, check if we want to open the command palette
+            view.onDidChangeText = { [unowned self] in
+                let range = view.selectedRange
+                let string = view.textValue.string
+                let location = range.location
+                let prefix = string.prefix(location)
+
+                if prefix.last == "/" {
+                    let rect = view.firstRect(forCharacterRange: NSRange(location: prefix.count - 1, length: 1), actualRange: nil)
+                    self.commandPaletteAnchor = (row, location, rect)
+                    self.showCommandPalette(line: row, query: "", rect: rect)
+                } else if let anchor = self.commandPaletteAnchor, location > anchor.character, string.count >= location {
+                    let query = (string as NSString).substring(with: NSRange(location: anchor.character, length: location - anchor.character))
+                    self.showCommandPalette(line: row, query: query, rect: anchor.rect)
+                } else {
+                    self.commandPaletteAnchor = nil
+                    self.hideCommandPalette()
+                }
             }
 
             view.onChangeSelectedRange = { [unowned self] range in
@@ -1177,6 +1182,11 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
+            view.onPressEscape = { [unowned self] in
+                self.hideInlineToolbarWindow()
+                self.hideCommandPalette()
+            }
+
             return view
         }
     }
@@ -1304,6 +1314,12 @@ extension BlockListView: NSTableViewDelegate {
         subwindow.suggestionText = query
         subwindow.suggestionItems = filteredSuggestionItems(query: query).map { offset, item in item }
         subwindow.selectedIndex = filteredSuggestionItems(query: query).firstIndex(where: { offset, item in item.isSelectable })
+
+        // If there are no selectable results, hide the command palette
+        if subwindow.selectedIndex == nil {
+            hideCommandPalette()
+            return
+        }
 
         subwindow.onSelectIndex = { [unowned subwindow] index in
             subwindow.selectedIndex = index

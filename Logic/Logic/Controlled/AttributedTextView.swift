@@ -45,6 +45,7 @@ open class AttributedTextView: NSTextView {
 
     // MARK: Public
 
+    public var onDidChangeText: (() -> Void)?
     public var onChangeSelectedRange: ((NSRange) -> Void)?
     public var onChangeTextValue: ((NSAttributedString) -> Void)?
     public var onSubmit: (() -> Void)?
@@ -141,6 +142,12 @@ extension AttributedTextView: NSTextViewDelegate {
         }
 
         return false
+    }
+
+    open override func didChangeText() {
+        super.didChangeText()
+
+        onDidChangeText?()
     }
 
     open override func doCommand(by selector: Selector) {
