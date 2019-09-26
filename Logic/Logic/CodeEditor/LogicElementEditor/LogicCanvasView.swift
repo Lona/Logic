@@ -1009,7 +1009,7 @@ public class LogicCanvasView: NSView {
     }
 
     private var minHeight: CGFloat {
-        let contentHeight = measuredElements.last?.backgroundRect.maxY ?? style.textMargin.height
+        let contentHeight = measuredElements.map { $0.backgroundRect.maxY }.max() ?? style.textMargin.height
         let minHeight = contentHeight + style.textMargin.height
         return minHeight
     }

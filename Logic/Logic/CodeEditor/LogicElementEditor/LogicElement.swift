@@ -253,7 +253,7 @@ extension LogicElement {
                 attributedStringRect: rect,
                 backgroundRect: backgroundRect)
         case .colorPreview, .shadowPreview:
-            let rect: CGRect = .init(origin: origin, size: .init(width: 64, height: 64))
+            let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
 
             return LogicMeasuredElement(
                 element: self,
@@ -261,7 +261,7 @@ extension LogicElement {
                 attributedStringRect: rect,
                 backgroundRect: rect)
         case .textStylePreview:
-            let rect: CGRect = .init(origin: origin, size: .init(width: 64 * 2, height: 64))
+            let rect: CGRect = .init(origin: origin, size: .init(width: 68 * 2, height: 68))
 
             return LogicMeasuredElement(
                 element: self,
