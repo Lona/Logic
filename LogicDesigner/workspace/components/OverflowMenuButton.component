@@ -1,0 +1,123 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+
+      }
+    }
+  ],
+  "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "Container",
+        "onPress"
+      ],
+      "content" : [
+        "parameters",
+        "onPressButton"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "Container",
+            "backgroundColor"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : "divider",
+              "type" : "Color"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "layers",
+          "Container",
+          "hovered"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
+    }
+  ],
+  "params" : [
+    {
+      "name" : "onPressButton",
+      "type" : {
+        "name" : "Function"
+      }
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "id" : "Line1",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "textMuted",
+          "height" : 1,
+          "marginBottom" : 3
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "id" : "Line2",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "textMuted",
+          "height" : 1,
+          "marginBottom" : 3
+        },
+        "type" : "Lona:View"
+      },
+      {
+        "id" : "Line3",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "textMuted",
+          "height" : 1
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "Container",
+    "params" : {
+      "borderRadius" : 4,
+      "height" : 19,
+      "paddingBottom" : 5,
+      "paddingLeft" : 5,
+      "paddingRight" : 5,
+      "paddingTop" : 5,
+      "width" : 19
+    },
+    "type" : "Lona:View"
+  }
+}

@@ -1166,7 +1166,7 @@ extension BlockListView: NSTableViewDelegate {
                         self.focus(id: previousBlock.id)
                         self.selection = .item(previousLine, .init(location: previousTextValue.length, length: 0))
                     }
-                case .tokens, .divider:
+                case .tokens, .divider, .image:
                     clone.remove(at: previousLine)
 
                     if self.handleChangeBlocks(clone) {
@@ -1183,6 +1183,8 @@ extension BlockListView: NSTableViewDelegate {
 
             return view
         case .divider:
+            return item.view
+        case .image:
             return item.view
         }
     }
@@ -1260,6 +1262,10 @@ extension BlockListView: NSTableViewDelegate {
             (
                 SuggestionListItem.row("Divider", "Horizontal divider", false, nil, image(named: "menu-thumbnail-h3")),
                 EditableBlock(id: UUID(), content: .divider)
+            ),
+            (
+                SuggestionListItem.row("Image", "Display an image", false, nil, image(named: "menu-thumbnail-h3")),
+                EditableBlock(id: UUID(), content: .image(nil))
             ),
             (
                 SuggestionListItem.sectionHeader("TOKENS"),
@@ -1357,7 +1363,7 @@ extension BlockListView: NSTableViewDelegate {
                 if mutable.length > 1 {
                     replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel))
                 }
-            case .tokens, .divider:
+            case .tokens, .divider, .image:
                 break
             }
 

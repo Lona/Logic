@@ -37,6 +37,8 @@ public enum MarkdownFile {
             return "```tokens\n\(code)\n```"
         case .divider:
             return "---"
+        case .image(let url):
+            return "![](\(url?.absoluteString ?? ""))"
         }
     }
 
