@@ -659,9 +659,7 @@ public class BlockListView: NSBox {
         hideCommandPalette()
         hideInlineToolbarWindow()
 
-        let point = convert(event.locationInWindow, from: nil)
-
-        trackMouse(startingAt: point)
+        trackMouse(startingWith: event)
     }
 
     public override func mouseMoved(with event: NSEvent) {
@@ -713,15 +711,18 @@ public class BlockListView: NSBox {
 //        return nil
 //    }
 
-    public func trackMouse(startingAt initialPosition: NSPoint) {
+    public func trackMouse(startingWith initialEvent: NSEvent) {
         guard let window = window else { return }
+
+        let initialPosition = convert(initialEvent.locationInWindow, from: nil)
 
         let clickedItem = item(at: initialPosition)
 
         TooltipManager.shared.hideTooltip()
 
         switch clickedItem {
-        case .moreButton(let line):
+        case .moreButton(let line),
+             .item(let line, _) where blocks[line].supportsDirectDragging:
             var isDragging: Bool = false
 
             let tableViewRect = convert(tableView.frame, from: tableView)
@@ -765,7 +766,7 @@ public class BlockListView: NSBox {
                     }
                 case .leftMouseUp:
                     if !isDragging {
-                        handleMouseClick(point: position)
+                        handleClick(mouseDownEvent: initialEvent, mouseUpEvent: event)
                     }
 
                     if let dragTargetLine = dragTargetLine {
@@ -849,7 +850,7 @@ public class BlockListView: NSBox {
                     }
                 case .leftMouseUp:
                     if !isDragging {
-                        handleMouseClick(point: position)
+                        handleClick(mouseDownEvent: initialEvent, mouseUpEvent: event)
                     }
 
                     switch selection {
@@ -883,10 +884,12 @@ public class BlockListView: NSBox {
         }
     }
 
-    public func handleMouseClick(point: NSPoint) {
+    public func handleClick(mouseDownEvent: NSEvent, mouseUpEvent: NSEvent) {
         selection = .none
 
         hideCommandPalette()
+
+        let point = convert(mouseUpEvent.locationInWindow, from: nil)
 
         switch item(at: point) {
         case .plusButton(let line):
@@ -903,8 +906,12 @@ public class BlockListView: NSBox {
                 if view.acceptsFirstResponder {
                     window?.makeFirstResponder(view)
                 }
-            } else if let view = view as? LogicEditor {
-                view.canvasView.handlePress(locationInWindow: convert(point, to: nil))
+            } else if let view = view, let superview = view.superview {
+                let superviewPoint = superview.convert(mouseUpEvent.locationInWindow, from: nil)
+                if let targetView = view.hitTest(superviewPoint) {
+                    targetView.mouseDown(with: mouseUpEvent)
+                    targetView.mouseUp(with: mouseUpEvent)
+                }
             }
         case .background:
             break
@@ -1000,6 +1007,8 @@ extension BlockListView: NSTableViewDelegate {
 
             // If the string has changed, check if we want to open the command palette
             view.onDidChangeText = { [unowned self] in
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
                 let range = view.selectedRange
                 let string = view.textValue.string
                 let location = range.location
@@ -1040,9 +1049,7 @@ extension BlockListView: NSTableViewDelegate {
                     fatalError("Invalid selection when inside text block")
                     break
                 case .item(let line, _):
-                    if line == 0 {
-                        self.selection = .item(0, .empty)
-                    } else if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
+                    if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
                         let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
@@ -1055,6 +1062,8 @@ extension BlockListView: NSTableViewDelegate {
                         if nextView.acceptsFirstResponder {
                             self.window?.makeFirstResponder(nextView)
                         }
+                    } else {
+                        self.selection = .item(line, .empty)
                     }
                 case .none:
                     break
@@ -1069,9 +1078,7 @@ extension BlockListView: NSTableViewDelegate {
                     fatalError("Invalid selection when inside text block")
                     break
                 case .item(let line, _):
-                    if line >= self.blocks.count - 1 {
-                        self.selection = .item(self.blocks.count - 1, self.blocks[line].lastSelectionRange)
-                    } else if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
+                    if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
                         let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
@@ -1084,6 +1091,8 @@ extension BlockListView: NSTableViewDelegate {
                         if nextView.acceptsFirstResponder {
                             self.window?.makeFirstResponder(nextView)
                         }
+                    } else {
+                        self.selection = .item(line, self.blocks[line].lastSelectionRange)
                     }
                 case .none:
                     break
@@ -1149,14 +1158,16 @@ extension BlockListView: NSTableViewDelegate {
 
                 if line == 0 { return }
 
-                let textValue = view.textValue
-                let previousLine = line - 1
-                let previousBlock = self.blocks[previousLine]
-
                 var clone = self.blocks
+                let textValue = view.textValue
 
-                switch previousBlock.content {
-                case .text(let previousTextValue, let previousSizeLevel):
+                if let previousLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsMergingText }),
+                    let nextView = tableView.view(atColumn: 0, row: previousLine, makeIfNecessary: true) as? TextBlockView {
+
+                    let previousBlock = self.blocks[previousLine]
+                    let previousTextValue = nextView.textValue
+                    let previousSizeLevel = nextView.sizeLevel
+
                     let mergedTextValue = [previousTextValue, textValue].joined()
 
                     clone.remove(at: line)
@@ -1166,13 +1177,12 @@ extension BlockListView: NSTableViewDelegate {
                         self.focus(id: previousBlock.id)
                         self.selection = .item(previousLine, .init(location: previousTextValue.length, length: 0))
                     }
-                case .tokens, .divider, .image:
-                    clone.remove(at: previousLine)
 
-                    if self.handleChangeBlocks(clone) {
-                        self.focus(id: item.id)
-                        self.selection = .item(previousLine, .init(location: 0, length: 0))
+                    if nextView.acceptsFirstResponder {
+                        self.window?.makeFirstResponder(nextView)
                     }
+                } else {
+                    self.selection = .item(line, .empty)
                 }
             }
 
@@ -1185,7 +1195,17 @@ extension BlockListView: NSTableViewDelegate {
         case .divider:
             return item.view
         case .image:
-            return item.view
+            let view = item.view as! ImageBlock
+
+            view.onPressOverflowMenu = {
+                Swift.print("Press image overflow menu")
+            }
+
+            view.onPressImage = {
+                Swift.print("Press image")
+            }
+
+            return view
         }
     }
 
@@ -1260,11 +1280,11 @@ extension BlockListView: NSTableViewDelegate {
                 EditableBlock(id: UUID(), content: .text(.init(), .h3))
             ),
             (
-                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, image(named: "menu-thumbnail-h3")),
+                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, image(named: "menu-thumbnail-divider")),
                 EditableBlock(id: UUID(), content: .divider)
             ),
             (
-                SuggestionListItem.row("Image", "Display an image", false, nil, image(named: "menu-thumbnail-h3")),
+                SuggestionListItem.row("Image", "Display an image", false, nil, image(named: "menu-thumbnail-image")),
                 EditableBlock(id: UUID(), content: .image(nil))
             ),
             (

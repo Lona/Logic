@@ -93,8 +93,11 @@ public class OverflowMenuButton: NSBox {
 
     cornerRadius = 4
     line1View.fillColor = Colors.textMuted
+    line1View.cornerRadius = 2
     line2View.fillColor = Colors.textMuted
+    line2View.cornerRadius = 2
     line3View.fillColor = Colors.textMuted
+    line3View.cornerRadius = 2
   }
 
   private func setUpConstraints() {
@@ -103,44 +106,48 @@ public class OverflowMenuButton: NSBox {
     line2View.translatesAutoresizingMaskIntoConstraints = false
     line3View.translatesAutoresizingMaskIntoConstraints = false
 
-    let heightAnchorConstraint = heightAnchor.constraint(equalToConstant: 19)
-    let widthAnchorConstraint = widthAnchor.constraint(equalToConstant: 19)
-    let line1ViewTopAnchorConstraint = line1View.topAnchor.constraint(equalTo: topAnchor, constant: 5)
+    let heightAnchorConstraint = heightAnchor.constraint(equalToConstant: 13)
+    let widthAnchorConstraint = widthAnchor.constraint(equalToConstant: 23)
     let line1ViewLeadingAnchorConstraint = line1View.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5)
-    let line1ViewTrailingAnchorConstraint = line1View.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5)
-    let line2ViewTopAnchorConstraint = line2View.topAnchor.constraint(equalTo: line1View.bottomAnchor, constant: 3)
-    let line2ViewLeadingAnchorConstraint = line2View.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5)
-    let line2ViewTrailingAnchorConstraint = line2View.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5)
-    let line3ViewTopAnchorConstraint = line3View.topAnchor.constraint(equalTo: line2View.bottomAnchor, constant: 3)
-    let line3ViewLeadingAnchorConstraint = line3View.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5)
-    let line3ViewTrailingAnchorConstraint = line3View.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5)
-    let line1ViewHeightAnchorConstraint = line1View.heightAnchor.constraint(equalToConstant: 1)
-    let line2ViewHeightAnchorConstraint = line2View.heightAnchor.constraint(equalToConstant: 1)
-    let line3ViewHeightAnchorConstraint = line3View.heightAnchor.constraint(equalToConstant: 1)
+    let line1ViewTopAnchorConstraint = line1View.topAnchor.constraint(equalTo: topAnchor, constant: 5)
+    let line2ViewLeadingAnchorConstraint = line2View
+      .leadingAnchor
+      .constraint(equalTo: line1View.trailingAnchor, constant: 2)
+    let line2ViewTopAnchorConstraint = line2View.topAnchor.constraint(equalTo: topAnchor, constant: 5)
+    let line3ViewLeadingAnchorConstraint = line3View
+      .leadingAnchor
+      .constraint(equalTo: line2View.trailingAnchor, constant: 2)
+    let line3ViewTopAnchorConstraint = line3View.topAnchor.constraint(equalTo: topAnchor, constant: 5)
+    let line1ViewHeightAnchorConstraint = line1View.heightAnchor.constraint(equalToConstant: 3)
+    let line1ViewWidthAnchorConstraint = line1View.widthAnchor.constraint(equalToConstant: 3)
+    let line2ViewHeightAnchorConstraint = line2View.heightAnchor.constraint(equalToConstant: 3)
+    let line2ViewWidthAnchorConstraint = line2View.widthAnchor.constraint(equalToConstant: 3)
+    let line3ViewHeightAnchorConstraint = line3View.heightAnchor.constraint(equalToConstant: 3)
+    let line3ViewWidthAnchorConstraint = line3View.widthAnchor.constraint(equalToConstant: 3)
 
     NSLayoutConstraint.activate([
       heightAnchorConstraint,
       widthAnchorConstraint,
-      line1ViewTopAnchorConstraint,
       line1ViewLeadingAnchorConstraint,
-      line1ViewTrailingAnchorConstraint,
-      line2ViewTopAnchorConstraint,
+      line1ViewTopAnchorConstraint,
       line2ViewLeadingAnchorConstraint,
-      line2ViewTrailingAnchorConstraint,
-      line3ViewTopAnchorConstraint,
+      line2ViewTopAnchorConstraint,
       line3ViewLeadingAnchorConstraint,
-      line3ViewTrailingAnchorConstraint,
+      line3ViewTopAnchorConstraint,
       line1ViewHeightAnchorConstraint,
+      line1ViewWidthAnchorConstraint,
       line2ViewHeightAnchorConstraint,
-      line3ViewHeightAnchorConstraint
+      line2ViewWidthAnchorConstraint,
+      line3ViewHeightAnchorConstraint,
+      line3ViewWidthAnchorConstraint
     ])
   }
 
   private func update() {
-    fillColor = Colors.transparent
+    fillColor = Colors.divider
     onPress = handleOnPressButton
     if hovered {
-      fillColor = Colors.divider
+      fillColor = Colors.dividerBackground
     }
   }
 

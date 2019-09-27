@@ -94,6 +94,11 @@ public class ImageBlock: NSBox {
     set { parameters.onPressImage = newValue }
   }
 
+  public var onPressOverflowMenu: (() -> Void)? {
+    get { return parameters.onPressOverflowMenu }
+    set { parameters.onPressOverflowMenu = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -109,13 +114,14 @@ public class ImageBlock: NSBox {
     options: [.mouseEnteredAndExited, .activeAlways, .mouseMoved, .inVisibleRect],
     owner: self)
 
+  private var imageContainerView = NSBox()
   private var imageView = ImageWithBackgroundColor()
   private var imageContentView = NSBox()
   private var overflowMenuButtonView = OverflowMenuButton()
 
-  private var hovered = false
-  private var pressed = false
-  private var onPress: (() -> Void)?
+  private var imageContainerViewHovered = false
+  private var imageContainerViewPressed = false
+  private var imageContainerViewOnPress: (() -> Void)?
 
   private var imageContentViewTopAnchorImageViewTopAnchorConstraint: NSLayoutConstraint?
   private var imageContentViewBottomAnchorImageViewBottomAnchorConstraint: NSLayoutConstraint?
@@ -132,26 +138,40 @@ public class ImageBlock: NSBox {
     boxType = .custom
     borderType = .noBorder
     contentViewMargins = .zero
+    imageContainerView.boxType = .custom
+    imageContainerView.borderType = .noBorder
+    imageContainerView.contentViewMargins = .zero
     imageContentView.boxType = .custom
     imageContentView.borderType = .noBorder
     imageContentView.contentViewMargins = .zero
 
-    addSubview(imageView)
+    addSubview(imageContainerView)
+    imageContainerView.addSubview(imageView)
     imageView.addSubview(imageContentView)
     imageContentView.addSubview(overflowMenuButtonView)
 
-    imageView.fillColor = Colors.raisedBackground
+    imageView.fillColor = Colors.blockBackground
   }
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
+    imageContainerView.translatesAutoresizingMaskIntoConstraints = false
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageContentView.translatesAutoresizingMaskIntoConstraints = false
     overflowMenuButtonView.translatesAutoresizingMaskIntoConstraints = false
 
-    let imageViewTopAnchorConstraint = imageView.topAnchor.constraint(equalTo: topAnchor)
-    let imageViewBottomAnchorConstraint = imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
-    let imageViewLeadingAnchorConstraint = imageView.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let imageContainerViewTopAnchorConstraint = imageContainerView.topAnchor.constraint(equalTo: topAnchor)
+    let imageContainerViewBottomAnchorConstraint = imageContainerView.bottomAnchor.constraint(equalTo: bottomAnchor)
+    let imageContainerViewLeadingAnchorConstraint = imageContainerView.leadingAnchor.constraint(equalTo: leadingAnchor)
+    let imageContainerViewTrailingAnchorConstraint = imageContainerView
+      .trailingAnchor
+      .constraint(lessThanOrEqualTo: trailingAnchor)
+    let imageViewWidthAnchorParentConstraint = imageView
+      .widthAnchor
+      .constraint(lessThanOrEqualTo: imageContainerView.widthAnchor)
+    let imageViewTopAnchorConstraint = imageView.topAnchor.constraint(equalTo: imageContainerView.topAnchor)
+    let imageViewBottomAnchorConstraint = imageView.bottomAnchor.constraint(equalTo: imageContainerView.bottomAnchor)
+    let imageViewLeadingAnchorConstraint = imageView.leadingAnchor.constraint(equalTo: imageContainerView.leadingAnchor)
     let imageViewHeightAnchorConstraint = imageView.heightAnchor.constraint(equalToConstant: 100)
     let imageViewWidthAnchorConstraint = imageView.widthAnchor.constraint(equalToConstant: 100)
     let imageContentViewTopAnchorImageViewTopAnchorConstraint = imageContentView
@@ -174,8 +194,10 @@ public class ImageBlock: NSBox {
       .constraint(equalTo: imageContentView.trailingAnchor, constant: -4)
     let overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonView
       .heightAnchor
-      .constraint(equalToConstant: 19)
-    let overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonView.widthAnchor.constraint(equalToConstant: 19)
+      .constraint(equalToConstant: 13)
+    let overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonView.widthAnchor.constraint(equalToConstant: 23)
+
+    imageViewWidthAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
 
     self.imageContentViewTopAnchorImageViewTopAnchorConstraint = imageContentViewTopAnchorImageViewTopAnchorConstraint
     self.imageContentViewBottomAnchorImageViewBottomAnchorConstraint =
@@ -196,6 +218,11 @@ public class ImageBlock: NSBox {
 
     NSLayoutConstraint.activate(
       [
+        imageContainerViewTopAnchorConstraint,
+        imageContainerViewBottomAnchorConstraint,
+        imageContainerViewLeadingAnchorConstraint,
+        imageContainerViewTrailingAnchorConstraint,
+        imageViewWidthAnchorParentConstraint,
         imageViewTopAnchorConstraint,
         imageViewBottomAnchorConstraint,
         imageViewLeadingAnchorConstraint,
@@ -235,10 +262,11 @@ public class ImageBlock: NSBox {
     imageViewHeightAnchorConstraint?.constant = imageHeight
     imageViewWidthAnchorConstraint?.constant = imageWidth
     imageView.image = image
-    onPress = handleOnPressImage
-    if hovered {
+    imageContainerViewOnPress = handleOnPressImage
+    overflowMenuButtonView.onPressButton = handleOnPressOverflowMenu
+    if imageContainerViewHovered {
       imageContentView.isHidden = !true
-      alphaValue = 0.85
+      alphaValue = 0.75
     }
 
     if imageContentView.isHidden != imageContentViewIsHidden {
@@ -251,10 +279,16 @@ public class ImageBlock: NSBox {
     onPressImage?()
   }
 
+  private func handleOnPressOverflowMenu() {
+    onPressOverflowMenu?()
+  }
+
   private func updateHoverState(with event: NSEvent) {
-    let hovered = bounds.contains(convert(event.locationInWindow, from: nil))
-    if hovered != self.hovered {
-      self.hovered = hovered
+    let imageContainerViewHovered = imageContainerView
+      .bounds
+      .contains(imageContainerView.convert(event.locationInWindow, from: nil))
+    if imageContainerViewHovered != self.imageContainerViewHovered {
+      self.imageContainerViewHovered = imageContainerViewHovered
 
       update()
     }
@@ -277,25 +311,28 @@ public class ImageBlock: NSBox {
   }
 
   public override func mouseDown(with event: NSEvent) {
-    let pressed = bounds.contains(convert(event.locationInWindow, from: nil))
-    if pressed != self.pressed {
-      self.pressed = pressed
+    let imageContainerViewPressed = imageContainerView
+      .bounds
+      .contains(imageContainerView.convert(event.locationInWindow, from: nil))
+    if imageContainerViewPressed != self.imageContainerViewPressed {
+      self.imageContainerViewPressed = imageContainerViewPressed
 
       update()
     }
   }
 
   public override func mouseUp(with event: NSEvent) {
-    let clicked = pressed && bounds.contains(convert(event.locationInWindow, from: nil))
+    let imageContainerViewClicked = imageContainerViewPressed &&
+      imageContainerView.bounds.contains(imageContainerView.convert(event.locationInWindow, from: nil))
 
-    if pressed {
-      pressed = false
+    if imageContainerViewPressed {
+      imageContainerViewPressed = false
 
       update()
     }
 
-    if clicked {
-      onPress?()
+    if imageContainerViewClicked {
+      imageContainerViewOnPress?()
     }
   }
 }
@@ -308,12 +345,20 @@ extension ImageBlock {
     public var imageHeight: CGFloat
     public var image: NSImage
     public var onPressImage: (() -> Void)?
+    public var onPressOverflowMenu: (() -> Void)?
 
-    public init(imageWidth: CGFloat, imageHeight: CGFloat, image: NSImage, onPressImage: (() -> Void)? = nil) {
+    public init(
+      imageWidth: CGFloat,
+      imageHeight: CGFloat,
+      image: NSImage,
+      onPressImage: (() -> Void)? = nil,
+      onPressOverflowMenu: (() -> Void)? = nil)
+    {
       self.imageWidth = imageWidth
       self.imageHeight = imageHeight
       self.image = image
       self.onPressImage = onPressImage
+      self.onPressOverflowMenu = onPressOverflowMenu
     }
 
     public init() {
@@ -345,8 +390,21 @@ extension ImageBlock {
       self.parameters = parameters
     }
 
-    public init(imageWidth: CGFloat, imageHeight: CGFloat, image: NSImage, onPressImage: (() -> Void)? = nil) {
-      self.init(Parameters(imageWidth: imageWidth, imageHeight: imageHeight, image: image, onPressImage: onPressImage))
+    public init(
+      imageWidth: CGFloat,
+      imageHeight: CGFloat,
+      image: NSImage,
+      onPressImage: (() -> Void)? = nil,
+      onPressOverflowMenu: (() -> Void)? = nil)
+    {
+      self
+        .init(
+          Parameters(
+            imageWidth: imageWidth,
+            imageHeight: imageHeight,
+            image: image,
+            onPressImage: onPressImage,
+            onPressOverflowMenu: onPressOverflowMenu))
     }
 
     public init() {

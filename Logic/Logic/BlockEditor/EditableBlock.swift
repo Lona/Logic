@@ -146,6 +146,25 @@ public class EditableBlock: Equatable {
             return false
         }
     }
+
+    public var supportsMergingText: Bool {
+        switch content {
+        case .text:
+            return true
+        case .tokens, .divider, .image:
+            return false
+        }
+    }
+
+    public var supportsDirectDragging: Bool {
+        switch content {
+        case .text, .tokens, .divider:
+            return false
+        case .image:
+            return true
+        }
+    }
+
 }
 
 extension EditableBlock: CustomDebugStringConvertible {

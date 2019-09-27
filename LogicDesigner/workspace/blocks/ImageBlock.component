@@ -68,12 +68,24 @@
     {
       "assignee" : [
         "layers",
-        "Container",
+        "ImageContainer",
         "onPress"
       ],
       "content" : [
         "parameters",
         "onPressImage"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "OverflowMenuButton",
+        "onPressButton"
+      ],
+      "content" : [
+        "parameters",
+        "onPressOverflowMenu"
       ],
       "type" : "AssignExpr"
     },
@@ -103,7 +115,7 @@
           "content" : {
             "type" : "LitExpr",
             "value" : {
-              "data" : 0.84999999999999998,
+              "data" : 0.75,
               "type" : "Number"
             }
           },
@@ -113,7 +125,7 @@
       "condition" : {
         "left" : [
           "layers",
-          "Container",
+          "ImageContainer",
           "hovered"
         ],
         "op" : "==",
@@ -155,6 +167,12 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "onPressOverflowMenu",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {
@@ -164,32 +182,41 @@
           {
             "children" : [
               {
-                "id" : "OverflowMenuButton",
-                "params" : {
+                "children" : [
+                  {
+                    "id" : "OverflowMenuButton",
+                    "params" : {
 
+                    },
+                    "type" : "OverflowMenuButton"
+                  }
+                ],
+                "id" : "ImageContent",
+                "params" : {
+                  "alignItems" : "flex-end",
+                  "alignSelf" : "stretch",
+                  "flex" : 1,
+                  "paddingRight" : 4,
+                  "paddingTop" : 4,
+                  "visible" : false
                 },
-                "type" : "OverflowMenuButton"
+                "type" : "Lona:View"
               }
             ],
-            "id" : "ImageContent",
+            "id" : "Image",
             "params" : {
-              "alignItems" : "flex-end",
-              "alignSelf" : "stretch",
-              "flex" : 1,
-              "paddingRight" : 4,
-              "paddingTop" : 4,
-              "visible" : false
+              "backgroundColor" : "blockBackground",
+              "height" : 100,
+              "width" : 100
             },
-            "type" : "Lona:View"
+            "type" : "Lona:Image"
           }
         ],
-        "id" : "Image",
+        "id" : "ImageContainer",
         "params" : {
-          "backgroundColor" : "raisedBackground",
-          "height" : 100,
-          "width" : 100
+
         },
-        "type" : "Lona:Image"
+        "type" : "Lona:View"
       }
     ],
     "id" : "Container",

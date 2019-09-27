@@ -404,9 +404,7 @@ public class TextBlockView: AttributedTextView {
     override public var intrinsicContentSize: NSSize {
         let size = lineRects.union.size
 
-        let marginBottom: CGFloat = 10
-
-        return .init(width: size.width, height: ceil(size.height + marginBottom))
+        return .init(width: size.width, height: ceil(size.height))
     }
 
     func textDidChange(_ notification: Notification) {

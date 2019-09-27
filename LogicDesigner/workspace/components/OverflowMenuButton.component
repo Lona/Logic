@@ -42,7 +42,7 @@
           "content" : {
             "type" : "LitExpr",
             "value" : {
-              "data" : "divider",
+              "data" : "dividerBackground",
               "type" : "Color"
             }
           },
@@ -81,42 +81,47 @@
       {
         "id" : "Line1",
         "params" : {
-          "alignSelf" : "stretch",
           "backgroundColor" : "textMuted",
-          "height" : 1,
-          "marginBottom" : 3
+          "borderRadius" : 2,
+          "height" : 3,
+          "marginRight" : 2,
+          "width" : 3
         },
         "type" : "Lona:View"
       },
       {
         "id" : "Line2",
         "params" : {
-          "alignSelf" : "stretch",
           "backgroundColor" : "textMuted",
-          "height" : 1,
-          "marginBottom" : 3
+          "borderRadius" : 2,
+          "height" : 3,
+          "marginRight" : 2,
+          "width" : 3
         },
         "type" : "Lona:View"
       },
       {
         "id" : "Line3",
         "params" : {
-          "alignSelf" : "stretch",
           "backgroundColor" : "textMuted",
-          "height" : 1
+          "borderRadius" : 2,
+          "height" : 3,
+          "width" : 3
         },
         "type" : "Lona:View"
       }
     ],
     "id" : "Container",
     "params" : {
+      "backgroundColor" : "divider",
       "borderRadius" : 4,
-      "height" : 19,
+      "flexDirection" : "row",
+      "height" : 13,
       "paddingBottom" : 5,
       "paddingLeft" : 5,
       "paddingRight" : 5,
       "paddingTop" : 5,
-      "width" : 19
+      "width" : 23
     },
     "type" : "Lona:View"
   }
