@@ -189,7 +189,7 @@ public class BlockListView: NSBox {
         let id = UUID()
         let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
 
-        if ok, let addedLine = self.line(forBlock: id), let view = blocks[addedLine].view as? InlineBlockEditor {
+        if ok, let addedLine = self.line(forBlock: id), let view = blocks[addedLine].view as? TextBlockView {
             let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
 
             commandPaletteAnchor = (addedLine, 0, rect)
@@ -225,7 +225,7 @@ public class BlockListView: NSBox {
 //                        Swift.print("update", index)
                         let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false)
 
-                        if let view = view as? InlineBlockEditor, case .text(let attributedString, let sizeLevel) = new.content {
+                        if let view = view as? TextBlockView, case .text(let attributedString, let sizeLevel) = new.content {
                             view.textValue = attributedString
                             view.sizeLevel = sizeLevel
                             view.needsLayout = true
@@ -280,7 +280,7 @@ public class BlockListView: NSBox {
 
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? InlineBlockEditor {
+                if let view = view as? TextBlockView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
                     view.needsDisplay = true
                     view.setPlaceholder(string: " ")
@@ -300,7 +300,7 @@ public class BlockListView: NSBox {
 
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? InlineBlockEditor {
+                if let view = view as? TextBlockView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: range)])
 //                    view.needsDisplay = true
                     view.setPlaceholder(string: "Type '/' for commands")
@@ -432,7 +432,7 @@ public class BlockListView: NSBox {
         super.layout()
 
         tableView.enumerateAvailableRowViews { rowView, row in
-            if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? InlineBlockEditor {
+            if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? TextBlockView {
                 view.width = tableView.bounds.width
             }
         }
@@ -825,7 +825,7 @@ public class BlockListView: NSBox {
                         } else {
                             initialRow = row
 
-                            if let view = view as? InlineBlockEditor {
+                            if let view = view as? TextBlockView {
                                 let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
                                 if let initialIndex = initialIndex {
@@ -861,7 +861,7 @@ public class BlockListView: NSBox {
                         }
 
                         if range.length > 0 {
-                            (view as? InlineBlockEditor)?.showInlineToolbar(for: range)
+                            (view as? TextBlockView)?.showInlineToolbar(for: range)
                         }
                     default:
                         window.makeFirstResponder(self)
@@ -876,7 +876,7 @@ public class BlockListView: NSBox {
             if didChangeInsertionColor, let row = initialRow {
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? InlineBlockEditor {
+                if let view = view as? TextBlockView {
                     view.insertionPointColor = NSColor.textColor
                 }
             }
@@ -896,7 +896,7 @@ public class BlockListView: NSBox {
         case .item(let line, let point):
             let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
 
-            if let view = view as? InlineBlockEditor {
+            if let view = view as? TextBlockView {
                 let characterIndex = view.characterIndexForInsertion(at: convert(point, to: view))
                 selection = .item(line, NSRange(location: characterIndex, length: 0))
 
@@ -967,7 +967,7 @@ extension BlockListView: NSTableViewDelegate {
 
             return view
         case .text(let textValue, let sizeLevel):
-            let view = item.view as! InlineBlockEditor
+            let view = item.view as! TextBlockView
 
 //            Swift.print("Row", row, view)
 
@@ -977,7 +977,7 @@ extension BlockListView: NSTableViewDelegate {
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                 // Automatically create headings
-                for heading in InlineBlockEditor.SizeLevel.headings {
+                for heading in TextBlockView.SizeLevel.headings {
                     if let prefix = heading.prefix, newValue.string.starts(with: prefix + " ") && !textValue.string.starts(with: prefix + " ") {
                         let prefixLength = prefix.count + 1
                         let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
@@ -1023,7 +1023,7 @@ extension BlockListView: NSTableViewDelegate {
 
                 self.selection = .item(row, range)
 
-                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? InlineBlockEditor {
+                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? TextBlockView {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
                     } else {
@@ -1044,7 +1044,7 @@ extension BlockListView: NSTableViewDelegate {
 
                     if line == 0 {
                         self.selection = .item(0, .empty)
-                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? InlineBlockEditor {
+                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1076,7 +1076,7 @@ extension BlockListView: NSTableViewDelegate {
 
                     if line >= self.blocks.count - 1 {
                         self.selection = .item(self.blocks.count - 1, self.blocks[line].lastSelectionRange)
-                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? InlineBlockEditor {
+                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)

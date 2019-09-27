@@ -76,7 +76,7 @@ public enum MarkdownFile {
             case .lineBreak:
                 return nil
             case .heading(level: let level, content: let inlineElements):
-                func sizeLevel() -> InlineBlockEditor.SizeLevel {
+                func sizeLevel() -> TextBlockView.SizeLevel {
                     switch level {
                     case .level1: return .h1
                     case .level2: return .h2

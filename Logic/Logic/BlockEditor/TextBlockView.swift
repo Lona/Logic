@@ -1,5 +1,5 @@
 //
-//  InlineBlockEditor.swift
+//  TextBlockView.swift
 //  Logic
 //
 //  Created by Devin Abbott on 9/10/19.
@@ -11,7 +11,7 @@ import Foundation
 private var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
 private var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: NSColor.placeholderTextColor)
 
-public class InlineBlockEditor: AttributedTextView {
+public class TextBlockView: AttributedTextView {
 
     public enum SizeLevel {
         case h1
@@ -94,7 +94,7 @@ public class InlineBlockEditor: AttributedTextView {
 
     private var placeholderTextStyle: [NSAttributedString.Key: Any] {
         let ps = NSMutableParagraphStyle()
-        ps.lineHeightMultiple = InlineBlockEditor.lineHeightMultiple - 0.25
+        ps.lineHeightMultiple = TextBlockView.lineHeightMultiple - 0.25
         var attributes = defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize).attributeDictionary
         attributes[.paragraphStyle] = ps
         return attributes
@@ -471,7 +471,7 @@ extension NSTextView {
 
 // https://christiantietze.de/posts/2017/07/nstextview-proper-line-height/
 
-extension InlineBlockEditor: NSLayoutManagerDelegate {
+extension TextBlockView: NSLayoutManagerDelegate {
 
     public func layoutManager(
         _ layoutManager: NSLayoutManager,
@@ -482,7 +482,7 @@ extension InlineBlockEditor: NSLayoutManagerDelegate {
         forGlyphRange glyphRange: NSRange) -> Bool {
 
         let fontLineHeight = layoutManager.defaultLineHeight(for: textStyle.nsFont)
-        let lineHeight = fontLineHeight * InlineBlockEditor.lineHeightMultiple
+        let lineHeight = fontLineHeight * TextBlockView.lineHeightMultiple
         let baselineNudge = (lineHeight - fontLineHeight)
             // The following factor is a result of experimentation:
             * 0.5
@@ -511,7 +511,7 @@ class InlineBlockLayoutManager: NSLayoutManager {
 
     private var lineHeight: CGFloat {
         let fontLineHeight = self.defaultLineHeight(for: font)
-        let lineHeight = fontLineHeight * InlineBlockEditor.lineHeightMultiple
+        let lineHeight = fontLineHeight * TextBlockView.lineHeightMultiple
         return lineHeight
     }
 

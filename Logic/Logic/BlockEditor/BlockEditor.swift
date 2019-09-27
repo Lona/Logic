@@ -28,7 +28,7 @@ public class EditableBlock: Equatable {
     private func makeView() -> NSView {
         switch self.content {
         case .text:
-            return InlineBlockEditor()
+            return TextBlockView()
         case .tokens(let syntaxNode):
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
@@ -51,7 +51,7 @@ public class EditableBlock: Equatable {
     private func configure(view: NSView) {
         switch self.content {
         case .text(let attributedString, let sizeLevel):
-            let view = view as! InlineBlockEditor
+            let view = view as! TextBlockView
             view.textValue = attributedString
             view.sizeLevel = sizeLevel
         case .tokens(let value):
@@ -140,13 +140,13 @@ extension EditableBlock: CustomDebugStringConvertible {
 }
 
 public enum EditableBlockContent: Equatable {
-    case text(NSAttributedString, InlineBlockEditor.SizeLevel)
+    case text(NSAttributedString, TextBlockView.SizeLevel)
     case tokens(LGCSyntaxNode)
 
     var lineButtonAlignmentHeight: CGFloat {
         switch self {
         case .text(_, let sizeLevel):
-            return sizeLevel.fontSize * InlineBlockEditor.lineHeightMultiple
+            return sizeLevel.fontSize * TextBlockView.lineHeightMultiple
         case .tokens:
             return 18
         }
