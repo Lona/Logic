@@ -1040,11 +1040,10 @@ extension BlockListView: NSTableViewDelegate {
                     fatalError("Invalid selection when inside text block")
                     break
                 case .item(let line, _):
-                    let nextLine = line - 1
-
                     if line == 0 {
                         self.selection = .item(0, .empty)
-                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                    } else if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1056,8 +1055,6 @@ extension BlockListView: NSTableViewDelegate {
                         if nextView.acceptsFirstResponder {
                             self.window?.makeFirstResponder(nextView)
                         }
-                    } else {
-                        self.focus(line: nextLine)
                     }
                 case .none:
                     break
@@ -1072,11 +1069,10 @@ extension BlockListView: NSTableViewDelegate {
                     fatalError("Invalid selection when inside text block")
                     break
                 case .item(let line, _):
-                    let nextLine = line + 1
-
                     if line >= self.blocks.count - 1 {
                         self.selection = .item(self.blocks.count - 1, self.blocks[line].lastSelectionRange)
-                    } else if let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                    } else if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1088,8 +1084,6 @@ extension BlockListView: NSTableViewDelegate {
                         if nextView.acceptsFirstResponder {
                             self.window?.makeFirstResponder(nextView)
                         }
-                    } else {
-                        self.focus(line: nextLine)
                     }
                 case .none:
                     break
@@ -1172,7 +1166,7 @@ extension BlockListView: NSTableViewDelegate {
                         self.focus(id: previousBlock.id)
                         self.selection = .item(previousLine, .init(location: previousTextValue.length, length: 0))
                     }
-                case .tokens:
+                case .tokens, .divider:
                     clone.remove(at: previousLine)
 
                     if self.handleChangeBlocks(clone) {
@@ -1188,6 +1182,8 @@ extension BlockListView: NSTableViewDelegate {
             }
 
             return view
+        case .divider:
+            return item.view
         }
     }
 
@@ -1260,6 +1256,10 @@ extension BlockListView: NSTableViewDelegate {
             (
                 SuggestionListItem.row("Heading 3", "Small section heading", false, nil, image(named: "menu-thumbnail-h3")),
                 EditableBlock(id: UUID(), content: .text(.init(), .h3))
+            ),
+            (
+                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, image(named: "menu-thumbnail-h3")),
+                EditableBlock(id: UUID(), content: .divider)
             ),
             (
                 SuggestionListItem.sectionHeader("TOKENS"),
@@ -1357,7 +1357,7 @@ extension BlockListView: NSTableViewDelegate {
                 if mutable.length > 1 {
                     replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel))
                 }
-            case .tokens:
+            case .tokens, .divider:
                 break
             }
 

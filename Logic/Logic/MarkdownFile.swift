@@ -35,6 +35,8 @@ public enum MarkdownFile {
             let code = String(data: xml, encoding: .utf8)!
 
             return "```tokens\n\(code)\n```"
+        case .divider:
+            return "---"
         }
     }
 

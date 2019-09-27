@@ -45,6 +45,8 @@ public class EditableBlock: Equatable {
             view.scrollsVertically = false
 
             return view
+        case .divider:
+            return DividerBlock()
         }
     }
 
@@ -57,6 +59,8 @@ public class EditableBlock: Equatable {
         case .tokens(let value):
             let view = view as! LogicEditor
             view.rootNode = value
+        case .divider:
+            break
         }
     }
 
@@ -92,7 +96,7 @@ public class EditableBlock: Equatable {
 
     public var lastSelectionRange: NSRange {
         switch content {
-        case .tokens:
+        case .tokens, .divider:
             return .empty
         case .text(let text, _):
             return .init(location: text.length, length: 0)
@@ -106,24 +110,17 @@ public class EditableBlock: Equatable {
         case .text(let text, _):
             let string = text.string
             return string.isEmpty || string == "/"
+        case .divider:
+            return true
         }
     }
 
-    public var markdownString: String {
+    public var supportsInlineFocus: Bool {
         switch content {
-        case .text(let textValue, let sizeLevel):
-            if let prefix = sizeLevel.prefix {
-                return prefix + " " + textValue.markdownString() + "\n"
-            } else {
-                return textValue.markdownString() + "\n"
-            }
-        case .tokens(let rootNode):
-            let encoder = JSONEncoder()
-            guard let data = try? encoder.encode(rootNode) else { return "FAILED TO SERIALIZE TOKENS" }
-            guard let xml = LogicFile.convert(data, kind: .logic, to: .xml) else { return "FAILED TO CONVERT TOKENS TO XML" }
-            let code = String(data: xml, encoding: .utf8)!
-
-            return "```tokens\n\(code)\n```"
+        case .text:
+            return true
+        case .tokens, .divider:
+            return false
         }
     }
 }
@@ -135,6 +132,8 @@ extension EditableBlock: CustomDebugStringConvertible {
             return "text:\(sizeLevel):\(textValue.string)"
         case .tokens(let syntaxNode):
             return "tokens:\(syntaxNode.nodeTypeDescription)"
+        case .divider:
+            return "divider"
         }
     }
 }
@@ -142,6 +141,7 @@ extension EditableBlock: CustomDebugStringConvertible {
 public enum EditableBlockContent: Equatable {
     case text(NSAttributedString, TextBlockView.SizeLevel)
     case tokens(LGCSyntaxNode)
+    case divider
 
     var lineButtonAlignmentHeight: CGFloat {
         switch self {
@@ -149,6 +149,8 @@ public enum EditableBlockContent: Equatable {
             return sizeLevel.fontSize * TextBlockView.lineHeightMultiple
         case .tokens:
             return 18
+        case .divider:
+            return 21
         }
     }
 }
