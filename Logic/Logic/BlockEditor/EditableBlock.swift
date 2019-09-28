@@ -81,10 +81,7 @@ public class EditableBlock: Equatable {
     }
 
     public var view: NSView {
-        if let view = EditableBlock.viewCache[id] {
-            configure(view: view)
-            return view
-        }
+        if let view = EditableBlock.viewCache[id] { return view }
 
         let view = makeView()
         configure(view: view)

@@ -222,23 +222,10 @@ public class BlockListView: NSBox {
                     let new = blocks[index]
 
                     if old !== new {
-//                        Swift.print("update", index)
-                        let view = tableView.view(atColumn: 0, row: index, makeIfNecessary: false)
+                        new.updateView()
 
-                        if let view = view as? TextBlockView, case .text(let attributedString, let sizeLevel) = new.content {
-                            view.textValue = attributedString
-                            view.sizeLevel = sizeLevel
-                            view.needsLayout = true
-                            view.needsDisplay = true
-                        } else if let view = view as? LogicEditor, case .tokens(let rootNode) = new.content {
-                            view.rootNode = rootNode
-                        } else if let view = view as? ImageBlock, case .image(let url) = new.content {
-                            if let url = url {
-                                view.image = NSImage(byReferencing: url)
-                            } else {
-                                view.image = NSImage()
-                            }
-                        }
+                        new.view.needsLayout = true
+                        new.view.needsDisplay = true
                     }
                 }
             } else {
