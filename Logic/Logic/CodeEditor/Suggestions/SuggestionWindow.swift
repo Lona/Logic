@@ -55,6 +55,8 @@ public class SuggestionWindow: NSWindow {
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
 
         suggestionView.onSubmit = {
+            self.onPressEnter?()
+
             if let selectedIndex = self.selectedIndex {
                 self.onSubmit?(selectedIndex)
             }
@@ -166,6 +168,8 @@ public class SuggestionWindow: NSWindow {
     public var onRequestHide: (() -> Void)?
 
     public var onSubmit: ((Int) -> Void)?
+
+    public var onPressEnter: (() -> Void)?
 
     public var onSelectIndex: ((Int?) -> Void)?
 

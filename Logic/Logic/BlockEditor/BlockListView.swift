@@ -232,6 +232,12 @@ public class BlockListView: NSBox {
                             view.needsDisplay = true
                         } else if let view = view as? LogicEditor, case .tokens(let rootNode) = new.content {
                             view.rootNode = rootNode
+                        } else if let view = view as? ImageBlock, case .image(let url) = new.content {
+                            if let url = url {
+                                view.image = NSImage(byReferencing: url)
+                            } else {
+                                view.image = NSImage()
+                            }
                         }
                     }
                 }
@@ -432,9 +438,7 @@ public class BlockListView: NSBox {
         super.layout()
 
         tableView.enumerateAvailableRowViews { rowView, row in
-            if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? TextBlockView {
-                view.width = tableView.bounds.width
-            }
+            self.blocks[row].updateViewWidth(tableView.bounds.width)
         }
     }
 
@@ -548,6 +552,22 @@ public class BlockListView: NSBox {
         return suggestionWindow
     }()
 
+    public static var linkEditor: SuggestionWindow = {
+        let subwindow = SuggestionWindow()
+
+        subwindow.showsSearchBar = true
+        subwindow.showsFilterBar = false
+        subwindow.showsSuggestionArea = false
+        subwindow.placeholderText = "Paste a URL and press Enter"
+        subwindow.defaultWindowSize = .init(width: 400, height: 32 + OverlayWindow.shadowViewMargin * 2)
+
+        subwindow.onChangeSuggestionText = { value in
+            subwindow.suggestionText = value
+        }
+
+        return subwindow
+    }()
+
     // MARK: Event handling
 
     public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
@@ -658,6 +678,7 @@ public class BlockListView: NSBox {
     public override func mouseDown(with event: NSEvent) {
         hideCommandPalette()
         hideInlineToolbarWindow()
+        hideLinkEditor()
 
         trackMouse(startingWith: event)
     }
@@ -888,6 +909,7 @@ public class BlockListView: NSBox {
         selection = .none
 
         hideCommandPalette()
+        hideLinkEditor()
 
         let point = convert(mouseUpEvent.locationInWindow, from: nil)
 
@@ -1189,24 +1211,67 @@ extension BlockListView: NSTableViewDelegate {
             view.onPressEscape = { [unowned self] in
                 self.hideInlineToolbarWindow()
                 self.hideCommandPalette()
+                self.hideLinkEditor()
             }
 
             return view
         case .divider:
             return item.view
-        case .image:
+        case .image(let url):
             let view = item.view as! ImageBlock
 
-            view.onPressOverflowMenu = {
-                Swift.print("Press image overflow menu")
+            view.onPressOverflowMenu = { [unowned self] in
+                guard let window = self.window else { return }
+
+                let windowRect = view.convert(view.frame, to: nil)
+                let screenRect = window.convertToScreen(windowRect)
+                let adjustedRect = NSRect(x: screenRect.minX, y: screenRect.maxY, width: 0, height: 0)
+
+                self.showLinkEditor(rect: adjustedRect, initialValue: url?.absoluteString ?? "")
+
+                BlockListView.linkEditor.onPressEnter = { [unowned self] in
+                    guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                    guard let url = URL(string: BlockListView.linkEditor.suggestionText) else { return }
+
+                    let id = UUID()
+                    let clone = self.blocks.replacing(
+                        elementAt: line,
+                        with: .init(id: id, content: .image(url))
+                    )
+
+                    self.hideLinkEditor()
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: id)
+                    }
+                }
             }
 
             view.onPressImage = {
                 Swift.print("Press image")
             }
 
+            item.updateViewWidth(tableView.bounds.width)
+
             return view
         }
+    }
+
+    func showLinkEditor(rect: NSRect, initialValue: String) {
+        guard let window = self.window else { return }
+
+        let subwindow = BlockListView.linkEditor
+        subwindow.suggestionText = initialValue
+
+        window.addChildWindow(subwindow, ordered: .above)
+
+        subwindow.anchorTo(rect: rect)
+        subwindow.focusSearchField()
+    }
+
+    func hideLinkEditor() {
+        BlockListView.linkEditor.orderOut(nil)
     }
 
     func hideInlineToolbarWindow() {

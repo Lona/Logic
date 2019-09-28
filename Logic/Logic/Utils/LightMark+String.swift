@@ -59,7 +59,8 @@ extension LightMark.InlineElement {
 
             return mutable
         case .image(let source, let description):
-            fatalError("Not supported")
+//            fatalError("Not supported")
+            return NSAttributedString(string: "")
         case .link(let source, let content):
             fatalError("Not supported")
         case .code(let value):

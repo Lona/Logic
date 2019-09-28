@@ -72,15 +72,10 @@ public class EditableBlock: Equatable {
         case .image(let url):
             let view = view as! ImageBlock
 
-            if let url = url {
-                let image = NSImage(byReferencing: url)
+            if let url = url, let image = EditableBlock.fetchImage(url) {
                 view.image = image
-                view.imageWidth = image.size.width
-                view.imageHeight = image.size.height
             } else {
                 view.image = NSImage()
-                view.imageWidth = 100
-                view.imageHeight = 100
             }
         }
     }
@@ -103,12 +98,42 @@ public class EditableBlock: Equatable {
 
     static var viewCache: [UUID: NSView] = [:]
 
+    static var fetchImage: (URL) -> NSImage? = Memoize.all { url in
+        guard let data = try? Data(contentsOf: url), let image = NSImage(data: data) else { return nil }
+        return image
+    }
+
 //    deinit {
 //        EditableBlock.viewCache.removeValue(forKey: id)
 //    }
 
     public static func makeDefaultEmptyBlock() -> EditableBlock {
         return .init(.text(.init(), .paragraph))
+    }
+
+    public func updateViewWidth(_ width: CGFloat) {
+        switch content {
+        case .text:
+            let view = self.view as! TextBlockView
+            view.width = width
+        case .image(let url):
+            let view = self.view as! ImageBlock
+            if let _ = url {
+                let imageSize = view.image.size
+                if imageSize.width > width {
+                    view.imageWidth = width
+                    view.imageHeight = imageSize.height * (width / imageSize.width )
+                } else  {
+                    view.imageWidth = imageSize.width
+                    view.imageHeight = imageSize.height
+                }
+            } else {
+                view.imageWidth = 100
+                view.imageHeight = 100
+            }
+        default:
+            break
+        }
     }
 
     public var lineButtonAlignmentHeight: CGFloat {
