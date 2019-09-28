@@ -1207,6 +1207,12 @@ extension BlockListView: NSTableViewDelegate {
         case .image(let url):
             let view = item.view as! ImageBlock
 
+            view.onPressImage = {
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.selection = .blocks(.init(location: line, length: 1))
+            }
+
             view.onPressOverflowMenu = { [unowned self] in
                 guard let window = self.window else { return }
 
@@ -1233,10 +1239,10 @@ extension BlockListView: NSTableViewDelegate {
                         self.focus(id: id)
                     }
                 }
-            }
 
-            view.onPressImage = {
-                Swift.print("Press image")
+                BlockListView.linkEditor.onPressEscapeKey = { [unowned self] in
+                    self.hideLinkEditor()
+                }
             }
 
             item.updateViewWidth(tableView.bounds.width)

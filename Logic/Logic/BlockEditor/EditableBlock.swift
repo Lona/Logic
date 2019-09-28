@@ -119,7 +119,7 @@ public class EditableBlock: Equatable {
                 let imageSize = view.image.size
                 if imageSize.width > width {
                     view.imageWidth = width
-                    view.imageHeight = imageSize.height * (width / imageSize.width )
+                    view.imageHeight = ceil(imageSize.height * (width / imageSize.width))
                 } else  {
                     view.imageWidth = imageSize.width
                     view.imageHeight = imageSize.height
