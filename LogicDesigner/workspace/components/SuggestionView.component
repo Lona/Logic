@@ -124,6 +124,18 @@
     {
       "assignee" : [
         "layers",
+        "Suggestion List Container",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsSuggestionList"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "Detail Area",
         "visible"
       ],
@@ -134,16 +146,74 @@
       "type" : "AssignExpr"
     },
     {
-      "assignee" : [
-        "layers",
-        "VDivider",
-        "visible"
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "VDivider",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
       ],
-      "content" : [
-        "parameters",
-        "showsSuggestionDetails"
+      "condition" : {
+        "left" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "op" : "==",
+        "right" : [
+          "parameters",
+          "showsSuggestionList"
+        ],
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "VDivider",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
       ],
-      "type" : "AssignExpr"
+      "condition" : {
+        "left" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "op" : "==",
+        "right" : [
+          "parameters",
+          "showsSuggestionDetails"
+        ],
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
     },
     {
       "assignee" : [
@@ -792,6 +862,14 @@
       },
       "name" : "showsSuggestionArea",
       "type" : "Boolean"
+    },
+    {
+      "defaultValue" : {
+        "data" : true,
+        "type" : "Boolean"
+      },
+      "name" : "showsSuggestionList",
+      "type" : "Boolean"
     }
   ],
   "root" : {
@@ -884,6 +962,7 @@
             "params" : {
               "alignSelf" : "stretch",
               "backgroundColor" : "divider",
+              "visible" : false,
               "width" : 1
             },
             "type" : "Lona:View"

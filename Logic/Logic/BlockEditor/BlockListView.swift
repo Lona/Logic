@@ -971,12 +971,18 @@ extension BlockListView: NSTableViewDelegate {
         case .tokens:
             let view = item.view as! LogicEditor
 
+            view.onRequestDelete = { [unowned self] in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                _ = self.handleChangeBlocks(self.blocks.removing(at: line))
+            }
+
             view.onChangeRootNode = { [unowned self] newRootNode in
-                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return false }
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return false }
 
                 let newBlock: BlockEditor.Block = .init(id: item.id, content: .tokens(newRootNode))
 
-                _ = self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock))
+                _ = self.handleChangeBlocks(self.blocks.replacing(elementAt: line, with: newBlock))
 
                 return true
             }

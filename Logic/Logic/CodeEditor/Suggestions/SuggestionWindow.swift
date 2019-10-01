@@ -47,6 +47,7 @@ public class SuggestionWindow: NSWindow {
         suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
         suggestionView.showsSearchBar = true
+        suggestionView.showsSuggestionList = true
         suggestionView.showsSuggestionArea = true
         suggestionView.suggestionListWidth = 200
         suggestionView.showsSuggestionDetails = true
@@ -221,6 +222,11 @@ public class SuggestionWindow: NSWindow {
     public var showsSuggestionDetails: Bool {
         get { return suggestionView.showsSuggestionDetails }
         set { suggestionView.showsSuggestionDetails = newValue }
+    }
+
+    public var showsSuggestionList: Bool {
+        get { return suggestionView.showsSuggestionList }
+        set { suggestionView.showsSuggestionList = newValue }
     }
 
     public var showsSuggestionArea: Bool {

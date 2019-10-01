@@ -112,7 +112,7 @@ public extension LGCIdentifier {
         public static func name(_ string: String) -> LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: string,
-                category: "Variables".uppercased(),
+                category: LGCExpression.Suggestion.variablesCategoryTitle,
                 node: LGCSyntaxNode.identifier(.init(id: UUID(), string: string))
             )
         }
@@ -662,7 +662,7 @@ public extension LGCExpression {
             return LogicSuggestionItem(
                 title: identifiers.last?.string ?? "",
                 subtitle: identifiers.count > 1 ? identifiers.dropLast().map { $0.string }.joined(separator: ".") : nil,
-                category: "Variables".uppercased(),
+                category: variablesCategoryTitle,
                 node: .expression(LGCExpression.makeMemberExpression(identifiers: identifiers))
             )
         }
@@ -690,6 +690,8 @@ public extension LGCExpression {
         }
 
         public static let categoryTitle = "Expressions".uppercased()
+
+        public static let variablesCategoryTitle = "Variables".uppercased()
     }
 
     static var assignmentSuggestionItem: LogicSuggestionItem {
