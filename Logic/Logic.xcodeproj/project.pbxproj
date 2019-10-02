@@ -128,6 +128,11 @@
 		6BC2D44E2263B7AE003A9F63 /* TextStyleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC2D44D2263B7AE003A9F63 /* TextStyleRow.swift */; };
 		6BC606342247DDFB003E616B /* Colors+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC606332247DDFB003E616B /* Colors+Appearance.swift */; };
 		6BD44E5C228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */; };
+		6BD9948D2343FCE800F3F173 /* ImageLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9948C2343FCE800F3F173 /* ImageLocator.swift */; };
+		6BD994912343FF6000F3F173 /* menu-thumbnail-function.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD9948E2343FF5F00F3F173 /* menu-thumbnail-function.png */; };
+		6BD994922343FF6000F3F173 /* menu-thumbnail-new-value.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */; };
+		6BD994932343FF6000F3F173 /* menu-thumbnail-variable.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */; };
+		6BD9949923443CC100F3F173 /* MDXSyntax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9949823443CC100F3F173 /* MDXSyntax.swift */; };
 		6BEEA13122A6E6EF00905664 /* LGCSyntax+Range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */; };
 		6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */; };
 		6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13522A713FA00905664 /* StandardConfiguration.swift */; };
@@ -263,6 +268,11 @@
 		6BC2D44D2263B7AE003A9F63 /* TextStyleRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextStyleRow.swift; sourceTree = "<group>"; };
 		6BC606332247DDFB003E616B /* Colors+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors+Appearance.swift"; sourceTree = "<group>"; };
 		6BD44E5B228CEEAD0025A3C8 /* NSBezierPath+Squiggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSBezierPath+Squiggle.swift"; sourceTree = "<group>"; };
+		6BD9948C2343FCE800F3F173 /* ImageLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLocator.swift; sourceTree = "<group>"; };
+		6BD9948E2343FF5F00F3F173 /* menu-thumbnail-function.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-function.png"; sourceTree = "<group>"; };
+		6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-new-value.png"; sourceTree = "<group>"; };
+		6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-variable.png"; sourceTree = "<group>"; };
+		6BD9949823443CC100F3F173 /* MDXSyntax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MDXSyntax.swift; sourceTree = "<group>"; };
 		6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Range.swift"; sourceTree = "<group>"; };
 		6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeFormattable.swift; sourceTree = "<group>"; };
 		6BEEA13522A713FA00905664 /* StandardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardConfiguration.swift; sourceTree = "<group>"; };
@@ -430,6 +440,7 @@
 				6BBD0C122298945D00EB87A9 /* LGCSyntax+Selection.swift */,
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
 				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
+				6BD9949823443CC100F3F173 /* MDXSyntax.swift */,
 				6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */,
 				6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */,
 				6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */,
@@ -461,6 +472,7 @@
 				6B3414A122593E2000CC65D1 /* Array+Union.swift */,
 				6B34149A2256EF2F00CC65D1 /* BundleLocator.swift */,
 				6B9528D422A0C2710094D9C7 /* CSSColor.swift */,
+				6BD9948C2343FCE800F3F173 /* ImageLocator.swift */,
 				6BBD0C002294DA1100EB87A9 /* KeyValueCollection.swift */,
 				6BBD0C012294DA1100EB87A9 /* KeyValueList.swift */,
 				6B1DE40422DAB9BE00FC565E /* LightMark.swift */,
@@ -608,12 +620,15 @@
 			isa = PBXGroup;
 			children = (
 				6B0F9463233EBBE9007C115E /* menu-thumbnail-divider.png */,
-				6B0F9464233EBBE9007C115E /* menu-thumbnail-image.png */,
+				6BD9948E2343FF5F00F3F173 /* menu-thumbnail-function.png */,
 				6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */,
 				6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */,
 				6BFA8A562332B0460016FC7B /* menu-thumbnail-h3.png */,
-				6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */,
+				6B0F9464233EBBE9007C115E /* menu-thumbnail-image.png */,
+				6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */,
 				6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */,
+				6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */,
+				6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */,
 			);
 			path = assets;
 			sourceTree = "<group>";
@@ -694,12 +709,15 @@
 				6B4E260222E7B39500F0076A /* Shadow.logic in Resources */,
 				6BFA8A592332B0460016FC7B /* menu-thumbnail-h1.png in Resources */,
 				6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */,
+				6BD994932343FF6000F3F173 /* menu-thumbnail-variable.png in Resources */,
+				6BD994922343FF6000F3F173 /* menu-thumbnail-new-value.png in Resources */,
 				6BFA8A5A2332B0460016FC7B /* menu-thumbnail-h2.png in Resources */,
 				6B0F9466233EBBE9007C115E /* menu-thumbnail-image.png in Resources */,
 				6BFA8A5B2332B0460016FC7B /* menu-thumbnail-h3.png in Resources */,
 				6BFA8A5C2332B0460016FC7B /* menu-thumbnail-tokens.png in Resources */,
 				6B4E260022E7B27000F0076A /* Color.logic in Resources */,
 				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
+				6BD994912343FF6000F3F173 /* menu-thumbnail-function.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -715,9 +733,11 @@
 				6B44E160223B3DFF00740318 /* ForeignTypes.swift in Sources */,
 				6B6F19DD230B56C900E5AC60 /* LGCSyntax+Dragging.swift in Sources */,
 				6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */,
+				6BD9949923443CC100F3F173 /* MDXSyntax.swift in Sources */,
 				6B44E15E223B3DF300740318 /* TextStyle.swift in Sources */,
 				6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */,
 				6B44E178223B40BA00740318 /* LogicElement.swift in Sources */,
+				6BD9948D2343FCE800F3F173 /* ImageLocator.swift in Sources */,
 				6BBD0C0722961B9C00EB87A9 /* NameGenerator.swift in Sources */,
 				6B858C21229DB13A00DE6216 /* ScopeStack.swift in Sources */,
 				6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */,

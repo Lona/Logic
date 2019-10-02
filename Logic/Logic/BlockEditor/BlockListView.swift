@@ -1328,27 +1328,27 @@ extension BlockListView: NSTableViewDelegate {
                 EditableBlock.makeDefaultEmptyBlock()
             ),
             (
-                SuggestionListItem.row("Text", "Write plain text", false, nil, image(named: "menu-thumbnail-paragraph")),
+                SuggestionListItem.row("Text", "Write plain text", false, nil, MenuThumbnailImage.paragraph),
                 EditableBlock(id: UUID(), content: .text(.init(), .paragraph))
             ),
             (
-                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, image(named: "menu-thumbnail-h1")),
+                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, MenuThumbnailImage.h1),
                 EditableBlock(id: UUID(), content: .text(.init(), .h1))
             ),
             (
-                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, image(named: "menu-thumbnail-h2")),
+                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, MenuThumbnailImage.h2),
                 EditableBlock(id: UUID(), content: .text(.init(), .h2))
             ),
             (
-                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, image(named: "menu-thumbnail-h3")),
+                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, MenuThumbnailImage.h3),
                 EditableBlock(id: UUID(), content: .text(.init(), .h3))
             ),
             (
-                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, image(named: "menu-thumbnail-divider")),
+                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider),
                 EditableBlock(id: UUID(), content: .divider)
             ),
             (
-                SuggestionListItem.row("Image", "Display an image", false, nil, image(named: "menu-thumbnail-image")),
+                SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image),
                 EditableBlock(id: UUID(), content: .image(nil))
             ),
             (
@@ -1356,15 +1356,49 @@ extension BlockListView: NSTableViewDelegate {
                 EditableBlock.makeDefaultEmptyBlock()
             ),
             (
-                SuggestionListItem.row("Token", "Define a design token variable", false, nil, image(named: "menu-thumbnail-tokens")),
+                SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
                 EditableBlock(
                     id: UUID(),
                     content: .tokens(
                         LGCSyntaxNode.declaration(
                             .variable(
                                 id: UUID(),
-                                name: .init(id: UUID(), name: "variable1"),
+                                name: .init(id: UUID(), name: "colorToken1"),
                                 annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Color"), genericArguments: .empty),
+                                initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                                comment: nil
+                            )
+                        )
+                    )
+                )
+            ),
+            (
+                SuggestionListItem.row("Text style token", "Define a text style variable", false, nil, MenuThumbnailImage.tokens),
+                EditableBlock(
+                    id: UUID(),
+                    content: .tokens(
+                        LGCSyntaxNode.declaration(
+                            .variable(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "textStyleToken1"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "TextStyle"), genericArguments: .empty),
+                                initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
+                                comment: nil
+                            )
+                        )
+                    )
+                )
+            ),
+            (
+                SuggestionListItem.row("Shadow token", "Define a shadow variable", false, nil, MenuThumbnailImage.tokens),
+                EditableBlock(
+                    id: UUID(),
+                    content: .tokens(
+                        LGCSyntaxNode.declaration(
+                            .variable(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "shadowToken1"),
+                                annotation: .typeIdentifier(id: UUID(), identifier: .init(id: UUID(), string: "Shadow"), genericArguments: .empty),
                                 initializer: .identifierExpression(id: UUID(), identifier: .init(id: UUID(), string: "placeholder", isPlaceholder: true)),
                                 comment: nil
                             )
@@ -1467,7 +1501,18 @@ extension BlockListView: NSTableViewDelegate {
                 let ok = self.handleChangeBlocks(clone)
 
                 if ok {
-                    self.focus(id: newBlock.id)
+                    switch newBlock.content {
+                    case .tokens(.declaration(.variable(_, let pattern, _, _, _))):
+                        let view = newBlock.view as! LogicEditor
+
+                        // This is a workaround to solve the window appearing at the wrong x position.
+                        // I think we need to force a layout pass for the window to appear in the correct location.
+                        DispatchQueue.main.async {
+                            view.showSuggestionWindow(for: pattern.uuid)
+                        }
+                    default:
+                        self.focus(id: newBlock.id)
+                    }
                 }
             }
 

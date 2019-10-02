@@ -663,15 +663,19 @@ extension LogicEditor {
 
             subwindow.placeholderText = "Filter actions"
         case .expression:
-            let customValueItem: LogicEditor.MenuItem = .init(row: .row("Custom value", nil, false, nil, nil), action: { [unowned self] in
+            let customValueRow: SuggestionListItem = .row("Custom value", "Define a new value", false, nil, MenuThumbnailImage.newValue)
+            let variableReferenceRow: SuggestionListItem = .row("Variable reference", "Reference an existing value", false, nil, MenuThumbnailImage.variable)
+            let functionCallRow: SuggestionListItem = .row("Function call", "Generate a value from a function", false, nil, MenuThumbnailImage.function)
+
+            let customValueItem: LogicEditor.MenuItem = .init(row: customValueRow, action: { [unowned self] in
                 self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: LGCLiteral.Suggestion.categoryTitle)
             })
 
-            let variableReferenceItem: LogicEditor.MenuItem = .init(row: .row("Variable reference", nil, false, nil, nil), action: { [unowned self] in
+            let variableReferenceItem: LogicEditor.MenuItem = .init(row: variableReferenceRow, action: { [unowned self] in
                 self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: LGCExpression.Suggestion.variablesCategoryTitle)
             })
 
-            let functionCallItem: LogicEditor.MenuItem = .init(row: .row("Function call", nil, false, nil, nil), action: { [unowned self] in
+            let functionCallItem: LogicEditor.MenuItem = .init(row: functionCallRow, action: { [unowned self] in
                 self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode)
             })
 
@@ -885,6 +889,16 @@ extension LogicEditor {
         }
     }
 
+    public func showSuggestionWindow(for syntaxNodeId: UUID) {
+        let topNode = context.topNodeWithEqualElements(as: syntaxNodeId, includeTopLevel: false)
+
+        if let selectedRange = context.elementRange(for: topNode.uuid, includeTopLevel: false) {
+            self.canvasView.selectedRange = selectedRange
+
+            self.showSuggestionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
+        }
+    }
+
     // The suggestion window is shared between all logic editors, so we need to assign every parameter
     // to it each time we show it. Otherwise, we may be showing parameters set by another logic editor.
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode, categoryFilter: String? = nil) {
@@ -954,12 +968,14 @@ extension LogicEditor {
             childWindow.defaultWindowSize = .init(width: defaultActionWindowWidth, height: defaultSuggestionWindowSize.height)
             childWindow.showsSuggestionArea = true
             childWindow.showsSuggestionList = true
+            childWindow.suggestionView.suggestionListWidth = 200
             childWindow.showsSuggestionDetails = false
         default:
             childWindow.placeholderText = placeholderText
             childWindow.defaultWindowSize = defaultSuggestionWindowSize
             childWindow.showsSuggestionArea = true
             childWindow.showsSuggestionList = true
+            childWindow.suggestionView.suggestionListWidth = 200
             childWindow.showsSuggestionDetails = showsSuggestionDetails
             childWindow.showsFilterBar = showsFilterBar
         }
