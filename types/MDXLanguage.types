@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<root>
+  <NativeType name="Int"/>
+  <NativeType name="String"/>
+  <NativeType name="Array">
+    <NativeType.GenericParam type="Element"/>
+  </NativeType>
+  <NativeType name="Optional">
+    <NativeType.GenericParam type="Value"/>
+  </NativeType>
+  <Type name="Text">
+    <Record name="text">
+      <Record.Param name="value" type="String"/>
+    </Record>
+  </Type>
+  <Type name="Image">
+    <Record name="image">
+      <Record.Param name="alt" type="String"/>
+      <Record.Param name="url" type="String"/>
+    </Record>
+  </Type>
+  <Type name="Strong">
+    <Record name="strong">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Paragraph">
+    <Record name="paragraph">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Heading">
+    <Record name="heading">
+      <Record.Param name="depth" type="Int"/>
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Code">
+    <Record name="code">
+      <Record.Param name="lang" type="Optional">
+        <Record.Substitution generic="Value" instance="String"/>
+      </Record.Param>
+      <Record.Param name="value" type="String"/>
+      <Record.Param name="parsed" type="Optional">
+        <Record.Substitution generic="Value" instance="LGCSyntaxNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="Root">
+    <Record name="root">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="BlockNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="BlockNode">
+    <Case name="paragraph">
+      <Case.Param type="Paragraph"/>
+    </Case>
+    <Case name="heading">
+      <Case.Param type="Heading"/>
+    </Case>
+    <Case name="code">
+      <Case.Param type="Code"/>
+    </Case>
+  </Type>
+  <Type name="InlineNode">
+    <Case name="text">
+      <Case.Param type="Text"/>
+    </Case>
+    <Case name="image">
+      <Case.Param type="Image"/>
+    </Case>
+    <Case name="strong">
+      <Case.Param type="Strong"/>
+    </Case>
+  </Type>
+  <NativeType name="LGCSyntaxNode"/>
+</root>
