@@ -64,6 +64,9 @@
       </Record.Param>
     </Record>
   </Type>
+  <Type name="ThematicBreak">
+    <Record name="thematicBreak"/>
+  </Type>
   <Type name="Root">
     <Record name="root">
       <Record.Param name="children" type="Array">
@@ -83,6 +86,9 @@
     </Case>
     <Case name="code">
       <Case.Param type="Code"/>
+    </Case>
+    <Case name="thematicBreak">
+      <Case.Param type="ThematicBreak"/>
     </Case>
   </Type>
   <Type name="InlineNode">

@@ -76,8 +76,10 @@ public enum MarkdownFile {
 
         let blocks: [BlockEditor.Block] = mdxRoot.children.compactMap { blockElement in
             switch blockElement {
-//            case .lineBreak:
-//                return nil
+            case .thematicBreak:
+                return BlockEditor.Block(.divider)
+            case .image(let image):
+                return BlockEditor.Block(.image(URL(string: image.url)))
             case .heading(let value):
                 func sizeLevel(_ level: Int) -> TextBlockView.SizeLevel {
                     switch level {
@@ -108,8 +110,6 @@ public enum MarkdownFile {
                 }
 
                 return BlockEditor.Block(.tokens(.declaration(topLevelDeclarations.declarations.first!)))
-            default:
-                return nil
             }
         }
         return blocks
