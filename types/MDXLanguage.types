@@ -26,6 +26,18 @@
       </Record.Param>
     </Record>
   </Type>
+  <Type name="Emphasis">
+    <Record name="emphasis">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="InlineCode">
+    <Record name="inlineCode">
+      <Record.Param name="value" type="String"/>
+    </Record>
+  </Type>
   <Type name="Paragraph">
     <Record name="paragraph">
       <Record.Param name="children" type="Array">
@@ -60,6 +72,9 @@
     </Record>
   </Type>
   <Type name="BlockNode">
+    <Case name="image">
+      <Case.Param type="Image"/>
+    </Case>
     <Case name="paragraph">
       <Case.Param type="Paragraph"/>
     </Case>
@@ -74,11 +89,14 @@
     <Case name="text">
       <Case.Param type="Text"/>
     </Case>
-    <Case name="image">
-      <Case.Param type="Image"/>
-    </Case>
     <Case name="strong">
       <Case.Param type="Strong"/>
+    </Case>
+    <Case name="emphasis">
+      <Case.Param type="Emphasis"/>
+    </Case>
+    <Case name="inlineCode">
+      <Case.Param type="InlineCode"/>
     </Case>
   </Type>
   <NativeType name="LGCSyntaxNode"/>

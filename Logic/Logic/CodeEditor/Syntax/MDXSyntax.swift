@@ -26,6 +26,22 @@ public struct MDXStrong: Codable & Equatable {
   public var children: Array<MDXInlineNode>
 }
 
+public struct MDXEmphasis: Codable & Equatable {
+  public init(children: Array<MDXInlineNode>) {
+    self.children = children
+  }
+
+  public var children: Array<MDXInlineNode>
+}
+
+public struct MDXInlineCode: Codable & Equatable {
+  public init(value: String) {
+    self.value = value
+  }
+
+  public var value: String
+}
+
 public struct MDXParagraph: Codable & Equatable {
   public init(children: Array<MDXInlineNode>) {
     self.children = children
@@ -65,6 +81,7 @@ public struct MDXRoot: Codable & Equatable {
 }
 
 public indirect enum MDXBlockNode: Codable & Equatable {
+  case image(MDXImage)
   case paragraph(MDXParagraph)
   case heading(MDXHeading)
   case code(MDXCode)
@@ -81,6 +98,8 @@ public indirect enum MDXBlockNode: Codable & Equatable {
     let type = try container.decode(String.self, forKey: .type)
 
     switch type {
+      case "image":
+        self = .image(try container.decode(MDXImage.self, forKey: .data))
       case "paragraph":
         self = .paragraph(try container.decode(MDXParagraph.self, forKey: .data))
       case "heading":
@@ -96,6 +115,9 @@ public indirect enum MDXBlockNode: Codable & Equatable {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     switch self {
+      case .image(let value):
+        try container.encode("image", forKey: .type)
+        try container.encode(value, forKey: .data)
       case .paragraph(let value):
         try container.encode("paragraph", forKey: .type)
         try container.encode(value, forKey: .data)
@@ -111,8 +133,9 @@ public indirect enum MDXBlockNode: Codable & Equatable {
 
 public indirect enum MDXInlineNode: Codable & Equatable {
   case text(MDXText)
-  case image(MDXImage)
   case strong(MDXStrong)
+  case emphasis(MDXEmphasis)
+  case inlineCode(MDXInlineCode)
 
   // MARK: Codable
 
@@ -128,10 +151,12 @@ public indirect enum MDXInlineNode: Codable & Equatable {
     switch type {
       case "text":
         self = .text(try container.decode(MDXText.self, forKey: .data))
-      case "image":
-        self = .image(try container.decode(MDXImage.self, forKey: .data))
       case "strong":
         self = .strong(try container.decode(MDXStrong.self, forKey: .data))
+      case "emphasis":
+        self = .emphasis(try container.decode(MDXEmphasis.self, forKey: .data))
+      case "inlineCode":
+        self = .inlineCode(try container.decode(MDXInlineCode.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -144,11 +169,14 @@ public indirect enum MDXInlineNode: Codable & Equatable {
       case .text(let value):
         try container.encode("text", forKey: .type)
         try container.encode(value, forKey: .data)
-      case .image(let value):
-        try container.encode("image", forKey: .type)
-        try container.encode(value, forKey: .data)
       case .strong(let value):
         try container.encode("strong", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .emphasis(let value):
+        try container.encode("emphasis", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .inlineCode(let value):
+        try container.encode("inlineCode", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }
