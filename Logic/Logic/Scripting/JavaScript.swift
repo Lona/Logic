@@ -35,15 +35,28 @@ public enum JavaScript {
         return context
     }()
 
-    static func convert(contents: String, kind: EncodingConversionKind, to targetEncoding: LogicFile.DataSerializationFormat) -> String? {
+    static func convert(
+        contents: String,
+        kind: EncodingConversionKind,
+        to targetEncoding: LogicFile.DataSerializationFormat,
+        from sourceEncoding: LogicFile.DataSerializationFormat? = nil) -> String? {
+
         context.setObject(contents, forKeyedSubscript: "___contents" as NSString)
+
+        var options = "{}"
+        if let sourceEncoding = sourceEncoding {
+            options = "{sourceFormat: '\(sourceEncoding.rawValue)'}"
+        }
 
         switch kind {
         case .logic:
-            let script = "global.lonaSerialization.convertLogic(___contents, '\(targetEncoding.rawValue)')"
+            let script = "global.lonaSerialization.convertLogic(___contents, '\(targetEncoding.rawValue)', \(options))"
             return context.evaluateScript(script)?.toString()
         case .types:
-            let script = "global.lonaSerialization.convertTypes(___contents, '\(targetEncoding.rawValue)')"
+            let script = "global.lonaSerialization.convertTypes(___contents, '\(targetEncoding.rawValue)', \(options))"
+            return context.evaluateScript(script)?.toString()
+        case .document:
+            let script = "global.lonaSerialization.convertDocument(___contents, '\(targetEncoding.rawValue)', \(options))"
             return context.evaluateScript(script)?.toString()
         }
     }
@@ -52,4 +65,5 @@ public enum JavaScript {
 public enum EncodingConversionKind: String {
     case logic
     case types
+    case document
 }

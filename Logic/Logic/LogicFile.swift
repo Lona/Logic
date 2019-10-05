@@ -10,20 +10,20 @@ import Foundation
 
 public enum LogicFile {
     public enum DataSerializationFormat: String {
-        case xml, json
+        case xml, json, mdx
     }
 
-    public static func convert(_ contents: String, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat) -> String? {
-        return JavaScript.convert(contents: contents, kind: kind, to: targetFormat)
+    public static func convert(_ contents: String, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat, from sourceFormat: DataSerializationFormat? = nil) -> String? {
+        return JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat)
     }
 
-    public static func convert(_ data: Data, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat) -> Data? {
+    public static func convert(_ data: Data, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat, from sourceFormat: DataSerializationFormat? = nil) -> Data? {
         guard let contents = String(data: data, encoding: .utf8) else {
             Swift.print("Failed to convert Logic file Data to String")
             return nil
         }
 
-        guard let converted = JavaScript.convert(contents: contents, kind: kind, to: targetFormat) else {
+        guard let converted = JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat) else {
             return nil
         }
 

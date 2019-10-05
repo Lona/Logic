@@ -44,7 +44,7 @@ class MarkdownDocument: NSDocument {
     var blockEditor: BlockEditor = {
         let blockEditor = BlockEditor()
 
-        blockEditor.blocks = MarkdownFile.makeBlocks("")
+        blockEditor.blocks = MarkdownFile.makeBlocks(.init(children: []))
 
         return blockEditor
     }()

@@ -58,54 +58,52 @@ public enum MarkdownFile {
     // MARK: Decoding markdown
 
     public static func makeBlocks(_ markdownData: Data) -> [BlockEditor.Block]? {
-        guard let contents = String(data: markdownData, encoding: .utf8) else {
-            Swift.print("Failed to convert Markdown file Data to String")
+        guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .mdx),
+            let mdxRoot = try? JSONDecoder().decode(MDXRoot.self, from: jsonData) else {
+            Swift.print("Failed to convert Markdown file Data to AST")
             return nil
         }
 
-        return makeBlocks(contents)
+        return makeBlocks(mdxRoot)
     }
 
-    public static func makeBlocks(_ markdownString: String) -> [BlockEditor.Block] {
-        let parsed = LightMark.parse(markdownString)
-
-        if parsed.count == 0 {
+    public static func makeBlocks(_ mdxRoot: MDXRoot) -> [BlockEditor.Block] {
+        if mdxRoot.children.count == 0 {
             return [
                 EditableBlock.makeDefaultEmptyBlock()
             ]
         }
 
-        let blocks: [BlockEditor.Block] = parsed.compactMap { blockElement in
+        let blocks: [BlockEditor.Block] = mdxRoot.children.compactMap { blockElement in
             switch blockElement {
-            case .lineBreak:
-                return nil
-            case .heading(level: let level, content: let inlineElements):
-                func sizeLevel() -> TextBlockView.SizeLevel {
+//            case .lineBreak:
+//                return nil
+            case .heading(let value):
+                func sizeLevel(_ level: Int) -> TextBlockView.SizeLevel {
                     switch level {
-                    case .level1: return .h1
-                    case .level2: return .h2
-                    case .level3: return .h3
-                    case .level4: return .h4
-                    case .level5: return .h5
-                    case .level6: return .h6
+                    case 1: return .h1
+                    case 2: return .h2
+                    case 3: return .h3
+                    case 4: return .h4
+                    case 5: return .h5
+                    case 6: return .h6
+                    default: fatalError("Invalid markdown header level")
                     }
                 }
 
-                let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(value, sizeLevel()))
-            case .paragraph(content: let inlineElements):
-                let value: NSAttributedString = inlineElements.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(value, .paragraph))
-            case .block(language: "tokens", content: let code):
-                guard let data = code.data(using: .utf8) else { fatalError("Invalid utf8 data in markdown code block") }
-
-                guard let rootNode = LGCSyntaxNode(data: data) else {
-                    Swift.print("Failed to create code block from", code)
+                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
+                return BlockEditor.Block(.text(attributedString, sizeLevel(value.depth)))
+            case .paragraph(let value):
+                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
+                return BlockEditor.Block(.text(attributedString, .paragraph))
+            case .code(let value):
+                guard let rootNode = value.parsed else {
+                    Swift.print("Code block didn't contain parsed tokens", value)
                     return nil
                 }
 
                 guard case .topLevelDeclarations(let topLevelDeclarations) = rootNode else {
-                    Swift.print("DECODING: Tokens block uses incorrect top-level node", code)
+                    Swift.print("DECODING: Tokens block uses incorrect top-level node", value)
                     return nil
                 }
 
