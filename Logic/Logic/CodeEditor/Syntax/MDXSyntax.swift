@@ -9,12 +9,12 @@ public struct MDXText: Codable & Equatable {
 }
 
 public struct MDXImage: Codable & Equatable {
-  public init(alt: String, url: String) {
+  public init(alt: Optional<String>, url: String) {
     self.alt = alt
     self.url = url
   }
 
-  public var alt: String
+  public var alt: Optional<String>
   public var url: String
 }
 

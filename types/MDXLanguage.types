@@ -15,7 +15,9 @@
   </Type>
   <Type name="Image">
     <Record name="image">
-      <Record.Param name="alt" type="String"/>
+      <Record.Param name="alt" type="Optional">
+        <Record.Substitution generic="Value" instance="String"/>
+      </Record.Param>
       <Record.Param name="url" type="String"/>
     </Record>
   </Type>
