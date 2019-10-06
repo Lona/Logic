@@ -176,25 +176,29 @@ public class BlockListView: NSBox {
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
 
+        func showCommandPalette(line: Int) {
+            if let view = blocks[line].view as? TextBlockView {
+                let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
+
+                commandPaletteAnchor = (line, 0, rect)
+                self.showCommandPalette(line: line, query: "", rect: rect)
+                view.setPlaceholder(string: "Type to filter commands")
+            }
+        }
+
         if blocks[line].content == .text(.init(), .paragraph) {
             focus(line: line)
-            return
-        }
-
-        if line + 1 < blocks.count, blocks[line + 1].content == .text(.init(), .paragraph) {
+            showCommandPalette(line: line)
+        } else if line + 1 < blocks.count, blocks[line + 1].content == .text(.init(), .paragraph) {
             focus(line: line + 1)
-            return
-        }
+            showCommandPalette(line: line + 1)
+        } else {
+            let id = UUID()
+            let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
 
-        let id = UUID()
-        let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
-
-        if ok, let addedLine = self.line(forBlock: id), let view = blocks[addedLine].view as? TextBlockView {
-            let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
-
-            commandPaletteAnchor = (addedLine, 0, rect)
-            showCommandPalette(line: addedLine, query: "", rect: rect)
-            view.setPlaceholder(string: "Type to filter commands")
+            if ok, let addedLine = self.line(forBlock: id) {
+                showCommandPalette(line: addedLine)
+            }
         }
     }
 
