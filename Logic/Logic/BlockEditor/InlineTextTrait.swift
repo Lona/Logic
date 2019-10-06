@@ -148,4 +148,33 @@ extension NSAttributedString {
 
         return result
     }
+
+    public func markdownInlineBlock() -> [MDXInlineNode] {
+        func buildInlineNode(traits: [InlineTextTrait], text: String) -> MDXInlineNode {
+            if traits.contains(.italic) {
+                return .emphasis(.init(children: [buildInlineNode(traits: traits.filter { $0 != .italic }, text: text)]))
+            } else if traits.contains(.bold) {
+                return .strong(.init(children: [buildInlineNode(traits: traits.filter { $0 != .bold }, text: text)]))
+            } else if traits.contains(.code) {
+                return .inlineCode(.init(value: text))
+            } else {
+                return .text(.init(value: text))
+            }
+        }
+
+        var nodes: [MDXInlineNode] = []
+
+        for index in 0..<self.length {
+            let character = self.attributedSubstring(from: NSRange(location: index, length: 1)).string
+            let traits: [InlineTextTrait] = .init(attributes: self.attributes(at: index, effectiveRange: nil))
+
+            let node = buildInlineNode(traits: traits, text: character)
+
+            nodes.append(node)
+        }
+
+        let result = MDXInlineNode.optimized(nodes: nodes)
+
+        return result
+    }
 }

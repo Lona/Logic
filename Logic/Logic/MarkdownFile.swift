@@ -14,45 +14,48 @@ public enum MarkdownFile {
 
     // MARK: Encoding markdown
 
-    public static func makeMarkdownString(_ block: BlockEditor.Block) -> String {
+    public static func makeMarkdownBlock(_ block: BlockEditor.Block) -> MDXBlockNode {
         switch block.content {
         case .text(let textValue, let sizeLevel):
-            if let prefix = sizeLevel.prefix {
-                return prefix + " " + textValue.markdownString() + "\n"
-            } else {
-                return textValue.markdownString() + "\n"
+            switch sizeLevel {
+            case .h1, .h2, .h3, .h4, .h5, .h6:
+                return .heading(.init(depth: sizeLevel.rawValue, children: textValue.markdownInlineBlock()))
+            case .paragraph:
+                return .paragraph(.init(children: textValue.markdownInlineBlock()))
             }
         case .tokens(let rootNode):
             guard case .declaration(let declaration) = rootNode else {
                 Swift.print("ENCODING: Tokens block uses incorrect top-level node")
-                return "FAILED TO ENCODE TOKENS"
+                fatalError("FAILED TO ENCODE TOKENS")
             }
             let rootNode: LGCSyntaxNode = .topLevelDeclarations(.init(id: UUID(), declarations: .init([declaration])))
 
-            let encoder = JSONEncoder()
-            guard let data = try? encoder.encode(rootNode) else { return "FAILED TO SERIALIZE TOKENS" }
-            guard let xml = LogicFile.convert(data, kind: .logic, to: .xml) else { return "FAILED TO CONVERT TOKENS TO XML" }
-            let code = String(data: xml, encoding: .utf8)!
-
-            return "```tokens\n\(code)\n```"
+            return .code(.init(lang: "tokens", value: "", parsed: rootNode))
         case .divider:
-            return "---"
+            return .thematicBreak(.init())
         case .image(let url):
-            return "![](\(url?.absoluteString ?? ""))"
+            return .image(.init(alt: "", url: url?.absoluteString ?? ""))
         }
     }
 
-    public static func makeMarkdownString(_ blocks: [BlockEditor.Block]) -> String {
-        return blocks.map { makeMarkdownString($0) }.joined(separator: "\n")
+    public static func makeMarkdownRoot(_ blocks: [BlockEditor.Block]) -> MDXRoot {
+        return .init(children: blocks.map { makeMarkdownBlock($0) })
     }
 
     public static func makeMarkdownData(_ blocks: [BlockEditor.Block]) -> Data? {
-        guard let convertedData = makeMarkdownString(blocks).data(using: .utf8) else {
-            Swift.print("Failed to convert Markdown file String to Data")
+        let mdxRoot = makeMarkdownRoot(blocks)
+
+        guard let convertedData = try? JSONEncoder().encode(mdxRoot) else {
+            Swift.print("Failed to convert MDXRoot to Data")
             return nil
         }
 
-        return convertedData
+        guard let markdownStringData = LogicFile.convert(convertedData, kind: .document, to: .mdx, from: .json) else {
+            Swift.print("Failed to convert MDX JSON to markdown string")
+            return nil
+        }
+
+        return markdownStringData
     }
 
     // MARK: Decoding markdown

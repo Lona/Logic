@@ -31,6 +31,7 @@
 		6B1BFC772322CEE10060FD13 /* Tooltip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BFC762322CEE10060FD13 /* Tooltip.swift */; };
 		6B1DE40522DAB9BE00FC565E /* LightMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1DE40422DAB9BE00FC565E /* LightMark.swift */; };
 		6B2484F023398E50000C5C9F /* MarkdownFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2484EF23398E50000C5C9F /* MarkdownFile.swift */; };
+		6B2DC3022349663B00A768A1 /* MDXSyntax+InlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */; };
 		6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34148C225417F800CC65D1 /* JavaScript.swift */; };
 		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
@@ -169,6 +170,7 @@
 		6B1BFC762322CEE10060FD13 /* Tooltip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tooltip.swift; sourceTree = "<group>"; };
 		6B1DE40422DAB9BE00FC565E /* LightMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightMark.swift; sourceTree = "<group>"; };
 		6B2484EF23398E50000C5C9F /* MarkdownFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownFile.swift; sourceTree = "<group>"; };
+		6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MDXSyntax+InlineNode.swift"; sourceTree = "<group>"; };
 		6B34148C225417F800CC65D1 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
 		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
@@ -441,6 +443,7 @@
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
 				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
 				6BD9949823443CC100F3F173 /* MDXSyntax.swift */,
+				6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */,
 				6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */,
 				6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */,
 				6B34149F2258154500CC65D1 /* SyntaxNodePlaceholdable.swift */,
@@ -743,6 +746,7 @@
 				6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */,
 				6B44E156223B3DD000740318 /* LonaViewModel.swift in Sources */,
 				6BC2D44E2263B7AE003A9F63 /* TextStyleRow.swift in Sources */,
+				6B2DC3022349663B00A768A1 /* MDXSyntax+InlineNode.swift in Sources */,
 				6B1BFC772322CEE10060FD13 /* Tooltip.swift in Sources */,
 				6B87001422ED12F8007C589C /* MinimapScroller.swift in Sources */,
 				6BBD0BFB2292134700EB87A9 /* EnumType.swift in Sources */,
