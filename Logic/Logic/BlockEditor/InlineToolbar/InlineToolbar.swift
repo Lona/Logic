@@ -26,13 +26,18 @@ private extension NSImage {
 
 // MARK: - InlineToolbar
 
+private let menuTextStyle = TextStyle(size: 14, lineHeight: 16, color: .black)
+private let monospacedMenuTextStyle = TextStyle(family: "Andale Mono", size: 15, lineHeight: 15, kerning: -2, color: .black)
+
 public class InlineToolbar: NSView {
 
-    public enum Command {
-        case divider, blockType, bold, italic, strikethrough, code, link
+    public enum Command: Equatable {
+        case replace(String), divider, blockType, bold, italic, strikethrough, code, link
 
         var width: CGFloat {
             switch self {
+            case .replace(let label):
+                return menuTextStyle.apply(to: label).size().width + 32
             case .divider:
                 return 1
             case .blockType:
@@ -52,12 +57,11 @@ public class InlineToolbar: NSView {
             }
 
             let image = NSImage(size: .init(width: width, height: InlineToolbar.height), flipped: false, drawingHandler: { rect in
-                let menuTextStyle = TextStyle(size: 14, lineHeight: 16, color: .black)
-                let monospacedMenuTextStyle = TextStyle(family: "Andale Mono", size: 15, lineHeight: 15, kerning: -2, color: .black)
-
                 var string: NSAttributedString? = nil
 
                 switch self {
+                case .replace(let value):
+                    string = menuTextStyle.apply(to: value)
                 case .bold:
                     let font = NSFontManager.shared.convert(menuTextStyle.nsFont, toHaveTrait: NSFontTraitMask.boldFontMask)
                     let mutable = NSMutableAttributedString(attributedString: menuTextStyle.apply(to: "b"))
@@ -94,6 +98,18 @@ public class InlineToolbar: NSView {
                         boundingRect.origin.x -= 1
                     }
 
+                    if case .replace = self {
+                        boundingRect.origin.x -= 8
+
+                        let caretRect = NSRect(
+                            x: rect.maxX - 16, y: rect.midY - 2.5, width: 6, height: 3.5)
+
+                        Colors.text.withAlphaComponent(0.5).setStroke()
+                        let path = NSBezierPath(caretWithin: caretRect, pointing: .down)
+                        path.lineCapStyle = .round
+                        path.stroke()
+                    }
+
                     string.draw(with: boundingRect, options: [.usesLineFragmentOrigin])
                 }
 
@@ -102,12 +118,12 @@ public class InlineToolbar: NSView {
 
             image.isTemplate = true
 
-            Command.imageCache[self] = image
+            Command.imageCache.set(image, for: self)
 
             return image
         }
 
-        private static var imageCache: [Command: NSImage] = [:]
+        private static var imageCache: KeyValueList<Command, NSImage> = [:]
     }
 
     // MARK: Lifecycle
@@ -154,7 +170,7 @@ public class InlineToolbar: NSView {
     func index(at point: NSPoint) -> Int? {
         let buttonRects = self.buttonRects
 
-        for index in 0..<InlineToolbar.commands.count {
+        for index in 0..<commands.count {
             if buttonRects[index].contains(point) {
                 return index
             }
@@ -181,8 +197,8 @@ public class InlineToolbar: NSView {
             self.clickedIndex = clickedIndex
             TooltipManager.shared.hideTooltip()
 
-            Swift.print("Clicked", InlineToolbar.commands[clickedIndex])
-            onCommand?(InlineToolbar.commands[clickedIndex])
+            Swift.print("Clicked", commands[clickedIndex])
+            onCommand?(commands[clickedIndex])
         }
     }
 
@@ -214,6 +230,15 @@ public class InlineToolbar: NSView {
     // MARK: Public
 
     public var onCommand: ((Command) -> Void)?
+
+    public var replaceCommandLabel: String = "" {
+        didSet {
+            if oldValue != replaceCommandLabel {
+                invalidateIntrinsicContentSize()
+                update()
+            }
+        }
+    }
 
     public var isBoldEnabled: Bool = false {
         didSet {
@@ -267,7 +292,9 @@ public class InlineToolbar: NSView {
                 if let index = hoveredIndex, clickedIndex != hoveredIndex {
                     let rect = buttonRects[index]
                     let midpoint = NSPoint(x: rect.midX, y: rect.maxY + 4)
-                    switch InlineToolbar.commands[index] {
+                    switch commands[index] {
+                    case .replace:
+                        showToolTip(string: "**Replace with...**", at: midpoint)
                     case .bold:
                         showToolTip(string: "**Bold**\n⌘+B", at: midpoint)
                     case .italic:
@@ -298,7 +325,7 @@ public class InlineToolbar: NSView {
     }
 
     public override var intrinsicContentSize: NSSize {
-        return NSSize(width: InlineToolbar.commands.map { $0.width }.reduce(0, +), height: InlineToolbar.height)
+        return NSSize(width: commands.map { $0.width }.reduce(0, +), height: InlineToolbar.height)
     }
 
     // MARK: Drawing
@@ -307,7 +334,7 @@ public class InlineToolbar: NSView {
         var result: [NSRect] = []
 
         var x: CGFloat = 0
-        for command in InlineToolbar.commands {
+        for command in commands {
             let size = NSSize(width: command.width, height: InlineToolbar.height)
             let boundingRect = NSRect(x: x, y: bounds.minY, width: size.width, height: size.height)
             result.append(boundingRect)
@@ -317,23 +344,26 @@ public class InlineToolbar: NSView {
         return result
     }
 
+    public func rect(for command: Command) -> NSRect? {
+        guard let index = commands.firstIndex(of: command) else { return nil }
+        return buttonRects[index]
+    }
+
     public override func draw(_ dirtyRect: NSRect) {
         NSBezierPath(roundedRect: bounds, xRadius: 4, yRadius: 4).setClip()
 
-//        Colors.background.setFill()
-//        dirtyRect.fill()
-
         var x: CGFloat = 0
-        for (index, command) in InlineToolbar.commands.enumerated() {
+        for (index, command) in commands.enumerated() {
             let size = NSSize(width: command.width, height: InlineToolbar.height)
             let boundingRect = NSRect(x: x, y: bounds.minY, width: size.width, height: size.height)
 
-            if index == hoveredIndex {
+            if command == .divider {
+                Colors.indentGuide.set()
+                boundingRect.fill()
+            } else if index == hoveredIndex {
                 Colors.divider.set()
                 boundingRect.fill()
             }
-
-//            boundingRect.fill(using: .sourceAtop)
 
             var selected = false
 
@@ -356,7 +386,9 @@ public class InlineToolbar: NSView {
         }
     }
 
-    public static var commands: [Command] = [.bold, .italic, .strikethrough, .code]
+    public var commands: [Command] {
+        return [.replace(replaceCommandLabel), .divider, .bold, .italic, .strikethrough, .code]
+    }
 
     public static var height: CGFloat = 28
 }

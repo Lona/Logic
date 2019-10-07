@@ -22,6 +22,18 @@ public class TextBlockView: AttributedTextView {
         case h6 = 6
         case paragraph = 0
 
+        var blockDescription: String {
+            switch self {
+            case .paragraph: return "Text"
+            case .h6: return "Heading 6"
+            case .h5: return "Heading 5"
+            case .h4: return "Heading 4"
+            case .h3: return "Heading 3"
+            case .h2: return "Heading 2"
+            case .h1: return "Heading 1"
+            }
+        }
+
         var fontSize: CGFloat {
             switch self {
             case .paragraph: return 16
@@ -205,6 +217,8 @@ public class TextBlockView: AttributedTextView {
 
     public var onFocus: (() -> Void)?
 
+    public var onOpenReplacementPalette: ((NSRect) -> Void)?
+
     public var onRequestCreateEditor: ((NSAttributedString) -> Void)?
 
     public var onRequestDeleteEditor: (() -> Void)?
@@ -261,6 +275,7 @@ public class TextBlockView: AttributedTextView {
         InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
         InlineToolbarWindow.shared.isCodeEnabled = traits.contains(.code)
         InlineToolbarWindow.shared.isStrikethroughEnabled = traits.contains(.strikethrough)
+        InlineToolbarWindow.shared.replaceCommandLabel = sizeLevel.blockDescription
     }
 
     private func updateToolbar(for range: NSRange) {
@@ -279,6 +294,11 @@ public class TextBlockView: AttributedTextView {
             }
 
             switch command {
+            case .replace:
+                if let rect = InlineToolbarWindow.shared.screenRect(for: command) {
+                    self.onOpenReplacementPalette?(rect)
+                }
+                return
             case .bold:
                 update(trait: .bold)
                 self.onChangeTextValue?(mutable)

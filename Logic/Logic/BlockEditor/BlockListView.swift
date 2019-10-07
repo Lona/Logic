@@ -543,6 +543,83 @@ public class BlockListView: NSBox {
         return suggestionWindow
     }()
 
+    func hideReplaceWithTextMenu() {
+        let subwindow = BlockListView.replaceWithTextMenu
+
+        subwindow.orderOut(nil)
+    }
+
+    func showReplaceWithTextMenu(rect: NSRect) {
+        guard let window = window else { return }
+
+        guard case let .item(line, _) = selection else { return }
+
+        let subwindow = BlockListView.replaceWithTextMenu
+
+        window.addChildWindow(subwindow, ordered: .above)
+        window.makeMain()
+
+        subwindow.anchorTo(rect: rect, verticalOffset: 4)
+
+        let hide: () -> Void = { [unowned self] in
+            self.hideReplaceWithTextMenu()
+            self.hideInlineToolbarWindow()
+        }
+
+        subwindow.onRequestHide = hide
+        subwindow.onPressEscapeKey = hide
+
+        subwindow.onSubmit = { [unowned self] index in
+            let newBlock = BlockListView.replaceMenuSuggestionItems[index].1
+            let oldBlock = self.blocks[line]
+
+            switch (newBlock.content, oldBlock.content) {
+            case (.text(_, let newSizeLevel), .text(let textValue, _)):
+
+                // TODO: Why aren't inline attributes preserved?
+                let replacementBlock: EditableBlock = .init(id: oldBlock.id, content: .text(newSizeLevel.apply(to: textValue), newSizeLevel))
+
+                let clone = self.blocks.replacing(elementAt: line, with: replacementBlock)
+
+                let ok = self.handleChangeBlocks(clone)
+
+                if ok {
+                    self.focus(id: oldBlock.id)
+                }
+            default:
+                return
+            }
+
+            hide()
+        }
+    }
+
+    public static var replaceMenuSuggestionItems: [(SuggestionListItem, EditableBlock)] = [
+        (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph))),
+        (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
+        (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
+        (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
+    ]
+
+    public static var replaceWithTextMenu: SuggestionWindow = {
+        let subwindow = SuggestionWindow()
+
+        subwindow.showsSearchBar = false
+        subwindow.showsSuggestionDetails = false
+
+        let suggestionItems: [SuggestionListItem] = replaceMenuSuggestionItems.map { $0.0 }
+        let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
+
+        subwindow.defaultWindowSize = .init(
+            width: 260,
+            height: min(suggestionListHeight + OverlayWindow.shadowViewMargin * 2, 400)
+        )
+
+        subwindow.suggestionItems = suggestionItems
+
+        return subwindow
+    }()
+
     public static var linkEditor: SuggestionWindow = {
         let subwindow = SuggestionWindow()
 
@@ -669,6 +746,7 @@ public class BlockListView: NSBox {
     public override func mouseDown(with event: NSEvent) {
         hideCommandPalette()
         hideInlineToolbarWindow()
+        hideReplaceWithTextMenu()
         hideLinkEditor()
 
         trackMouse(startingWith: event)
@@ -1054,8 +1132,10 @@ extension BlockListView: NSTableViewDelegate {
                 if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? TextBlockView {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
+                        self.hideReplaceWithTextMenu()
                     } else {
                         self.hideInlineToolbarWindow()
+                        self.hideReplaceWithTextMenu()
                     }
                 }
             }
@@ -1170,6 +1250,10 @@ extension BlockListView: NSTableViewDelegate {
                 if self.handleChangeBlocks(clone) {
                     self.focus(id: nextBlock.id)
                 }
+            }
+
+            view.onOpenReplacementPalette = { [unowned self] rect in
+                self.showReplaceWithTextMenu(rect: rect)
             }
 
             view.onRequestDeleteEditor = { [unowned self] in
@@ -1315,50 +1399,32 @@ extension BlockListView: NSTableViewDelegate {
         }
     }
 
+    enum Suggestion {
+        static var documentationSectionHeader = SuggestionListItem.sectionHeader("DOCUMENTATION")
+        static var tokensSectionHeader = SuggestionListItem.sectionHeader("TOKENS")
+
+        static var text = SuggestionListItem.row("Text", "Write plain text", false, nil, MenuThumbnailImage.paragraph)
+        static var heading1 = SuggestionListItem.row("Heading 1", "Large section heading", false, nil, MenuThumbnailImage.h1)
+        static var heading2 = SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, MenuThumbnailImage.h2)
+        static var heading3 = SuggestionListItem.row("Heading 3", "Small section heading", false, nil, MenuThumbnailImage.h3)
+        static var divider = SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider)
+        static var image = SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image)
+    }
+
     func showCommandPalette(line: Int, query: String, rect: NSRect) {
         guard let window = self.window else { return }
-
-        func image(named name: String) -> NSImage? {
-            let bundle = BundleLocator.getBundle()
-            guard let url = bundle.url(forResource: name, withExtension: "png") else { return nil }
-            return NSImage(byReferencing: url)
-        }
 
         BlockListView.commandPaletteVisible = true
 
         let menuItems: [(SuggestionListItem, EditableBlock)] = [
-            (
-                SuggestionListItem.sectionHeader("DOCUMENTATION"),
-                EditableBlock.makeDefaultEmptyBlock()
-            ),
-            (
-                SuggestionListItem.row("Text", "Write plain text", false, nil, MenuThumbnailImage.paragraph),
-                EditableBlock(id: UUID(), content: .text(.init(), .paragraph))
-            ),
-            (
-                SuggestionListItem.row("Heading 1", "Large section heading", false, nil, MenuThumbnailImage.h1),
-                EditableBlock(id: UUID(), content: .text(.init(), .h1))
-            ),
-            (
-                SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, MenuThumbnailImage.h2),
-                EditableBlock(id: UUID(), content: .text(.init(), .h2))
-            ),
-            (
-                SuggestionListItem.row("Heading 3", "Small section heading", false, nil, MenuThumbnailImage.h3),
-                EditableBlock(id: UUID(), content: .text(.init(), .h3))
-            ),
-            (
-                SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider),
-                EditableBlock(id: UUID(), content: .divider)
-            ),
-            (
-                SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image),
-                EditableBlock(id: UUID(), content: .image(nil))
-            ),
-            (
-                SuggestionListItem.sectionHeader("TOKENS"),
-                EditableBlock.makeDefaultEmptyBlock()
-            ),
+            (Suggestion.documentationSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
+            (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph))),
+            (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
+            (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
+            (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
+            (Suggestion.divider, EditableBlock(id: UUID(), content: .divider)),
+            (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil))),
+            (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
             (
                 SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
                 EditableBlock(

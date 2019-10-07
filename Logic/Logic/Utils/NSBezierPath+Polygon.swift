@@ -9,12 +9,20 @@
 import AppKit
 
 extension NSBezierPath {
-    convenience init(downwardCaretWithin rect: CGRect) {
+
+    enum CaretDirection {
+        case up, down
+    }
+
+    convenience init(caretWithin rect: CGRect, pointing: CaretDirection) {
         self.init()
 
-        let start = CGPoint(x: rect.minX, y: rect.minY)
-        let middle = CGPoint(x: rect.midX, y: rect.maxY)
-        let end = CGPoint(x: rect.maxX, y: rect.minY)
+        let y1 = pointing == .up ? rect.minY : rect.maxY
+        let y2 = pointing == .up ? rect.maxY : rect.minY
+
+        let start = CGPoint(x: rect.minX, y: y1)
+        let middle = CGPoint(x: rect.midX, y: y2)
+        let end = CGPoint(x: rect.maxX, y: y1)
 
         move(to: start)
         line(to: middle)

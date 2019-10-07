@@ -50,13 +50,19 @@ public class EditableBlock: Equatable {
         case .image:
             let view = ImageBlock()
 
-            view.image = NSImage()
+            view.image = EditableBlock.placeholderImage
             view.imageWidth = 100
             view.imageHeight = 100
 
             return view
         }
     }
+
+    static var placeholderImage: NSImage = {
+        let image = NSImage()
+        image.size = .init(width: 100, height: 100)
+        return image
+    }()
 
     private func configure(view: NSView) {
         switch self.content {
@@ -75,7 +81,7 @@ public class EditableBlock: Equatable {
             if let url = url, let image = EditableBlock.fetchImage(url) {
                 view.image = image
             } else {
-                view.image = NSImage()
+                view.image = EditableBlock.placeholderImage
             }
         }
     }

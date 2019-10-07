@@ -30,6 +30,11 @@ public class InlineToolbarWindow: OverlayWindow {
         set { toolbarView.onCommand = newValue }
     }
 
+    public var replaceCommandLabel: String {
+        get { return toolbarView.replaceCommandLabel }
+        set { toolbarView.replaceCommandLabel = newValue }
+    }
+
     public var isBoldEnabled: Bool {
         get { return toolbarView.isBoldEnabled }
         set { toolbarView.isBoldEnabled = newValue }
@@ -51,6 +56,13 @@ public class InlineToolbarWindow: OverlayWindow {
     }
 
     public var onSubmit: ((Int) -> Void)?
+
+    public func screenRect(for command: InlineToolbar.Command) -> NSRect? {
+        guard let rect = toolbarView.rect(for: command) else { return nil }
+        let windowRect = toolbarView.convert(rect, to: nil)
+        let screenRect = convertToScreen(windowRect)
+        return screenRect
+    }
 
     // MARK: Overrides
 
