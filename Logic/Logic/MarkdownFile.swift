@@ -50,7 +50,7 @@ public enum MarkdownFile {
             return nil
         }
 
-        guard let markdownStringData = LogicFile.convert(convertedData, kind: .document, to: .mdx, from: .json) else {
+        guard let markdownStringData = LogicFile.convert(convertedData, kind: .document, to: .source, from: .json) else {
             Swift.print("Failed to convert MDX JSON to markdown string")
             return nil
         }
@@ -61,7 +61,7 @@ public enum MarkdownFile {
     // MARK: Decoding markdown
 
     public static func makeBlocks(_ markdownData: Data) -> [BlockEditor.Block]? {
-        guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .mdx),
+        guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .source),
             let mdxRoot = try? JSONDecoder().decode(MDXRoot.self, from: jsonData) else {
             Swift.print("Failed to convert Markdown file Data to AST")
             return nil

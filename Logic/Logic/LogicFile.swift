@@ -10,7 +10,9 @@ import Foundation
 
 public enum LogicFile {
     public enum DataSerializationFormat: String {
-        case xml, json, mdx
+        case xml
+        case json
+        case source
     }
 
     public static func convert(_ contents: String, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat, from sourceFormat: DataSerializationFormat? = nil) -> String? {
