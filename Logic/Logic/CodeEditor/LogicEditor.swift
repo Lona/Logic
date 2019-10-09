@@ -151,7 +151,7 @@ open class LogicEditor: NSBox {
 
     public var placeholderText: String? = nil
 
-    public var focusControl: FocusControl = .manual
+    public var focusControl: FocusControl = .automatic
 
     public var showsFilterBar: Bool = false
 
