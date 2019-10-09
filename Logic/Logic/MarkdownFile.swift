@@ -45,6 +45,10 @@ public enum MarkdownFile {
     public static func makeMarkdownData(_ blocks: [BlockEditor.Block]) -> Data? {
         let mdxRoot = makeMarkdownRoot(blocks)
 
+        return makeMarkdownData(mdxRoot)
+    }
+
+    public static func makeMarkdownData(_ mdxRoot: MDXRoot) -> Data? {
         guard let convertedData = try? JSONEncoder().encode(mdxRoot) else {
             Swift.print("Failed to convert MDXRoot to Data")
             return nil
