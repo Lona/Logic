@@ -24,13 +24,7 @@ public enum MarkdownFile {
                 return .paragraph(.init(children: textValue.markdownInlineBlock()))
             }
         case .tokens(let rootNode):
-            guard case .declaration(let declaration) = rootNode else {
-                Swift.print("ENCODING: Tokens block uses incorrect top-level node")
-                fatalError("FAILED TO ENCODE TOKENS")
-            }
-            let rootNode: LGCSyntaxNode = .topLevelDeclarations(.init(id: UUID(), declarations: .init([declaration])))
-
-            return .code(.init(lang: "tokens", value: "", parsed: rootNode))
+            return .code(MDXCode(rootNode))
         case .divider:
             return .thematicBreak(.init())
         case .image(let url):
@@ -64,10 +58,19 @@ public enum MarkdownFile {
 
     // MARK: Decoding markdown
 
-    public static func makeBlocks(_ markdownData: Data) -> [BlockEditor.Block]? {
+    public static func makeMDXRoot(_ markdownData: Data) -> MDXRoot? {
         guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .source),
             let mdxRoot = try? JSONDecoder().decode(MDXRoot.self, from: jsonData) else {
-            Swift.print("Failed to convert Markdown file Data to AST")
+            Swift.print("Failed to convert Markdown file Data to MDXRoot")
+            return nil
+        }
+
+        return mdxRoot
+    }
+
+    public static func makeBlocks(_ markdownData: Data) -> [BlockEditor.Block]? {
+        guard let mdxRoot = makeMDXRoot(markdownData) else {
+            Swift.print("Failed to convert Markdown file Data to BlockEditor blocks")
             return nil
         }
 
@@ -106,19 +109,54 @@ public enum MarkdownFile {
                 let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
                 return BlockEditor.Block(.text(attributedString, .paragraph))
             case .code(let value):
-                guard let rootNode = value.parsed else {
-                    Swift.print("Code block didn't contain parsed tokens", value)
-                    return nil
-                }
-
-                guard case .topLevelDeclarations(let topLevelDeclarations) = rootNode else {
-                    Swift.print("DECODING: Tokens block uses incorrect top-level node", value)
-                    return nil
-                }
-
-                return BlockEditor.Block(.tokens(.declaration(topLevelDeclarations.declarations.first!)))
+                return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)))
             }
         }
         return blocks
+    }
+}
+
+extension MDXRoot {
+    public func program() -> LGCProgram {
+        let declarations: [[LGCDeclaration]] = children.compactMap { blockNode in
+            switch blockNode {
+            case .code(let value) where value.lang == "tokens":
+                return value.declarations()
+            default:
+                return nil
+            }
+        }
+
+        return LGCProgram(declarations: Array(declarations.joined()))
+    }
+}
+
+extension MDXCode {
+    public init(_ rootNode: LGCSyntaxNode) {
+        switch rootNode {
+        case .declaration(let value):
+            let rootNode: LGCSyntaxNode = .topLevelDeclarations(.init(id: UUID(), declarations: .init([value])))
+            self = .init(lang: "tokens", value: "", parsed: rootNode)
+        default:
+            Swift.print("MDXCode created with incorrect top-level tokens node")
+            fatalError("FAILED TO ENCODE TOKENS")
+        }
+    }
+
+    public func declarations() -> [LGCDeclaration]? {
+        guard let rootNode = parsed else {
+            Swift.print("MDXCode block didn't contain parsed tokens", value)
+            return nil
+        }
+
+        switch rootNode {
+        case .declaration(let value):
+            return [value]
+        case .topLevelDeclarations(let value):
+            return value.declarations.map { $0 }
+        default:
+            Swift.print("MDXCode block uses incorrect top-level node (should be Declaration or TopLevelDeclarations)", value)
+            return nil
+        }
     }
 }
