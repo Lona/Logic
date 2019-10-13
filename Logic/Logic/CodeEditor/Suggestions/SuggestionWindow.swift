@@ -9,14 +9,73 @@
 import AppKit
 
 public class SuggestionWindow: NSWindow {
-    static var shared = SuggestionWindow()
+
+    public struct Style: Equatable {
+        var showsSearchBar: Bool = true
+        var showsFilterBar: Bool = false
+        var showsSuggestionArea: Bool = true
+        var showsSuggestionList = true
+        var showsSuggestionDetails = true
+        var suggestionListWidth: CGFloat = 200
+        var defaultContentWidth: CGFloat = 586
+
+        public static var `default` = Style()
+
+        public static var textInput: Style = {
+            var style = Style()
+            style.showsSearchBar = true
+            style.showsFilterBar = false
+            style.showsSuggestionArea = false
+            style.defaultContentWidth = 376
+            return style
+        }()
+
+        public static var detail: Style = {
+            var style = Style()
+            style.showsSearchBar = true
+            style.showsFilterBar = false
+            style.showsSuggestionArea = true
+            style.showsSuggestionList = false
+            style.showsSuggestionDetails = true
+            style.defaultContentWidth = 376
+            return style
+        }()
+
+        public static var contextMenu: Style = {
+            var style = Style()
+            style.showsSearchBar = true
+            style.showsFilterBar = false
+            style.showsSuggestionArea = true
+            style.showsSuggestionList = true
+            style.showsSuggestionDetails = false
+            style.defaultContentWidth = 256
+            return style
+        }()
+    }
+
+    public static var contextMenu: SuggestionWindow = {
+        let window = SuggestionWindow(style: .contextMenu)
+        window.showsSearchBar = false
+        window.onRequestHide = {
+            window.orderOut(nil)
+        }
+        return window
+    }()
+
+    public static var shared = SuggestionWindow()
 
     convenience init() {
+        self.init(style: .default)
+    }
+
+    convenience init(style: Style) {
         self.init(
             contentRect: NSRect(origin: .zero, size: .zero),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false)
+
+        self.style = style
 
         let window = self
         window.backgroundColor = NSColor.clear
@@ -46,11 +105,6 @@ public class SuggestionWindow: NSWindow {
         suggestionView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor).isActive = true
         suggestionView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor).isActive = true
 
-        suggestionView.showsSearchBar = true
-        suggestionView.showsSuggestionList = true
-        suggestionView.showsSuggestionArea = true
-        suggestionView.suggestionListWidth = 200
-        suggestionView.showsSuggestionDetails = true
         suggestionView.searchInput.isBordered = false
         suggestionView.searchInput.focusRingType = .none
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
@@ -122,6 +176,14 @@ public class SuggestionWindow: NSWindow {
             self.onChangeSuggestionFilter?(.all)
         }
 
+        suggestionView.onPressOverflowMenu = { [unowned self] in
+            let rect = self.suggestionView.overflowMenuContainerView.bounds
+            let windowRect = self.suggestionView.convert(rect, to: nil)
+            let screenRect = self.convertToScreen(windowRect)
+
+            self.onPressOverflowMenu?(screenRect)
+        }
+
         window.contentView = view
 
         let notificationTokens = [
@@ -162,9 +224,54 @@ public class SuggestionWindow: NSWindow {
 
     // MARK: Public
 
-    public var defaultWindowSize = CGSize(width: 610, height: 380)
+    public var style: Style = Style() {
+        didSet {
+            suggestionView.showsSearchBar = style.showsSearchBar
+            suggestionView.showsFilterBar = style.showsFilterBar
+            suggestionView.showsSuggestionArea = style.showsSuggestionArea
+            suggestionView.showsSuggestionList = style.showsSuggestionList
+            suggestionView.showsSuggestionDetails = style.showsSuggestionDetails
+            suggestionView.suggestionListWidth = style.suggestionListWidth
+        }
+    }
 
-    public var allowedShrinkingSize = CGSize(width: 180, height: 200)
+    private var computedHeight: CGFloat {
+        var height: CGFloat = 0
+
+        if showsSearchBar {
+            height += 32
+
+            if showsSuggestionArea {
+                height += 1 // Divider
+            }
+        }
+
+        if showsSuggestionArea {
+            if suggestionView.showsSuggestionDetails {
+                height = 380
+            } else if suggestionView.showsSuggestionList {
+                height += min(suggestionItems.map { $0.height }.reduce(0, +), 400)
+            }
+        }
+
+        if showsFilterBar {
+            height += 1 // Divider
+            height += 16
+        }
+
+        return height
+    }
+
+    public var defaultContentWidth: CGFloat {
+        get { return style.defaultContentWidth }
+        set { style.defaultContentWidth = newValue }
+    }
+
+    public var defaultContentSize: NSSize {
+        get { return .init(width: style.defaultContentWidth, height: computedHeight) }
+    }
+
+    public var allowedShrinkingSize = NSSize(width: 180, height: 200)
 
     public var onRequestHide: (() -> Void)?
 
@@ -194,6 +301,8 @@ public class SuggestionWindow: NSWindow {
         set { suggestionView.onPressShiftTabKey = newValue }
     }
 
+    public var onPressOverflowMenu: ((NSRect) -> Void)?
+
     public var suggestionItems: [SuggestionListItem] {
         get { return suggestionView.suggestionList.items }
         set { suggestionView.suggestionList.items = newValue }
@@ -215,23 +324,28 @@ public class SuggestionWindow: NSWindow {
     }
 
     public var showsSearchBar: Bool {
-        get { return suggestionView.showsSearchBar }
-        set { suggestionView.showsSearchBar = newValue }
+        get { return style.showsSearchBar }
+        set { style.showsSearchBar = newValue }
     }
 
     public var showsSuggestionDetails: Bool {
-        get { return suggestionView.showsSuggestionDetails }
-        set { suggestionView.showsSuggestionDetails = newValue }
+        get { return style.showsSuggestionDetails }
+        set { style.showsSuggestionDetails = newValue }
     }
 
     public var showsSuggestionList: Bool {
-        get { return suggestionView.showsSuggestionList }
-        set { suggestionView.showsSuggestionList = newValue }
+        get { return style.showsSuggestionList }
+        set { style.showsSuggestionList = newValue }
     }
 
     public var showsSuggestionArea: Bool {
         get { return suggestionView.showsSuggestionArea }
         set { suggestionView.showsSuggestionArea = newValue }
+    }
+
+    public var showsOverflowMenu: Bool {
+        get { return suggestionView.showsOverflowMenu }
+        set { suggestionView.showsOverflowMenu = newValue }
     }
 
     // MARK: Filter bar
@@ -244,8 +358,8 @@ public class SuggestionWindow: NSWindow {
     public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
 
     public var showsFilterBar: Bool {
-        get { return suggestionView.showsFilterBar }
-        set { suggestionView.showsFilterBar = newValue }
+        get { return style.showsFilterBar }
+        set { style.showsFilterBar = newValue }
     }
 
     // MARK: Dropdown
@@ -330,7 +444,7 @@ public class SuggestionWindow: NSWindow {
         }
 
         if !showsSuggestionDetails {
-            suggestionView.suggestionListWidth = defaultContentViewSize.width
+            style.suggestionListWidth = defaultContentViewSize.width
         }
 
         setContentSize(contentRect.size)
@@ -362,7 +476,7 @@ public class SuggestionWindow: NSWindow {
         }
 
         if !showsSuggestionDetails {
-            suggestionView.suggestionListWidth = defaultContentViewSize.width
+            style.suggestionListWidth = defaultContentViewSize.width
         }
 
         setContentSize(contentRect.size)
@@ -370,14 +484,22 @@ public class SuggestionWindow: NSWindow {
     }
 
     public var defaultContentViewSize: CGSize {
+        return defaultContentSize
+    }
+
+    public var defaultWindowSize: CGSize {
         return CGSize(
-            width: defaultWindowSize.width - SuggestionWindow.shadowViewMargin * 2,
-            height: defaultWindowSize.height - SuggestionWindow.shadowViewMargin * 2)
+            width: defaultContentSize.width + SuggestionWindow.shadowViewMargin * 2,
+            height: defaultContentSize.height + SuggestionWindow.shadowViewMargin * 2)
     }
 
     private static var shadowViewMargin: CGFloat = 12
 
     // MARK: Overrides
+
+    public override var canBecomeMain: Bool {
+        return true
+    }
 
     public override var canBecomeKey: Bool {
         return showsSearchBar

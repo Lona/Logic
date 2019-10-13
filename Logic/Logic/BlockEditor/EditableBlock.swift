@@ -41,7 +41,6 @@ public class EditableBlock: Equatable {
             style.textMargin = .init(width: 5, height: 6)
             view.canvasStyle = style
 
-            view.showsSearchBar = true
             view.scrollsVertically = false
 
             return view

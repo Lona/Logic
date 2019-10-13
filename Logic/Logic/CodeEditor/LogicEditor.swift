@@ -137,15 +137,9 @@ open class LogicEditor: NSBox {
 
     public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
 
-    public var defaultSuggestionWindowSize = CGSize(width: 610, height: 380)
+    public var defaultSuggestionWindowSize = CGSize(width: 610 - 24, height: 380 - 24)
 
-    public var defaultActionWindowWidth: CGFloat = 280
-
-    public var defaultDetailWindowWidth: CGFloat = 400
-
-    public var showsSearchBar: Bool = true
-
-    public var showsSuggestionDetails: Bool = true
+    public var defaultDetailWindowWidth: CGFloat = 400 - 24
 
     public var showsDropdown: Bool = false
 
@@ -566,7 +560,7 @@ extension LogicEditor {
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
-        subwindow.defaultWindowSize = .init(width: 200, height: min(suggestionListHeight + 32 + 25, 400))
+        subwindow.defaultContentWidth = 200
         subwindow.suggestionView.showsSuggestionDetails = false
         subwindow.suggestionView.suggestionListWidth = 200
         subwindow.suggestionText = ""
@@ -687,14 +681,13 @@ extension LogicEditor {
             return
         }
 
-        let suggestionItems = menu.map { $0.row }
-
-        subwindow.defaultWindowSize = .init(width: defaultActionWindowWidth, height: suggestionListHeight(for: suggestionItems))
-        subwindow.suggestionView.showsSuggestionDetails = false
+        subwindow.style = .contextMenu
         subwindow.suggestionText = ""
 
-        subwindow.anchorTo(rect: rect, verticalOffset: 2)
+        let suggestionItems = menu.map { $0.row }
+        
         subwindow.suggestionItems = suggestionItems
+        subwindow.anchorTo(rect: rect, verticalOffset: 2)
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
             return suggestionItems.enumerated().filter { offset, item in
@@ -954,34 +947,20 @@ extension LogicEditor {
         switch syntaxNode {
         case .pattern:
             childWindow.placeholderText = "Type a new name and press Enter"
-            childWindow.defaultWindowSize = .init(width: defaultDetailWindowWidth, height: 32 + OverlayWindow.shadowViewMargin * 2)
-            childWindow.showsSuggestionArea = false
-            childWindow.showsFilterBar = false
+            childWindow.style = .textInput
         case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
             childWindow.placeholderText = "Type or pick a new value and press Enter"
-            childWindow.defaultWindowSize = .init(width: defaultDetailWindowWidth, height: defaultSuggestionWindowSize.height)
-            childWindow.showsSuggestionArea = true
-            childWindow.showsSuggestionList = false
-            childWindow.showsSuggestionDetails = true
+            childWindow.style = .detail
         case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
             childWindow.placeholderText = "Filter variables"
-            childWindow.defaultWindowSize = .init(width: defaultActionWindowWidth, height: defaultSuggestionWindowSize.height)
-            childWindow.showsSuggestionArea = true
-            childWindow.showsSuggestionList = true
-            childWindow.suggestionView.suggestionListWidth = 200
-            childWindow.showsSuggestionDetails = false
+            childWindow.style = .contextMenu
         default:
             childWindow.placeholderText = placeholderText
-            childWindow.defaultWindowSize = defaultSuggestionWindowSize
-            childWindow.showsSuggestionArea = true
-            childWindow.showsSuggestionList = true
-            childWindow.suggestionView.suggestionListWidth = 200
-            childWindow.showsSuggestionDetails = showsSuggestionDetails
+            childWindow.style = .default
             childWindow.showsFilterBar = showsFilterBar
+            childWindow.showsDropdown = showsDropdown
         }
 
-        childWindow.showsDropdown = showsDropdown
-        childWindow.showsSearchBar = showsSearchBar
         childWindow.onRequestHide = hideSuggestionWindow
         childWindow.selectedIndex = initialIndex
         childWindow.detailView = makeDetailView(

@@ -131,7 +131,25 @@ extension NSMutableAttributedString {
 }
 
 extension NSAttributedString {
-//    public func att
+    public func addingAttribute(_ name: NSAttributedString.Key, value: Any) -> NSMutableAttributedString {
+        return addingAttribute(name, value: value, range: NSRange(location: 0, length: self.length))
+    }
+
+    public func addingAttribute(_ name: NSAttributedString.Key, value: Any, range: NSRange) -> NSMutableAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: self)
+        mutable.addAttribute(name, value: value, range: range)
+        return mutable
+    }
+
+    public func removingAttribute(_ name: NSAttributedString.Key) -> NSMutableAttributedString {
+        return removingAttribute(name, range: NSRange(location: 0, length: self.length))
+    }
+
+    public func removingAttribute(_ name: NSAttributedString.Key, range: NSRange) -> NSMutableAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: self)
+        mutable.removeAttribute(name, range: range)
+        return mutable
+    }
 
     public func markdownString() -> String {
         let characterTraits: [[InlineTextTrait]] = (0..<self.length).map { index in

@@ -13,6 +13,7 @@
       "name" : "Default",
       "params" : {
         "showsFilterBar" : true,
+        "showsOverflowMenu" : true,
         "suggestionFilter" : null
       }
     },
@@ -21,6 +22,7 @@
       "name" : "name",
       "params" : {
         "onSelectIndex" : null,
+        "showsDropdown" : false,
         "showsSuggestionDetails" : false,
         "suggestionListWidth" : 300
       }
@@ -48,6 +50,18 @@
       "content" : [
         "parameters",
         "showsSearchBar"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "OverflowMenuContainer",
+        "visible"
+      ],
+      "content" : [
+        "parameters",
+        "showsOverflowMenu"
       ],
       "type" : "AssignExpr"
     },
@@ -542,6 +556,18 @@
     {
       "assignee" : [
         "layers",
+        "OverflowMenuButton",
+        "onPressButton"
+      ],
+      "content" : [
+        "parameters",
+        "onPressOverflowMenu"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "Suggestion List Container",
         "width"
       ],
@@ -870,6 +896,20 @@
       },
       "name" : "showsSuggestionList",
       "type" : "Boolean"
+    },
+    {
+      "defaultValue" : {
+        "data" : false,
+        "type" : "Boolean"
+      },
+      "name" : "showsOverflowMenu",
+      "type" : "Boolean"
+    },
+    {
+      "name" : "onPressOverflowMenu",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {
@@ -917,6 +957,31 @@
               "flexDirection" : "row",
               "paddingLeft" : 5,
               "paddingRight" : 5
+            },
+            "type" : "Lona:View"
+          },
+          {
+            "children" : [
+              {
+                "id" : "OverflowMenuButton",
+                "params" : {
+
+                },
+                "type" : "OverflowMenuButton"
+              }
+            ],
+            "id" : "OverflowMenuContainer",
+            "metadata" : {
+              "accessLevel" : {
+                "macos" : "internal"
+              }
+            },
+            "params" : {
+              "alignItems" : "center",
+              "alignSelf" : "stretch",
+              "flexDirection" : "row",
+              "paddingLeft" : 5,
+              "paddingRight" : 10
             },
             "type" : "Lona:View"
           }

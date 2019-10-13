@@ -115,7 +115,9 @@ extension MDXInlineNode {
             return .emphasis(.init(children: children))
         case .strong:
             return .strong(.init(children: children))
-        default:
+        case .link(let value):
+            return .link(.init(children: children, url: value.url))
+        case .text, .inlineCode:
             fatalError("Cannot set children for \(self)")
         }
     }
@@ -126,7 +128,7 @@ extension MDXInlineNode {
             return .inlineCode(.init(value: value))
         case .text:
             return .text(.init(value: value))
-        default:
+        case .emphasis, .strong, .link:
             fatalError("Cannot set value for \(self)")
         }
     }
@@ -137,7 +139,9 @@ extension MDXInlineNode {
             return value.children
         case .strong(let value):
             return value.children
-        default:
+        case .link(let value):
+            return value.children
+        case .text, .inlineCode:
             return nil
         }
     }

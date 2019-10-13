@@ -610,13 +610,8 @@ public class BlockListView: NSBox {
         subwindow.showsSuggestionDetails = false
 
         let suggestionItems: [SuggestionListItem] = replaceMenuSuggestionItems.map { $0.0 }
-        let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
-        subwindow.defaultWindowSize = .init(
-            width: 260,
-            height: min(suggestionListHeight + OverlayWindow.shadowViewMargin * 2, 400)
-        )
-
+        subwindow.defaultContentWidth = 236
         subwindow.suggestionItems = suggestionItems
 
         return subwindow
@@ -625,12 +620,8 @@ public class BlockListView: NSBox {
     public static var linkEditor: SuggestionWindow = {
         let subwindow = SuggestionWindow()
 
-        subwindow.showsSearchBar = true
-        subwindow.showsFilterBar = false
-        subwindow.showsSuggestionArea = false
+        subwindow.style = .textInput
         subwindow.placeholderText = "Paste a URL and press Enter"
-        subwindow.defaultWindowSize = .init(width: 400, height: 32 + OverlayWindow.shadowViewMargin * 2)
-
         subwindow.onChangeSuggestionText = { value in
             subwindow.suggestionText = value
         }
@@ -733,6 +724,13 @@ public class BlockListView: NSBox {
 //        }
 //    }
 
+    public func hideChildWindows() {
+        hideCommandPalette()
+        hideInlineToolbarWindow()
+        hideReplaceWithTextMenu()
+        hideLinkEditor()
+    }
+
     public override func hitTest(_ point: NSPoint) -> NSView? {
         if let scroller = scrollView.verticalScroller, let view = scroller.hitTest(point) {
             return view
@@ -746,10 +744,7 @@ public class BlockListView: NSBox {
     }
 
     public override func mouseDown(with event: NSEvent) {
-        hideCommandPalette()
-        hideInlineToolbarWindow()
-        hideReplaceWithTextMenu()
-        hideLinkEditor()
+        hideChildWindows()
 
         trackMouse(startingWith: event)
     }
@@ -979,8 +974,7 @@ public class BlockListView: NSBox {
     public func handleClick(mouseDownEvent: NSEvent, mouseUpEvent: NSEvent) {
         selection = .none
 
-        hideCommandPalette()
-        hideLinkEditor()
+        hideChildWindows()
 
         let point = convert(mouseUpEvent.locationInWindow, from: nil)
 
@@ -1286,21 +1280,60 @@ extension BlockListView: NSTableViewDelegate {
                     self.selection = .item(line, longestRange)
                 }
 
-                self.showLinkEditor(rect: rect, initialValue: link?.absoluteString ?? "")
+                let initialValue = link?.absoluteString ?? ""
+
+                BlockListView.linkEditor.showsOverflowMenu = !initialValue.isEmpty
+
+                BlockListView.linkEditor.onPressOverflowMenu = { rect in
+                    let items: [(SuggestionListItem, () -> Void)] = [
+                        (.row("Open link", nil, false, nil, nil), {
+                            _ = self.onClickLink?(initialValue)
+
+                            self.hideChildWindows()
+                        }),
+                        (.row("Unlink", nil, false, nil, nil), {
+                            guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                            let newTextValue = view.textValue.removingAttribute(.link, range: view.selectedRange())
+
+                            let id = UUID()
+                            let clone = self.blocks.replacing(
+                                elementAt: line,
+                                with: .init(id: id, content: .text(newTextValue, view.sizeLevel))
+                            )
+
+                            self.hideChildWindows()
+
+                            if self.handleChangeBlocks(clone) {
+                                self.focus(id: id)
+                            }
+                        })
+                    ]
+                    SuggestionWindow.contextMenu.suggestionItems = items.map { $0.0 }
+
+                    self.window?.addChildWindow(SuggestionWindow.contextMenu, ordered: .above)
+
+                    SuggestionWindow.contextMenu.anchorTo(rect: rect)
+                    SuggestionWindow.contextMenu.makeMain()
+
+                    SuggestionWindow.contextMenu.onSubmit = { index in
+                        items[index].1()
+                    }
+                }
+
+                self.showLinkEditor(rect: rect, initialValue: initialValue)
 
                 BlockListView.linkEditor.onPressEnter = { [unowned self] in
                     guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                     guard let url = NSURL(string: BlockListView.linkEditor.suggestionText) else { return }
 
-                    let mutable = NSMutableAttributedString(attributedString: view.textValue)
-
-                    mutable.addAttribute(.link, value: url, range: view.selectedRange())
+                    let newTextValue = view.textValue.addingAttribute(.link, value: url, range: view.selectedRange())
 
                     let id = UUID()
                     let clone = self.blocks.replacing(
                         elementAt: line,
-                        with: .init(id: id, content: .text(mutable, view.sizeLevel))
+                        with: .init(id: id, content: .text(newTextValue, view.sizeLevel))
                     )
 
                     self.hideLinkEditor()
@@ -1541,13 +1574,7 @@ extension BlockListView: NSTableViewDelegate {
 
         let suggestionItems: [SuggestionListItem] = menuItems.map { $0.0 }
 
-        let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
-
-        subwindow.defaultWindowSize = .init(
-            width: 260,
-            height: min(suggestionListHeight + OverlayWindow.shadowViewMargin * 2, 400)
-        )
-        subwindow.anchorTo(rect: rect, verticalOffset: 4)
+        subwindow.defaultContentWidth = 260 - 24
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
             return suggestionItems.enumerated().filter { offset, item in
@@ -1578,6 +1605,7 @@ extension BlockListView: NSTableViewDelegate {
             subwindow.selectedIndex = index
         }
 
+        subwindow.anchorTo(rect: rect, verticalOffset: 4)
         window.addChildWindow(subwindow, ordered: .above)
         window.makeMain()
 
