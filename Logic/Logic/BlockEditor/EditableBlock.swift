@@ -227,3 +227,29 @@ public enum EditableBlockContent: Equatable {
         }
     }
 }
+
+// MARK: - Sequence
+
+extension Sequence where Iterator.Element: EditableBlock {
+    public var topLevelDeclarations: LGCTopLevelDeclarations {
+        let nodes: [LGCSyntaxNode] = self.compactMap {
+            switch $0.content {
+            case .tokens(let rootNode):
+                return rootNode
+            default:
+                return nil
+            }
+        }
+
+        let declarations: [LGCDeclaration] = nodes.compactMap {
+            switch $0 {
+            case .declaration(let declaration):
+                return declaration
+            default:
+                return nil
+            }
+        }
+
+        return LGCTopLevelDeclarations(id: UUID(), declarations: .init(declarations))
+    }
+}

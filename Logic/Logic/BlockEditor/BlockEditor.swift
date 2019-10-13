@@ -57,6 +57,11 @@ public class BlockEditor: NSBox {
         set { blockListView.onChangeBlocks = newValue }
     }
 
+    public var onClickLink: ((String) -> Bool)? {
+        get { return blockListView.onClickLink }
+        set { blockListView.onClickLink = newValue }
+    }
+
     public var parameters: Parameters {
         didSet {
             if parameters != oldValue {
@@ -122,29 +127,5 @@ extension BlockEditor {
         public init() {
             self.init(Parameters())
         }
-    }
-}
-
-extension Sequence where Iterator.Element: EditableBlock {
-    public var topLevelDeclarations: LGCTopLevelDeclarations {
-        let nodes: [LGCSyntaxNode] = self.compactMap {
-            switch $0.content {
-            case .tokens(let rootNode):
-                return rootNode
-            default:
-                return nil
-            }
-        }
-
-        let declarations: [LGCDeclaration] = nodes.compactMap {
-            switch $0 {
-            case .declaration(let declaration):
-                return declaration
-            default:
-                return nil
-            }
-        }
-
-        return LGCTopLevelDeclarations(id: UUID(), declarations: .init(declarations))
     }
 }

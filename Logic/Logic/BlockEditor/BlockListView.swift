@@ -261,6 +261,8 @@ public class BlockListView: NSBox {
 
     public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
 
+    public var onClickLink: ((String) -> Bool)?
+
     // MARK: Private
 
     private var selection: BlockListSelection = .none {
@@ -991,7 +993,16 @@ public class BlockListView: NSBox {
             let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
 
             if let view = view as? TextBlockView {
-                let characterIndex = view.characterIndexForInsertion(at: convert(point, to: view))
+                let pointInView = convert(point, to: view)
+
+                if let linkInfo = view.linkRects.first(where: { info in info.rect.contains(pointInView) }) {
+                    if onClickLink?(linkInfo.url.absoluteString ?? "") == true {
+                        return
+                    }
+                }
+
+                let characterIndex = view.characterIndexForInsertion(at: pointInView)
+
                 selection = .item(line, NSRange(location: characterIndex, length: 0))
 
                 if view.acceptsFirstResponder {

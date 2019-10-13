@@ -332,7 +332,9 @@ public class InlineToolbar: NSView {
                         showToolTip(string: "**Strikethrough**\n⌘+Shift+S", at: midpoint)
                     case .code:
                         showToolTip(string: "**Code**\n⌘+E", at: midpoint)
-                    default:
+                    case .link:
+                        showToolTip(string: "**Add Link**\n⌘+K", at: midpoint)
+                    case .divider:
                         break
                     }
                 } else {

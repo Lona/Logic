@@ -224,6 +224,7 @@ public class TextBlockView: AttributedTextView {
 
     private func updateToolbar(for range: NSRange) {
         var traits: [InlineTextTrait] = .init(attributes: self.textValue.attributes(at: range.location, longestEffectiveRange: nil, in: range))
+
         self.updateSharedToolbarWindow(traits: traits)
 
         InlineToolbarWindow.shared.onCommand = { [unowned self] command in
@@ -264,7 +265,8 @@ public class TextBlockView: AttributedTextView {
                 break
             }
 
-            traits = .init(attributes: self.textValue.fontAttributes(in: range))
+            traits = .init(attributes: self.textValue.attributes(at: range.location, longestEffectiveRange: nil, in: range))
+            
             self.updateSharedToolbarWindow(traits: traits)
         }
     }
@@ -416,6 +418,25 @@ extension NSTextView {
         let glyph = manager.glyphIndex(for: point, in: container, fractionOfDistanceThroughGlyph: nil)
 
         return manager.characterIndexForGlyph(at: glyph)
+    }
+
+
+    public var linkRects: [(rect: NSRect, url: NSURL)] {
+        guard let container = textContainer, let manager = container.layoutManager else { return [] }
+
+        let textValue = attributedString()
+        var values: [(NSRect, NSURL)] = []
+
+        textValue.enumerateAttribute(.link, in: .init(location: 0, length: textValue.length), options: []) { (value, range, pointer) in
+            guard let link = value as? NSURL else { return }
+
+            let glyphRange = manager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+            let rect = manager.boundingRect(forGlyphRange: glyphRange, in: container)
+
+            values.append((rect, link))
+        }
+
+        return values
     }
 }
 

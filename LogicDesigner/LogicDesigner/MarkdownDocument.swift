@@ -225,6 +225,12 @@ class MarkdownDocument: NSDocument {
             return true
         }
 
+        blockEditor.onClickLink = { link in
+            guard let url = URL(string: link) else { return true }
+            NSWorkspace.shared.open(url)
+            return true
+        }
+
         containerView.translatesAutoresizingMaskIntoConstraints = false
         blockEditor.translatesAutoresizingMaskIntoConstraints = false
 
