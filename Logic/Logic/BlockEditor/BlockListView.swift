@@ -507,6 +507,11 @@ public class BlockListView: NSBox {
     private func plusButtonRect(for line: Int) -> CGRect {
         let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
 
+        if line >= blocks.count {
+            Swift.print("Bad state, plusButtonRect")
+            return .zero
+        }
+
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
@@ -520,6 +525,11 @@ public class BlockListView: NSBox {
 
     private func moreButtonRect(for line: Int) -> CGRect {
         let rowRect = convert(tableView.rect(ofRow: line), from: tableView)
+
+        if line >= blocks.count {
+            Swift.print("Bad state, moreButtonRect")
+            return .zero
+        }
 
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
