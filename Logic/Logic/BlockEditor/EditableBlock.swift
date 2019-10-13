@@ -28,7 +28,7 @@ public class EditableBlock: Equatable {
     private func makeView() -> NSView {
         switch self.content {
         case .text:
-            return TextBlockView()
+            return TextBlockContainerView()
         case .tokens(let syntaxNode):
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
@@ -66,7 +66,7 @@ public class EditableBlock: Equatable {
     private func configure(view: NSView) {
         switch self.content {
         case .text(let attributedString, let sizeLevel):
-            let view = view as! TextBlockView
+            let view = view as! TextBlockContainerView
             view.textValue = attributedString
             view.sizeLevel = sizeLevel
         case .tokens(let value):
@@ -113,10 +113,19 @@ public class EditableBlock: Equatable {
         return .init(.text(.init(), .paragraph))
     }
 
+
+    public func focus() {
+        if let view = view as? TextBlockContainerView {
+            view.focus()
+        } else if view.acceptsFirstResponder {
+            view.window?.makeFirstResponder(view)
+        }
+    }
+
     public func updateViewWidth(_ width: CGFloat) {
         switch content {
         case .text:
-            let view = self.view as! TextBlockView
+            let view = self.view as! TextBlockContainerView
             view.width = width
         case .image(let url):
             let view = self.view as! ImageBlock

@@ -8,10 +8,216 @@
 
 import Foundation
 
-private var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
-private var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: NSColor.placeholderTextColor)
+public class TextBlockContainerView: NSBox {
+
+    public override var isFlipped: Bool {
+        return true
+    }
+
+    // MARK: Lifecycle
+
+    public init() {
+        super.init(frame: .zero)
+
+        setUpViews()
+        setUpConstraints()
+
+        update()
+    }
+
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        setUpViews()
+        setUpConstraints()
+
+        update()
+    }
+
+    // MARK: Public
+
+    public func firstRect(forCharacterRange range: NSRange) -> NSRect {
+        return blockView.firstRect(forCharacterRange: range, actualRange: nil)
+    }
+
+    public func setPlaceholder(string: String) {
+        blockView.setPlaceholder(string: string)
+    }
+
+    public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
+        blockView.setSelectedRangesWithoutNotification(ranges)
+    }
+
+    public func characterIndexForInsertion(at point: NSPoint) -> Int {
+        return blockView.characterIndexForInsertion(at: point)
+    }
+
+    public func showInlineToolbar(for range: NSRange) {
+        blockView.showInlineToolbar(for: range)
+    }
+
+    // AttributedTextView
+
+    public var lineRects: [NSRect] {
+        return blockView.lineRects
+    }
+
+    public var linkRects: [(rect: NSRect, url: NSURL)] {
+        return blockView.linkRects
+    }
+
+    public var selectedRange: NSRange {
+        return blockView.selectedRange()
+    }
+
+    public var insertionPointColor: NSColor {
+        get { return blockView.insertionPointColor }
+        set { blockView.insertionPointColor = newValue }
+    }
+
+    public var onDidChangeText: (() -> Void)? {
+        get { return blockView.onDidChangeText }
+        set { blockView.onDidChangeText = newValue }
+    }
+
+    public var onChangeSelectedRange: ((NSRange) -> Void)? {
+        get { return blockView.onChangeSelectedRange }
+        set { blockView.onChangeSelectedRange = newValue }
+    }
+
+    public var onChangeTextValue: ((NSAttributedString) -> Void)? {
+        get { return blockView.onChangeTextValue }
+        set { blockView.onChangeTextValue = newValue }
+    }
+
+    public var onSubmit: (() -> Void)? {
+        get { return blockView.onSubmit }
+        set { blockView.onSubmit = newValue }
+    }
+
+    public var onPressEscape: (() -> Void)? {
+        get { return blockView.onPressEscape }
+        set { blockView.onPressEscape = newValue }
+    }
+
+    // TextBlockView
+
+    public var sizeLevel: TextBlockView.SizeLevel {
+        get { return blockView.sizeLevel }
+        set { blockView.sizeLevel = newValue }
+    }
+
+    public var textValue: NSAttributedString {
+        get { return blockView.textValue }
+        set { blockView.textValue = newValue }
+    }
+
+    public var width: CGFloat {
+        get { return blockView.width }
+        set { blockView.width = newValue }
+    }
+
+    public var onFocus: (() -> Void)? {
+        get { return blockView.onFocus }
+        set { blockView.onFocus = newValue }
+    }
+
+    public var onOpenReplacementPalette: ((NSRect) -> Void)? {
+        get { return blockView.onOpenReplacementPalette }
+        set { blockView.onOpenReplacementPalette = newValue }
+    }
+
+    public var onMoveToBeginningOfDocument: (() -> Void)? {
+        get { return blockView.onMoveToBeginningOfDocument }
+        set { blockView.onMoveToBeginningOfDocument = newValue }
+    }
+
+    public var onMoveToEndOfDocument: (() -> Void)? {
+        get { return blockView.onMoveToEndOfDocument }
+        set { blockView.onMoveToEndOfDocument = newValue }
+    }
+
+    public var onOpenLinkEditor: ((NSRect) -> Void)? {
+        get { return blockView.onOpenLinkEditor }
+        set { blockView.onOpenLinkEditor = newValue }
+    }
+
+    public var onRequestCreateEditor: ((NSAttributedString) -> Void)? {
+        get { return blockView.onRequestCreateEditor }
+        set { blockView.onRequestCreateEditor = newValue }
+    }
+
+    public var onRequestDeleteEditor: (() -> Void)? {
+        get { return blockView.onRequestDeleteEditor }
+        set { blockView.onRequestDeleteEditor = newValue }
+    }
+
+    public var onPressUp: (() -> Void)? {
+        get { return blockView.onPressUp }
+        set { blockView.onPressUp = newValue }
+    }
+
+    public var onPressDown: (() -> Void)? {
+        get { return blockView.onPressDown }
+        set { blockView.onPressDown = newValue }
+    }
+
+    public var onMoveUp: ((NSRect) -> Void)? {
+        get { return blockView.onMoveUp }
+        set { blockView.onMoveUp = newValue }
+    }
+
+    public var onMoveDown: ((NSRect) -> Void)? {
+        get { return blockView.onMoveDown }
+        set { blockView.onMoveDown = newValue }
+    }
+
+    public var onSelectUp: (() -> Void)? {
+        get { return blockView.onSelectUp }
+        set { blockView.onSelectUp = newValue }
+    }
+
+    public var onSelectDown: (() -> Void)? {
+        get { return blockView.onSelectDown }
+        set { blockView.onSelectDown = newValue }
+    }
+
+    // MARK: Private
+
+    private let blockView = TextBlockView()
+
+    private func setUpViews() {
+        boxType = .custom
+        borderType = .noBorder
+        contentViewMargins = .zero
+
+        addSubview(blockView)
+    }
+
+    private func setUpConstraints() {
+        translatesAutoresizingMaskIntoConstraints = false
+        blockView.translatesAutoresizingMaskIntoConstraints = false
+
+        blockView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        blockView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        blockView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        blockView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+    }
+
+    private func update() {}
+
+    public func focus() {
+        if blockView.acceptsFirstResponder {
+            window?.makeFirstResponder(blockView)
+        }
+    }
+}
 
 public class TextBlockView: AttributedTextView {
+
+    public static var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
+
+    public static var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: NSColor.placeholderTextColor)
 
     public enum SizeLevel: Int {
         case h1 = 1
@@ -70,7 +276,7 @@ public class TextBlockView: AttributedTextView {
             let newTextValue = NSMutableAttributedString(attributedString: textValue)
 
             newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
-                let font = (value as? NSFont) ?? defaultTextStyle.nsFont
+                let font = (value as? NSFont) ?? TextBlockView.defaultTextStyle.nsFont
                 guard let newFont = NSFont(descriptor: font.fontDescriptor, size: self.fontSize) else { return }
 //                newTextValue.addAttribute(.font, value: newFont, range: range)
 
@@ -101,13 +307,13 @@ public class TextBlockView: AttributedTextView {
     }
 
     private var textStyle: TextStyle {
-        return defaultTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
+        return TextBlockView.defaultTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
     }
 
     private var placeholderTextStyle: [NSAttributedString.Key: Any] {
         let ps = NSMutableParagraphStyle()
         ps.lineHeightMultiple = TextBlockView.lineHeightMultiple - 0.25
-        var attributes = defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize).attributeDictionary
+        var attributes = TextBlockView.defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize).attributeDictionary
         attributes[.paragraphStyle] = ps
         return attributes
     }
@@ -140,7 +346,7 @@ public class TextBlockView: AttributedTextView {
 
         delegate = self
 
-        font = defaultTextStyle.nsFont
+        font = TextBlockView.defaultTextStyle.nsFont
 
         focusRingType = .none
 
@@ -389,67 +595,6 @@ public class TextBlockView: AttributedTextView {
     }
 }
 
-extension NSTextView {
-    var lineRects: [NSRect] {
-        guard let container = textContainer, let manager = container.layoutManager else { return [] }
-
-        let fullGlyphRange = manager.glyphRange(for: container)
-        var rects: [NSRect] = []
-
-        manager.enumerateLineFragments(forGlyphRange: fullGlyphRange) { (rect, usedRect, textContainer, glyphRange, boolPointer) in
-            rects.append(rect)
-        }
-
-        if manager.extraLineFragmentRect.height > 4 {
-            rects.append(manager.extraLineFragmentRect)
-        }
-
-        return rects
-    }
-
-    var currentLineFragmentIndex: Int? {
-        guard let container = textContainer, let manager = container.layoutManager else { return nil }
-
-        let selectedGlyphRange = manager.glyphRange(forCharacterRange: selectedRange(), actualCharacterRange: nil)
-        let selectedGlyphRect = manager.boundingRect(forGlyphRange: selectedGlyphRange, in: container)
-
-        for (line, rect) in lineRects.enumerated() {
-            if rect.minY <= selectedGlyphRect.midY && selectedGlyphRect.midY <= rect.maxY {
-                return line
-            }
-        }
-
-        return nil
-    }
-
-    public func nearestCharacter(at point: NSPoint) -> Int? {
-        guard let container = textContainer, let manager = container.layoutManager else { return nil }
-
-        let glyph = manager.glyphIndex(for: point, in: container, fractionOfDistanceThroughGlyph: nil)
-
-        return manager.characterIndexForGlyph(at: glyph)
-    }
-
-
-    public var linkRects: [(rect: NSRect, url: NSURL)] {
-        guard let container = textContainer, let manager = container.layoutManager else { return [] }
-
-        let textValue = attributedString()
-        var values: [(NSRect, NSURL)] = []
-
-        textValue.enumerateAttribute(.link, in: .init(location: 0, length: textValue.length), options: []) { (value, range, pointer) in
-            guard let link = value as? NSURL else { return }
-
-            let glyphRange = manager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-            let rect = manager.boundingRect(forGlyphRange: glyphRange, in: container)
-
-            values.append((rect, link))
-        }
-
-        return values
-    }
-}
-
 // MARK: - NSLayoutManagerDelegate
 
 // https://christiantietze.de/posts/2017/07/nstextview-proper-line-height/
@@ -481,40 +626,5 @@ extension TextBlockView: NSLayoutManagerDelegate {
         baselineOffset.pointee = baselineOffset.pointee + baselineNudge
 
         return true
-    }
-}
-
-class InlineBlockLayoutManager: NSLayoutManager {
-
-    var getFont: (() -> NSFont?) = { return nil }
-
-    private var font: NSFont {
-        return getFont() ?? defaultTextStyle.nsFont
-    }
-
-    private var lineHeight: CGFloat {
-        let fontLineHeight = self.defaultLineHeight(for: font)
-        let lineHeight = fontLineHeight * TextBlockView.lineHeightMultiple
-        return lineHeight
-    }
-
-    // Takes care only of the last empty newline in the text backing
-    // store, or totally empty text views.
-    override func setExtraLineFragmentRect(
-        _ fragmentRect: NSRect,
-        usedRect: NSRect,
-        textContainer container: NSTextContainer) {
-
-        // This is only called when editing, and re-computing the
-        // `lineHeight` isn't that expensive, so I do no caching.
-        let lineHeight = self.lineHeight
-        var fragmentRect = fragmentRect
-        fragmentRect.size.height = lineHeight
-        var usedRect = usedRect
-        usedRect.size.height = lineHeight
-
-        super.setExtraLineFragmentRect(fragmentRect,
-            usedRect: usedRect,
-            textContainer: container)
     }
 }

@@ -177,8 +177,8 @@ public class BlockListView: NSBox {
         TooltipManager.shared.hideTooltip()
 
         func showCommandPalette(line: Int) {
-            if let view = blocks[line].view as? TextBlockView {
-                let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
+            if let view = blocks[line].view as? TextBlockContainerView {
+                let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0))
 
                 commandPaletteAnchor = (line, 0, rect)
                 self.showCommandPalette(line: line, query: "", rect: rect)
@@ -279,7 +279,7 @@ public class BlockListView: NSBox {
 
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? TextBlockView {
+                if let view = view as? TextBlockContainerView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
                     view.needsDisplay = true
                     view.setPlaceholder(string: " ")
@@ -299,7 +299,7 @@ public class BlockListView: NSBox {
 
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? TextBlockView {
+                if let view = view as? TextBlockContainerView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: range)])
 //                    view.needsDisplay = true
                     view.setPlaceholder(string: "Type '/' for commands")
@@ -360,9 +360,7 @@ public class BlockListView: NSBox {
         case .item(let row, _):
             let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
 
-            if view.acceptsFirstResponder {
-                window.makeFirstResponder(view)
-            }
+            blocks[row].focus()
         default:
             break
         }
@@ -923,7 +921,7 @@ public class BlockListView: NSBox {
                         } else {
                             initialRow = row
 
-                            if let view = view as? TextBlockView {
+                            if let view = view as? TextBlockContainerView {
                                 let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
                                 if let initialIndex = initialIndex {
@@ -933,11 +931,9 @@ public class BlockListView: NSBox {
                                     selection = .item(row, NSRange(location: characterIndex, length: 0))
                                 }
 
-                                if view.acceptsFirstResponder {
-                                    window.makeFirstResponder(view)
-                                    view.insertionPointColor = .clear
-                                    didChangeInsertionColor = true
-                                }
+                                view.focus()
+                                view.insertionPointColor = .clear
+                                didChangeInsertionColor = true
                             }
                         }
                     }
@@ -954,12 +950,10 @@ public class BlockListView: NSBox {
                     case .item(let row, let range):
                         let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
 
-                        if view.acceptsFirstResponder {
-                            window.makeFirstResponder(view)
-                        }
+                        blocks[row].focus()
 
                         if range.length > 0 {
-                            (view as? TextBlockView)?.showInlineToolbar(for: range)
+                            (view as? TextBlockContainerView)?.showInlineToolbar(for: range)
                         }
                     default:
                         window.makeFirstResponder(self)
@@ -974,7 +968,7 @@ public class BlockListView: NSBox {
             if didChangeInsertionColor, let row = initialRow {
                 let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
 
-                if let view = view as? TextBlockView {
+                if let view = view as? TextBlockContainerView {
                     view.insertionPointColor = NSColor.textColor
                 }
             }
@@ -996,7 +990,7 @@ public class BlockListView: NSBox {
         case .item(let line, let point):
             let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
 
-            if let view = view as? TextBlockView {
+            if let view = view as? TextBlockContainerView {
                 let pointInView = convert(point, to: view)
 
                 if let linkInfo = view.linkRects.first(where: { info in info.rect.contains(pointInView) }) {
@@ -1009,9 +1003,7 @@ public class BlockListView: NSBox {
 
                 selection = .item(line, NSRange(location: characterIndex, length: 0))
 
-                if view.acceptsFirstResponder {
-                    window?.makeFirstResponder(view)
-                }
+                view.focus()
             } else if let view = view, let superview = view.superview {
                 let superviewPoint = superview.convert(mouseUpEvent.locationInWindow, from: nil)
                 if let targetView = view.hitTest(superviewPoint) {
@@ -1086,7 +1078,7 @@ extension BlockListView: NSTableViewDelegate {
 
             return view
         case .text(let textValue, let sizeLevel):
-            let view = item.view as! TextBlockView
+            let view = item.view as! TextBlockContainerView
 
 //            Swift.print("Row", row, view)
 
@@ -1127,7 +1119,7 @@ extension BlockListView: NSTableViewDelegate {
                 let prefix = string.prefix(location)
 
                 if prefix.last == "/" {
-                    let rect = view.firstRect(forCharacterRange: NSRange(location: prefix.count - 1, length: 1), actualRange: nil)
+                    let rect = view.firstRect(forCharacterRange: NSRange(location: prefix.count - 1, length: 1))
                     self.commandPaletteAnchor = (row, location, rect)
                     self.showCommandPalette(line: row, query: "", rect: rect)
                 } else if let anchor = self.commandPaletteAnchor, location > anchor.character, string.count >= location {
@@ -1144,7 +1136,7 @@ extension BlockListView: NSTableViewDelegate {
 
                 self.selection = .item(row, range)
 
-                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? TextBlockView {
+                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? TextBlockContainerView {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
                         self.hideReplaceWithTextMenu()
@@ -1164,7 +1156,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1173,9 +1165,7 @@ extension BlockListView: NSTableViewDelegate {
 
                         self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
 
-                        if nextView.acceptsFirstResponder {
-                            self.window?.makeFirstResponder(nextView)
-                        }
+                        nextView.focus()
                     } else {
                         self.selection = .item(line, .empty)
                     }
@@ -1193,7 +1183,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1202,9 +1192,7 @@ extension BlockListView: NSTableViewDelegate {
 
                         self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
 
-                        if nextView.acceptsFirstResponder {
-                            self.window?.makeFirstResponder(nextView)
-                        }
+                        nextView.focus()
                     } else {
                         self.selection = .item(line, self.blocks[line].lastSelectionRange)
                     }
@@ -1222,13 +1210,11 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
 
                         self.selection = .item(nextLine, .init(location: 0, length: 0))
 
-                        if nextView.acceptsFirstResponder {
-                            self.window?.makeFirstResponder(nextView)
-                        }
+                        nextView.focus()
                     }
                 case .none:
                     break
@@ -1244,15 +1230,13 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
 
                         let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: nextView.bounds.maxX, y: nextView.bounds.maxY))
 
                         self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
 
-                        if nextView.acceptsFirstResponder {
-                            self.window?.makeFirstResponder(nextView)
-                        }
+                        nextView.focus()
                     }
                 case .none:
                     break
@@ -1329,7 +1313,7 @@ extension BlockListView: NSTableViewDelegate {
                     var longestRange: NSRange = .empty
                     textValue.attribute(
                         .link,
-                        at: view.selectedRange().location,
+                        at: view.selectedRange.location,
                         longestEffectiveRange: &longestRange,
                         in: .init(between: 0, and: textValue.length)
                     )
@@ -1350,7 +1334,7 @@ extension BlockListView: NSTableViewDelegate {
                         (.row("Unlink", nil, false, nil, nil), {
                             guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                            let newTextValue = view.textValue.removingAttribute(.link, range: view.selectedRange())
+                            let newTextValue = view.textValue.removingAttribute(.link, range: view.selectedRange)
 
                             let id = UUID()
                             let clone = self.blocks.replacing(
@@ -1384,7 +1368,7 @@ extension BlockListView: NSTableViewDelegate {
 
                     guard let url = NSURL(string: BlockListView.linkEditor.suggestionText) else { return }
 
-                    let newTextValue = view.textValue.addingAttribute(.link, value: url, range: view.selectedRange())
+                    let newTextValue = view.textValue.addingAttribute(.link, value: url, range: view.selectedRange)
 
                     let id = UUID()
                     let clone = self.blocks.replacing(
@@ -1413,7 +1397,7 @@ extension BlockListView: NSTableViewDelegate {
                 let textValue = view.textValue
 
                 if let previousLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsMergingText }),
-                    let nextView = tableView.view(atColumn: 0, row: previousLine, makeIfNecessary: true) as? TextBlockView {
+                    let nextView = tableView.view(atColumn: 0, row: previousLine, makeIfNecessary: true) as? TextBlockContainerView {
 
                     let previousBlock = self.blocks[previousLine]
                     let previousTextValue = nextView.textValue
@@ -1429,9 +1413,7 @@ extension BlockListView: NSTableViewDelegate {
                         self.selection = .item(previousLine, .init(location: previousTextValue.length, length: 0))
                     }
 
-                    if nextView.acceptsFirstResponder {
-                        self.window?.makeFirstResponder(nextView)
-                    }
+                    nextView.focus()
                 } else {
                     self.selection = .item(line, .empty)
                 }
