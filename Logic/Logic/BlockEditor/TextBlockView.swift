@@ -164,6 +164,10 @@ public class TextBlockView: AttributedTextView {
 
     public var onOpenReplacementPalette: ((NSRect) -> Void)?
 
+    public var onMoveToBeginningOfDocument: (() -> Void)?
+
+    public var onMoveToEndOfDocument: (() -> Void)?
+
     public var onOpenLinkEditor: ((NSRect) -> Void)?
 
     public var onRequestCreateEditor: ((NSAttributedString) -> Void)?
@@ -266,7 +270,7 @@ public class TextBlockView: AttributedTextView {
             }
 
             traits = .init(attributes: self.textValue.attributes(at: range.location, longestEffectiveRange: nil, in: range))
-            
+
             self.updateSharedToolbarWindow(traits: traits)
         }
     }
@@ -289,7 +293,13 @@ public class TextBlockView: AttributedTextView {
     }
 
     public override func doCommand(by selector: Selector) {
-        if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange == .empty {
+        if selector == #selector(NSResponder.moveToBeginningOfDocument) {
+            onMoveToBeginningOfDocument?()
+            return
+        } else if selector == #selector(NSResponder.moveToEndOfDocument) {
+            onMoveToEndOfDocument?()
+            return
+        } else if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange == .empty {
             onRequestDeleteEditor?()
             return
 //        } else if selector == #selector(NSResponder.insertNewline(_:)) {

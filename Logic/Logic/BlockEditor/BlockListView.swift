@@ -1213,6 +1213,52 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
+            view.onMoveToBeginningOfDocument = {
+                if BlockListView.commandPaletteVisible { return }
+
+                switch self.selection {
+                case .blocks:
+                    fatalError("Invalid selection when inside text block")
+                    break
+                case .item:
+                    if let nextLine = self.blocks.firstIndex(where: { $0.supportsInlineFocus }),
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+
+                        self.selection = .item(nextLine, .init(location: 0, length: 0))
+
+                        if nextView.acceptsFirstResponder {
+                            self.window?.makeFirstResponder(nextView)
+                        }
+                    }
+                case .none:
+                    break
+                }
+            }
+
+            view.onMoveToEndOfDocument = {
+                if BlockListView.commandPaletteVisible { return }
+
+                switch self.selection {
+                case .blocks:
+                    fatalError("Invalid selection when inside text block")
+                    break
+                case .item:
+                    if let nextLine = self.blocks.lastIndex(where: { $0.supportsInlineFocus }),
+                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockView {
+
+                        let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: nextView.bounds.maxX, y: nextView.bounds.maxY))
+
+                        self.selection = .item(nextLine, .init(location: characterIndex, length: 0))
+
+                        if nextView.acceptsFirstResponder {
+                            self.window?.makeFirstResponder(nextView)
+                        }
+                    }
+                case .none:
+                    break
+                }
+            }
+
             let handleSelect: () -> Void = { [unowned self] in
                 switch self.selection {
                 case .blocks:
