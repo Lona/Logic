@@ -32,22 +32,37 @@ private let monospacedMenuTextStyle = TextStyle(family: "Andale Mono", size: 15,
 public class InlineToolbar: NSView {
 
     public enum Command: Equatable {
-        case replace(String), divider, blockType, bold, italic, strikethrough, code, link
+        case replace(String), divider, bold, italic, strikethrough, code, link
+
+        var label: String {
+            switch self {
+            case .replace(let label):
+                return label
+            case .divider:
+                return ""
+            case .bold:
+                return "b"
+            case .italic:
+                return "i"
+            case .strikethrough:
+                return "s"
+            case .code:
+                return "<>"
+            case .link:
+                return "Link"
+            }
+        }
 
         var width: CGFloat {
             switch self {
-            case .replace(let label):
+            case .replace:
                 return menuTextStyle.apply(to: label).size().width + 32
+            case .link:
+                return menuTextStyle.apply(to: label).size().width + 16
             case .divider:
                 return 1
-            case .blockType:
-                return 80
-            case .bold, .italic, .strikethrough:
+            case .bold, .italic, .strikethrough, .code:
                 return 24
-            case .code:
-                return 24
-            case .link:
-                return 40
             }
         }
 
@@ -59,9 +74,15 @@ public class InlineToolbar: NSView {
             let image = NSImage(size: .init(width: width, height: InlineToolbar.height), flipped: false, drawingHandler: { rect in
                 var string: NSAttributedString? = nil
 
+                NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
+
                 switch self {
                 case .replace(let value):
                     string = menuTextStyle.apply(to: value)
+                case .link:
+                    let mutable = NSMutableAttributedString(attributedString: menuTextStyle.apply(to: "Link"))
+                    mutable.addAttributes([NSAttributedString.Key.underlineStyle: 1], range: NSRange(location: 0, length: mutable.length))
+                    string = mutable
                 case .bold:
                     let font = NSFontManager.shared.convert(menuTextStyle.nsFont, toHaveTrait: NSFontTraitMask.boldFontMask)
                     let mutable = NSMutableAttributedString(attributedString: menuTextStyle.apply(to: "b"))
@@ -272,6 +293,14 @@ public class InlineToolbar: NSView {
         }
     }
 
+    public var isLinkEnabled: Bool = false {
+        didSet {
+            if oldValue != isLinkEnabled {
+                update()
+            }
+        }
+    }
+
     public var parameters: Parameters {
         didSet {
             if parameters != oldValue {
@@ -376,6 +405,8 @@ public class InlineToolbar: NSView {
                 selected = isStrikethroughEnabled
             case .code:
                 selected = isCodeEnabled
+            case .link:
+                selected = isLinkEnabled
             default:
                 break
             }
@@ -387,7 +418,7 @@ public class InlineToolbar: NSView {
     }
 
     public var commands: [Command] {
-        return [.replace(replaceCommandLabel), .divider, .bold, .italic, .strikethrough, .code]
+        return [.replace(replaceCommandLabel), .divider, .bold, .italic, .strikethrough, .code, .link]
     }
 
     public static var height: CGFloat = 28

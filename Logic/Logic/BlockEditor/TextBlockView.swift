@@ -122,10 +122,6 @@ public class TextBlockView: AttributedTextView {
         }
     }
 
-//    public override func hitTest(_ point: NSPoint) -> NSView? {
-//        return nil
-//    }
-
     // MARK: Lifecycle
 
     public override func sharedInit() {
@@ -142,66 +138,15 @@ public class TextBlockView: AttributedTextView {
 
         setContentHuggingPriority(.defaultHigh, for: .vertical)
 
-//        setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-//        setContentHuggingPriority(.defaultLow, for: .horizontal)
-//        setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
-
-//        textContainer?.maximumNumberOfLines = -1
-//        textContainer?.lineBreakMode = .byWordWrapping
-//        textContainer?.widthTracksTextView = true
-//        textContainer?.heightTracksTextView = true
-//
-//        isVerticallyResizable = true
-
-//        selectedTextAttributes = [
-//            NSAttributedString.Key.backgroundColor: NSColor.green
-//        ]
-
         delegate = self
 
-//        allowsEditingTextAttributes = true
-//
-//        isBordered = false
-
         font = defaultTextStyle.nsFont
-
-//        attributedStringValue = defaultTextStyle.apply(to: "")
-//
-//        placeholderString = " "
-//
-//        usesSingleLineMode = false
-//
-//        lineBreakMode = .byWordWrapping
 
         focusRingType = .none
 
         drawsBackground = true
 
         backgroundColor = .clear
-
-//        onPressEscape = { [unowned self] in
-//            if self.commandPaletteIndex != nil {
-//                self.commandPaletteIndex = nil
-//
-//                self.onHideCommandPalette?()
-//            } else {
-//                self.window?.makeFirstResponder(nil)
-//
-////                self.placeholderString = " "
-//            }
-//        }
-
-//        onChangeSelectedRange = { [weak self] range in
-//            guard let self = self else { return }
-//
-//            if range.length > 0 {
-//                self.updateToolbar(for: range)
-//                self.showToolbar(for: range)
-//            } else {
-//                InlineToolbarWindow.shared.orderOut(nil)
-//            }
-//        }
     }
 
     public func showInlineToolbar(for range: NSRange) {
@@ -218,6 +163,8 @@ public class TextBlockView: AttributedTextView {
     public var onFocus: (() -> Void)?
 
     public var onOpenReplacementPalette: ((NSRect) -> Void)?
+
+    public var onOpenLinkEditor: ((NSRect) -> Void)?
 
     public var onRequestCreateEditor: ((NSAttributedString) -> Void)?
 
@@ -266,20 +213,17 @@ public class TextBlockView: AttributedTextView {
 //        return mutable
     }
 
-//    public override func handleChangeTextValue(_ value: NSAttributedString) {
-//        super.handleChangeTextValue(value)
-//    }
-
     private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
         InlineToolbarWindow.shared.isBoldEnabled = traits.contains(.bold)
         InlineToolbarWindow.shared.isItalicEnabled = traits.contains(.italic)
         InlineToolbarWindow.shared.isCodeEnabled = traits.contains(.code)
         InlineToolbarWindow.shared.isStrikethroughEnabled = traits.contains(.strikethrough)
+        InlineToolbarWindow.shared.isLinkEnabled = traits.isLink
         InlineToolbarWindow.shared.replaceCommandLabel = sizeLevel.blockDescription
     }
 
     private func updateToolbar(for range: NSRange) {
-        var traits: [InlineTextTrait] = .init(attributes: self.textValue.fontAttributes(in: range))
+        var traits: [InlineTextTrait] = .init(attributes: self.textValue.attributes(at: range.location, longestEffectiveRange: nil, in: range))
         self.updateSharedToolbarWindow(traits: traits)
 
         InlineToolbarWindow.shared.onCommand = { [unowned self] command in
@@ -297,6 +241,11 @@ public class TextBlockView: AttributedTextView {
             case .replace:
                 if let rect = InlineToolbarWindow.shared.screenRect(for: command) {
                     self.onOpenReplacementPalette?(rect)
+                }
+                return
+            case .link:
+                if let rect = InlineToolbarWindow.shared.screenRectForFirstCommand() {
+                    self.onOpenLinkEditor?(rect)
                 }
                 return
             case .bold:
@@ -326,21 +275,6 @@ public class TextBlockView: AttributedTextView {
         InlineToolbarWindow.shared.anchorTo(rect: rect, verticalOffset: 4)
         self.window?.addChildWindow(InlineToolbarWindow.shared, ordered: .above)
     }
-
-//    public override func becomeFirstResponder() -> Bool {
-//        let result = super.becomeFirstResponder()
-//
-//        if result {
-//            //            Swift.print("Become")
-////            placeholderString = "Type '/' for commands"
-////            needsDisplay = true
-//
-//            selectedRange = .init(location: 0, length: 0)
-//            onFocus?()
-//        }
-//
-//        return result
-//    }
 
     public override func resignFirstResponder() -> Bool {
         let result = super.resignFirstResponder()

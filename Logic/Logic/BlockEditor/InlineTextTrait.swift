@@ -35,6 +35,28 @@ public enum InlineTextTrait: Equatable {
 }
 
 extension Array where Element == InlineTextTrait {
+    public var isLink: Bool {
+        return contains(where: {
+            switch $0 {
+            case .link:
+                return true
+            default:
+                return false
+            }
+        })
+    }
+
+    public var linkText: String? {
+        return compactMap({
+            switch $0 {
+            case .link(let string):
+                return string
+            default:
+                return nil
+            }
+            }).first
+    }
+
     public var isBold: Bool { return contains(.bold) }
 
     public var isItalic: Bool { return contains(.italic) }
@@ -57,6 +79,10 @@ extension Array where Element == InlineTextTrait {
         if let strikethrough = attributes[.strikethroughStyle] as? Int, strikethrough != 0 {
             self.append(.strikethrough)
         }
+
+        if let link = attributes[.link] as? NSURL {
+            self.append(.link(link.absoluteString ?? ""))
+        }
     }
 }
 
@@ -77,8 +103,8 @@ extension NSMutableAttributedString {
             let newFont = NSFontManager.shared.convert(font, toFamily: InlineTextTrait.monospacedFontFamily)
             addAttribute(.font, value: newFont, range: range)
             addAttribute(.backgroundColor, value: Colors.commentBackground, range: range)
-        default:
-            break
+        case .link(let string):
+            addAttribute(.link, value: NSURL(string: string) ?? NSURL(), range: range)
         }
     }
 
@@ -98,8 +124,8 @@ extension NSMutableAttributedString {
             let newFont = NSFontManager.shared.convert(font, toFamily: NSFont.systemFont(ofSize: NSFont.systemFontSize).familyName!)
             addAttribute(.font, value: newFont, range: range)
             removeAttribute(.backgroundColor, range: range)
-        default:
-            break
+        case .link:
+            removeAttribute(.link, range: range)
         }
     }
 }
@@ -151,7 +177,17 @@ extension NSAttributedString {
 
     public func markdownInlineBlock() -> [MDXInlineNode] {
         func buildInlineNode(traits: [InlineTextTrait], text: String) -> MDXInlineNode {
-            if traits.contains(.italic) {
+            if let linkText = traits.linkText {
+                let contents = buildInlineNode(traits: traits.filter {
+                    switch $0 {
+                    case .link:
+                        return false
+                    default:
+                        return true
+                    }
+                }, text: text)
+                return .link(.init(children: [contents], url: linkText))
+            } else if traits.contains(.italic) {
                 return .emphasis(.init(children: [buildInlineNode(traits: traits.filter { $0 != .italic }, text: text)]))
             } else if traits.contains(.bold) {
                 return .strong(.init(children: [buildInlineNode(traits: traits.filter { $0 != .bold }, text: text)]))

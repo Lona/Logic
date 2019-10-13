@@ -102,6 +102,18 @@ extension MDXInlineNode {
             mutable.add(trait: .bold, range: range)
 
             return mutable
+        case .link(let value):
+            let values: [NSAttributedString] = value.children.map { $0.editableString }
+            let joined = values.joined()
+
+            if joined.length == 0 { return joined }
+
+            let mutable = NSMutableAttributedString(attributedString: joined)
+            let range: NSRange = .init(location: 0, length: mutable.length)
+
+            mutable.add(trait: .link(value.url), range: range)
+
+            return mutable
         case .inlineCode(let value):
             let mutable = NSMutableAttributedString(string: value.value, attributes: codeTextStyle.attributeDictionary)
 

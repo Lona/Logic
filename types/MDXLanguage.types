@@ -40,6 +40,14 @@
       <Record.Param name="value" type="String"/>
     </Record>
   </Type>
+  <Type name="Link">
+    <Record name="link">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+      <Record.Param name="url" type="String"/>
+    </Record>
+  </Type>
   <Type name="Paragraph">
     <Record name="paragraph">
       <Record.Param name="children" type="Array">
@@ -105,6 +113,9 @@
     </Case>
     <Case name="inlineCode">
       <Case.Param type="InlineCode"/>
+    </Case>
+    <Case name="link">
+      <Case.Param type="Link"/>
     </Case>
   </Type>
   <NativeType name="LGCSyntaxNode"/>

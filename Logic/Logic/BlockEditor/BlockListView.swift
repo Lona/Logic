@@ -1256,6 +1256,54 @@ extension BlockListView: NSTableViewDelegate {
                 self.showReplaceWithTextMenu(rect: rect)
             }
 
+            view.onOpenLinkEditor = { [unowned self] rect in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                let textValue = view.textValue
+                let selectedRange = view.selectedRange
+
+                let link = textValue.attribute(.link, at: selectedRange.location, effectiveRange: nil) as? NSURL
+
+                if let _ = link {
+                    var longestRange: NSRange = .empty
+                    textValue.attribute(
+                        .link,
+                        at: view.selectedRange().location,
+                        longestEffectiveRange: &longestRange,
+                        in: .init(between: 0, and: textValue.length)
+                    )
+                    self.selection = .item(line, longestRange)
+                }
+
+                self.showLinkEditor(rect: rect, initialValue: link?.absoluteString ?? "")
+
+                BlockListView.linkEditor.onPressEnter = { [unowned self] in
+                    guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                    guard let url = NSURL(string: BlockListView.linkEditor.suggestionText) else { return }
+
+                    let mutable = NSMutableAttributedString(attributedString: view.textValue)
+
+                    mutable.addAttribute(.link, value: url, range: view.selectedRange())
+
+                    let id = UUID()
+                    let clone = self.blocks.replacing(
+                        elementAt: line,
+                        with: .init(id: id, content: .text(mutable, view.sizeLevel))
+                    )
+
+                    self.hideLinkEditor()
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: id)
+                    }
+                }
+
+                BlockListView.linkEditor.onPressEscapeKey = { [unowned self] in
+                    self.hideLinkEditor()
+                }
+            }
+
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
@@ -1353,7 +1401,7 @@ extension BlockListView: NSTableViewDelegate {
 
         window.addChildWindow(subwindow, ordered: .above)
 
-        subwindow.anchorTo(rect: rect)
+        subwindow.anchorTo(rect: rect, verticalOffset: 4)
         subwindow.focusSearchField()
     }
 

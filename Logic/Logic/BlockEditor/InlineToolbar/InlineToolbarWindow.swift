@@ -50,6 +50,11 @@ public class InlineToolbarWindow: OverlayWindow {
         set { toolbarView.isCodeEnabled = newValue }
     }
 
+    public var isLinkEnabled: Bool {
+        get { return toolbarView.isLinkEnabled }
+        set { toolbarView.isLinkEnabled = newValue }
+    }
+
     public var isStrikethroughEnabled: Bool {
         get { return toolbarView.isStrikethroughEnabled }
         set { toolbarView.isStrikethroughEnabled = newValue }
@@ -59,6 +64,13 @@ public class InlineToolbarWindow: OverlayWindow {
 
     public func screenRect(for command: InlineToolbar.Command) -> NSRect? {
         guard let rect = toolbarView.rect(for: command) else { return nil }
+        let windowRect = toolbarView.convert(rect, to: nil)
+        let screenRect = convertToScreen(windowRect)
+        return screenRect
+    }
+
+    public func screenRectForFirstCommand() -> NSRect? {
+        guard let rect = toolbarView.buttonRects.first else { return nil }
         let windowRect = toolbarView.convert(rect, to: nil)
         let screenRect = convertToScreen(windowRect)
         return screenRect

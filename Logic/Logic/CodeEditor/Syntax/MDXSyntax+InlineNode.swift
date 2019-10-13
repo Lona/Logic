@@ -41,6 +41,8 @@ extension MDXInlineNode {
                 return value.children[index]
             case .strong(let value):
                 return value.children[index]
+            case .link(let value):
+                return value.children[index]
             case .text, .inlineCode:
                 fatalError("Invalid path")
             }
@@ -52,6 +54,8 @@ extension MDXInlineNode {
         case .emphasis(let value):
             return value.children[index].node(atPath: rest)
         case .strong(let value):
+            return value.children[index].node(atPath: rest)
+        case .link(let value):
             return value.children[index].node(atPath: rest)
         case .text, .inlineCode:
             fatalError("Invalid path")
@@ -69,6 +73,8 @@ extension MDXInlineNode {
                 return .emphasis(.init(children: value.children.replacing(elementAt: index, with: node)))
             case .strong(let value):
                 return .strong(.init(children: value.children.replacing(elementAt: index, with: node)))
+            case .link(let value):
+                return .strong(.init(children: value.children.replacing(elementAt: index, with: node)))
             case .text, .inlineCode:
                 return node
             }
@@ -83,6 +89,9 @@ extension MDXInlineNode {
         case .strong(let value):
             let children = value.children.replacing(elementAt: index, with: value.children[index].replacing(nodeAtPath: rest, with: node))
             return .strong(.init(children: children))
+        case .link(let value):
+            let children = value.children.replacing(elementAt: index, with: value.children[index].replacing(nodeAtPath: rest, with: node))
+            return .link(.init(children: children, url: value.url))
         case .text, .inlineCode:
             fatalError("Invalid replacement path")
         }
@@ -96,47 +105,6 @@ extension MDXInlineNode {
         let newParentNode = parentNode.with(children: parentNode.children!.inserting(node, at: path[path.count - 1]))
 
         return self.replacing(nodeAtPath: path, with: newParentNode)
-    }
-
-    public func appending(string: String) -> MDXInlineNode {
-        switch self {
-        case .emphasis(let value):
-            let children = value.children
-
-            if let last = children.last {
-                switch last {
-                case .text, .inlineCode:
-                    return .emphasis(.init(children: children.replacing(elementAt: children.count - 1, with: last.appending(string: string))))
-                default:
-                    break
-                }
-            }
-
-            return .emphasis(.init(children: children.inserting(.text(.init(value: string)), at: children.count)))
-        case .strong(let value):
-            let children = value.children
-
-            if let last = children.last {
-                switch last {
-                case .text, .inlineCode:
-                    return .strong(.init(children: children.replacing(elementAt: children.count - 1, with: last.appending(string: string))))
-                default:
-                    break
-                }
-            }
-
-            return .strong(.init(children: children.inserting(.text(.init(value: string)), at: children.count)))
-        case .text(let value):
-            return .text(.init(value: value.value + string))
-        case .inlineCode(let value):
-            return .inlineCode(.init(value: value.value + string))
-        }
-    }
-
-    public func appending(string: String, atPath path: [Int]) -> MDXInlineNode {
-        let parentNode = node(atPath: path)
-        let newParentNode = parentNode.appending(string: string)
-        return replacing(nodeAtPath: path, with: newParentNode)
     }
 
     // MARK: Accessors
@@ -180,7 +148,7 @@ extension MDXInlineNode {
             return value.value
         case .text(let value):
             return value.value
-        case .strong, .emphasis:
+        case .strong, .emphasis, .link:
             return nil
         }
     }
@@ -194,6 +162,8 @@ extension MDXInlineNode {
         case .emphasis(let value):
             return value.children.isEmpty
         case .strong(let value):
+            return value.children.isEmpty
+        case .link(let value):
             return value.children.isEmpty
         }
     }
@@ -265,6 +235,8 @@ extension MDXInlineNode {
             return .emphasis(.init(children: a.children + b.children))
         case (.strong(let a), .strong(let b)):
             return .strong(.init(children: a.children + b.children))
+        case (.link(let a), .link(let b)) where a.url == b.url:
+            return .link(.init(children: a.children + b.children, url: a.url))
         default:
             return nil
         }
