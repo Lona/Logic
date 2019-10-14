@@ -559,18 +559,11 @@ public class TextBlockView: AttributedTextView {
         } else if selector == #selector(NSResponder.deleteBackward(_:)) && selectedRange == .empty {
             onRequestDeleteEditor?()
             return
-//        } else if selector == #selector(NSResponder.insertNewline(_:)) {
-//            let selectedRange = self.selectedRange
-//            let remainingRange = NSRange(location: selectedRange.upperBound, length: textValue.length - selectedRange.upperBound)
-//            let suffix = textValue.attributedSubstring(from: remainingRange)
-//            let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
-//
-//            onRequestCreateEditor?(suffix)
-//            onChangeTextValue?(prefix)
-//
-////            Swift.print("remainder", suffix.string)
-//
-//            return
+        } else if selector == #selector(NSResponder.insertNewline(_:)),
+            let event = NSApp.currentEvent, event.modifierFlags.contains(.shift) {
+
+            super.doCommand(by: #selector(NSResponder.insertNewlineIgnoringFieldEditor))
+            return
         } else if selector == #selector(NSResponder.moveUp) {
             onPressUp?()
 
