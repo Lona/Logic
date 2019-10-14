@@ -40,6 +40,9 @@
       <Record.Param name="value" type="String"/>
     </Record>
   </Type>
+  <Type name="Break">
+    <Record name="break"/>
+  </Type>
   <Type name="Link">
     <Record name="link">
       <Record.Param name="children" type="Array">
@@ -126,6 +129,9 @@
     </Case>
     <Case name="link">
       <Case.Param type="Link"/>
+    </Case>
+    <Case name="break">
+      <Case.Param type="Break"/>
     </Case>
   </Type>
   <NativeType name="LGCSyntaxNode"/>

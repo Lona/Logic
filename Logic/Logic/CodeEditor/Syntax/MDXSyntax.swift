@@ -42,6 +42,10 @@ public struct MDXInlineCode: Codable & Equatable {
   public var value: String
 }
 
+public struct MDXBreak: Codable & Equatable {
+  public init() {}
+}
+
 public struct MDXLink: Codable & Equatable {
   public init(children: Array<MDXInlineNode>, url: String) {
     self.children = children
@@ -171,6 +175,7 @@ public indirect enum MDXInlineNode: Codable & Equatable {
   case emphasis(MDXEmphasis)
   case inlineCode(MDXInlineCode)
   case link(MDXLink)
+  case `break`(MDXBreak)
 
   // MARK: Codable
 
@@ -194,6 +199,8 @@ public indirect enum MDXInlineNode: Codable & Equatable {
         self = .inlineCode(try container.decode(MDXInlineCode.self, forKey: .data))
       case "link":
         self = .link(try container.decode(MDXLink.self, forKey: .data))
+      case "break":
+        self = .break(try container.decode(MDXBreak.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -217,6 +224,9 @@ public indirect enum MDXInlineNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .link(let value):
         try container.encode("link", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .break(let value):
+        try container.encode("break", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

@@ -76,6 +76,8 @@ extension LightMark.InlineElement {
 extension MDXInlineNode {
     public var editableString: NSAttributedString {
         switch self {
+        case .break:
+            return textStyle.apply(to: "\n")
         case .text(let value):
             return textStyle.apply(to: value.value)
         case .emphasis(let value):

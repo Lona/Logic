@@ -34,20 +34,6 @@ extension MDXInlineNode {
         if path.count == 0 { return self }
 
         let index = path[0]
-
-        if path.count == 1 {
-            switch self {
-            case .emphasis(let value):
-                return value.children[index]
-            case .strong(let value):
-                return value.children[index]
-            case .link(let value):
-                return value.children[index]
-            case .text, .inlineCode:
-                fatalError("Invalid path")
-            }
-        }
-
         let rest = Array(path.dropFirst())
 
         switch self {
@@ -57,7 +43,7 @@ extension MDXInlineNode {
             return value.children[index].node(atPath: rest)
         case .link(let value):
             return value.children[index].node(atPath: rest)
-        case .text, .inlineCode:
+        case .text, .inlineCode, .break:
             fatalError("Invalid path")
         }
     }
@@ -66,20 +52,6 @@ extension MDXInlineNode {
         if path.count == 0 { return node }
 
         let index = path[0]
-
-        if path.count == 1 {
-            switch self {
-            case .emphasis(let value):
-                return .emphasis(.init(children: value.children.replacing(elementAt: index, with: node)))
-            case .strong(let value):
-                return .strong(.init(children: value.children.replacing(elementAt: index, with: node)))
-            case .link(let value):
-                return .strong(.init(children: value.children.replacing(elementAt: index, with: node)))
-            case .text, .inlineCode:
-                return node
-            }
-        }
-
         let rest = Array(path.dropFirst())
 
         switch self {
@@ -92,7 +64,7 @@ extension MDXInlineNode {
         case .link(let value):
             let children = value.children.replacing(elementAt: index, with: value.children[index].replacing(nodeAtPath: rest, with: node))
             return .link(.init(children: children, url: value.url))
-        case .text, .inlineCode:
+        case .text, .inlineCode, .break:
             fatalError("Invalid replacement path")
         }
     }
@@ -117,7 +89,7 @@ extension MDXInlineNode {
             return .strong(.init(children: children))
         case .link(let value):
             return .link(.init(children: children, url: value.url))
-        case .text, .inlineCode:
+        case .text, .inlineCode, .break:
             fatalError("Cannot set children for \(self)")
         }
     }
@@ -128,7 +100,7 @@ extension MDXInlineNode {
             return .inlineCode(.init(value: value))
         case .text:
             return .text(.init(value: value))
-        case .emphasis, .strong, .link:
+        case .emphasis, .strong, .link, .break:
             fatalError("Cannot set value for \(self)")
         }
     }
@@ -141,7 +113,7 @@ extension MDXInlineNode {
             return value.children
         case .link(let value):
             return value.children
-        case .text, .inlineCode:
+        case .text, .inlineCode, .break:
             return nil
         }
     }
@@ -152,7 +124,7 @@ extension MDXInlineNode {
             return value.value
         case .text(let value):
             return value.value
-        case .strong, .emphasis, .link:
+        case .strong, .emphasis, .link, .break:
             return nil
         }
     }
@@ -169,6 +141,8 @@ extension MDXInlineNode {
             return value.children.isEmpty
         case .link(let value):
             return value.children.isEmpty
+        case .break:
+            return false
         }
     }
 
@@ -241,6 +215,8 @@ extension MDXInlineNode {
             return .strong(.init(children: a.children + b.children))
         case (.link(let a), .link(let b)) where a.url == b.url:
             return .link(.init(children: a.children + b.children, url: a.url))
+        case (.break, .break):
+            return .break(.init())
         default:
             return nil
         }

@@ -222,9 +222,11 @@ extension NSAttributedString {
             let character = self.attributedSubstring(from: NSRange(location: index, length: 1)).string
             let traits: [InlineTextTrait] = .init(attributes: self.attributes(at: index, effectiveRange: nil))
 
-            let node = buildInlineNode(traits: traits, text: character)
-
-            nodes.append(node)
+            if character == "\n" {
+                nodes.append(.break(.init()))
+            } else {
+                nodes.append(buildInlineNode(traits: traits, text: character))
+            }
         }
 
         let result = MDXInlineNode.optimized(nodes: nodes)
