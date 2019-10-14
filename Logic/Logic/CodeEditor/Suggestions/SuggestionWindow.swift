@@ -497,9 +497,12 @@ public class SuggestionWindow: NSWindow {
 
     // MARK: Overrides
 
-    public override var canBecomeMain: Bool {
-        return true
-    }
+    // If an overlay window becomes main, the previous main window will lose focus. When this happen,
+    // the toolbar looks inactive visually, which may not be what we want. However, if an overlay window
+    // can't become main, we have no way of knowing when it becomes hidden
+//    public override var canBecomeMain: Bool {
+//        return true
+//    }
 
     public override var canBecomeKey: Bool {
         return showsSearchBar

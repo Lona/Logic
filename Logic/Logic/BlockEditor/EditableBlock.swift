@@ -8,6 +8,68 @@
 
 import AppKit
 
+// MARK: - EditableBlockView
+
+public class EditableBlockView: NSView {
+
+    public override var isFlipped: Bool {
+        return true
+    }
+
+    // MARK: Lifecycle
+
+    public init() {
+        super.init(frame: .zero)
+
+        setUpViews()
+        setUpConstraints()
+
+        update()
+    }
+
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+
+        setUpViews()
+        setUpConstraints()
+
+        update()
+    }
+
+    // MARK: Public
+
+    public var contentView: NSView? {
+        didSet {
+            if contentView == oldValue { return }
+
+            oldValue?.removeFromSuperview()
+
+            if let contentView = contentView {
+                addSubview(contentView)
+
+                contentView.translatesAutoresizingMaskIntoConstraints = false
+                contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+                contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+                contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+                contentView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            }
+        }
+    }
+
+    // MARK: Private
+
+    private func setUpViews() {}
+
+    private func setUpConstraints() {
+        translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    private func update() {}
+}
+
+
+// MARK: - EditableBlock
+
 public class EditableBlock: Equatable {
     public let id: UUID
     public let content: EditableBlockContent
@@ -33,9 +95,6 @@ public class EditableBlock: Equatable {
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
             view.cornerRadius = 4
-//            view.borderType = .lineBorder
-//            view.borderWidth = 1
-//            view.borderColor = Colors.divider
 
             var style = view.canvasStyle
             style.textMargin = .init(width: 5, height: 6)
@@ -94,11 +153,23 @@ public class EditableBlock: Equatable {
         return view
     }
 
+    public var wrapperView: EditableBlockView {
+        if let wrapperView = EditableBlock.wrapperViewCache[id] { return wrapperView }
+
+        let wrapperView = EditableBlockView()
+        wrapperView.contentView = self.view
+        EditableBlock.wrapperViewCache[id] = wrapperView
+        return wrapperView
+    }
+
     public func updateView() {
         configure(view: view)
+        enqueueLayoutUpdate()
     }
 
     static var viewCache: [UUID: NSView] = [:]
+
+    static var wrapperViewCache: [UUID: EditableBlockView] = [:]
 
     static var fetchImage: (URL) -> NSImage? = Memoize.all { url in
         guard let data = try? Data(contentsOf: url), let image = NSImage(data: data) else { return nil }
@@ -113,6 +184,15 @@ public class EditableBlock: Equatable {
         return .init(.text(.init(), .paragraph))
     }
 
+    public func enqueueLayoutUpdate() {
+        switch content {
+        case .text:
+            let view = self.view as! TextBlockContainerView
+            view.blockView.needsLayout = true
+        default:
+            view.needsLayout = true
+        }
+    }
 
     public func focus() {
         if let view = view as? TextBlockContainerView {

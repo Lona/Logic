@@ -184,7 +184,7 @@ public class TextBlockContainerView: NSBox {
 
     // MARK: Private
 
-    private let blockView = TextBlockView()
+    let blockView = TextBlockView()
 
     private func setUpViews() {
         boxType = .custom

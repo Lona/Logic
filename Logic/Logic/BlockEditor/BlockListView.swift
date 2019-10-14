@@ -227,9 +227,6 @@ public class BlockListView: NSBox {
 
                     if old !== new {
                         new.updateView()
-
-                        new.view.needsLayout = true
-                        new.view.needsDisplay = true
                     }
                 }
             } else {
@@ -277,7 +274,7 @@ public class BlockListView: NSBox {
             case .item(let row, _):
                 if row >= blocks.count { return }
 
-                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+                let view = blocks[row].view
 
                 if let view = view as? TextBlockContainerView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
@@ -297,7 +294,7 @@ public class BlockListView: NSBox {
             case .item(let row, let range):
                 if row >= blocks.count { return }
 
-                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+                let view = blocks[row].view
 
                 if let view = view as? TextBlockContainerView {
                     view.setSelectedRangesWithoutNotification([NSValue(range: range)])
@@ -354,12 +351,8 @@ public class BlockListView: NSBox {
     private func focus(line index: Int) {
         selection = .item(index, .empty)
 
-        guard let window = window else { return }
-
         switch selection {
         case .item(let row, _):
-            let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
-
             blocks[row].focus()
         default:
             break
@@ -567,7 +560,7 @@ public class BlockListView: NSBox {
         let subwindow = BlockListView.replaceWithTextMenu
 
         window.addChildWindow(subwindow, ordered: .above)
-        window.makeMain()
+//        window.makeMain()
 
         subwindow.anchorTo(rect: rect, verticalOffset: 4)
 
@@ -737,6 +730,7 @@ public class BlockListView: NSBox {
         hideInlineToolbarWindow()
         hideReplaceWithTextMenu()
         hideLinkEditor()
+        SuggestionWindow.contextMenu.orderOut(nil)
     }
 
     public override func hitTest(_ point: NSPoint) -> NSView? {
@@ -908,8 +902,6 @@ public class BlockListView: NSBox {
                     let row = tableView.row(at: convert(position, to: tableView))
 
                     if row >= 0 {
-                        let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
-
                         if let initialRow = initialRow, initialRow != row {
                             if initialRow < row {
                                 let newRange = NSRange(location: initialRow, length: row - initialRow + 1)
@@ -921,7 +913,7 @@ public class BlockListView: NSBox {
                         } else {
                             initialRow = row
 
-                            if let view = view as? TextBlockContainerView {
+                            if let view = blocks[row].view as? TextBlockContainerView {
                                 let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
                                 if let initialIndex = initialIndex {
@@ -948,7 +940,7 @@ public class BlockListView: NSBox {
 
                     switch selection {
                     case .item(let row, let range):
-                        let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)!
+                        let view = blocks[row].view
 
                         blocks[row].focus()
 
@@ -966,7 +958,7 @@ public class BlockListView: NSBox {
             }
 
             if didChangeInsertionColor, let row = initialRow {
-                let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true)
+                let view = blocks[row].view
 
                 if let view = view as? TextBlockContainerView {
                     view.insertionPointColor = NSColor.textColor
@@ -988,7 +980,7 @@ public class BlockListView: NSBox {
         case .moreButton(let line):
             handlePressMore(line: line)
         case .item(let line, let point):
-            let view = tableView.view(atColumn: 0, row: line, makeIfNecessary: false)
+            let view = blocks[line].view
 
             if let view = view as? TextBlockContainerView {
                 let pointInView = convert(point, to: view)
@@ -1004,7 +996,7 @@ public class BlockListView: NSBox {
                 selection = .item(line, NSRange(location: characterIndex, length: 0))
 
                 view.focus()
-            } else if let view = view, let superview = view.superview {
+            } else if let superview = view.superview {
                 let superviewPoint = superview.convert(mouseUpEvent.locationInWindow, from: nil)
                 if let targetView = view.hitTest(superviewPoint) {
                     targetView.mouseDown(with: mouseUpEvent)
@@ -1075,8 +1067,6 @@ extension BlockListView: NSTableViewDelegate {
 
                 return true
             }
-
-            return view
         case .text(let textValue, let sizeLevel):
             let view = item.view as! TextBlockContainerView
 
@@ -1136,7 +1126,7 @@ extension BlockListView: NSTableViewDelegate {
 
                 self.selection = .item(row, range)
 
-                if let view = tableView.view(atColumn: 0, row: row, makeIfNecessary: true) as? TextBlockContainerView {
+                if let view = self.blocks[row].view as? TextBlockContainerView {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
                         self.hideReplaceWithTextMenu()
@@ -1156,7 +1146,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
+                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1183,7 +1173,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
+                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1210,7 +1200,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
+                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
 
                         self.selection = .item(nextLine, .init(location: 0, length: 0))
 
@@ -1230,7 +1220,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = tableView.view(atColumn: 0, row: nextLine, makeIfNecessary: true) as? TextBlockContainerView {
+                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
 
                         let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: nextView.bounds.maxX, y: nextView.bounds.maxY))
 
@@ -1354,7 +1344,7 @@ extension BlockListView: NSTableViewDelegate {
                     self.window?.addChildWindow(SuggestionWindow.contextMenu, ordered: .above)
 
                     SuggestionWindow.contextMenu.anchorTo(rect: rect)
-                    SuggestionWindow.contextMenu.makeMain()
+//                    SuggestionWindow.contextMenu.makeMain()
 
                     SuggestionWindow.contextMenu.onSubmit = { index in
                         items[index].1()
@@ -1397,7 +1387,7 @@ extension BlockListView: NSTableViewDelegate {
                 let textValue = view.textValue
 
                 if let previousLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsMergingText }),
-                    let nextView = tableView.view(atColumn: 0, row: previousLine, makeIfNecessary: true) as? TextBlockContainerView {
+                    let nextView = self.blocks[previousLine].view as? TextBlockContainerView {
 
                     let previousBlock = self.blocks[previousLine]
                     let previousTextValue = nextView.textValue
@@ -1424,10 +1414,8 @@ extension BlockListView: NSTableViewDelegate {
                 self.hideCommandPalette()
                 self.hideLinkEditor()
             }
-
-            return view
         case .divider:
-            return item.view
+            break
         case .image(let url):
             let view = item.view as! ImageBlock
 
@@ -1470,9 +1458,9 @@ extension BlockListView: NSTableViewDelegate {
             }
 
             item.updateViewWidth(tableView.bounds.width)
-
-            return view
         }
+
+        return item.wrapperView
     }
 
     func showLinkEditor(rect: NSRect, initialValue: String) {
