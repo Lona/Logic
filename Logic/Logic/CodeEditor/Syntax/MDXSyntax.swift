@@ -70,6 +70,14 @@ public struct MDXHeading: Codable & Equatable {
   public var children: Array<MDXInlineNode>
 }
 
+public struct MDXBlockquote: Codable & Equatable {
+  public init(children: Array<MDXInlineNode>) {
+    self.children = children
+  }
+
+  public var children: Array<MDXInlineNode>
+}
+
 public struct MDXCode: Codable & Equatable {
   public init(lang: Optional<String>, value: String, parsed: Optional<LGCSyntaxNode>) {
     self.lang = lang
@@ -100,6 +108,7 @@ public indirect enum MDXBlockNode: Codable & Equatable {
   case heading(MDXHeading)
   case code(MDXCode)
   case thematicBreak(MDXThematicBreak)
+  case blockquote(MDXBlockquote)
 
   // MARK: Codable
 
@@ -123,6 +132,8 @@ public indirect enum MDXBlockNode: Codable & Equatable {
         self = .code(try container.decode(MDXCode.self, forKey: .data))
       case "thematicBreak":
         self = .thematicBreak(try container.decode(MDXThematicBreak.self, forKey: .data))
+      case "blockquote":
+        self = .blockquote(try container.decode(MDXBlockquote.self, forKey: .data))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -146,6 +157,9 @@ public indirect enum MDXBlockNode: Codable & Equatable {
         try container.encode(value, forKey: .data)
       case .thematicBreak(let value):
         try container.encode("thematicBreak", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .blockquote(let value):
+        try container.encode("blockquote", forKey: .type)
         try container.encode(value, forKey: .data)
     }
   }

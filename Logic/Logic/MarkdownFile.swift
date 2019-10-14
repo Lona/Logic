@@ -22,6 +22,8 @@ public enum MarkdownFile {
                 return .heading(.init(depth: sizeLevel.rawValue, children: textValue.markdownInlineBlock()))
             case .paragraph:
                 return .paragraph(.init(children: textValue.markdownInlineBlock()))
+            case .quote:
+                return .blockquote(.init(children: textValue.markdownInlineBlock()))
             }
         case .tokens(let rootNode):
             return .code(MDXCode(rootNode))
@@ -108,6 +110,9 @@ public enum MarkdownFile {
             case .paragraph(let value):
                 let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
                 return BlockEditor.Block(.text(attributedString, .paragraph))
+            case .blockquote(let value):
+                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
+                return BlockEditor.Block(.text(attributedString, .quote))
             case .code(let value):
                 return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)))
             }

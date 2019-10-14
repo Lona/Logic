@@ -264,48 +264,50 @@ public class BlockListView: NSBox {
 
     private var selection: BlockListSelection = .none {
         didSet {
-            if oldValue == selection {
-                return
+            if oldValue == selection { return }
+
+            updateSelection(from: oldValue, to: selection)
+        }
+    }
+
+    private func updateSelection(from oldValue: BlockListSelection, to selection: BlockListSelection) {
+        switch oldValue {
+        case .none:
+            break
+        case .item(let row, _):
+            if row >= blocks.count { return }
+
+            let view = blocks[row].view
+
+            if let view = view as? TextBlockContainerView {
+                view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
+                view.needsDisplay = true
+                view.setPlaceholder(string: " ")
             }
-
-            switch oldValue {
-            case .none:
-                break
-            case .item(let row, _):
-                if row >= blocks.count { return }
-
-                let view = blocks[row].view
-
-                if let view = view as? TextBlockContainerView {
-                    view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
-                    view.needsDisplay = true
-                    view.setPlaceholder(string: " ")
-                }
-            case .blocks(let range, _):
-                for index in range.lowerBound..<range.upperBound {
-                    let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
-                    rowView?.isBlockSelected = false
-                }
+        case .blocks(let range, _):
+            for index in range.lowerBound..<range.upperBound {
+                let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
+                rowView?.isBlockSelected = false
             }
+        }
 
-            switch selection {
-            case .none:
-                break
-            case .item(let row, let range):
-                if row >= blocks.count { return }
+        switch selection {
+        case .none:
+            break
+        case .item(let row, let range):
+            if row >= blocks.count { return }
 
-                let view = blocks[row].view
+            let view = blocks[row].view
 
-                if let view = view as? TextBlockContainerView {
-                    view.setSelectedRangesWithoutNotification([NSValue(range: range)])
+            if let view = view as? TextBlockContainerView {
+                view.setSelectedRangesWithoutNotification([NSValue(range: range)])
 //                    view.needsDisplay = true
-                    view.setPlaceholder(string: "Type '/' for commands")
-                }
-            case .blocks(let range, _):
-                for index in range.lowerBound..<range.upperBound {
-                    let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
-                    rowView?.isBlockSelected = true
-                }
+                view.setPlaceholder(string: "Type '/' for commands")
+            }
+        case .blocks(let range, _):
+            for index in range.lowerBound..<range.upperBound {
+                let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
+                rowView?.isBlockSelected = true
             }
         }
     }
@@ -602,6 +604,7 @@ public class BlockListView: NSBox {
         (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
         (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
         (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
+        (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote))),
     ]
 
     public static var replaceWithTextMenu: SuggestionWindow = {
@@ -1078,7 +1081,7 @@ extension BlockListView: NSTableViewDelegate {
                 guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
                 // Automatically create headings
-                for heading in TextBlockView.SizeLevel.headings {
+                for heading in TextBlockView.SizeLevel.prefixShortcutSizes {
                     if let prefix = heading.prefix, newValue.string.starts(with: prefix + " ") && !textValue.string.starts(with: prefix + " ") {
                         let prefixLength = prefix.count + 1
                         let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
@@ -1276,10 +1279,13 @@ extension BlockListView: NSTableViewDelegate {
                 let suffix = textValue.attributedSubstring(from: remainingRange)
                 let prefix = textValue.attributedSubstring(from: NSRange(location: 0, length: selectedRange.upperBound))
 
-                var clone = self.blocks
-                clone[line] = .init(id: item.id, content: .text(prefix, view.sizeLevel))
+                // Determine which node keeps the sizeLevel
+                let prefixKeepsSizeLevel = prefix.length > 0
 
-                let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, .paragraph))
+                var clone = self.blocks
+                clone[line] = .init(id: item.id, content: .text(prefix, prefixKeepsSizeLevel ? view.sizeLevel : .paragraph))
+
+                let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, prefixKeepsSizeLevel ? .paragraph : view.sizeLevel))
                 clone.insert(nextBlock, at: line + 1)
 
                 if self.handleChangeBlocks(clone) {
@@ -1381,10 +1387,25 @@ extension BlockListView: NSTableViewDelegate {
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
-                if line == 0 { return }
-
                 var clone = self.blocks
                 let textValue = view.textValue
+
+                if view.sizeLevel != .paragraph {
+                    let id = UUID()
+
+                    clone = clone.replacing(elementAt: line, with: .init(id: id, content: .text(textValue, .paragraph)))
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: id)
+
+                        // Selection doesn't change, but we still want the side effects
+                        self.updateSelection(from: self.selection, to: .item(line, .empty))
+                    }
+
+                    return
+                }
+
+                if line == 0 { return }
 
                 if let previousLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsMergingText }),
                     let nextView = self.blocks[previousLine].view as? TextBlockContainerView {
@@ -1518,13 +1539,14 @@ extension BlockListView: NSTableViewDelegate {
     }
 
     enum Suggestion {
-        static var documentationSectionHeader = SuggestionListItem.sectionHeader("DOCUMENTATION")
+        static var documentationSectionHeader = SuggestionListItem.sectionHeader("MARKDOWN")
         static var tokensSectionHeader = SuggestionListItem.sectionHeader("TOKENS")
 
         static var text = SuggestionListItem.row("Text", "Write plain text", false, nil, MenuThumbnailImage.paragraph)
         static var heading1 = SuggestionListItem.row("Heading 1", "Large section heading", false, nil, MenuThumbnailImage.h1)
         static var heading2 = SuggestionListItem.row("Heading 2", "Medium section heading", false, nil, MenuThumbnailImage.h2)
         static var heading3 = SuggestionListItem.row("Heading 3", "Small section heading", false, nil, MenuThumbnailImage.h3)
+        static var quote = SuggestionListItem.row("Quote", "Display a quote", false, nil, MenuThumbnailImage.quote)
         static var divider = SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider)
         static var image = SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image)
     }
@@ -1540,6 +1562,7 @@ extension BlockListView: NSTableViewDelegate {
             (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
             (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
             (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
+            (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote))),
             (Suggestion.divider, EditableBlock(id: UUID(), content: .divider)),
             (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil))),
             (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),

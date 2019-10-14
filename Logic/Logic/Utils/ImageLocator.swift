@@ -23,6 +23,7 @@ public enum MenuThumbnailImage {
     public static let h1 = ImageLocator.image(named: "menu-thumbnail-h1")!
     public static let h2 = ImageLocator.image(named: "menu-thumbnail-h2")!
     public static let h3 = ImageLocator.image(named: "menu-thumbnail-h3")!
+    public static let quote = ImageLocator.image(named: "menu-thumbnail-quote")!
     public static let divider = ImageLocator.image(named: "menu-thumbnail-divider")!
     public static let image = ImageLocator.image(named: "menu-thumbnail-image")!
 

@@ -49,7 +49,7 @@ public class TextBlockContainerView: NSBox {
     }
 
     public func characterIndexForInsertion(at point: NSPoint) -> Int {
-        return blockView.characterIndexForInsertion(at: point)
+        return blockView.characterIndexForInsertion(at: convert(point, to: blockView))
     }
 
     public func showInlineToolbar(for range: NSRange) {
@@ -59,11 +59,13 @@ public class TextBlockContainerView: NSBox {
     // AttributedTextView
 
     public var lineRects: [NSRect] {
-        return blockView.lineRects
+        return blockView.lineRects.map { convert($0, from: blockView) }
     }
 
     public var linkRects: [(rect: NSRect, url: NSURL)] {
-        return blockView.linkRects
+        return blockView.linkRects.map {
+            return (rect: convert($0.rect, from: blockView), url: $0.url)
+        }
     }
 
     public var selectedRange: NSRange {
@@ -102,9 +104,44 @@ public class TextBlockContainerView: NSBox {
 
     // TextBlockView
 
+    private var showsBorderView: Bool = false {
+        didSet {
+            if showsBorderView == oldValue { return }
+
+            if showsBorderView {
+                if borderView == nil {
+                    let borderView = NSBox()
+
+                    addSubview(borderView)
+
+                    borderView.boxType = .custom
+                    borderView.borderType = .noBorder
+                    borderView.fillColor = Colors.textComment
+
+                    borderView.translatesAutoresizingMaskIntoConstraints = false
+                    borderView.widthAnchor.constraint(equalToConstant: 3).isActive = true
+                    borderView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
+                    borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+                    borderView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
+                    self.borderView = borderView
+                }
+
+                borderView?.isHidden = false
+                leadingAnchorConstraint?.constant = 13
+            } else {
+                borderView?.isHidden = true
+                leadingAnchorConstraint?.constant = 0
+            }
+        }
+    }
+
     public var sizeLevel: TextBlockView.SizeLevel {
         get { return blockView.sizeLevel }
-        set { blockView.sizeLevel = newValue }
+        set {
+            showsBorderView = newValue == .quote
+            blockView.sizeLevel = newValue
+        }
     }
 
     public var textValue: NSAttributedString {
@@ -114,7 +151,7 @@ public class TextBlockContainerView: NSBox {
 
     public var width: CGFloat {
         get { return blockView.width }
-        set { blockView.width = newValue }
+        set { blockView.width = newValue - indentWidth }
     }
 
     public var onFocus: (() -> Void)? {
@@ -186,6 +223,14 @@ public class TextBlockContainerView: NSBox {
 
     let blockView = TextBlockView()
 
+    private var indentWidth: CGFloat {
+        return leadingAnchorConstraint?.constant ?? 0
+    }
+
+    private var leadingAnchorConstraint: NSLayoutConstraint?
+
+    private var borderView: NSBox?
+
     private func setUpViews() {
         boxType = .custom
         borderType = .noBorder
@@ -200,8 +245,10 @@ public class TextBlockContainerView: NSBox {
 
         blockView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         blockView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        blockView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         blockView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+
+        leadingAnchorConstraint = blockView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0)
+        leadingAnchorConstraint?.isActive = true
     }
 
     private func update() {}
@@ -228,6 +275,8 @@ public class TextBlockView: AttributedTextView {
         case h6 = 6
         case paragraph = 0
 
+        case quote = -1
+
         var blockDescription: String {
             switch self {
             case .paragraph: return "Text"
@@ -237,12 +286,13 @@ public class TextBlockView: AttributedTextView {
             case .h3: return "Heading 3"
             case .h2: return "Heading 2"
             case .h1: return "Heading 1"
+            case .quote: return "Quote"
             }
         }
 
         var fontSize: CGFloat {
             switch self {
-            case .paragraph: return 16
+            case .paragraph, .quote: return 16
             case .h6, .h5, .h4: return 16
             case .h3: return 22
             case .h2: return 28
@@ -269,6 +319,7 @@ public class TextBlockView: AttributedTextView {
             case .h3: return "###"
             case .h2: return "##"
             case .h1: return "#"
+            case .quote: return ">"
             }
         }
 
@@ -289,7 +340,7 @@ public class TextBlockView: AttributedTextView {
             return newTextValue
         }
 
-        public static let headings: [SizeLevel] = [.h1, .h2, .h3, .h4, .h5, .h6]
+        public static let prefixShortcutSizes: [SizeLevel] = [.h1, .h2, .h3, .h4, .h5, .h6, .quote]
     }
 
     public var sizeLevel: SizeLevel = .paragraph {

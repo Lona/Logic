@@ -63,6 +63,13 @@
       </Record.Param>
     </Record>
   </Type>
+  <Type name="Blockquote">
+    <Record name="blockquote">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="InlineNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
   <Type name="Code">
     <Record name="code">
       <Record.Param name="lang" type="Optional">
@@ -99,6 +106,9 @@
     </Case>
     <Case name="thematicBreak">
       <Case.Param type="ThematicBreak"/>
+    </Case>
+    <Case name="blockquote">
+      <Case.Param type="Blockquote"/>
     </Case>
   </Type>
   <Type name="InlineNode">

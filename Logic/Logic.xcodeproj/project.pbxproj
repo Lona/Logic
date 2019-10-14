@@ -34,6 +34,7 @@
 		6B2DC3022349663B00A768A1 /* MDXSyntax+InlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */; };
 		6B2DC3082353C29600A768A1 /* NSTextView+Measurement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2DC3072353C29600A768A1 /* NSTextView+Measurement.swift */; };
 		6B2DC30A2353C2DB00A768A1 /* InlineBlockLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B2DC3092353C2DB00A768A1 /* InlineBlockLayoutManager.swift */; };
+		6B2DC30C23550AF600A768A1 /* menu-thumbnail-quote.png in Resources */ = {isa = PBXBuildFile; fileRef = 6B2DC30B23550AF600A768A1 /* menu-thumbnail-quote.png */; };
 		6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B34148C225417F800CC65D1 /* JavaScript.swift */; };
 		6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */ = {isa = PBXBuildFile; fileRef = 6B34148E225418D800CC65D1 /* lona-serialization.umd.js */; };
 		6B3414912254366C00CC65D1 /* LogicFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3414902254366C00CC65D1 /* LogicFile.swift */; };
@@ -175,6 +176,7 @@
 		6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MDXSyntax+InlineNode.swift"; sourceTree = "<group>"; };
 		6B2DC3072353C29600A768A1 /* NSTextView+Measurement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSTextView+Measurement.swift"; sourceTree = "<group>"; };
 		6B2DC3092353C2DB00A768A1 /* InlineBlockLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineBlockLayoutManager.swift; sourceTree = "<group>"; };
+		6B2DC30B23550AF600A768A1 /* menu-thumbnail-quote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-quote.png"; sourceTree = "<group>"; };
 		6B34148C225417F800CC65D1 /* JavaScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JavaScript.swift; sourceTree = "<group>"; };
 		6B34148E225418D800CC65D1 /* lona-serialization.umd.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "lona-serialization.umd.js"; sourceTree = "<group>"; };
 		6B3414902254366C00CC65D1 /* LogicFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicFile.swift; sourceTree = "<group>"; };
@@ -636,6 +638,7 @@
 				6B0F9464233EBBE9007C115E /* menu-thumbnail-image.png */,
 				6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */,
 				6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */,
+				6B2DC30B23550AF600A768A1 /* menu-thumbnail-quote.png */,
 				6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */,
 				6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */,
 			);
@@ -716,6 +719,7 @@
 				6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */,
 				6B0F9465233EBBE9007C115E /* menu-thumbnail-divider.png in Resources */,
 				6B4E260222E7B39500F0076A /* Shadow.logic in Resources */,
+				6B2DC30C23550AF600A768A1 /* menu-thumbnail-quote.png in Resources */,
 				6BFA8A592332B0460016FC7B /* menu-thumbnail-h1.png in Resources */,
 				6B3414992256ECD900CC65D1 /* Assets.xcassets in Resources */,
 				6BD994932343FF6000F3F173 /* menu-thumbnail-variable.png in Resources */,
