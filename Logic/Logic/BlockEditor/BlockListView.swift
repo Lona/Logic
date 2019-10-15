@@ -218,6 +218,8 @@ public class BlockListView: NSBox {
 
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
+            blocks.updateMargins()
+
             let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
 
             if diff.isEmpty {

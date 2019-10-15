@@ -38,6 +38,12 @@ public class EditableBlockView: NSView {
 
     // MARK: Public
 
+    public var bottomMargin: CGFloat = 0 {
+        didSet {
+            bottomAnchorConstraint?.constant = -bottomMargin
+        }
+    }
+
     public var contentView: NSView? {
         didSet {
             if contentView == oldValue { return }
@@ -51,12 +57,16 @@ public class EditableBlockView: NSView {
                 contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
                 contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
                 contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-                contentView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
+                bottomAnchorConstraint = contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
+                bottomAnchorConstraint?.isActive = true
             }
         }
     }
 
     // MARK: Private
+
+    private var bottomAnchorConstraint: NSLayoutConstraint?
 
     private func setUpViews() {}
 
@@ -73,6 +83,15 @@ public class EditableBlockView: NSView {
 public class EditableBlock: Equatable {
     public let id: UUID
     public let content: EditableBlockContent
+
+    public var bottomMargin: CGFloat {
+        get { return wrapperView.bottomMargin }
+        set {
+            if newValue != wrapperView.bottomMargin {
+                wrapperView.bottomMargin = newValue
+            }
+        }
+    }
 
     public init(id: UUID, content: EditableBlockContent) {
         self.id = id
@@ -281,6 +300,20 @@ public class EditableBlock: Equatable {
         }
     }
 
+    static func margin(_ a: EditableBlock, _ b: EditableBlock) -> CGFloat {
+        switch (a.content, b.content) {
+        case (.text(_, .paragraph), .text(_, .h1)):
+            return 32
+        case (.text(_, .paragraph), .text(_, .h2)):
+            return 20
+        case (.text(_, .paragraph), .text(_, .h3)):
+            return 8
+        case (.text(_, .paragraph), .text(_, .paragraph)):
+            return 8
+        default:
+            return 0
+        }
+    }
 }
 
 extension EditableBlock: CustomDebugStringConvertible {
@@ -339,5 +372,12 @@ extension Sequence where Iterator.Element: EditableBlock {
         }
 
         return LGCTopLevelDeclarations(id: UUID(), declarations: .init(declarations))
+    }
+
+    public func updateMargins() {
+        zip(dropLast(), dropFirst()).forEach { a, b in
+            let margin = EditableBlock.margin(a, b)
+            a.bottomMargin = margin
+        }
     }
 }
