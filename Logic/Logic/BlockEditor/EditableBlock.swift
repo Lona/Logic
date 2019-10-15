@@ -75,6 +75,20 @@ public class EditableBlockView: NSView {
     }
 
     private func update() {}
+
+    public override var intrinsicContentSize: NSSize {
+        guard let contentView = contentView else { return super.intrinsicContentSize }
+
+        let contentSize = contentView.intrinsicContentSize
+
+        return .init(width: contentSize.width, height: contentSize.height + bottomMargin)
+    }
+
+    public override func invalidateIntrinsicContentSize() {
+        contentView?.invalidateIntrinsicContentSize()
+
+        super.invalidateIntrinsicContentSize()
+    }
 }
 
 
@@ -147,6 +161,9 @@ public class EditableBlock: Equatable {
             let view = view as! TextBlockContainerView
             view.textValue = attributedString
             view.sizeLevel = sizeLevel
+            view.onRequestInvalidateIntrinsicContentSize = { [weak self] in
+                self?.wrapperView.invalidateIntrinsicContentSize()
+            }
         case .tokens(let value):
             let view = view as! LogicEditor
             view.rootNode = value
@@ -206,10 +223,10 @@ public class EditableBlock: Equatable {
     public func enqueueLayoutUpdate() {
         switch content {
         case .text:
-            let view = self.view as! TextBlockContainerView
-            view.blockView.needsLayout = true
+            wrapperView.invalidateIntrinsicContentSize()
+            wrapperView.needsLayout = true
         default:
-            view.needsLayout = true
+            wrapperView.needsLayout = true
         }
     }
 

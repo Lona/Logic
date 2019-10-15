@@ -170,6 +170,11 @@ public class TextBlockContainerView: NSBox {
         set { blockView.onPasteBlocks = newValue }
     }
 
+    public var onRequestInvalidateIntrinsicContentSize: (() -> Void)? {
+        get { return blockView.onRequestInvalidateIntrinsicContentSize }
+        set { blockView.onRequestInvalidateIntrinsicContentSize = newValue }
+    }
+
     public var onOpenReplacementPalette: ((NSRect) -> Void)? {
         get { return blockView.onOpenReplacementPalette }
         set { blockView.onOpenReplacementPalette = newValue }
@@ -268,6 +273,18 @@ public class TextBlockContainerView: NSBox {
         if blockView.acceptsFirstResponder {
             window?.makeFirstResponder(blockView)
         }
+    }
+
+    public override var intrinsicContentSize: NSSize {
+        let contentSize = blockView.intrinsicContentSize
+
+        return .init(width: contentSize.width + indentWidth, height: contentSize.height)
+    }
+
+    public override func invalidateIntrinsicContentSize() {
+        blockView.invalidateIntrinsicContentSize()
+        
+        super.invalidateIntrinsicContentSize()
     }
 }
 
@@ -488,6 +505,8 @@ public class TextBlockView: AttributedTextView {
 
     public var onPasteBlocks: (() -> Void)?
 
+    public var onRequestInvalidateIntrinsicContentSize: (() -> Void)?
+
     public var onOpenReplacementPalette: ((NSRect) -> Void)?
 
     public var onMoveToBeginningOfDocument: (() -> Void)?
@@ -684,14 +703,14 @@ public class TextBlockView: AttributedTextView {
     }
 
     func textDidChange(_ notification: Notification) {
-        invalidateIntrinsicContentSize()
+        onRequestInvalidateIntrinsicContentSize?()
     }
 
     public override func layout() {
         super.layout()
 
         // Workaround to fix extra blank line on first render
-        invalidateIntrinsicContentSize()
+        onRequestInvalidateIntrinsicContentSize?()
     }
 
     public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
