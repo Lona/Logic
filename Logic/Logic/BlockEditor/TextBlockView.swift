@@ -8,6 +8,10 @@
 
 import Foundation
 
+extension NSPasteboard.PasteboardType {
+    public static var mdx = NSPasteboard.PasteboardType.init("mdx")
+}
+
 // MARK: - TextBlockContainerView
 
 public class TextBlockContainerView: NSBox {
@@ -686,6 +690,45 @@ public class TextBlockView: AttributedTextView {
     public func setSelectedRangesWithoutNotification(_ ranges: [NSValue]) {
         super.setSelectedRanges(ranges, affinity: .downstream, stillSelecting: true)
     }
+
+    public override func copy(_ sender: Any?) {
+        let selectedText = textValue.attributedSubstring(from: selectedRange())
+
+        let mdxNodes = selectedText.markdownInlineBlock()
+        let mdxContent = MDXPasteboardContent(nodes: mdxNodes)
+
+        guard let data = try? JSONEncoder().encode(mdxContent) else {
+            Swift.print("Failed to serialize clipboard")
+            return
+        }
+
+        NSPasteboard.general.declareTypes([.string, .mdx], owner: self)
+        NSPasteboard.general.setString(selectedText.string, forType: .string)
+        NSPasteboard.general.setData(data, forType: .mdx)
+    }
+
+    public override func pasteAsPlainText(_ sender: Any?) {
+        if let mdxData = NSPasteboard.general.data(forType: .mdx) {
+            if let mdxContent = try? JSONDecoder().decode(MDXPasteboardContent.self, from: mdxData) {
+                let pastedValue = mdxContent.nodes.map { $0.attributedString(for: sizeLevel) }.joined()
+
+                let range = selectedRange()
+
+                let prefix = textValue.attributedSubstring(from: .init(location: 0, length: range.location))
+                let suffix = textValue.attributedSubstring(from: .init(location: range.upperBound, length: textValue.length - range.upperBound))
+                let result = [prefix, pastedValue, suffix].joined()
+
+                onChangeTextValue?(result)
+                setSelectedRange(.init(location: prefix.length + pastedValue.length, length: 0))
+            }
+        } else {
+            super.pasteAsPlainText(sender)
+        }
+    }
+
+    private struct MDXPasteboardContent: Codable {
+        var nodes: [MDXInlineNode]
+    }
 }
 
 // MARK: - NSLayoutManagerDelegate
@@ -721,3 +764,4 @@ extension TextBlockView: NSLayoutManagerDelegate {
         return true
     }
 }
+
