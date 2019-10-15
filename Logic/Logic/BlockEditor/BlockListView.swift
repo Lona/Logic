@@ -451,7 +451,7 @@ public class BlockListView: NSBox {
 
     public var horizontalPadding: CGFloat {
         let width = bounds.width
-        let horizontalPadding = width > 820 ? floor((width - 700) / 2) : 60
+        let horizontalPadding = width > 820 ? (width - 700) / 2 : 60
         return horizontalPadding
     }
 
@@ -1532,9 +1532,9 @@ extension BlockListView: NSTableViewDelegate {
                     self.hideLinkEditor()
                 }
             }
-
-            item.updateViewWidth(tableView.bounds.width)
         }
+
+        item.updateViewWidth(tableView.bounds.width)
 
         return item.wrapperView
     }
