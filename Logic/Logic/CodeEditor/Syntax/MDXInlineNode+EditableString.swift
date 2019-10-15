@@ -11,7 +11,7 @@ import AppKit
 extension MDXInlineNode {
     public func attributedString(for sizeLevel: TextBlockView.SizeLevel) -> NSAttributedString {
         func inner(_ node: MDXInlineNode) -> NSAttributedString {
-            switch self {
+            switch node {
             case .break:
                 return NSAttributedString(string: "\n")
             case .text(let value):
