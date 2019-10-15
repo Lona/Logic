@@ -165,6 +165,11 @@ public class TextBlockContainerView: NSBox {
         set { blockView.onFocus = newValue }
     }
 
+    public var onPasteBlocks: (() -> Void)? {
+        get { return blockView.onPasteBlocks }
+        set { blockView.onPasteBlocks = newValue }
+    }
+
     public var onOpenReplacementPalette: ((NSRect) -> Void)? {
         get { return blockView.onOpenReplacementPalette }
         set { blockView.onOpenReplacementPalette = newValue }
@@ -481,6 +486,8 @@ public class TextBlockView: AttributedTextView {
 
     public var onFocus: (() -> Void)?
 
+    public var onPasteBlocks: (() -> Void)?
+
     public var onOpenReplacementPalette: ((NSRect) -> Void)?
 
     public var onMoveToBeginningOfDocument: (() -> Void)?
@@ -708,7 +715,10 @@ public class TextBlockView: AttributedTextView {
     }
 
     public override func pasteAsPlainText(_ sender: Any?) {
-        if let mdxData = NSPasteboard.general.data(forType: .mdx) {
+        if NSPasteboard.general.availableType(from: [.blocks]) == .blocks {
+            onPasteBlocks?()
+            return
+        } else if let mdxData = NSPasteboard.general.data(forType: .mdx) {
             if let mdxContent = try? JSONDecoder().decode(MDXPasteboardContent.self, from: mdxData) {
                 let pastedValue = mdxContent.nodes.map { $0.attributedString(for: sizeLevel) }.joined()
 
@@ -728,6 +738,14 @@ public class TextBlockView: AttributedTextView {
 
     private struct MDXPasteboardContent: Codable {
         var nodes: [MDXInlineNode]
+    }
+
+    public override func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+        if item.action == #selector(NSTextView.pasteAsPlainText) && NSPasteboard.general.availableType(from: [.blocks]) == .blocks {
+            return true
+        }
+
+        return super.validateUserInterfaceItem(item)
     }
 }
 

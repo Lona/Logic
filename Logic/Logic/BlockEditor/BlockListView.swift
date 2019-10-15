@@ -9,6 +9,19 @@
 import AppKit
 import Differ
 
+extension NSPasteboard.PasteboardType {
+    public static var blocks = NSPasteboard.PasteboardType.init("blocks")
+}
+
+extension NSPasteboard {
+    public var blocks: [EditableBlock]? {
+        guard let blockData = data(forType: .blocks),
+            let pastedBlocks = MarkdownFile.makeBlocks(blockData) else { return nil }
+
+        return pastedBlocks
+    }
+}
+
 private enum BlockListSelection: Equatable {
     case none
     case item(Int, NSRange)
@@ -162,6 +175,14 @@ public class BlockListView: NSBox {
         newBlocks.insert(contentsOf: targetBlocks, at: normalizedIndex)
 
         return handleChangeBlocks(newBlocks)
+    }
+
+    private func replaceBlocks(in range: NSRange, with otherBlocks: [EditableBlock]) -> Bool {
+        var newBlocks: [BlockEditor.Block] = Array(blocks[0..<range.location] + blocks[range.location+range.length..<blocks.count])
+
+        newBlocks.insert(contentsOf: otherBlocks, at: range.location)
+
+        return self.handleChangeBlocks(newBlocks)
     }
 
     public var plusButtonTooltip: String = "**Click** _to add below_"
@@ -728,7 +749,7 @@ public class BlockListView: NSBox {
                 break
             }
         default:
-            break
+            super.keyDown(with: event)
         }
     }
 
@@ -1407,6 +1428,17 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
+            view.onPasteBlocks = { [unowned self] in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+                guard let pastedBlocks = NSPasteboard.general.blocks else { return }
+
+                let isEmpty = self.blocks[line].isEmpty
+
+                if self.replaceBlocks(in: .init(location: isEmpty ? line : line + 1, length: isEmpty ? 1 : 0), with: pastedBlocks) {
+                    self.selection = .none
+                }
+            }
+
             view.onRequestDeleteEditor = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
@@ -1765,6 +1797,43 @@ extension BlockListView: NSTableViewDataSource {
 //            return value.measure(width: tableView.bounds.width).height
 //        }
 //    }
+}
+
+// MARK: - Copy & Paste
+
+extension BlockListView {
+    @IBAction public func copy(_ sender: Any?) {
+        switch selection {
+        case .none:
+            return
+        case .item:
+            return
+        case .blocks(let range, _):
+            let selectedBlocks = Array(blocks[range.location..<range.upperBound])
+
+            let data = MarkdownFile.makeMarkdownData(selectedBlocks)
+
+            NSPasteboard.general.declareTypes([.blocks], owner: self)
+            NSPasteboard.general.setData(data, forType: .blocks)
+        }
+    }
+
+    @IBAction public func pasteAsPlainText(_ sender: Any?) {
+        guard let pastedBlocks = NSPasteboard.general.blocks else { return }
+
+        switch selection {
+        case .none:
+            break
+        case .item(let line, _):
+            if replaceBlocks(in: .init(location: line + 1, length: 0), with: pastedBlocks) {
+                selection = .none
+            }
+        case .blocks(let range, _):
+            if replaceBlocks(in: range, with: pastedBlocks) {
+                selection = .none
+            }
+        }
+    }
 }
 
 // MARK: - BlockListTableView
