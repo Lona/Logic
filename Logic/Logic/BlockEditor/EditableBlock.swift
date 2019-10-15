@@ -302,13 +302,26 @@ public class EditableBlock: Equatable {
 
     static func margin(_ a: EditableBlock, _ b: EditableBlock) -> CGFloat {
         switch (a.content, b.content) {
-        case (.text(_, .paragraph), .text(_, .h1)):
-            return 32
-        case (.text(_, .paragraph), .text(_, .h2)):
-            return 20
-        case (.text(_, .paragraph), .text(_, .h3)):
+        case (.text(_, .h1), .text(_, .h2)),
+             (.text(_, .h1), .text(_, .h3)):
+            return 12
+        case (.text(_, .h2), .text(_, .h3)):
             return 8
-        case (.text(_, .paragraph), .text(_, .paragraph)):
+        case (.text(_, .h3), .text(_, .paragraph)):
+            return 4
+        case (.text(_, .paragraph), .text(_, .h1)),
+             (.text(_, .quote), .text(_, .h1)):
+            return 32
+        case (.text(_, .paragraph), .text(_, .h2)),
+             (.text(_, .quote), .text(_, .h2)):
+            return 20
+        case (.text(_, .paragraph), .text(_, .h3)),
+             (.text(_, .quote), .text(_, .h3)):
+            return 8
+        case (.text(_, .paragraph), .text(_, .paragraph)),
+             (.text(_, .quote), .text(_, .paragraph)),
+             (.text(_, .paragraph), .text(_, .quote)),
+             (.text(_, .quote), .text(_, .quote)):
             return 8
         default:
             return 0

@@ -118,11 +118,11 @@ public class TextBlockContainerView: NSBox {
 
                     borderView.boxType = .custom
                     borderView.borderType = .noBorder
-                    borderView.fillColor = Colors.textComment
+                    borderView.fillColor = TextBlockView.SizeLevel.quoteTextColor.withAlphaComponent(0.3)
 
                     borderView.translatesAutoresizingMaskIntoConstraints = false
                     borderView.widthAnchor.constraint(equalToConstant: 3).isActive = true
-                    borderView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5).isActive = true
+                    borderView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 6).isActive = true
                     borderView.topAnchor.constraint(equalTo: topAnchor).isActive = true
                     borderView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
 
@@ -130,7 +130,7 @@ public class TextBlockContainerView: NSBox {
                 }
 
                 borderView?.isHidden = false
-                leadingAnchorConstraint?.constant = 13
+                leadingAnchorConstraint?.constant = 14
             } else {
                 borderView?.isHidden = true
                 leadingAnchorConstraint?.constant = 0
@@ -333,6 +333,15 @@ public class TextBlockView: AttributedTextView {
             }
         }
 
+        public var textColor: NSColor {
+            switch self {
+            case .quote:
+                return SizeLevel.quoteTextColor
+            default:
+                return SizeLevel.textColor
+            }
+        }
+
         public var textStyle: TextStyle {
             return SizeLevel.textStyleForSizeLevel(self)
         }
@@ -355,7 +364,7 @@ public class TextBlockView: AttributedTextView {
                     family: traits.isCode ? SizeLevel.monospacedFont : nil,
                     weight: traits.isBold ? self.boldFontWeight : self.standardFontWeight,
                     size: self.fontSize,
-                    color: SizeLevel.textColor
+                    color: self.textColor
                 )
 
                 var newAttributes = textStyle.attributeDictionary
@@ -394,9 +403,11 @@ public class TextBlockView: AttributedTextView {
 
         public static let prefixShortcutSizes: [SizeLevel] = [.h1, .h2, .h3, .h4, .h5, .h6, .quote]
 
-        private static var monospacedFont = "Menlo"
+        public static var monospacedFont = "Menlo"
 
-        private static var textColor = NSColor.textColor.withAlphaComponent(0.8)
+        public static var textColor = NSColor.textColor.withAlphaComponent(0.8)
+
+        public static var quoteTextColor = NSColor.textColor.withAlphaComponent(0.5)
     }
 
     public var sizeLevel: SizeLevel = .paragraph {
@@ -409,6 +420,7 @@ public class TextBlockView: AttributedTextView {
 
     private func updateSizeLevel(to sizeLevel: SizeLevel) {
         font = sizeLevel.textStyle.nsFont
+        textColor = sizeLevel.textColor
 
         if let placeholderAttributedString = self.placeholderAttributedString {
             self.placeholderAttributedString = NSAttributedString(string: placeholderAttributedString.string, attributes: sizeLevel.placeholderFontAttributes)

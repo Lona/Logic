@@ -254,6 +254,12 @@ public class BlockListView: NSBox {
                 }
             }
 
+            if blocks.all(where: { $0.isEmpty }), !blocks.isEmpty {
+                if let view = blocks[0].view as? TextBlockContainerView {
+                    view.setPlaceholder(string: "Click here to start!")
+                }
+            }
+
             needsDisplay = true
         }
     }
@@ -428,7 +434,7 @@ public class BlockListView: NSBox {
         return horizontalPadding
     }
 
-    public var verticalPadding: CGFloat = 20
+    public var verticalPadding: CGFloat = 120
 
     public override func layout() {
         super.layout()
