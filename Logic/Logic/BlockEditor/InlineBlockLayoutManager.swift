@@ -13,7 +13,7 @@ class InlineBlockLayoutManager: NSLayoutManager {
     var getFont: (() -> NSFont?) = { return nil }
 
     private var font: NSFont {
-        return getFont() ?? TextBlockView.defaultTextStyle.nsFont
+        return getFont()!
     }
 
     private var lineHeight: CGFloat {

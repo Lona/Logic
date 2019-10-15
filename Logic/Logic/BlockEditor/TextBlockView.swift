@@ -8,6 +8,8 @@
 
 import Foundation
 
+// MARK: - TextBlockContainerView
+
 public class TextBlockContainerView: NSBox {
 
     public override var isFlipped: Bool {
@@ -260,11 +262,11 @@ public class TextBlockContainerView: NSBox {
     }
 }
 
+// MARK: - TextBlockView
+
 public class TextBlockView: AttributedTextView {
 
-    public static var defaultTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16)
-
-    public static var defaultPlaceholderTextStyle = TextStyle(weight: NSFont.Weight.light, size: 16, color: NSColor.placeholderTextColor)
+    // MARK: SizeLevel
 
     public enum SizeLevel: Int {
         case h1 = 1
@@ -300,16 +302,24 @@ public class TextBlockView: AttributedTextView {
             }
         }
 
-        var fontWeight: NSFont.Weight {
-            // This affects bold trait detection
-            return .regular
-//            switch self {
-//            case .paragraph: return .light
-//            case .h6, .h5, .h4: return .regular
-//            case .h3: return .medium
-//            case .h2: return .medium
-//            case .h1: return .medium
-//            }
+        var standardFontWeight: NSFont.Weight {
+            switch self {
+            case .paragraph, .quote: return .light
+            case .h6, .h5, .h4: return .regular
+            case .h3: return .medium
+            case .h2: return .medium
+            case .h1: return .semibold
+            }
+        }
+
+        var boldFontWeight: NSFont.Weight {
+            switch self {
+            case .paragraph, .quote: return .bold
+            case .h6, .h5, .h4: return .bold
+            case .h3: return .bold
+            case .h2: return .bold
+            case .h1: return .heavy
+            }
         }
 
         public var prefix: String? {
@@ -323,54 +333,86 @@ public class TextBlockView: AttributedTextView {
             }
         }
 
+        public var textStyle: TextStyle {
+            return SizeLevel.textStyleForSizeLevel(self)
+        }
+
+        public var placeholderFontAttributes: [NSAttributedString.Key: Any] {
+            return SizeLevel.placeholderFontAttributesForSizeLevel(self)
+        }
+
+        func apply(to string: String) -> NSAttributedString {
+            return apply(to: NSAttributedString(string: string))
+        }
+
         func apply(to textValue: NSAttributedString) -> NSAttributedString {
             let newTextValue = NSMutableAttributedString(attributedString: textValue)
 
-            newTextValue.enumerateAttribute(.font, in: NSRange(location: 0, length: textValue.length), options: [], using: { value, range, boolPointer in
-                let font = (value as? NSFont) ?? TextBlockView.defaultTextStyle.nsFont
-                guard let newFont = NSFont(descriptor: font.fontDescriptor, size: self.fontSize) else { return }
-//                newTextValue.addAttribute(.font, value: newFont, range: range)
+            newTextValue.enumerateAttributes(in: NSRange(location: 0, length: textValue.length), options: []) { (attributes, range, _) in
+                let traits: [InlineTextTrait] = .init(attributes: attributes)
 
-                newTextValue.addAttributes(
-                    [.font: newFont, .foregroundColor: NSColor.textColor.withAlphaComponent(0.8)],
-                    range: range
+                let textStyle = TextStyle(
+                    family: traits.isCode ? SizeLevel.monospacedFont : nil,
+                    weight: traits.isBold ? self.boldFontWeight : self.standardFontWeight,
+                    size: self.fontSize,
+                    color: SizeLevel.textColor
                 )
-            })
+
+                var newAttributes = textStyle.attributeDictionary
+
+                if traits.isCode {
+                    newAttributes[.backgroundColor] = Colors.commentBackground
+                }
+
+                if let font = newAttributes[.font] as? NSFont, traits.isItalic {
+                    newAttributes[.font] = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
+                }
+
+                newTextValue.addAttributes(newAttributes, range: range)
+            }
 
             return newTextValue
         }
 
+        // MARK: Static
+
+        public static var textStyleForSizeLevel: (SizeLevel) -> TextStyle = Memoize.all { sizeLevel in
+            return TextStyle(weight: sizeLevel.standardFontWeight, size: sizeLevel.fontSize)
+        }
+
+        public static var placeholderFontAttributesForSizeLevel: (SizeLevel) -> [NSAttributedString.Key: Any] = Memoize.all { sizeLevel in
+             let ps = NSMutableParagraphStyle()
+             ps.lineHeightMultiple = TextBlockView.lineHeightMultiple - 0.25
+             var attributes = TextStyle(weight: sizeLevel.standardFontWeight, size: sizeLevel.fontSize, color: NSColor.placeholderTextColor).attributeDictionary
+             attributes[.paragraphStyle] = ps
+             return attributes
+        }
+
         public static let prefixShortcutSizes: [SizeLevel] = [.h1, .h2, .h3, .h4, .h5, .h6, .quote]
+
+        private static var monospacedFont = "Menlo"
+
+        private static var textColor = NSColor.textColor.withAlphaComponent(0.8)
     }
 
     public var sizeLevel: SizeLevel = .paragraph {
         didSet {
-//            Swift.print("set size level", sizeLevel)
-
             if oldValue == sizeLevel { return }
 
-            font = textStyle.nsFont
-
-            if let placeholderAttributedString = self.placeholderAttributedString {
-                self.placeholderAttributedString = NSAttributedString(string: placeholderAttributedString.string, attributes: placeholderTextStyle)
-            }
+            updateSizeLevel(to: sizeLevel)
         }
     }
 
-    private var textStyle: TextStyle {
-        return TextBlockView.defaultTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize)
-    }
+    private func updateSizeLevel(to sizeLevel: SizeLevel) {
+        font = sizeLevel.textStyle.nsFont
 
-    private var placeholderTextStyle: [NSAttributedString.Key: Any] {
-        let ps = NSMutableParagraphStyle()
-        ps.lineHeightMultiple = TextBlockView.lineHeightMultiple - 0.25
-        var attributes = TextBlockView.defaultPlaceholderTextStyle.with(weight: sizeLevel.fontWeight, size: sizeLevel.fontSize).attributeDictionary
-        attributes[.paragraphStyle] = ps
-        return attributes
+        if let placeholderAttributedString = self.placeholderAttributedString {
+            self.placeholderAttributedString = NSAttributedString(string: placeholderAttributedString.string, attributes: sizeLevel.placeholderFontAttributes)
+        }
     }
 
     public func setPlaceholder(string: String) {
-        placeholderAttributedString = NSAttributedString(string: string, attributes: placeholderTextStyle)
+        placeholderAttributedString = NSAttributedString(string: string, attributes: sizeLevel.placeholderFontAttributes)
     }
 
     @objc private var placeholderAttributedString: NSAttributedString? {
@@ -387,7 +429,7 @@ public class TextBlockView: AttributedTextView {
         let layoutManager = InlineBlockLayoutManager()
         layoutManager.getFont = { [weak self] in
             guard let self = self else { return nil }
-            return self.textStyle.nsFont
+            return self.sizeLevel.textStyle.nsFont
         }
         layoutManager.delegate = self
 
@@ -397,13 +439,13 @@ public class TextBlockView: AttributedTextView {
 
         delegate = self
 
-        font = TextBlockView.defaultTextStyle.nsFont
-
         focusRingType = .none
 
         drawsBackground = true
 
         backgroundColor = .clear
+
+        updateSizeLevel(to: .paragraph)
     }
 
     public func showInlineToolbar(for range: NSRange) {
@@ -463,15 +505,6 @@ public class TextBlockView: AttributedTextView {
 
     public override func prepareTextValue(_ value: NSAttributedString) -> NSAttributedString {
         return sizeLevel.apply(to: value)
-//        let mutable = NSMutableAttributedString(attributedString: value)
-//
-//        let style = NSMutableParagraphStyle()
-//
-//        style.lineSpacing = 10
-//
-//        mutable.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: value.length))
-//
-//        return mutable
     }
 
     private func updateSharedToolbarWindow(traits: [InlineTextTrait]) {
@@ -489,7 +522,7 @@ public class TextBlockView: AttributedTextView {
         self.updateSharedToolbarWindow(traits: traits)
 
         InlineToolbarWindow.shared.onCommand = { [unowned self] command in
-            let mutable = NSMutableAttributedString(attributedString: self.textValue)
+            var mutable = NSMutableAttributedString(attributedString: self.textValue)
 
             func update(trait: InlineTextTrait) {
                 if traits.contains(trait) {
@@ -653,7 +686,7 @@ extension TextBlockView: NSLayoutManagerDelegate {
         in textContainer: NSTextContainer,
         forGlyphRange glyphRange: NSRange) -> Bool {
 
-        let fontLineHeight = layoutManager.defaultLineHeight(for: textStyle.nsFont)
+        let fontLineHeight = layoutManager.defaultLineHeight(for: sizeLevel.textStyle.nsFont)
         let lineHeight = fontLineHeight * TextBlockView.lineHeightMultiple
         let baselineNudge = (lineHeight - fontLineHeight)
             // The following factor is a result of experimentation:

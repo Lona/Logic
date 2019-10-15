@@ -140,6 +140,7 @@
 		6BEEA13122A6E6EF00905664 /* LGCSyntax+Range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */; };
 		6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */; };
 		6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13522A713FA00905664 /* StandardConfiguration.swift */; };
+		6BF4EF43235554E800548F61 /* MDXInlineNode+EditableString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF4EF42235554E800548F61 /* MDXInlineNode+EditableString.swift */; };
 		6BF7795922D24EE1009A4119 /* FilterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF7795822D24EE1009A4119 /* FilterLabel.swift */; };
 		6BFA8A592332B0460016FC7B /* menu-thumbnail-h1.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */; };
 		6BFA8A5A2332B0460016FC7B /* menu-thumbnail-h2.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */; };
@@ -284,6 +285,7 @@
 		6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Range.swift"; sourceTree = "<group>"; };
 		6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeFormattable.swift; sourceTree = "<group>"; };
 		6BEEA13522A713FA00905664 /* StandardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardConfiguration.swift; sourceTree = "<group>"; };
+		6BF4EF42235554E800548F61 /* MDXInlineNode+EditableString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MDXInlineNode+EditableString.swift"; sourceTree = "<group>"; };
 		6BF7795822D24EE1009A4119 /* FilterLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterLabel.swift; sourceTree = "<group>"; };
 		6BFA8A542332B0460016FC7B /* menu-thumbnail-h1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-h1.png"; sourceTree = "<group>"; };
 		6BFA8A552332B0460016FC7B /* menu-thumbnail-h2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-h2.png"; sourceTree = "<group>"; };
@@ -450,6 +452,7 @@
 				6BBD0C122298945D00EB87A9 /* LGCSyntax+Selection.swift */,
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
 				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
+				6BF4EF42235554E800548F61 /* MDXInlineNode+EditableString.swift */,
 				6BD9949823443CC100F3F173 /* MDXSyntax.swift */,
 				6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */,
 				6B3961292321C39100F27CB8 /* SyntaxNodeContext.swift */,
@@ -834,6 +837,7 @@
 				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
+				6BF4EF43235554E800548F61 /* MDXInlineNode+EditableString.swift in Sources */,
 				6BBD0BFF2294D92B00EB87A9 /* Unification.swift in Sources */,
 				6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */,
 				6BBD0C0F2298759F00EB87A9 /* LGCExpression+Builders.swift in Sources */,

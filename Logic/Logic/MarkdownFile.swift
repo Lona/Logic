@@ -93,8 +93,8 @@ public enum MarkdownFile {
             case .image(let image):
                 return BlockEditor.Block(.image(URL(string: image.url)))
             case .heading(let value):
-                func sizeLevel(_ level: Int) -> TextBlockView.SizeLevel {
-                    switch level {
+                func sizeLevelForDepth(_ depth: Int) -> TextBlockView.SizeLevel {
+                    switch depth {
                     case 1: return .h1
                     case 2: return .h2
                     case 3: return .h3
@@ -105,13 +105,14 @@ public enum MarkdownFile {
                     }
                 }
 
-                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
-                return BlockEditor.Block(.text(attributedString, sizeLevel(value.depth)))
+                let sizeLevel = sizeLevelForDepth(value.depth)
+                let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: sizeLevel) }.joined()
+                return BlockEditor.Block(.text(attributedString, sizeLevel))
             case .paragraph(let value):
-                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
+                let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .paragraph) }.joined()
                 return BlockEditor.Block(.text(attributedString, .paragraph))
             case .blockquote(let value):
-                let attributedString: NSAttributedString = value.children.map { $0.editableString }.joined()
+                let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .quote) }.joined()
                 return BlockEditor.Block(.text(attributedString, .quote))
             case .code(let value):
                 return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)))

@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension NSAttributedString.Key {
+    public static let bold = NSAttributedString.Key("bold")
+    public static let italic = NSAttributedString.Key("italic")
+    public static let code = NSAttributedString.Key("code")
+}
+
 public enum InlineTextTrait: Equatable {
     case bold, italic, strikethrough, code, link(String)
 
@@ -30,8 +36,6 @@ public enum InlineTextTrait: Equatable {
         case .link: return "]"
         }
     }
-
-    static var monospacedFontFamily: String = "Menlo"
 }
 
 extension Array where Element == InlineTextTrait {
@@ -61,19 +65,21 @@ extension Array where Element == InlineTextTrait {
 
     public var isItalic: Bool { return contains(.italic) }
 
+    public var isCode: Bool { return contains(.code) }
+
     public init(attributes: [NSAttributedString.Key: Any]) {
         self.init()
 
-        if let font = attributes[.font] as? NSFont {
-            if NSFontManager.shared.traits(of: font).contains(.boldFontMask) {
-                self.append(.bold)
-            }
-            if NSFontManager.shared.traits(of: font).contains(.italicFontMask) {
-                self.append(.italic)
-            }
-            if font.familyName == InlineTextTrait.monospacedFontFamily {
-                self.append(.code)
-            }
+        if let value = attributes[.bold] as? Bool, value == true {
+            self.append(.bold)
+        }
+
+        if let value = attributes[.italic] as? Bool, value == true {
+            self.append(.italic)
+        }
+
+        if let value = attributes[.code] as? Bool, value == true {
+            self.append(.code)
         }
 
         if let strikethrough = attributes[.strikethroughStyle] as? Int, strikethrough != 0 {
@@ -88,42 +94,30 @@ extension Array where Element == InlineTextTrait {
 
 extension NSMutableAttributedString {
     public func add(trait: InlineTextTrait, range: NSRange) {
-        guard let font = self.fontAttributes(in: range)[.font] as? NSFont else { return }
-
         switch trait {
         case .bold:
-            let newFont = NSFontManager.shared.convert(font, toHaveTrait: .boldFontMask)
-            addAttribute(.font, value: newFont, range: range)
+            addAttribute(.bold, value: true, range: range)
         case .italic:
-            let newFont = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
-            addAttribute(.font, value: newFont, range: range)
+            addAttribute(.italic, value: true, range: range)
         case .strikethrough:
             addAttribute(.strikethroughStyle, value: 1, range: range)
         case .code:
-            let newFont = NSFontManager.shared.convert(font, toFamily: InlineTextTrait.monospacedFontFamily)
-            addAttribute(.font, value: newFont, range: range)
-            addAttribute(.backgroundColor, value: Colors.commentBackground, range: range)
+            addAttribute(.code, value: true, range: range)
         case .link(let string):
             addAttribute(.link, value: NSURL(string: string) ?? NSURL(), range: range)
         }
     }
 
     public func remove(trait: InlineTextTrait, range: NSRange) {
-        guard let font = self.fontAttributes(in: range)[.font] as? NSFont else { return }
-
         switch trait {
         case .bold:
-            let newFont = NSFontManager.shared.convert(font, toNotHaveTrait: .boldFontMask)
-            addAttribute(.font, value: newFont, range: range)
+            removeAttribute(.bold, range: range)
         case .italic:
-            let newFont = NSFontManager.shared.convert(font, toNotHaveTrait: .italicFontMask)
-            addAttribute(.font, value: newFont, range: range)
+            removeAttribute(.italic, range: range)
         case .strikethrough:
             removeAttribute(.strikethroughStyle, range: range)
         case .code:
-            let newFont = NSFontManager.shared.convert(font, toFamily: NSFont.systemFont(ofSize: NSFont.systemFontSize).familyName!)
-            addAttribute(.font, value: newFont, range: range)
-            removeAttribute(.backgroundColor, range: range)
+            removeAttribute(.code, range: range)
         case .link:
             removeAttribute(.link, range: range)
         }
