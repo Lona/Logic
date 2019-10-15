@@ -386,8 +386,8 @@ public class BlockListView: NSBox {
         scrollView.documentView = tableView
 
         scrollView.automaticallyAdjustsContentInsets = false
-        scrollView.contentInsets = .init(top: 20, left: 60, bottom: 20, right: 60)
-        scrollView.scrollerInsets = .init(top: -20, left: -60, bottom: -20, right: -60)
+        scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
+        scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
 
         addSubview(scrollView)
 
@@ -422,8 +422,23 @@ public class BlockListView: NSBox {
         return true
     }
 
+    public var horizontalPadding: CGFloat {
+        let width = bounds.width
+        let horizontalPadding = width > 820 ? floor((width - 700) / 2) : 60
+        return horizontalPadding
+    }
+
+    public var verticalPadding: CGFloat = 20
+
     public override func layout() {
         super.layout()
+
+        let horizontalPadding = self.horizontalPadding
+
+        if scrollView.contentInsets.left != horizontalPadding {
+            scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
+            scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
+        }
 
         tableView.enumerateAvailableRowViews { rowView, row in
             self.blocks[row].updateViewWidth(tableView.bounds.width)
@@ -510,7 +525,7 @@ public class BlockListView: NSBox {
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
-            x: 60 - lineButtonSize.width - lineButtonMargin,
+            x: horizontalPadding - lineButtonSize.width - lineButtonMargin,
             y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
@@ -529,7 +544,7 @@ public class BlockListView: NSBox {
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
-            x: 60 - lineButtonSize.width * 2 - lineButtonMargin * 2,
+            x: horizontalPadding - lineButtonSize.width * 2 - lineButtonMargin * 2,
             y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)

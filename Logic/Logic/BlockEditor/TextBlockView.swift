@@ -369,6 +369,10 @@ public class TextBlockView: AttributedTextView {
                 }
 
                 newTextValue.addAttributes(newAttributes, range: range)
+
+                if !traits.isCode {
+                    newTextValue.removeAttribute(.backgroundColor, range: range)
+                }
             }
 
             return newTextValue
