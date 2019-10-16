@@ -552,7 +552,7 @@ public class BlockListView: NSBox {
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
-            x: horizontalPadding - lineButtonSize.width - lineButtonMargin,
+            x: floor(horizontalPadding - lineButtonSize.width - lineButtonMargin),
             y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
