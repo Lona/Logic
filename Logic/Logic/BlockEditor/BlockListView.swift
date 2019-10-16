@@ -1821,6 +1821,18 @@ extension BlockListView {
     @IBAction public func pasteAsPlainText(_ sender: Any?) {
         guard let pastedBlocks = NSPasteboard.general.blocks else { return }
 
+        handlePasteBlocks(pastedBlocks)
+    }
+
+    @IBAction public func pasteAsMdxText(_ sender: Any?) {
+        guard let pastedString = NSPasteboard.general.string(forType: .string),
+            let data = pastedString.data(using: .utf8),
+            let pastedBlocks = MarkdownFile.makeBlocks(data) else { return }
+
+        handlePasteBlocks(pastedBlocks)
+    }
+
+    private func handlePasteBlocks(_ pastedBlocks: [EditableBlock]) {
         switch selection {
         case .none:
             break
