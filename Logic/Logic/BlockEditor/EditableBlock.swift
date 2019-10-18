@@ -327,13 +327,16 @@ public class EditableBlock: Equatable {
         case (.text(_, .h3), .text(_, .paragraph)):
             return 4
         case (.text(_, .paragraph), .text(_, .h1)),
-             (.text(_, .quote), .text(_, .h1)):
+             (.text(_, .quote), .text(_, .h1)),
+             (.tokens(_), .text(_, .h1)):
             return 32
         case (.text(_, .paragraph), .text(_, .h2)),
-             (.text(_, .quote), .text(_, .h2)):
+             (.text(_, .quote), .text(_, .h2)),
+             (.tokens(_), .text(_, .h2)):
             return 20
         case (.text(_, .paragraph), .text(_, .h3)),
-             (.text(_, .quote), .text(_, .h3)):
+             (.text(_, .quote), .text(_, .h3)),
+             (.tokens(_), .text(_, .h3)):
             return 8
         case (.text(_, .paragraph), .text(_, .paragraph)),
              (.text(_, .quote), .text(_, .paragraph)),
