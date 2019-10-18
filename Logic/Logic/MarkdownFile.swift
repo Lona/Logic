@@ -50,7 +50,7 @@ public enum MarkdownFile {
             return nil
         }
 
-        guard let markdownStringData = LogicFile.convert(convertedData, kind: .document, to: .source, from: .json) else {
+        guard let markdownStringData = LogicFile.convert(convertedData, kind: .document, to: .source, from: .json, embeddedFormat: .source) else {
             Swift.print("Failed to convert MDX JSON to markdown string")
             return nil
         }

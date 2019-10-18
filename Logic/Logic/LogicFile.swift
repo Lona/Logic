@@ -15,17 +15,27 @@ public enum LogicFile {
         case source
     }
 
-    public static func convert(_ contents: String, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat, from sourceFormat: DataSerializationFormat? = nil) -> String? {
-        return JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat)
+    public static func convert(
+        _ contents: String,
+        kind: EncodingConversionKind,
+        to targetFormat: DataSerializationFormat,
+        from sourceFormat: DataSerializationFormat? = nil,
+        embeddedFormat: DataSerializationFormat? = nil) -> String? {
+        return JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat, embeddedEncoding: embeddedFormat)
     }
 
-    public static func convert(_ data: Data, kind: EncodingConversionKind, to targetFormat: DataSerializationFormat, from sourceFormat: DataSerializationFormat? = nil) -> Data? {
+    public static func convert(
+        _ data: Data,
+        kind: EncodingConversionKind,
+        to targetFormat: DataSerializationFormat,
+        from sourceFormat: DataSerializationFormat? = nil,
+        embeddedFormat: DataSerializationFormat? = nil) -> Data? {
         guard let contents = String(data: data, encoding: .utf8) else {
             Swift.print("Failed to convert Logic file Data to String")
             return nil
         }
 
-        guard let converted = JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat) else {
+        guard let converted = JavaScript.convert(contents: contents, kind: kind, to: targetFormat, from: sourceFormat, embeddedEncoding: embeddedFormat) else {
             return nil
         }
 

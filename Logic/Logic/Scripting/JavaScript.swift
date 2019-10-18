@@ -35,28 +35,33 @@ public enum JavaScript {
         return context
     }()
 
-    static func convert(
+    public static func convert(
         contents: String,
         kind: EncodingConversionKind,
         to targetEncoding: LogicFile.DataSerializationFormat,
-        from sourceEncoding: LogicFile.DataSerializationFormat? = nil) -> String? {
+        from sourceEncoding: LogicFile.DataSerializationFormat? = nil,
+        embeddedEncoding: LogicFile.DataSerializationFormat? = nil) -> String? {
 
         context.setObject(contents, forKeyedSubscript: "___contents" as NSString)
 
-        var options = "{}"
+        var options: [String] = []
         if let sourceEncoding = sourceEncoding {
-            options = "{sourceFormat: '\(sourceEncoding.rawValue)'}"
+            options.append("sourceFormat: '\(sourceEncoding.rawValue)'")
         }
+        if let embeddedEncoding = embeddedEncoding {
+            options.append("embeddedFormat: '\(embeddedEncoding.rawValue)'")
+        }
+        let optionsString = "{\(options.joined(separator: ", "))}"
 
         switch kind {
         case .logic:
-            let script = "global.lonaSerialization.convertLogic(___contents, '\(targetEncoding.rawValue)', \(options))"
+            let script = "global.lonaSerialization.convertLogic(___contents, '\(targetEncoding.rawValue)', \(optionsString))"
             return context.evaluateScript(script)?.toString()
         case .types:
-            let script = "global.lonaSerialization.convertTypes(___contents, '\(targetEncoding.rawValue)', \(options))"
+            let script = "global.lonaSerialization.convertTypes(___contents, '\(targetEncoding.rawValue)', \(optionsString))"
             return context.evaluateScript(script)?.toString()
         case .document:
-            let script = "global.lonaSerialization.convertDocument(___contents, '\(targetEncoding.rawValue)', \(options))"
+            let script = "global.lonaSerialization.convertDocument(___contents, '\(targetEncoding.rawValue)', \(optionsString))"
             return context.evaluateScript(script)?.toString()
         }
     }
