@@ -152,6 +152,7 @@ public class LogicCanvasView: NSView {
     public var onMoveLine: ((Int, Int) -> Void)?
     public var onFocus: (() -> Void)?
     public var onBlur: (() -> Void)?
+    public var onClickBackground: (() -> Void)?
     public var onClickLinePlus: ((Int, NSRect) -> Void)?
     public var onClickLineMore: ((Int, NSRect) -> Void)?
     public var drawScrollerBackground: ((NSRect, Bool) -> Void)?
@@ -348,7 +349,7 @@ public class LogicCanvasView: NSView {
                 onClickLineMore?(index, rect)
             }
         case .some(.line):
-            break
+            onClickBackground?()
         }
     }
 

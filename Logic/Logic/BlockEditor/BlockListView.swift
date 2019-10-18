@@ -947,6 +947,8 @@ public class BlockListView: NSBox {
                     let row = tableView.row(at: convert(position, to: tableView))
 
                     if row >= 0 {
+
+                        // If the drag covers more than a single row, switch to block selection
                         if let initialRow = initialRow, initialRow != row {
                             if initialRow < row {
                                 let newRange = NSRange(location: initialRow, length: row - initialRow + 1)
@@ -958,6 +960,7 @@ public class BlockListView: NSBox {
                         } else {
                             initialRow = row
 
+                            // If the drag is within a text block, perform text selection
                             if let view = blocks[row].view as? TextBlockContainerView {
                                 let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
@@ -971,6 +974,9 @@ public class BlockListView: NSBox {
                                 view.focus()
                                 view.insertionPointColor = .clear
                                 didChangeInsertionColor = true
+                            // If the drag is within another kind of block, do block selection after the dragging threshold
+                            } else if isDragging {
+                                selection = .blocks(.init(location: row, length: 1))
                             }
                         }
                     }
@@ -1096,6 +1102,12 @@ extension BlockListView: NSTableViewDelegate {
         switch item.content {
         case .tokens:
             let view = item.view as! LogicEditor
+
+            view.onClickBackground = { [unowned self] in
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.selection = .blocks(.init(location: line, length: 1))
+            }
 
             view.onRequestDelete = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }

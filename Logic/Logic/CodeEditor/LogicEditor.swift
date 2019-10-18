@@ -76,6 +76,11 @@ open class LogicEditor: NSBox {
 
     public var onRequestDelete: (() -> Void)?
 
+    public var onClickBackground: (() -> Void)? {
+        get { return canvasView.onClickBackground }
+        set { canvasView.onClickBackground = newValue }
+    }
+
     public var decorationForNodeID: ((UUID) -> LogicElement.Decoration?)? {
         get { return canvasView.getElementDecoration }
         set { canvasView.getElementDecoration = newValue }
