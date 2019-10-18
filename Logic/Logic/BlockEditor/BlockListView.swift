@@ -457,7 +457,7 @@ public class BlockListView: NSBox {
         return horizontalPadding
     }
 
-    public var verticalPadding: CGFloat = 120
+    public var verticalPadding: CGFloat = 80
 
     public override func layout() {
         super.layout()
