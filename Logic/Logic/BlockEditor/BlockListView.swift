@@ -239,6 +239,8 @@ public class BlockListView: NSBox {
 
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
+            tableView.blocks = blocks
+
             blocks.updateMargins()
 
             let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
@@ -465,10 +467,6 @@ public class BlockListView: NSBox {
         if scrollView.contentInsets.left != horizontalPadding {
             scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
             scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
-        }
-
-        tableView.enumerateAvailableRowViews { rowView, row in
-            self.blocks[row].updateViewWidth(tableView.bounds.width)
         }
     }
 
@@ -1851,6 +1849,9 @@ extension BlockListView {
 // MARK: - BlockListTableView
 
 class BlockListTableView: NSTableView {
+
+    public var blocks: [BlockEditor.Block] = []
+
     override var acceptsFirstResponder: Bool {
         return false
     }
@@ -1858,5 +1859,13 @@ class BlockListTableView: NSTableView {
     // Allows clicking into NSTextFields directly (otherwise the NSTableView captures the first click)
     override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
         return true
+    }
+
+    override func layout() {
+        super.layout()
+
+        enumerateAvailableRowViews { rowView, row in
+            self.blocks[row].updateViewWidth(bounds.width)
+        }
     }
 }
