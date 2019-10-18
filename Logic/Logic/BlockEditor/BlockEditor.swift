@@ -10,7 +10,7 @@ import AppKit
 
 // MARK: - BlockEditor
 
-public class BlockEditor: NSBox {
+open class BlockEditor: NSBox {
 
     public typealias Block = EditableBlock
 
@@ -127,5 +127,14 @@ extension BlockEditor {
         public init() {
             self.init(Parameters())
         }
+    }
+}
+
+extension BlockEditor {
+
+    // The block editor supports drag and drop, so we don't allow dragging the window.
+    // We could potentially handle this more granularly if needed.
+    open override var mouseDownCanMoveWindow: Bool {
+        return false
     }
 }
