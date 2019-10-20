@@ -822,7 +822,7 @@ extension LogicEditor {
         return suggestionListItems
     }
 
-    private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String) -> [LogicSuggestionItem] {
+    private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String, categoryFilter: String?) -> [LogicSuggestionItem] {
         guard let range = context.elementRange(for: syntaxNode.uuid, includeTopLevel: false),
             let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
 
@@ -830,6 +830,8 @@ extension LogicEditor {
 
         return suggestionsForNode(rootNode, highestMatch, prefix).filter {
             !showsFilterBar || ($0.suggestionFilters.isEmpty || $0.suggestionFilters.contains(suggestionFilter))
+        }.filter {
+            categoryFilter == nil || $0.category == categoryFilter
         }
     }
 }
@@ -907,9 +909,7 @@ extension LogicEditor {
         let syntaxNodePath = context.uniqueElementPathTo(id: syntaxNode.uuid, includeTopLevel: false)
         let dropdownNodes = Array(syntaxNodePath)
 
-        var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText).filter {
-            categoryFilter == nil || $0.category == categoryFilter
-        }
+        var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText, categoryFilter: categoryFilter)
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
         let initialIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
@@ -979,7 +979,7 @@ extension LogicEditor {
         childWindow.suggestionFilter = suggestionFilter
         childWindow.onChangeSuggestionFilter = { value in
             self.onChangeSuggestionFilter?(value)
-            self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode)
+            self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: categoryFilter)
         }
 
         childWindow.onSelectIndex = { index in
@@ -1044,7 +1044,7 @@ extension LogicEditor {
             dynamicListItems.removeAll()
 
             // Update logicSuggestions
-            logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value)
+            logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value, categoryFilter: categoryFilter)
 
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
             let index = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })
