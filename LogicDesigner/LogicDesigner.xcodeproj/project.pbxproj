@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		6B00CA3323284411001907C6 /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B00CA3223284411001907C6 /* MarkdownDocument.swift */; };
-		6B00CA4B232C284C001907C6 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B00CA49232C2840001907C6 /* Differ.framework */; };
-		6B00CA4C232C284C001907C6 /* Differ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B00CA49232C2840001907C6 /* Differ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6B12C5E42218BD75005A808C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C5E32218BD75005A808C /* AppDelegate.swift */; };
 		6B12C5E62218BD75005A808C /* LogicDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B12C5E52218BD75005A808C /* LogicDocument.swift */; };
 		6B12C5EB2218BD77005A808C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B12C5EA2218BD77005A808C /* Assets.xcassets */; };
@@ -20,6 +18,8 @@
 		6B6F19B92304B00E00E5AC60 /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */; };
 		6B6F19D5230B3E2300E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D4230B3E2300E5AC60 /* Colors.framework */; };
 		6B6F19D7230B3E2B00E5AC60 /* Colors.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D4230B3E2300E5AC60 /* Colors.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6BF4EF5A235CC0CC00548F61 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF4EF59235CC0CC00548F61 /* Differ.framework */; };
+		6BF4EF5B235CC0E700548F61 /* Differ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF4EF59235CC0CC00548F61 /* Differ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,7 +29,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6B00CA4C232C284C001907C6 /* Differ.framework in Embed Frameworks */,
+				6BF4EF5B235CC0E700548F61 /* Differ.framework in Embed Frameworks */,
 				6B44E13E223B3CED00740318 /* Logic.framework in Embed Frameworks */,
 				6B6F19D7230B3E2B00E5AC60 /* Colors.framework in Embed Frameworks */,
 				6B6F19B32304AFFB00E5AC60 /* SwiftGraph.framework in Embed Frameworks */,
@@ -41,7 +41,6 @@
 
 /* Begin PBXFileReference section */
 		6B00CA3223284411001907C6 /* MarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocument.swift; sourceTree = "<group>"; };
-		6B00CA49232C2840001907C6 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
 		6B12C5E02218BD75005A808C /* LogicDesigner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LogicDesigner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B12C5E32218BD75005A808C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6B12C5E52218BD75005A808C /* LogicDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicDocument.swift; sourceTree = "<group>"; };
@@ -52,6 +51,7 @@
 		6B44E13C223B3CED00740318 /* Logic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Logic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
 		6B6F19D4230B3E2300E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
+		6BF4EF59235CC0CC00548F61 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = ../Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B00CA4B232C284C001907C6 /* Differ.framework in Frameworks */,
+				6BF4EF5A235CC0CC00548F61 /* Differ.framework in Frameworks */,
 				6B44E13D223B3CED00740318 /* Logic.framework in Frameworks */,
 				6B6F19D5230B3E2300E5AC60 /* Colors.framework in Frameworks */,
 				6B6F19B92304B00E00E5AC60 /* SwiftGraph.framework in Frameworks */,
@@ -72,8 +72,8 @@
 		6B12C5D72218BD75005A808C = {
 			isa = PBXGroup;
 			children = (
-				6B00CA49232C2840001907C6 /* Differ.framework */,
 				6B6F19D4230B3E2300E5AC60 /* Colors.framework */,
+				6BF4EF59235CC0CC00548F61 /* Differ.framework */,
 				6B44E13C223B3CED00740318 /* Logic.framework */,
 				6B6F19B02304AFF800E5AC60 /* SwiftGraph.framework */,
 				6B12C5E22218BD75005A808C /* LogicDesigner */,
