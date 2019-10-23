@@ -20,8 +20,8 @@
 		6B6F19CB2304B2E700E5AC60 /* XMLCoder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6B6F19DA230B506500E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D8230B506000E5AC60 /* Colors.framework */; };
 		6B6F19DB230B506500E5AC60 /* Colors.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D8230B506000E5AC60 /* Colors.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6BD99496234439F700F3F173 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BD99494234439EB00F3F173 /* Differ.framework */; };
-		6BD99497234439F700F3F173 /* Differ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6BD99494234439EB00F3F173 /* Differ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6BF4EF5F2360D4C300548F61 /* Differ.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF4EF5E2360D4C300548F61 /* Differ.framework */; };
+		6BF4EF602360D4CA00548F61 /* Differ.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6BF4EF5E2360D4C300548F61 /* Differ.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,8 +31,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				6BF4EF602360D4CA00548F61 /* Differ.framework in Embed Frameworks */,
 				6B5B7569215B1C0200CDC9C6 /* Logic.framework in Embed Frameworks */,
-				6BD99497234439F700F3F173 /* Differ.framework in Embed Frameworks */,
 				6B6F19C92304B2E500E5AC60 /* SwiftGraph.framework in Embed Frameworks */,
 				6B6F19DB230B506500E5AC60 /* Colors.framework in Embed Frameworks */,
 				6B6F19CB2304B2E700E5AC60 /* XMLCoder.framework in Embed Frameworks */,
@@ -55,7 +55,7 @@
 		6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XMLCoder.framework; path = Carthage/Build/Mac/XMLCoder.framework; sourceTree = "<group>"; };
 		6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
 		6B6F19D8230B506000E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
-		6BD99494234439EB00F3F173 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = ../LogicDesigner/Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
+		6BF4EF5E2360D4C300548F61 /* Differ.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Differ.framework; path = ../Carthage/Build/Mac/Differ.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,7 +64,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B6F19C72304B2D800E5AC60 /* SwiftGraph.framework in Frameworks */,
-				6BD99496234439F700F3F173 /* Differ.framework in Frameworks */,
+				6BF4EF5F2360D4C300548F61 /* Differ.framework in Frameworks */,
 				6B6F19CA2304B2E700E5AC60 /* XMLCoder.framework in Frameworks */,
 				6B6F19DA230B506500E5AC60 /* Colors.framework in Frameworks */,
 				6B5B7568215B1C0200CDC9C6 /* Logic.framework in Frameworks */,
@@ -77,8 +77,8 @@
 		6B5B7528215B19ED00CDC9C6 = {
 			isa = PBXGroup;
 			children = (
-				6BD99494234439EB00F3F173 /* Differ.framework */,
 				6B6F19D8230B506000E5AC60 /* Colors.framework */,
+				6BF4EF5E2360D4C300548F61 /* Differ.framework */,
 				6B6F19C62304B2D800E5AC60 /* SwiftGraph.framework */,
 				6B5B7567215B1C0200CDC9C6 /* Logic.framework */,
 				6B6F19C42304B2CD00E5AC60 /* XMLCoder.framework */,
