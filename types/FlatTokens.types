@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<root>
+  <NativeType name="CGFloat"/>
+  <NativeType name="String"/>
+  <NativeType name="Array">
+    <NativeType.GenericParam type="Element"/>
+  </NativeType>
+  <NativeType name="Optional">
+    <NativeType.GenericParam type="Wrapped"/>
+  </NativeType>
+  <Type name="FontWeight">
+    <Case name="100"/>
+    <Case name="200"/>
+    <Case name="300"/>
+    <Case name="400"/>
+    <Case name="500"/>
+    <Case name="600"/>
+    <Case name="700"/>
+    <Case name="800"/>
+    <Case name="900"/>
+  </Type>
+  <Type name="ColorValue">
+    <Record name="colorValue">
+      <Record.Param name="css" type="String"/>
+    </Record>
+  </Type>
+  <Type name="TextStyleValue">
+    <Record name="textStyleValue">
+      <Record.Param name="fontName" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="String"/>
+      </Record.Param>
+      <Record.Param name="fontFamily" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="String"/>
+      </Record.Param>
+      <Record.Param name="fontWeight" type="FontWeight"/>
+      <Record.Param name="fontSize" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="CGFloat"/>
+      </Record.Param>
+      <Record.Param name="lineHeight" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="CGFloat"/>
+      </Record.Param>
+      <Record.Param name="letterSpacing" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="CGFloat"/>
+      </Record.Param>
+      <Record.Param name="color" type="Optional">
+        <Record.Substitution generic="Wrapped" instance="ColorValue"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="ShadowValue">
+    <Record name="shadowValue">
+      <Record.Param name="x" type="CGFloat"/>
+      <Record.Param name="y" type="CGFloat"/>
+      <Record.Param name="blur" type="CGFloat"/>
+      <Record.Param name="radius" type="CGFloat"/>
+      <Record.Param name="color" type="ColorValue"/>
+    </Record>
+  </Type>
+  <Type name="TokenValue">
+    <Case name="color">
+      <Case.Param type="ColorValue"/>
+    </Case>
+    <Case name="shadow">
+      <Case.Param type="ShadowValue"/>
+    </Case>
+    <Case name="textStyle">
+      <Case.Param type="TextStyleValue"/>
+    </Case>
+  </Type>
+  <Type name="Token">
+    <Record name="token">
+      <Record.Param name="qualifiedName" type="Array">
+        <Record.Substitution generic="Element" instance="String"/>
+      </Record.Param>
+      <Record.Param name="value" type="TokenValue"/>
+    </Record>
+  </Type>
+  <Type name="ConvertedFileContents">
+    <Case name="flatTokens">
+      <Case.Param type="Array">
+        <Case.Substitution generic="Element" instance="Token"/>
+      </Case.Param>
+    </Case>
+  </Type>
+  <Type name="ConvertedFile">
+    <Record name="convertedFile">
+      <Record.Param name="inputPath" type="String"/>
+      <Record.Param name="outputPath" type="String"/>
+      <Record.Param name="name" type="String"/>
+      <Record.Param name="contents" type="ConvertedFileContents"/>
+    </Record>
+  </Type>
+  <Type name="ConvertedWorkspace">
+    <Record name="convertedWorkspace">
+      <Record.Param name="files" type="Array">
+        <Record.Substitution generic="Element" instance="ConvertedFile"/>
+      </Record.Param>
+      <Record.Param name="flatTokensSchemaVersion" type="String"/>
+    </Record>
+  </Type>
+</root>
