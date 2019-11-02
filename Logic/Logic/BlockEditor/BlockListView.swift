@@ -790,6 +790,10 @@ public class BlockListView: NSBox {
         return nil
     }
 
+    public override func scrollWheel(with event: NSEvent) {
+        scrollView.scrollWheel(with: event)
+    }
+
     public override func mouseDown(with event: NSEvent) {
         hideChildWindows()
 
