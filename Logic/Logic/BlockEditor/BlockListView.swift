@@ -946,7 +946,7 @@ public class BlockListView: NSBox {
                 case .leftMouseDragged:
                     let row = tableView.row(at: convert(position, to: tableView))
 
-                    if row >= 0 {
+                    if isDragging && row >= 0 {
 
                         // If the drag covers more than a single row, switch to block selection
                         if let initialRow = initialRow, initialRow != row {
@@ -1018,6 +1018,15 @@ public class BlockListView: NSBox {
         }
     }
 
+    private struct Insertion {
+        var time: TimeInterval = Date.distantPast.timeIntervalSinceReferenceDate
+        var count: Int = 0
+        var index: Int?
+        var line: Int?
+    }
+
+    private var lastInsertion = Insertion()
+
     public func handleClick(mouseDownEvent: NSEvent, mouseUpEvent: NSEvent) {
         selection = .none
 
@@ -1044,7 +1053,28 @@ public class BlockListView: NSBox {
 
                 let characterIndex = view.characterIndexForInsertion(at: pointInView)
 
-                selection = .item(line, NSRange(location: characterIndex, length: 0))
+                if lastInsertion.line == line, lastInsertion.index == characterIndex, Date().timeIntervalSinceReferenceDate - lastInsertion.time < 0.5 {
+                    let options: NSString.EnumerationOptions = lastInsertion.count % 2 == 1 ? .byWords : .byLines
+                    let string = view.textValue.string as NSString
+                    var selectionRange: NSRange = .init(location: characterIndex, length: 0)
+                    string.enumerateSubstrings(in: .init(location: 0, length: string.length), options: options) {
+                        (word, wordRange, enclosingRange, boolPointer) in
+                        if wordRange.lowerBound <= characterIndex && characterIndex <= wordRange.upperBound {
+                            selectionRange = wordRange
+                            boolPointer.pointee = true
+                        }
+                    }
+                    selection = .item(line, selectionRange)
+
+                } else {
+                    selection = .item(line, NSRange(location: characterIndex, length: 0))
+                    lastInsertion.count = 0
+                    lastInsertion.index = characterIndex
+                    lastInsertion.line = line
+                }
+
+                lastInsertion.count += 1
+                lastInsertion.time = Date().timeIntervalSinceReferenceDate
 
                 view.focus()
             } else if let superview = view.superview {
