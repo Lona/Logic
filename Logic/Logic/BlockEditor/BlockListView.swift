@@ -322,6 +322,8 @@ public class BlockListView: NSBox {
             }
         }
 
+        var scrollTargetView: NSView?
+
         switch selection {
         case .none:
             break
@@ -335,10 +337,25 @@ public class BlockListView: NSBox {
 //                    view.needsDisplay = true
                 view.setPlaceholder(string: "Type '/' for commands")
             }
-        case .blocks(let range, _):
+
+            scrollTargetView = view
+        case .blocks(let range, let anchor):
             for index in range.lowerBound..<range.upperBound {
                 let rowView = tableView.rowView(atRow: index, makeIfNecessary: false) as? BlockListRowView
                 rowView?.isBlockSelected = true
+            }
+
+            if anchor < blocks.count {
+                scrollTargetView = blocks[anchor].view
+            }
+        }
+
+        if let view = scrollTargetView {
+            let viewFrame = view.convert(view.frame, to: scrollView.documentView!)
+            if scrollView.documentVisibleRect.maxY - 20 < viewFrame.minY {
+                scrollView.documentView?.scrollToVisible(.init(x: 0, y: viewFrame.minY, width: 0, height: 0))
+            } else if scrollView.documentVisibleRect.minY + 20 > viewFrame.maxY {
+                scrollView.documentView?.scrollToVisible(.init(x: 0, y: viewFrame.maxY, width: 0, height: 0))
             }
         }
     }
