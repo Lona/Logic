@@ -232,10 +232,7 @@ extension Compiler {
         case .literal(.string(id: _, value: let value)):
             context.add(uuid: node.uuid, EvaluationThunk(label: "String Literal", { _ in LogicValue.string(value) }))
         case .literal(.color(id: _, value: let value)):
-            context.add(uuid: node.uuid, EvaluationThunk(label: "Color Literal", { _ in
-                let cssValue: LogicValue.Memory = .record(values: ["value": .string(value)])
-                return LogicValue(.color, cssValue)
-            }))
+            context.add(uuid: node.uuid, EvaluationThunk(label: "Color Literal", { _ in LogicValue.color(value) }))
         case .literal(.array(id: _, value: let expressions)):
             guard let type = unificationContext.nodes[node.uuid] else {
                 Swift.print("Failed to unify type of array")
