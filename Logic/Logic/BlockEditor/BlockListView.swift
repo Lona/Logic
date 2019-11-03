@@ -148,6 +148,15 @@ public class BlockListView: NSBox {
     // MARK: Public
 
     open func handleChangeBlocks(_ blocks: [BlockEditor.Block]) -> Bool {
+        var blocks = blocks
+
+        let emptyBlock = BlockEditor.Block.makeDefaultEmptyBlock()
+
+        // Ensure there is an empty block at the end of the document at all times
+        if blocks.last?.content != .some(emptyBlock.content) {
+            blocks.append(emptyBlock)
+        }
+
         return onChangeBlocks?(blocks) ?? false
     }
 
@@ -267,13 +276,21 @@ public class BlockListView: NSBox {
                     }
                 }
 
-                // Reloading can currently break item selection, but it works with block selection.
+                // Calling animateRowChanges currently breaks row rendering.
+                // Calling reloadData currently breaks item selection, but it works with block selection.
                 // By calling reload only if we make a move, this solves the problem for now, since we
                 // never move at the same time when doing an insert or delete
                 if containsMoves {
                     tableView.reloadData()
                 } else {
+                    let firstResponder = window?.firstResponder as? NSView
+
                     tableView.animateRowChanges(oldData: oldValue, newData: blocks)
+
+                    // Restore first responder if it hasn't been deleted
+                    if firstResponder?.window == window {
+                        window?.makeFirstResponder(firstResponder)
+                    }
                 }
             }
 

@@ -218,10 +218,8 @@ class MarkdownDocument: NSDocument {
         containerView.addSubview(blockEditor)
 
         blockEditor.onChangeBlocks = { [unowned self] blocks in
-            let newBlocks = blocks.isEmpty ? [EditableBlock.makeDefaultEmptyBlock()] : blocks
-
-            self.blockEditor.blocks = newBlocks
-            self.configure(blocks: newBlocks)
+            self.blockEditor.blocks = blocks
+            self.configure(blocks: blocks)
             return true
         }
 
