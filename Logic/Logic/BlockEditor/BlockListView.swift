@@ -1156,6 +1156,7 @@ public class BlockListView: NSBox {
 
 extension BlockListView: NSTableViewDelegate {
     static let numberedListRE = try! NSRegularExpression(pattern: #"^(\d+). "#)
+    static let orderedListPrefixes = ["- ", "* ", ". "]
 
     public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BlockListRowView()
@@ -1224,16 +1225,18 @@ extension BlockListView: NSTableViewDelegate {
                 }
 
                 // Automatically create unordered lists
-                if newValue.string.starts(with: "- ") && !textValue.string.starts(with: "- ") {
-                    let prefixLength = 2
-                    let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
+                for prefix in BlockListView.orderedListPrefixes {
+                    if newValue.string.starts(with: prefix) && !textValue.string.starts(with: prefix) {
+                        let prefixLength = prefix.count
+                        let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
 
-                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
-                    if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
-                        newBlock.focus()
+                        let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
+                        if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
+                            newBlock.focus()
+                        }
+
+                        return
                     }
-
-                    return
                 }
 
                 // Automatically create ordered lists
@@ -1606,9 +1609,18 @@ extension BlockListView: NSTableViewDelegate {
                 if self.blocks[line].listDepth != .none {
                     let id = UUID()
 
+                    func newListDepth(_ listDepth: EditableBlockListDepth) -> EditableBlockListDepth {
+                        switch (listDepth) {
+                        case .indented:
+                            return listDepth.outdented
+                        case .ordered, .unordered:
+                            return .indented(depth: listDepth.depth)
+                        }
+                    }
+
                     clone = clone.replacing(
                         elementAt: line,
-                        with: .init(id: id, content: .text(textValue, .paragraph), listDepth: .none)
+                        with: .init(id: id, content: .text(textValue, .paragraph), listDepth: newListDepth(self.blocks[line].listDepth))
                     )
 
                     if self.handleChangeBlocks(clone) {

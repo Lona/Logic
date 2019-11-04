@@ -581,7 +581,14 @@ extension Array where Element == EditableBlock {
                     break
                 }
             } else {
-                // All cases here are valid
+                switch block.listDepth {
+                case .indented(_):
+                    break
+                case .unordered(_):
+                    break
+                case .ordered(let depth, _):
+                    updatedListDepth = .ordered(depth: depth, index: 1)
+                }
             }
 
             if updatedListDepth != block.listDepth {
