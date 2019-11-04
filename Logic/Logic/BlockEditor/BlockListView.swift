@@ -157,7 +157,7 @@ public class BlockListView: NSBox {
             blocks.append(emptyBlock)
         }
 
-        return onChangeBlocks?(blocks) ?? false
+        return onChangeBlocks?(blocks.normalizeLists()) ?? false
     }
 
     private func showToolTip(string: String, at point: NSPoint) {

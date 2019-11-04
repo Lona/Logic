@@ -479,6 +479,16 @@ public enum EditableBlockListDepth: Equatable {
 
     public static var `default`: EditableBlockListDepth = .none
 
+    public func with(depth: Int) -> EditableBlockListDepth {
+        if depth == 0 { return .indented(depth: 0) }
+
+        switch self {
+        case .indented(_): return .indented(depth: depth)
+        case .unordered(_): return .unordered(depth: depth)
+        case .ordered(_, index: let index): return .ordered(depth: depth, index: index)
+        }
+    }
+
     public var depth: Int {
         switch self {
         case .indented(depth: let depth): return depth
@@ -501,11 +511,11 @@ public enum EditableBlockListDepth: Equatable {
     public var outdented: EditableBlockListDepth {
         switch self {
         case .indented(depth: let depth):
-            return depth >= 1 ? .indented(depth: depth - 1) : .none
+            return depth > 1 ? .indented(depth: depth - 1) : .none
         case .unordered(depth: let depth):
-            return depth >= 1 ? .unordered(depth: depth - 1) : .none
+            return depth > 1 ? .unordered(depth: depth - 1) : .none
         case .ordered(depth: let depth, index: let index):
-            return depth >= 1 ? .ordered(depth: depth - 1, index: index) : .none
+            return depth > 1 ? .ordered(depth: depth - 1, index: index) : .none
         }
     }
 
@@ -516,7 +526,7 @@ public enum EditableBlockListDepth: Equatable {
 
 // MARK: - Sequence
 
-extension Sequence where Iterator.Element: EditableBlock {
+extension Array where Element == EditableBlock {
     public var topLevelDeclarations: LGCTopLevelDeclarations {
         let nodes: [LGCSyntaxNode] = self.compactMap {
             switch $0.content {
@@ -544,5 +554,46 @@ extension Sequence where Iterator.Element: EditableBlock {
             let margin = EditableBlock.margin(a, b)
             a.bottomMargin = margin
         }
+    }
+
+    public func normalizeLists() -> [EditableBlock] {
+        let normalizedBlocks = self.enumerated().map { (offset, block) -> BlockEditor.Block in
+            var block = block
+
+            let previousListDepth = offset > 0 ? self[offset - 1].listDepth : .none
+
+            var updatedListDepth = block.listDepth
+
+            if previousListDepth.depth < block.listDepth.depth {
+                switch block.listDepth {
+                case .indented(_):
+                    updatedListDepth = .indented(depth: previousListDepth.depth)
+                case .unordered(_):
+                    updatedListDepth = .unordered(depth: previousListDepth.depth + 1)
+                case .ordered(_):
+                    updatedListDepth = .ordered(depth: previousListDepth.depth + 1, index: 1)
+                }
+            } else if previousListDepth.depth == block.listDepth.depth {
+                switch (previousListDepth, block.listDepth) {
+                case (.ordered(_, let previousIndex), .ordered(let depth, _)):
+                    updatedListDepth = .ordered(depth: depth, index: previousIndex + 1)
+                default:
+                    break
+                }
+            } else {
+                // All cases here are valid
+            }
+
+            if updatedListDepth != block.listDepth {
+                block = EditableBlock(id: block.id, content: block.content, listDepth: updatedListDepth)
+            }
+
+            return block
+        }
+
+        // Repeat until stable
+        return self.map { $0.listDepth } != normalizedBlocks.map { $0.listDepth }
+            ? normalizedBlocks.normalizeLists()
+            : normalizedBlocks
     }
 }
