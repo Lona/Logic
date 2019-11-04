@@ -1226,7 +1226,7 @@ extension BlockListView: NSTableViewDelegate {
                     let prefixLength = 2
                     let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
 
-                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
+                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: [.unordered])
                     if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
                         newBlock.focus()
                     }

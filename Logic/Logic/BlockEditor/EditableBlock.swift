@@ -52,7 +52,7 @@ public class EditableBlockView: NSView {
         }
     }
 
-    public var listDepth: EditableBlockListDepth = .none {
+    public var listDepth: EditableBlockListDepth = [] {
         didSet {
             if listDepth != oldValue {
                 update()
@@ -67,7 +67,7 @@ public class EditableBlockView: NSView {
         }
     }
 
-    public var listItemView: NSView?
+    public var listItemViews: [NSView] = []
 
     public var contentView: NSView? {
         didSet {
@@ -106,29 +106,34 @@ public class EditableBlockView: NSView {
     private func update() {
         leadingMargin = listDepth.margin
 
-        listItemView?.removeFromSuperview()
+        listItemViews.forEach { $0.removeFromSuperview() }
 
-        switch listDepth {
-        case .none:
-            break
-        case .unordered:
-            let bulletSize: CGFloat = 6
-            let bulletView = NSBox(
-                frame: .init(
-                    x: floor(listDepth.margin - 14),
-                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
-                    width: bulletSize,
-                    height: bulletSize
+        for (offset, indent) in listDepth.enumerated() {
+            switch indent {
+            case .none:
+                break
+            case .unordered:
+                Swift.print("add bullet", CGFloat(offset) * 20 - 14)
+
+                let bulletSize: CGFloat = 6
+                let bulletView = NSBox(
+                    frame: .init(
+                        x: floor(CGFloat(offset) * 20 + 6),
+                        y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                        width: bulletSize,
+                        height: bulletSize
+                    )
                 )
-            )
-            bulletView.boxType = .custom
-            bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
-            bulletView.borderType = .noBorder
-            bulletView.cornerRadius = bulletSize / 2
-            addSubview(bulletView)
-            listItemView = bulletView
-        case .ordered(let depth, let index):
-            break
+                bulletView.boxType = .custom
+                bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
+                bulletView.borderType = .noBorder
+                bulletView.cornerRadius = bulletSize / 2
+                addSubview(bulletView)
+
+                listItemViews.append(bulletView)
+            case .ordered(let index):
+                break
+            }
         }
     }
 
@@ -454,47 +459,35 @@ public enum EditableBlockContent: Equatable {
     }
 }
 
-public enum EditableBlockListDepth: Equatable {
+public enum EditableBlockIndent: Equatable {
     case none
-    case unordered(depth: Int)
-    case ordered(depth: Int, index: Int)
+    case unordered
+    case ordered(Int)
+}
 
-    public static var `default`: EditableBlockListDepth = .none
-
-    public var depth: Int {
-        switch self {
-        case .none: return 0
-        case .unordered(depth: let depth): return depth
-        case .ordered(depth: let depth, index: _): return depth
-        }
-    }
-
+extension Array where Iterator.Element == EditableBlockIndent {
     public var indented: EditableBlockListDepth {
-        switch self {
-        case .none:
-            return .unordered(depth: 1)
-        case .unordered(depth: let depth):
-            return .unordered(depth: depth + 1)
-        case .ordered(depth: let depth, index: let index):
-            return .ordered(depth: depth, index: index)
-        }
+        return [.none] + self
     }
 
     public var outdented: EditableBlockListDepth {
-        switch self {
-        case .none:
-            return .none
-        case .unordered(depth: let depth):
-            return depth > 1 ? .unordered(depth: depth - 1) : .none
-        case .ordered(depth: let depth, index: let index):
-            return depth > 1 ? .ordered(depth: depth - 1, index: index) : .none
-        }
+        return Array(self.dropFirst())
+    }
+
+    public var depth: Int {
+        return self.count
     }
 
     public var margin: CGFloat {
         return CGFloat(depth) * 20
     }
+
+    public static var none: [EditableBlockIndent] {
+        return []
+    }
 }
+
+public typealias EditableBlockListDepth = [EditableBlockIndent]
 
 // MARK: - Sequence
 
