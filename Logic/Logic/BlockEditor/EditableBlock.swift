@@ -52,7 +52,7 @@ public class EditableBlockView: NSView {
         }
     }
 
-    public var listDepth: EditableBlockListDepth = [] {
+    public var listDepth: EditableBlockListDepth = .none {
         didSet {
             if listDepth != oldValue {
                 update()
@@ -67,7 +67,7 @@ public class EditableBlockView: NSView {
         }
     }
 
-    public var listItemViews: [NSView] = []
+    public var listItemView: NSView?
 
     public var contentView: NSView? {
         didSet {
@@ -106,44 +106,43 @@ public class EditableBlockView: NSView {
     private func update() {
         leadingMargin = listDepth.margin
 
-        listItemViews.forEach { $0.removeFromSuperview() }
+        listItemView?.removeFromSuperview()
 
-        for (offset, indent) in listDepth.enumerated() {
-            switch indent {
-            case .none:
-                break
-            case .unordered:
-                let bulletSize: CGFloat = 6
-                let bulletRect: NSRect = .init(
-                    x: floor(CGFloat(offset) * EditableBlockIndent.width + 6),
-                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
-                    width: bulletSize,
-                    height: bulletSize
-                )
-                let bulletView = NSBox(frame: bulletRect)
-                bulletView.boxType = .custom
-                bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
-                bulletView.borderType = .noBorder
-                bulletView.cornerRadius = bulletSize / 2
-                addSubview(bulletView)
+        switch listDepth {
+        case .indented:
+            break
+        case .unordered:
+            let bulletSize: CGFloat = 6
+            let bulletRect: NSRect = .init(
+                x: floor(listDepth.margin - EditableBlockListDepth.indentWidth + 6),
+                y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                width: bulletSize,
+                height: bulletSize
+            )
 
-                listItemViews.append(bulletView)
-            case .ordered(let index):
-                let bulletSize: CGFloat = 14
-                let bulletRect: NSRect = .init(
-                    x: floor(CGFloat(offset) * EditableBlockIndent.width + 3),
-                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
-                    width: EditableBlockIndent.width,
-                    height: bulletSize
-                )
-                let string = String(describing: index) + "."
-                let attributedString = TextStyle(weight: .bold, color: NSColor.textColor.withAlphaComponent(0.8)).apply(to: string)
-                let bulletView = NSTextField(labelWithAttributedString: attributedString)
-                bulletView.frame.origin = bulletRect.origin
-                addSubview(bulletView)
+            let bulletView = NSBox(frame: bulletRect)
+            bulletView.boxType = .custom
+            bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
+            bulletView.borderType = .noBorder
+            bulletView.cornerRadius = bulletSize / 2
+            addSubview(bulletView)
 
-                listItemViews.append(bulletView)
-            }
+            listItemView = bulletView
+        case .ordered(_, let index):
+            let bulletSize: CGFloat = 14
+            let bulletRect: NSRect = .init(
+                x: floor(listDepth.margin - EditableBlockListDepth.indentWidth + 3),
+                y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                width: EditableBlockListDepth.indentWidth,
+                height: bulletSize
+            )
+            let string = String(describing: index) + "."
+            let attributedString = TextStyle(weight: .bold, color: NSColor.textColor.withAlphaComponent(0.8)).apply(to: string)
+            let bulletView = NSTextField(labelWithAttributedString: attributedString)
+            bulletView.frame.origin = bulletRect.origin
+            addSubview(bulletView)
+
+            listItemView = bulletView
         }
     }
 
@@ -469,37 +468,51 @@ public enum EditableBlockContent: Equatable {
     }
 }
 
-public enum EditableBlockIndent: Equatable {
-    case none
-    case unordered
-    case ordered(Int)
+public enum EditableBlockListDepth: Equatable {
+    case indented(depth: Int)
+    case unordered(depth: Int)
+    case ordered(depth: Int, index: Int)
 
-    public static var width: CGFloat { return 20 }
-}
+    public static var indentWidth: CGFloat = 20
 
-extension Array where Iterator.Element == EditableBlockIndent {
+    public static var none: EditableBlockListDepth = .indented(depth: 0)
+
+    public static var `default`: EditableBlockListDepth = .none
+
+    public var depth: Int {
+        switch self {
+        case .indented(depth: let depth): return depth
+        case .unordered(depth: let depth): return depth
+        case .ordered(depth: let depth, index: _): return depth
+        }
+    }
+
     public var indented: EditableBlockListDepth {
-        return [.none] + self
+        switch self {
+        case .indented(depth: let depth):
+            return .indented(depth: depth + 1)
+        case .unordered(depth: let depth):
+            return .unordered(depth: depth + 1)
+        case .ordered(depth: let depth, index: let index):
+            return .ordered(depth: depth + 1, index: index)
+        }
     }
 
     public var outdented: EditableBlockListDepth {
-        return Array(self.dropFirst())
-    }
-
-    public var depth: Int {
-        return self.count
+        switch self {
+        case .indented(depth: let depth):
+            return depth >= 1 ? .indented(depth: depth - 1) : .none
+        case .unordered(depth: let depth):
+            return depth >= 1 ? .unordered(depth: depth - 1) : .none
+        case .ordered(depth: let depth, index: let index):
+            return depth >= 1 ? .ordered(depth: depth - 1, index: index) : .none
+        }
     }
 
     public var margin: CGFloat {
-        return CGFloat(depth) * EditableBlockIndent.width
-    }
-
-    public static var none: [EditableBlockIndent] {
-        return []
+        return CGFloat(depth) * EditableBlockListDepth.indentWidth
     }
 }
-
-public typealias EditableBlockListDepth = [EditableBlockIndent]
 
 // MARK: - Sequence
 

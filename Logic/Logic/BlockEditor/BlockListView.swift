@@ -1226,7 +1226,7 @@ extension BlockListView: NSTableViewDelegate {
                     let prefixLength = 2
                     let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
 
-                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: [.unordered])
+                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
                     if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
                         newBlock.focus()
                     }
@@ -1772,8 +1772,8 @@ extension BlockListView: NSTableViewDelegate {
             (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote), listDepth: .none)),
             (Suggestion.divider, EditableBlock(id: UUID(), content: .divider, listDepth: .none)),
             (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil), listDepth: .none)),
-            (Suggestion.bulletedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: [.unordered])),
-            (Suggestion.numberedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: [.ordered(1)])),
+            (Suggestion.bulletedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .unordered(depth: 1))),
+            (Suggestion.numberedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .ordered(depth: 1, index: 1))),
             (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
             (
                 SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
