@@ -1155,6 +1155,8 @@ public class BlockListView: NSBox {
 // MARK: - Delegate
 
 extension BlockListView: NSTableViewDelegate {
+    static let numberedListRE = try! NSRegularExpression(pattern: #"^(\d+). "#)
+
     public func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         let rowView = BlockListRowView()
 
@@ -1221,12 +1223,26 @@ extension BlockListView: NSTableViewDelegate {
                     }
                 }
 
-                // Automatically create lists
+                // Automatically create unordered lists
                 if newValue.string.starts(with: "- ") && !textValue.string.starts(with: "- ") {
                     let prefixLength = 2
                     let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
 
                     let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
+                    if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
+                        newBlock.focus()
+                    }
+
+                    return
+                }
+
+                // Automatically create ordered lists
+                if let match = BlockListView.numberedListRE.firstMatch(in: newValue.string, range: .init(location: 0, length: newValue.length)),
+                    BlockListView.numberedListRE.firstMatch(in: textValue.string, range: .init(location: 0, length: textValue.length)) == nil {
+                    let prefixLength = match.range.length
+                    let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
+
+                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .ordered(depth: 1, index: 1))
                     if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
                         newBlock.focus()
                     }
