@@ -113,17 +113,14 @@ public class EditableBlockView: NSView {
             case .none:
                 break
             case .unordered:
-                Swift.print("add bullet", CGFloat(offset) * 20 - 14)
-
                 let bulletSize: CGFloat = 6
-                let bulletView = NSBox(
-                    frame: .init(
-                        x: floor(CGFloat(offset) * 20 + 6),
-                        y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
-                        width: bulletSize,
-                        height: bulletSize
-                    )
+                let bulletRect: NSRect = .init(
+                    x: floor(CGFloat(offset) * EditableBlockIndent.width + 6),
+                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                    width: bulletSize,
+                    height: bulletSize
                 )
+                let bulletView = NSBox(frame: bulletRect)
                 bulletView.boxType = .custom
                 bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
                 bulletView.borderType = .noBorder
@@ -132,7 +129,20 @@ public class EditableBlockView: NSView {
 
                 listItemViews.append(bulletView)
             case .ordered(let index):
-                break
+                let bulletSize: CGFloat = 14
+                let bulletRect: NSRect = .init(
+                    x: floor(CGFloat(offset) * EditableBlockIndent.width + 3),
+                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                    width: EditableBlockIndent.width,
+                    height: bulletSize
+                )
+                let string = String(describing: index) + "."
+                let attributedString = TextStyle(weight: .bold, color: NSColor.textColor.withAlphaComponent(0.8)).apply(to: string)
+                let bulletView = NSTextField(labelWithAttributedString: attributedString)
+                bulletView.frame.origin = bulletRect.origin
+                addSubview(bulletView)
+
+                listItemViews.append(bulletView)
             }
         }
     }
@@ -463,6 +473,8 @@ public enum EditableBlockIndent: Equatable {
     case none
     case unordered
     case ordered(Int)
+
+    public static var width: CGFloat { return 20 }
 }
 
 extension Array where Iterator.Element == EditableBlockIndent {
@@ -479,7 +491,7 @@ extension Array where Iterator.Element == EditableBlockIndent {
     }
 
     public var margin: CGFloat {
-        return CGFloat(depth) * 20
+        return CGFloat(depth) * EditableBlockIndent.width
     }
 
     public static var none: [EditableBlockIndent] {

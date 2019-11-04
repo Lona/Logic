@@ -1753,6 +1753,9 @@ extension BlockListView: NSTableViewDelegate {
         static var quote = SuggestionListItem.row("Quote", "Display a quote", false, nil, MenuThumbnailImage.quote)
         static var divider = SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider)
         static var image = SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image)
+
+        static var bulletedList = SuggestionListItem.row("Bulleted List", "Create a bulleted list", false, nil, MenuThumbnailImage.image)
+        static var numberedList = SuggestionListItem.row("Numbered List", "Create a numbered list", false, nil, MenuThumbnailImage.image)
     }
 
     func showCommandPalette(line: Int, query: String, rect: NSRect) {
@@ -1769,6 +1772,8 @@ extension BlockListView: NSTableViewDelegate {
             (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote), listDepth: .none)),
             (Suggestion.divider, EditableBlock(id: UUID(), content: .divider, listDepth: .none)),
             (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil), listDepth: .none)),
+            (Suggestion.bulletedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: [.unordered])),
+            (Suggestion.numberedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: [.ordered(1)])),
             (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
             (
                 SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
