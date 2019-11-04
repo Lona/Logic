@@ -224,7 +224,7 @@ public class BlockListView: NSBox {
             showCommandPalette(line: line + 1)
         } else {
             let id = UUID()
-            let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph)))
+            let ok = handleAddBlock(line: line, block: .init(id: id, content: .text(.init(), .paragraph), listDepth: .none))
 
             if ok, let addedLine = self.line(forBlock: id) {
                 showCommandPalette(line: addedLine)
@@ -658,7 +658,11 @@ public class BlockListView: NSBox {
             case (.text(_, let newSizeLevel), .text(let textValue, _)):
 
                 // TODO: Why aren't inline attributes preserved?
-                let replacementBlock: EditableBlock = .init(id: oldBlock.id, content: .text(newSizeLevel.apply(to: textValue), newSizeLevel))
+                let replacementBlock: EditableBlock = .init(
+                    id: oldBlock.id,
+                    content: .text(newSizeLevel.apply(to: textValue), newSizeLevel),
+                    listDepth: .none
+                )
 
                 let clone = self.blocks.replacing(elementAt: line, with: replacementBlock)
 
@@ -676,11 +680,11 @@ public class BlockListView: NSBox {
     }
 
     public static var replaceMenuSuggestionItems: [(SuggestionListItem, EditableBlock)] = [
-        (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph))),
-        (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
-        (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
-        (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
-        (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote))),
+        (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .none)),
+        (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1), listDepth: .none)),
+        (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2), listDepth: .none)),
+        (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3), listDepth: .none)),
+        (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote), listDepth: .none)),
     ]
 
     public static var replaceWithTextMenu: SuggestionWindow = {
@@ -1186,7 +1190,7 @@ extension BlockListView: NSTableViewDelegate {
             view.onChangeRootNode = { [unowned self] newRootNode in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return false }
 
-                let newBlock: BlockEditor.Block = .init(id: item.id, content: .tokens(newRootNode))
+                let newBlock: BlockEditor.Block = .init(id: item.id, content: .tokens(newRootNode), listDepth: .none)
 
                 _ = self.handleChangeBlocks(self.blocks.replacing(elementAt: line, with: newBlock))
 
@@ -1209,7 +1213,7 @@ extension BlockListView: NSTableViewDelegate {
                         let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
 
                         var clone = self.blocks
-                        clone[row] = .init(id: item.id, content: .text(heading.apply(to: remainder), heading))
+                        clone[row] = .init(id: item.id, content: .text(heading.apply(to: remainder), heading), listDepth: item.listDepth)
 
                         _ = self.handleChangeBlocks(clone)
 
@@ -1217,9 +1221,22 @@ extension BlockListView: NSTableViewDelegate {
                     }
                 }
 
+                // Automatically create lists
+                if newValue.string.starts(with: "- ") && !textValue.string.starts(with: "- ") {
+                    let prefixLength = 2
+                    let remainder = newValue.attributedSubstring(from: .init(location: prefixLength, length: newValue.length - prefixLength))
+
+                    let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
+                    if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
+                        newBlock.focus()
+                    }
+
+                    return
+                }
+
                 // Update the text
                 var clone = self.blocks
-                clone[row] = .init(id: item.id, content: .text(newValue, view.sizeLevel))
+                clone[row] = .init(id: item.id, content: .text(newValue, view.sizeLevel), listDepth: item.listDepth)
 
                 _ = self.handleChangeBlocks(clone)
             }
@@ -1316,6 +1333,34 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
+            view.onIndent = {
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                let newBlock = self.blocks[row].indented
+
+                let oldSelection = self.selection
+
+                if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
+                    // Reapply selection/focus
+                    self.updateSelection(from: oldSelection, to: self.selection)
+                    newBlock.focus()
+                }
+            }
+
+            view.onOutdent = {
+                guard let row = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                let newBlock = self.blocks[row].outdented
+
+                let oldSelection = self.selection
+
+                if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
+                    // Reapply selection/focus
+                    self.updateSelection(from: oldSelection, to: self.selection)
+                    newBlock.focus()
+                }
+            }
+
             view.onMoveToBeginningOfDocument = {
                 if BlockListView.commandPaletteVisible { return }
 
@@ -1405,9 +1450,10 @@ extension BlockListView: NSTableViewDelegate {
                 let prefixKeepsSizeLevel = prefix.length > 0
 
                 var clone = self.blocks
-                clone[line] = .init(id: item.id, content: .text(prefix, prefixKeepsSizeLevel ? view.sizeLevel : .paragraph))
+                clone[line] = .init(id: item.id, content: .text(prefix, prefixKeepsSizeLevel ? view.sizeLevel : .paragraph), listDepth: item.listDepth)
 
-                let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, prefixKeepsSizeLevel ? .paragraph : view.sizeLevel))
+                let nextBlock: EditableBlock = .init(id: UUID(), content: .text(suffix, prefixKeepsSizeLevel ? .paragraph : view.sizeLevel),
+                                                     listDepth: item.listDepth)
                 clone.insert(nextBlock, at: line + 1)
 
                 if self.handleChangeBlocks(clone) {
@@ -1457,7 +1503,7 @@ extension BlockListView: NSTableViewDelegate {
                             let id = UUID()
                             let clone = self.blocks.replacing(
                                 elementAt: line,
-                                with: .init(id: id, content: .text(newTextValue, view.sizeLevel))
+                                with: .init(id: id, content: .text(newTextValue, view.sizeLevel), listDepth: self.blocks[line].listDepth)
                             )
 
                             self.hideChildWindows()
@@ -1491,7 +1537,7 @@ extension BlockListView: NSTableViewDelegate {
                     let id = UUID()
                     let clone = self.blocks.replacing(
                         elementAt: line,
-                        with: .init(id: id, content: .text(newTextValue, view.sizeLevel))
+                        with: .init(id: id, content: .text(newTextValue, view.sizeLevel), listDepth: self.blocks[line].listDepth)
                     )
 
                     self.hideLinkEditor()
@@ -1526,7 +1572,28 @@ extension BlockListView: NSTableViewDelegate {
                 if view.sizeLevel != .paragraph {
                     let id = UUID()
 
-                    clone = clone.replacing(elementAt: line, with: .init(id: id, content: .text(textValue, .paragraph)))
+                    clone = clone.replacing(
+                        elementAt: line,
+                        with: .init(id: id, content: .text(textValue, .paragraph), listDepth: self.blocks[line].listDepth)
+                    )
+
+                    if self.handleChangeBlocks(clone) {
+                        self.focus(id: id)
+
+                        // Selection doesn't change, but we still want the side effects
+                        self.updateSelection(from: self.selection, to: .item(line, .empty))
+                    }
+
+                    return
+                }
+
+                if self.blocks[line].listDepth != .none {
+                    let id = UUID()
+
+                    clone = clone.replacing(
+                        elementAt: line,
+                        with: .init(id: id, content: .text(textValue, .paragraph), listDepth: .none)
+                    )
 
                     if self.handleChangeBlocks(clone) {
                         self.focus(id: id)
@@ -1550,7 +1617,11 @@ extension BlockListView: NSTableViewDelegate {
                     let mergedTextValue = [previousTextValue, textValue].joined()
 
                     clone.remove(at: line)
-                    clone[previousLine] = .init(id: previousBlock.id, content: .text(mergedTextValue, previousSizeLevel))
+                    clone[previousLine] = .init(
+                        id: previousBlock.id,
+                        content: .text(mergedTextValue, previousSizeLevel),
+                        listDepth: self.blocks[previousLine].listDepth
+                    )
 
                     if self.handleChangeBlocks(clone) {
                         self.focus(id: previousBlock.id)
@@ -1596,7 +1667,7 @@ extension BlockListView: NSTableViewDelegate {
                     let id = UUID()
                     let clone = self.blocks.replacing(
                         elementAt: line,
-                        with: .init(id: id, content: .image(url))
+                        with: .init(id: id, content: .image(url), listDepth: self.blocks[line].listDepth)
                     )
 
                     self.hideLinkEditor()
@@ -1691,13 +1762,13 @@ extension BlockListView: NSTableViewDelegate {
 
         let menuItems: [(SuggestionListItem, EditableBlock)] = [
             (Suggestion.documentationSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
-            (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph))),
-            (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1))),
-            (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2))),
-            (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3))),
-            (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote))),
-            (Suggestion.divider, EditableBlock(id: UUID(), content: .divider)),
-            (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil))),
+            (Suggestion.text, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .none)),
+            (Suggestion.heading1, EditableBlock(id: UUID(), content: .text(.init(), .h1), listDepth: .none)),
+            (Suggestion.heading2, EditableBlock(id: UUID(), content: .text(.init(), .h2), listDepth: .none)),
+            (Suggestion.heading3, EditableBlock(id: UUID(), content: .text(.init(), .h3), listDepth: .none)),
+            (Suggestion.quote, EditableBlock(id: UUID(), content: .text(.init(), .quote), listDepth: .none)),
+            (Suggestion.divider, EditableBlock(id: UUID(), content: .divider, listDepth: .none)),
+            (Suggestion.image, EditableBlock(id: UUID(), content: .image(nil), listDepth: .none)),
             (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
             (
                 SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
@@ -1713,7 +1784,8 @@ extension BlockListView: NSTableViewDelegate {
                                 comment: nil
                             )
                         )
-                    )
+                    ),
+                    listDepth: .none
                 )
             ),
             (
@@ -1730,7 +1802,8 @@ extension BlockListView: NSTableViewDelegate {
                                 comment: nil
                             )
                         )
-                    )
+                    ),
+                    listDepth: .none
                 )
             ),
             (
@@ -1747,7 +1820,8 @@ extension BlockListView: NSTableViewDelegate {
                                 comment: nil
                             )
                         )
-                    )
+                    ),
+                    listDepth: .none
                 )
             )
         ]
@@ -1818,7 +1892,7 @@ extension BlockListView: NSTableViewDelegate {
                 mutable.append(textValue.attributedSubstring(from: NSRange(location: queryEndIndex, length: textValue.length - queryEndIndex)))
 
                 if mutable.length > 1 {
-                    replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel))
+                    replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel), listDepth: .none)
                 }
             case .tokens, .divider, .image:
                 break

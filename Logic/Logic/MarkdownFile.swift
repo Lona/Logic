@@ -89,9 +89,9 @@ public enum MarkdownFile {
         let blocks: [BlockEditor.Block] = mdxRoot.children.compactMap { blockElement in
             switch blockElement {
             case .thematicBreak:
-                return BlockEditor.Block(.divider)
+                return BlockEditor.Block(.divider, .none)
             case .image(let image):
-                return BlockEditor.Block(.image(URL(string: image.url)))
+                return BlockEditor.Block(.image(URL(string: image.url)), .none)
             case .heading(let value):
                 func sizeLevelForDepth(_ depth: Int) -> TextBlockView.SizeLevel {
                     switch depth {
@@ -107,15 +107,15 @@ public enum MarkdownFile {
 
                 let sizeLevel = sizeLevelForDepth(value.depth)
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: sizeLevel) }.joined()
-                return BlockEditor.Block(.text(attributedString, sizeLevel))
+                return BlockEditor.Block(.text(attributedString, sizeLevel), .none)
             case .paragraph(let value):
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .paragraph) }.joined()
-                return BlockEditor.Block(.text(attributedString, .paragraph))
+                return BlockEditor.Block(.text(attributedString, .paragraph), .none)
             case .blockquote(let value):
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .quote) }.joined()
-                return BlockEditor.Block(.text(attributedString, .quote))
+                return BlockEditor.Block(.text(attributedString, .quote), .none)
             case .code(let value):
-                return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)))
+                return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)), .none)
             }
         }
         return blocks

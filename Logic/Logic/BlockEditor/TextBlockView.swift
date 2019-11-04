@@ -180,6 +180,16 @@ public class TextBlockContainerView: NSBox {
         set { blockView.onOpenReplacementPalette = newValue }
     }
 
+    public var onIndent: (() -> Void)? {
+        get { return blockView.onIndent }
+        set { blockView.onIndent = newValue }
+    }
+
+    public var onOutdent: (() -> Void)? {
+        get { return blockView.onOutdent }
+        set { blockView.onOutdent = newValue }
+    }
+
     public var onMoveToBeginningOfDocument: (() -> Void)? {
         get { return blockView.onMoveToBeginningOfDocument }
         set { blockView.onMoveToBeginningOfDocument = newValue }
@@ -509,6 +519,10 @@ public class TextBlockView: AttributedTextView {
 
     public var onOpenReplacementPalette: ((NSRect) -> Void)?
 
+    public var onIndent: (() -> Void)?
+
+    public var onOutdent: (() -> Void)?
+
     public var onMoveToBeginningOfDocument: (() -> Void)?
 
     public var onMoveToEndOfDocument: (() -> Void)?
@@ -629,7 +643,13 @@ public class TextBlockView: AttributedTextView {
     }
 
     public override func doCommand(by selector: Selector) {
-        if selector == #selector(NSResponder.moveToBeginningOfDocument) {
+        if selector == #selector(NSResponder.insertTab) {
+            onIndent?()
+            return
+        } else if selector == #selector(NSResponder.insertBacktab) {
+            onOutdent?()
+            return
+        } else if selector == #selector(NSResponder.moveToBeginningOfDocument) {
             onMoveToBeginningOfDocument?()
             return
         } else if selector == #selector(NSResponder.moveToEndOfDocument) {

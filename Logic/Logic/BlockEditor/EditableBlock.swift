@@ -44,6 +44,31 @@ public class EditableBlockView: NSView {
         }
     }
 
+    public var lineButtonAlignmentHeight: CGFloat = 0 {
+        didSet {
+            if lineButtonAlignmentHeight != oldValue {
+                update()
+            }
+        }
+    }
+
+    public var listDepth: EditableBlockListDepth = .none {
+        didSet {
+            if listDepth != oldValue {
+                update()
+            }
+        }
+    }
+
+    private var leadingMargin: CGFloat = 0 {
+        didSet {
+            leadingAnchorConstraint?.constant = leadingMargin
+            invalidateIntrinsicContentSize()
+        }
+    }
+
+    public var listItemView: NSView?
+
     public var contentView: NSView? {
         didSet {
             if contentView == oldValue { return }
@@ -55,11 +80,13 @@ public class EditableBlockView: NSView {
 
                 contentView.translatesAutoresizingMaskIntoConstraints = false
                 contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-                contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
                 contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
 
                 bottomAnchorConstraint = contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
                 bottomAnchorConstraint?.isActive = true
+
+                leadingAnchorConstraint = contentView.leadingAnchor.constraint(equalTo: leadingAnchor)
+                leadingAnchorConstraint?.isActive = true
             }
         }
     }
@@ -68,20 +95,49 @@ public class EditableBlockView: NSView {
 
     private var bottomAnchorConstraint: NSLayoutConstraint?
 
+    private var leadingAnchorConstraint: NSLayoutConstraint?
+
     private func setUpViews() {}
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
     }
 
-    private func update() {}
+    private func update() {
+        leadingMargin = listDepth.margin
+
+        listItemView?.removeFromSuperview()
+
+        switch listDepth {
+        case .none:
+            break
+        case .unordered:
+            let bulletSize: CGFloat = 6
+            let bulletView = NSBox(
+                frame: .init(
+                    x: floor(listDepth.margin - 14),
+                    y: floor((lineButtonAlignmentHeight - bulletSize) / 2) + 2,
+                    width: bulletSize,
+                    height: bulletSize
+                )
+            )
+            bulletView.boxType = .custom
+            bulletView.fillColor = NSColor.textColor.withAlphaComponent(0.8)
+            bulletView.borderType = .noBorder
+            bulletView.cornerRadius = bulletSize / 2
+            addSubview(bulletView)
+            listItemView = bulletView
+        case .ordered(let depth, let index):
+            break
+        }
+    }
 
     public override var intrinsicContentSize: NSSize {
         guard let contentView = contentView else { return super.intrinsicContentSize }
 
         let contentSize = contentView.intrinsicContentSize
 
-        return .init(width: contentSize.width, height: contentSize.height + bottomMargin)
+        return .init(width: contentSize.width + leadingMargin, height: contentSize.height + bottomMargin)
     }
 
     public override func invalidateIntrinsicContentSize() {
@@ -97,6 +153,7 @@ public class EditableBlockView: NSView {
 public class EditableBlock: Equatable {
     public let id: UUID
     public let content: EditableBlockContent
+    public let listDepth: EditableBlockListDepth
 
     public var bottomMargin: CGFloat {
         get { return wrapperView.bottomMargin }
@@ -107,13 +164,25 @@ public class EditableBlock: Equatable {
         }
     }
 
-    public init(id: UUID, content: EditableBlockContent) {
+    public init(id: UUID, content: EditableBlockContent, listDepth: EditableBlockListDepth) {
         self.id = id
         self.content = content
+        self.listDepth = listDepth
+
+        wrapperView.listDepth = listDepth
+        wrapperView.lineButtonAlignmentHeight = lineButtonAlignmentHeight
     }
 
-    public convenience init(_ content: EditableBlockContent) {
-        self.init(id: UUID(), content: content)
+    public convenience init(_ content: EditableBlockContent, _ listDepth: EditableBlockListDepth) {
+        self.init(id: UUID(), content: content, listDepth: listDepth)
+    }
+
+    public var indented: EditableBlock {
+        return .init(id: UUID(), content: content, listDepth: listDepth.indented)
+    }
+
+    public var outdented: EditableBlock {
+        return .init(id: UUID(), content: content, listDepth: listDepth.outdented)
     }
 
     public static func == (lhs: EditableBlock, rhs: EditableBlock) -> Bool {
@@ -217,7 +286,7 @@ public class EditableBlock: Equatable {
 //    }
 
     public static func makeDefaultEmptyBlock() -> EditableBlock {
-        return .init(.text(.init(), .paragraph))
+        return .init(.text(.init(), .paragraph), .none)
     }
 
     public func enqueueLayoutUpdate() {
@@ -239,6 +308,8 @@ public class EditableBlock: Equatable {
     }
 
     public func updateViewWidth(_ width: CGFloat) {
+        let width = width - listDepth.margin
+
         switch content {
         case .text:
             let view = self.view as! TextBlockContainerView
@@ -380,6 +451,48 @@ public enum EditableBlockContent: Equatable {
         case .divider:
             return 21
         }
+    }
+}
+
+public enum EditableBlockListDepth: Equatable {
+    case none
+    case unordered(depth: Int)
+    case ordered(depth: Int, index: Int)
+
+    public static var `default`: EditableBlockListDepth = .none
+
+    public var depth: Int {
+        switch self {
+        case .none: return 0
+        case .unordered(depth: let depth): return depth
+        case .ordered(depth: let depth, index: _): return depth
+        }
+    }
+
+    public var indented: EditableBlockListDepth {
+        switch self {
+        case .none:
+            return .unordered(depth: 1)
+        case .unordered(depth: let depth):
+            return .unordered(depth: depth + 1)
+        case .ordered(depth: let depth, index: let index):
+            return .ordered(depth: depth, index: index)
+        }
+    }
+
+    public var outdented: EditableBlockListDepth {
+        switch self {
+        case .none:
+            return .none
+        case .unordered(depth: let depth):
+            return depth > 1 ? .unordered(depth: depth - 1) : .none
+        case .ordered(depth: let depth, index: let index):
+            return depth > 1 ? .ordered(depth: depth - 1, index: index) : .none
+        }
+    }
+
+    public var margin: CGFloat {
+        return CGFloat(depth) * 20
     }
 }
 
