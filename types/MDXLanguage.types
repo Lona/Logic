@@ -2,12 +2,14 @@
 <root>
   <NativeType name="Int"/>
   <NativeType name="String"/>
+  <NativeType name="Bool"/>
   <NativeType name="Array">
     <NativeType.GenericParam type="Element"/>
   </NativeType>
   <NativeType name="Optional">
     <NativeType.GenericParam type="Value"/>
   </NativeType>
+  <NativeType name="LGCSyntaxNode"/>
   <Type name="Text">
     <Record name="text">
       <Record.Param name="value" type="String"/>
@@ -87,6 +89,21 @@
   <Type name="ThematicBreak">
     <Record name="thematicBreak"/>
   </Type>
+  <Type name="List">
+    <Record name="list">
+      <Record.Param name="ordered" type="Bool"/>
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="ListItemNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
+  <Type name="ListItemNode">
+    <Record name="listItem">
+      <Record.Param name="children" type="Array">
+        <Record.Substitution generic="Element" instance="BlockNode"/>
+      </Record.Param>
+    </Record>
+  </Type>
   <Type name="Root">
     <Record name="root">
       <Record.Param name="children" type="Array">
@@ -113,6 +130,9 @@
     <Case name="blockquote">
       <Case.Param type="Blockquote"/>
     </Case>
+    <Case name="list">
+      <Case.Param type="List"/>
+    </Case>
   </Type>
   <Type name="InlineNode">
     <Case name="text">
@@ -134,5 +154,4 @@
       <Case.Param type="Break"/>
     </Case>
   </Type>
-  <NativeType name="LGCSyntaxNode"/>
 </root>

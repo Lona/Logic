@@ -61,13 +61,18 @@ public enum MarkdownFile {
     // MARK: Decoding markdown
 
     public static func makeMDXRoot(_ markdownData: Data) -> MDXRoot? {
-        guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .source),
-            let mdxRoot = try? JSONDecoder().decode(MDXRoot.self, from: jsonData) else {
+        guard let jsonData = LogicFile.convert(markdownData, kind: .document, to: .json, from: .source) else { return nil }
+
+        do {
+            let mdxRoot = try JSONDecoder().decode(MDXRoot.self, from: jsonData)
+            return mdxRoot
+        } catch let error {
             Swift.print("Failed to convert Markdown file Data to MDXRoot")
+            if let error = error as? DecodingError {
+                Swift.print(error.errorDescription!)
+            }
             return nil
         }
-
-        return mdxRoot
     }
 
     public static func makeBlocks(_ markdownData: Data) -> [BlockEditor.Block]? {
@@ -86,12 +91,12 @@ public enum MarkdownFile {
             ]
         }
 
-        let blocks: [BlockEditor.Block] = mdxRoot.children.compactMap { blockElement in
+        func makeBlock(_ blockElement: MDXBlockNode, listDepth: EditableBlockListDepth) -> [BlockEditor.Block] {
             switch blockElement {
             case .thematicBreak:
-                return BlockEditor.Block(.divider, .none)
+                return [BlockEditor.Block(.divider, listDepth)]
             case .image(let image):
-                return BlockEditor.Block(.image(URL(string: image.url)), .none)
+                return [BlockEditor.Block(.image(URL(string: image.url)), listDepth)]
             case .heading(let value):
                 func sizeLevelForDepth(_ depth: Int) -> TextBlockView.SizeLevel {
                     switch depth {
@@ -107,18 +112,39 @@ public enum MarkdownFile {
 
                 let sizeLevel = sizeLevelForDepth(value.depth)
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: sizeLevel) }.joined()
-                return BlockEditor.Block(.text(attributedString, sizeLevel), .none)
+                return [BlockEditor.Block(.text(attributedString, sizeLevel), listDepth)]
             case .paragraph(let value):
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .paragraph) }.joined()
-                return BlockEditor.Block(.text(attributedString, .paragraph), .none)
+                return [BlockEditor.Block(.text(attributedString, .paragraph), listDepth)]
             case .blockquote(let value):
                 let attributedString: NSAttributedString = value.children.map { $0.attributedString(for: .quote) }.joined()
-                return BlockEditor.Block(.text(attributedString, .quote), .none)
+                return [BlockEditor.Block(.text(attributedString, .quote), listDepth)]
             case .code(let value):
-                return BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)), .none)
+                return [BlockEditor.Block(.tokens(.declaration(value.declarations()!.first!)), listDepth)]
+            case .list(let value):
+                let blocks: [[[BlockEditor.Block]]] = value.children.enumerated().map { offset, listItem in
+                    switch listItem {
+                    case .listItem(children: let listItemChildren):
+                        return listItemChildren.enumerated().map { childOffset, listItemBlock -> [BlockEditor.Block] in
+                            let newListDepth: EditableBlockListDepth = childOffset > 0
+                                ? .indented(depth: listDepth.depth + 1)
+                                : value.ordered
+                                ? .ordered(depth: listDepth.depth + 1, index: offset)
+                                : .unordered(depth: listDepth.depth + 1)
+                            return makeBlock(listItemBlock, listDepth: newListDepth)
+                        }
+                    }
+                }
+
+                return Array(blocks.joined().joined())
             }
         }
-        return blocks
+
+        let blocks: [[BlockEditor.Block]] = mdxRoot.children.compactMap { blockElement in makeBlock(blockElement, listDepth: .none) }
+
+        let result = Array(blocks.joined())
+
+        return result
     }
 }
 
