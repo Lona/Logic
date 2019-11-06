@@ -643,24 +643,6 @@ extension LogicEditor {
         })
 
         switch syntaxNode {
-        case .pattern:
-            let deleteItem: LogicEditor.MenuItem = .init(row: .row("Delete", nil, false, nil, nil), action: { [unowned self] in
-                if let parent = self.rootNode.contents.parentOf(target: syntaxNode.uuid, includeTopLevel: true),
-                    case .declaration(let declaration) = parent {
-                    if declaration.uuid == self.rootNode.uuid {
-                        self.onRequestDelete?()
-                    } else {
-                        let shouldActivate = self.onChangeRootNode?(self.rootNode.delete(id: declaration.uuid))
-                        if shouldActivate == true {
-                            self.handleActivateElement(nil)
-                        }
-                    }
-                }
-            })
-
-            menu = [renameItem, deleteItem]
-
-            subwindow.placeholderText = "Filter actions"
         case .expression:
             let customValueRow: SuggestionListItem = .row("Custom value", "Define a new value", false, nil, MenuThumbnailImage.newValue)
             let variableReferenceRow: SuggestionListItem = .row("Variable reference", "Reference an existing value", false, nil, MenuThumbnailImage.variable)
