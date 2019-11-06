@@ -67,10 +67,7 @@ public enum MarkdownFile {
             let mdxRoot = try JSONDecoder().decode(MDXRoot.self, from: jsonData)
             return mdxRoot
         } catch let error {
-            Swift.print("Failed to convert Markdown file Data to MDXRoot")
-            if let error = error as? DecodingError {
-                Swift.print(error.errorDescription!)
-            }
+            Swift.print("Failed to convert Markdown file Data to MDXRoot", error)
             return nil
         }
     }
