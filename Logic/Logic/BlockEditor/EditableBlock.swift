@@ -581,28 +581,34 @@ extension Array where Element == EditableBlock {
 
             if previousListDepth.depth < block.listDepth.depth {
                 switch block.listDepth {
-                case .indented(_):
+                case .indented:
                     updatedListDepth = .indented(depth: previousListDepth.depth)
-                case .unordered(_):
+                case .unordered:
                     updatedListDepth = .unordered(depth: previousListDepth.depth + 1)
-                case .ordered(_):
+                case .ordered:
                     updatedListDepth = .ordered(depth: previousListDepth.depth + 1, index: 1)
-                }
-            } else if previousListDepth.depth == block.listDepth.depth {
-                switch (previousListDepth, block.listDepth) {
-                case (.ordered(_, let previousIndex), .ordered(let depth, _)):
-                    updatedListDepth = .ordered(depth: depth, index: previousIndex + 1)
-                default:
-                    break
                 }
             } else {
                 switch block.listDepth {
-                case .indented(_):
-                    break
-                case .unordered(_):
+                case .indented, .unordered:
                     break
                 case .ordered(let depth, _):
-                    updatedListDepth = .ordered(depth: depth, index: 1)
+                    var index: Int = 1
+                    loop: for previousBlock in self[0..<offset].reversed() {
+                        if previousBlock.listDepth.depth < depth { break }
+                        if previousBlock.listDepth.depth == depth {
+                            switch previousBlock.listDepth {
+                            case .indented:
+                                continue loop
+                            case .unordered:
+                                break loop
+                            case .ordered(_, index: let previousIndex):
+                                index = previousIndex + 1
+                                break loop
+                            }
+                        }
+                    }
+                    updatedListDepth = .ordered(depth: depth, index: index)
                 }
             }
 
