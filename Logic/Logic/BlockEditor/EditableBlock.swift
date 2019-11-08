@@ -473,6 +473,21 @@ public enum EditableBlockListDepth: Equatable {
     case unordered(depth: Int)
     case ordered(depth: Int, index: Int)
 
+    public var kind: String {
+        switch self {
+        case .indented: return "indented"
+        case .unordered: return "unordered"
+        case .ordered: return "ordered"
+        }
+    }
+
+    public var isList: Bool {
+        switch self {
+        case .indented: return false
+        case .unordered, .ordered: return true
+        }
+    }
+
     public static var indentWidth: CGFloat = 20
 
     public static var none: EditableBlockListDepth = .indented(depth: 0)

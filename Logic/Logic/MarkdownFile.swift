@@ -35,7 +35,113 @@ public enum MarkdownFile {
     }
 
     public static func makeMarkdownRoot(_ blocks: [BlockEditor.Block]) -> MDXRoot {
-        return .init(children: blocks.map { makeMarkdownBlock($0) })
+        func isListStart(blocks: [BlockEditor.Block], block: BlockEditor.Block) -> Bool {
+            guard let index = blocks.firstIndex(of: block) else { return false }
+
+            let prefix = blocks.prefix(upTo: index)
+
+            for previous in prefix.reversed() {
+                if previous.listDepth.depth > block.listDepth.depth {
+                    continue
+                } else if previous.listDepth.depth == block.listDepth.depth {
+                    switch (previous.listDepth, block.listDepth) {
+                    // An indented block can't be the start of a new list
+                    case (_, .indented):
+                        return false
+                    // A different kind of list is the start of a new list
+                    case (.ordered, .unordered), (.unordered, .ordered):
+                        return true
+                    // The same kind of list must be in an existing list
+                    case (.ordered, .ordered), (.unordered, .unordered):
+                        return false
+                    // A list following an indented block may be a new list
+                    case (.indented, .unordered), (.indented, .ordered):
+                        continue
+                    }
+                // Only lists should be allowed here, but we double check `isList` anyway
+                } else if block.listDepth.isList {
+                    return true
+                }
+            }
+
+            return block.listDepth.isList
+        }
+
+        func getListItems(blocks: [BlockEditor.Block], block: BlockEditor.Block) -> [BlockEditor.Block] {
+            guard let index = blocks.firstIndex(of: block) else { return [] }
+
+            let suffix = blocks.suffix(from: index).dropFirst()
+
+            var list: [BlockEditor.Block] = []
+
+            for next in suffix {
+                if next.listDepth.depth == block.listDepth.depth && next.listDepth.isList &&
+                    !isListStart(blocks: blocks, block: next) {
+                    list.append(next)
+                } else if next.listDepth.depth == block.listDepth.depth && !next.listDepth.isList {
+                    continue
+                } else if next.listDepth.depth > block.listDepth.depth {
+                    continue
+                } else {
+                    break
+                }
+            }
+
+            return list
+        }
+
+        func getListItemChildren(blocks: [BlockEditor.Block], block: BlockEditor.Block) -> [BlockEditor.Block] {
+            guard let index = blocks.firstIndex(of: block) else { return [] }
+
+            let suffix = blocks.suffix(from: index).dropFirst()
+
+            var list: [BlockEditor.Block] = []
+
+            for next in suffix {
+                if next.listDepth.depth == block.listDepth.depth && !next.listDepth.isList {
+                    list.append(next)
+                } else if next.listDepth.depth == block.listDepth.depth + 1 && isListStart(blocks: blocks, block: next) {
+                    list.append(next)
+                } else if next.listDepth.depth > block.listDepth.depth {
+                    continue
+                } else {
+                    break
+                }
+            }
+
+            return list
+        }
+
+        func makeListBlock(_ block: BlockEditor.Block) -> MDXBlockNode {
+            if isListStart(blocks: blocks, block: block) {
+                let ordered = block.listDepth.kind == "ordered"
+
+                let firstNodeChildren = getListItemChildren(blocks: blocks, block: block)
+                let firstNode: MDXListItemNode = .listItem(
+                    children: [makeMarkdownBlock(block)] + firstNodeChildren.map(makeListBlock))
+
+                let listItems: [MDXListItemNode] = [firstNode] + getListItems(blocks: blocks, block: block).map { item in
+                    let children = getListItemChildren(blocks: blocks, block: item)
+                    return MDXListItemNode.listItem(children: [makeMarkdownBlock(item)] + children.map(makeListBlock))
+                }
+
+                return .list(MDXList(ordered: ordered, children: listItems))
+            } else {
+                return makeMarkdownBlock(block)
+            }
+        }
+
+        var topLevelBlocks: [MDXBlockNode] = []
+
+        for block in blocks {
+            if block.listDepth.depth == 0 {
+                topLevelBlocks.append(makeMarkdownBlock(block))
+            } else if block.listDepth.depth == 1 && isListStart(blocks: blocks, block: block) {
+                topLevelBlocks.append(makeListBlock(block))
+            }
+        }
+
+        return .init(children: topLevelBlocks)
     }
 
     public static func makeMarkdownData(_ blocks: [BlockEditor.Block]) -> Data? {
@@ -126,7 +232,7 @@ public enum MarkdownFile {
                             let newListDepth: EditableBlockListDepth = childOffset > 0
                                 ? .indented(depth: listDepth.depth + 1)
                                 : value.ordered
-                                ? .ordered(depth: listDepth.depth + 1, index: offset)
+                                ? .ordered(depth: listDepth.depth + 1, index: offset + 1)
                                 : .unordered(depth: listDepth.depth + 1)
                             return makeBlock(listItemBlock, listDepth: newListDepth)
                         }
