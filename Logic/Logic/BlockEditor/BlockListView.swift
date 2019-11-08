@@ -1782,8 +1782,8 @@ extension BlockListView: NSTableViewDelegate {
         static var divider = SuggestionListItem.row("Divider", "Horizontal divider", false, nil, MenuThumbnailImage.divider)
         static var image = SuggestionListItem.row("Image", "Display an image", false, nil, MenuThumbnailImage.image)
 
-        static var bulletedList = SuggestionListItem.row("Bulleted List", "Create a bulleted list", false, nil, MenuThumbnailImage.image)
-        static var numberedList = SuggestionListItem.row("Numbered List", "Create a numbered list", false, nil, MenuThumbnailImage.image)
+        static var bulletedList = SuggestionListItem.row("Bulleted List", "Create a bulleted list", false, nil, MenuThumbnailImage.unorderedList)
+        static var numberedList = SuggestionListItem.row("Numbered List", "Create a numbered list", false, nil, MenuThumbnailImage.orderedList)
     }
 
     func showCommandPalette(line: Int, query: String, rect: NSRect) {

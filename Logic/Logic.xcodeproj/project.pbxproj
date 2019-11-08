@@ -137,6 +137,8 @@
 		6BD994922343FF6000F3F173 /* menu-thumbnail-new-value.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */; };
 		6BD994932343FF6000F3F173 /* menu-thumbnail-variable.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */; };
 		6BD9949923443CC100F3F173 /* MDXSyntax.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD9949823443CC100F3F173 /* MDXSyntax.swift */; };
+		6BE9689523751B9B004C24CD /* menu-thumbnail-ordered-list.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BE9689323751B9B004C24CD /* menu-thumbnail-ordered-list.png */; };
+		6BE9689623751B9B004C24CD /* menu-thumbnail-unordered-list.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BE9689423751B9B004C24CD /* menu-thumbnail-unordered-list.png */; };
 		6BEEA13122A6E6EF00905664 /* LGCSyntax+Range.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */; };
 		6BEEA13322A6E93700905664 /* SyntaxNodeFormattable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */; };
 		6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEEA13522A713FA00905664 /* StandardConfiguration.swift */; };
@@ -282,6 +284,8 @@
 		6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-new-value.png"; sourceTree = "<group>"; };
 		6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-variable.png"; sourceTree = "<group>"; };
 		6BD9949823443CC100F3F173 /* MDXSyntax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MDXSyntax.swift; sourceTree = "<group>"; };
+		6BE9689323751B9B004C24CD /* menu-thumbnail-ordered-list.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-ordered-list.png"; sourceTree = "<group>"; };
+		6BE9689423751B9B004C24CD /* menu-thumbnail-unordered-list.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-thumbnail-unordered-list.png"; sourceTree = "<group>"; };
 		6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Range.swift"; sourceTree = "<group>"; };
 		6BEEA13222A6E93700905664 /* SyntaxNodeFormattable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntaxNodeFormattable.swift; sourceTree = "<group>"; };
 		6BEEA13522A713FA00905664 /* StandardConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardConfiguration.swift; sourceTree = "<group>"; };
@@ -640,9 +644,11 @@
 				6BFA8A562332B0460016FC7B /* menu-thumbnail-h3.png */,
 				6B0F9464233EBBE9007C115E /* menu-thumbnail-image.png */,
 				6BD9948F2343FF6000F3F173 /* menu-thumbnail-new-value.png */,
+				6BE9689323751B9B004C24CD /* menu-thumbnail-ordered-list.png */,
 				6BFA8A582332B0460016FC7B /* menu-thumbnail-paragraph.png */,
 				6B2DC30B23550AF600A768A1 /* menu-thumbnail-quote.png */,
 				6BFA8A572332B0460016FC7B /* menu-thumbnail-tokens.png */,
+				6BE9689423751B9B004C24CD /* menu-thumbnail-unordered-list.png */,
 				6BD994902343FF6000F3F173 /* menu-thumbnail-variable.png */,
 			);
 			path = assets;
@@ -720,6 +726,7 @@
 				6B858C2E229EEEAD00DE6216 /* Prelude.logic in Resources */,
 				6BFA8A5D2332B0460016FC7B /* menu-thumbnail-paragraph.png in Resources */,
 				6B4E25FE22E7A55000F0076A /* TextStyle.logic in Resources */,
+				6BE9689523751B9B004C24CD /* menu-thumbnail-ordered-list.png in Resources */,
 				6B0F9465233EBBE9007C115E /* menu-thumbnail-divider.png in Resources */,
 				6B4E260222E7B39500F0076A /* Shadow.logic in Resources */,
 				6B2DC30C23550AF600A768A1 /* menu-thumbnail-quote.png in Resources */,
@@ -731,6 +738,7 @@
 				6B0F9466233EBBE9007C115E /* menu-thumbnail-image.png in Resources */,
 				6BFA8A5B2332B0460016FC7B /* menu-thumbnail-h3.png in Resources */,
 				6BFA8A5C2332B0460016FC7B /* menu-thumbnail-tokens.png in Resources */,
+				6BE9689623751B9B004C24CD /* menu-thumbnail-unordered-list.png in Resources */,
 				6B4E260022E7B27000F0076A /* Color.logic in Resources */,
 				6B34148F225418D800CC65D1 /* lona-serialization.umd.js in Resources */,
 				6BD994912343FF6000F3F173 /* menu-thumbnail-function.png in Resources */,
