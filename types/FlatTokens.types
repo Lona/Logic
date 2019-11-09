@@ -81,6 +81,9 @@
         <Case.Substitution generic="Element" instance="Token"/>
       </Case.Param>
     </Case>
+    <Case name="mdxString">
+      <Case.Param type="String"/>
+    </Case>
   </Type>
   <Type name="ConvertedFile">
     <Record name="convertedFile">
