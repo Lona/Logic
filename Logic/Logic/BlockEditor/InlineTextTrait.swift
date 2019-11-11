@@ -14,7 +14,7 @@ extension NSAttributedString.Key {
     public static let code = NSAttributedString.Key("code")
 }
 
-public enum InlineTextTrait: Equatable {
+public enum InlineTextTrait: Equatable, Hashable {
     case bold, italic, strikethrough, code, link(String)
 
     var openingDelimiter: String {

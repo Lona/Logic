@@ -395,23 +395,7 @@ public class TextBlockView: AttributedTextView {
 
             newTextValue.enumerateAttributes(in: NSRange(location: 0, length: textValue.length), options: []) { (attributes, range, _) in
                 let traits: [InlineTextTrait] = .init(attributes: attributes)
-
-                let textStyle = TextStyle(
-                    family: traits.isCode ? SizeLevel.monospacedFont : nil,
-                    weight: traits.isBold ? self.boldFontWeight : self.standardFontWeight,
-                    size: self.fontSize,
-                    color: self.textColor
-                )
-
-                var newAttributes = textStyle.attributeDictionary
-
-                if traits.isCode {
-                    newAttributes[.backgroundColor] = Colors.commentBackground
-                }
-
-                if let font = newAttributes[.font] as? NSFont, traits.isItalic {
-                    newAttributes[.font] = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
-                }
+                let newAttributes = SizeLevel.attributesForSizeAndTraits(self, traits)
 
                 newTextValue.addAttributes(newAttributes, range: range)
 
@@ -424,6 +408,27 @@ public class TextBlockView: AttributedTextView {
         }
 
         // MARK: Static
+
+        public static var attributesForSizeAndTraits: (SizeLevel, [InlineTextTrait]) -> [NSAttributedString.Key : Any] = Memoize.all { sizeLevel, traits in
+            let textStyle = TextStyle(
+                family: traits.isCode ? SizeLevel.monospacedFont : nil,
+                weight: traits.isBold ? sizeLevel.boldFontWeight : sizeLevel.standardFontWeight,
+                size: sizeLevel.fontSize,
+                color: sizeLevel.textColor
+            )
+
+            var newAttributes = textStyle.attributeDictionary
+
+            if traits.isCode {
+                newAttributes[.backgroundColor] = Colors.commentBackground
+            }
+
+            if let font = newAttributes[.font] as? NSFont, traits.isItalic {
+                newAttributes[.font] = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
+            }
+
+            return newAttributes
+        }
 
         public static var textStyleForSizeLevel: (SizeLevel) -> TextStyle = Memoize.all { sizeLevel in
             return TextStyle(weight: sizeLevel.standardFontWeight, size: sizeLevel.fontSize)
@@ -709,8 +714,21 @@ public class TextBlockView: AttributedTextView {
                 break
             }
         } else {
-            // If there's no selection, we only update the NSAttributedString internally
-            NSFontManager.shared.addFontTrait(sender)
+            switch menuItem.tag {
+            case 1:
+                let enabled = (typingAttributes[.italic] as? Bool) ?? false
+                typingAttributes[.italic] = !enabled
+            case 2:
+                let enabled = (typingAttributes[.bold] as? Bool) ?? false
+                typingAttributes[.bold] = !enabled
+            default:
+                break
+            }
+
+            let traits: [InlineTextTrait] = .init(attributes: typingAttributes)
+            let updatedAttributes = SizeLevel.attributesForSizeAndTraits(sizeLevel, traits)
+
+            typingAttributes[.font] = updatedAttributes[.font]
         }
     }
 
