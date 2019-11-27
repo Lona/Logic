@@ -10,4 +10,19 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+
+    @IBAction func newLogicDocument(_ sender: AnyObject) {
+        let document: LogicDocument
+
+        do {
+            document = try LogicDocument(type: "DocumentType")
+        } catch {
+            Swift.print("Failed to initialize LogicDocument")
+            return
+        }
+
+        NSDocumentController.shared.addDocument(document)
+
+        document.makeWindowControllers()
+    }
 }
