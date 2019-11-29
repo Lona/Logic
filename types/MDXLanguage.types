@@ -104,6 +104,12 @@
       </Record.Param>
     </Record>
   </Type>
+  <Type name="Page">
+    <Record name="page">
+      <Record.Param name="value" type="String"/>
+      <Record.Param name="url" type="String"/>
+    </Record>
+  </Type>
   <Type name="Root">
     <Record name="root">
       <Record.Param name="children" type="Array">
@@ -132,6 +138,9 @@
     </Case>
     <Case name="list">
       <Case.Param type="List"/>
+    </Case>
+    <Case name="page">
+      <Case.Param type="Page"/>
     </Case>
   </Type>
   <Type name="InlineNode">
