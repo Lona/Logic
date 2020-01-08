@@ -38,6 +38,12 @@
       "fontWeight" : "300",
       "id" : "subtitleMuted",
       "name" : "Subtitle Muted"
+    },
+    {
+      "color" : "editableText",
+      "fontSize" : 16,
+      "id" : "pageLink",
+      "name" : "pageLink"
     }
   ]
 }

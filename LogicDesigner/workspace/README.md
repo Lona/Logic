@@ -7,3 +7,4 @@ Here we define the components, tokens (colors, text styles, shadows, etc), and d
 We then use the Lona compiler to convert this design system to platform-specific code.
 
 > You can learn more about Lona [here](https://github.com/airbnb/Lona).
+

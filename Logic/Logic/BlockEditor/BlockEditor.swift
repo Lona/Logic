@@ -62,6 +62,16 @@ open class BlockEditor: NSBox {
         set { blockListView.onClickLink = newValue }
     }
 
+    public var onClickPageLink: ((String) -> Bool)? {
+        get { return blockListView.onClickPageLink }
+        set { blockListView.onClickPageLink = newValue }
+    }
+
+    public var onRequestCreatePage: ((Int, Bool) -> Void)? {
+        get { return blockListView.onRequestCreatePage }
+        set { blockListView.onRequestCreatePage = newValue }
+    }
+
     public var parameters: Parameters {
         didSet {
             if parameters != oldValue {

@@ -207,6 +207,8 @@ public class EditableBlock: Equatable {
         switch self.content {
         case .text:
             return TextBlockContainerView()
+        case .page(title: let title, target: let target):
+            return PageBlock(titleText: title, linkTarget: target)
         case .tokens(let syntaxNode):
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
@@ -247,6 +249,9 @@ public class EditableBlock: Equatable {
             view.onRequestInvalidateIntrinsicContentSize = { [weak self] in
                 self?.wrapperView.invalidateIntrinsicContentSize()
             }
+        case .page(title: let title, target: let target):
+            let view = view as! PageBlock
+            view.title = title
         case .tokens(let value):
             let view = view as! LogicEditor
             view.rootNode = value
@@ -354,7 +359,7 @@ public class EditableBlock: Equatable {
 
     public var lastSelectionRange: NSRange {
         switch content {
-        case .tokens, .divider, .image:
+        case .tokens, .divider, .image, .page:
             return .empty
         case .text(let text, _):
             return .init(location: text.length, length: 0)
@@ -363,7 +368,7 @@ public class EditableBlock: Equatable {
 
     public var isEmpty: Bool {
         switch content {
-        case .tokens:
+        case .tokens, .page:
             return false
         case .text(let text, _):
             let string = text.string
@@ -379,7 +384,7 @@ public class EditableBlock: Equatable {
         switch content {
         case .text:
             return true
-        case .tokens, .divider, .image:
+        case .tokens, .divider, .image, .page:
             return false
         }
     }
@@ -388,14 +393,14 @@ public class EditableBlock: Equatable {
         switch content {
         case .text:
             return true
-        case .tokens, .divider, .image:
+        case .tokens, .divider, .image, .page:
             return false
         }
     }
 
     public var supportsDirectDragging: Bool {
         switch content {
-        case .text, .tokens, .divider:
+        case .text, .tokens, .divider, .page:
             return false
         case .image:
             return true
@@ -413,16 +418,19 @@ public class EditableBlock: Equatable {
             return 4
         case (.text(_, .paragraph), .text(_, .h1)),
              (.text(_, .quote), .text(_, .h1)),
-             (.tokens(_), .text(_, .h1)):
+             (.tokens(_), .text(_, .h1)),
+             (.page(_), .text(_, .h1)):
             return 32
         case (.text(_, .paragraph), .text(_, .h2)),
              (.text(_, .quote), .text(_, .h2)),
+             (.page(_), .text(_, .h2)),
              (.tokens(_), .text(_, .h2)),
              (.tokens(_), .text(_, .h3)),
              (.tokens(_), .text(_, .paragraph)):
             return 20
         case (.text(_, .paragraph), .text(_, .h3)),
-             (.text(_, .quote), .text(_, .h3)):
+             (.text(_, .quote), .text(_, .h3)),
+             (.page(_), .text(_, .h3)):
             return 8
         case (.text(_, .paragraph), .text(_, .paragraph)),
              (.text(_, .quote), .text(_, .paragraph)),
@@ -438,6 +446,8 @@ public class EditableBlock: Equatable {
 extension EditableBlock: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch content {
+        case .page(let value):
+            return "page:\(value.title):\(value.target)"
         case .text(let textValue, let sizeLevel):
             return "text:\(sizeLevel):\(textValue.string)"
         case .tokens(let syntaxNode):
@@ -455,11 +465,14 @@ public enum EditableBlockContent: Equatable {
     case tokens(LGCSyntaxNode)
     case divider
     case image(URL?)
+    case page(title: String, target: String)
 
     var lineButtonAlignmentHeight: CGFloat {
         switch self {
         case .text(_, let sizeLevel):
             return sizeLevel.fontSize * TextBlockView.lineHeightMultiple
+        case .page:
+            return 30
         case .tokens, .image:
             return 18
         case .divider:

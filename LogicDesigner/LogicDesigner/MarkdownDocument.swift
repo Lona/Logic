@@ -223,10 +223,27 @@ class MarkdownDocument: NSDocument {
             return true
         }
 
+        blockEditor.onRequestCreatePage = { blockIndex, shouldReplace in
+            let newPage: BlockEditor.Block = .init(.page(title: "My Page", target: ""), .none)
+
+            if shouldReplace {
+                self.blockEditor.blocks[blockIndex] = newPage
+            } else {
+                self.blockEditor.blocks.insert(newPage, at: blockIndex)
+            }
+
+            self.configure(blocks: self.blockEditor.blocks)
+        }
+
         blockEditor.onClickLink = { link in
             guard let url = URL(string: link) else { return true }
             NSWorkspace.shared.open(url)
             return true
+        }
+
+        blockEditor.onClickPageLink = { link in
+            Swift.print("Open page: \(link)")
+            return false
         }
 
         containerView.translatesAutoresizingMaskIntoConstraints = false

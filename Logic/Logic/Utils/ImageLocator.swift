@@ -28,6 +28,7 @@ public enum MenuThumbnailImage {
     public static let image = ImageLocator.image(named: "menu-thumbnail-image")!
     public static let orderedList = ImageLocator.image(named: "menu-thumbnail-ordered-list")!
     public static let unorderedList = ImageLocator.image(named: "menu-thumbnail-unordered-list")!
+    public static let page = ImageLocator.image(named: "menu-thumbnail-page")!
 
     // Tokens
     public static let tokens = ImageLocator.image(named: "menu-thumbnail-tokens")!

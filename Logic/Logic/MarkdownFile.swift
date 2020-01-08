@@ -25,6 +25,8 @@ public enum MarkdownFile {
             case .quote:
                 return .blockquote(.init(children: textValue.markdownInlineBlock()))
             }
+        case .page(title: let title, target: let target):
+            return .page(.init(value: title, url: target))
         case .tokens(let rootNode):
             return .code(MDXCode(rootNode))
         case .divider:
@@ -196,6 +198,8 @@ public enum MarkdownFile {
 
         func makeBlock(_ blockElement: MDXBlockNode, listDepth: EditableBlockListDepth) -> [BlockEditor.Block] {
             switch blockElement {
+            case .page(let value):
+                return [BlockEditor.Block(.page(title: value.value, target: value.url), listDepth)]
             case .thematicBreak:
                 return [BlockEditor.Block(.divider, listDepth)]
             case .image(let image):

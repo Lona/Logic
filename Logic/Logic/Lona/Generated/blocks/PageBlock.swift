@@ -3,22 +3,9 @@
 import AppKit
 import Foundation
 
-// MARK: - ImageWithBackgroundColor
+// MARK: - PageBlock
 
-private class ImageWithBackgroundColor: LNAImageView {
-  var fillColor = NSColor.clear
-
-  override func draw(_ dirtyRect: NSRect) {
-    fillColor.set()
-    bounds.fill()
-    super.draw(dirtyRect)
-  }
-}
-
-
-// MARK: - ImageBlock
-
-public class ImageBlock: NSBox {
+public class PageBlock: NSBox {
 
   // MARK: Lifecycle
 
@@ -35,8 +22,8 @@ public class ImageBlock: NSBox {
     addTrackingArea(trackingArea)
   }
 
-  public convenience init(imageWidth: CGFloat, imageHeight: CGFloat, image: NSImage) {
-    self.init(Parameters(imageWidth: imageWidth, imageHeight: imageHeight, image: image))
+  public convenience init(titleText: String, linkTarget: String) {
+    self.init(Parameters(titleText: titleText, linkTarget: linkTarget))
   }
 
   public convenience init() {
@@ -62,41 +49,32 @@ public class ImageBlock: NSBox {
 
   // MARK: Public
 
-  public var imageWidth: CGFloat {
-    get { return parameters.imageWidth }
-    set {
-      if parameters.imageWidth != newValue {
-        parameters.imageWidth = newValue
-      }
-    }
-  }
-
-  public var imageHeight: CGFloat {
-    get { return parameters.imageHeight }
-    set {
-      if parameters.imageHeight != newValue {
-        parameters.imageHeight = newValue
-      }
-    }
-  }
-
-  public var image: NSImage {
-    get { return parameters.image }
-    set {
-      if parameters.image != newValue {
-        parameters.image = newValue
-      }
-    }
-  }
-
-  public var onPressImage: (() -> Void)? {
-    get { return parameters.onPressImage }
-    set { parameters.onPressImage = newValue }
+  public var onPressBlock: (() -> Void)? {
+    get { return parameters.onPressBlock }
+    set { parameters.onPressBlock = newValue }
   }
 
   public var onPressOverflowMenu: (() -> Void)? {
     get { return parameters.onPressOverflowMenu }
     set { parameters.onPressOverflowMenu = newValue }
+  }
+
+  public var titleText: String {
+    get { return parameters.titleText }
+    set {
+      if parameters.titleText != newValue {
+        parameters.titleText = newValue
+      }
+    }
+  }
+
+  public var linkTarget: String {
+    get { return parameters.linkTarget }
+    set {
+      if parameters.linkTarget != newValue {
+        parameters.linkTarget = newValue
+      }
+    }
   }
 
   public var parameters: Parameters {
@@ -115,24 +93,27 @@ public class ImageBlock: NSBox {
     owner: self)
 
   private var imageContainerView = NSBox()
-  private var imageView = ImageWithBackgroundColor()
+  private var titleView = LNATextField(labelWithString: "")
   private var imageContentView = NSBox()
   private var overflowMenuButtonView = OverflowMenuButton()
+
+  private var titleViewTextStyle = TextStyles.pageLink
 
   private var imageContainerViewHovered = false
   private var imageContainerViewPressed = false
   private var imageContainerViewOnPress: (() -> Void)?
 
-  private var imageContentViewTopAnchorImageViewTopAnchorConstraint: NSLayoutConstraint?
-  private var imageContentViewBottomAnchorImageViewBottomAnchorConstraint: NSLayoutConstraint?
-  private var imageContentViewLeadingAnchorImageViewLeadingAnchorConstraint: NSLayoutConstraint?
-  private var imageContentViewTrailingAnchorImageViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var titleViewTrailingAnchorImageContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var imageContentViewHeightAnchorParentConstraint: NSLayoutConstraint?
+  private var imageContentViewTrailingAnchorImageContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var imageContentViewLeadingAnchorTitleViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var imageContentViewTopAnchorImageContainerViewTopAnchorConstraint: NSLayoutConstraint?
+  private var imageContentViewBottomAnchorImageContainerViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var overflowMenuButtonViewWidthAnchorParentConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewTopAnchorImageContentViewTopAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewTrailingAnchorImageContentViewTrailingAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewHeightAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewWidthAnchorConstraint: NSLayoutConstraint?
-  private var imageViewHeightAnchorConstraint: NSLayoutConstraint?
-  private var imageViewWidthAnchorConstraint: NSLayoutConstraint?
 
   private func setUpViews() {
     boxType = .custom
@@ -141,22 +122,25 @@ public class ImageBlock: NSBox {
     imageContainerView.boxType = .custom
     imageContainerView.borderType = .noBorder
     imageContainerView.contentViewMargins = .zero
+    titleView.lineBreakMode = .byWordWrapping
     imageContentView.boxType = .custom
     imageContentView.borderType = .noBorder
     imageContentView.contentViewMargins = .zero
 
     addSubview(imageContainerView)
-    imageContainerView.addSubview(imageView)
-    imageView.addSubview(imageContentView)
+    imageContainerView.addSubview(titleView)
+    imageContainerView.addSubview(imageContentView)
     imageContentView.addSubview(overflowMenuButtonView)
 
-    imageView.fillColor = Colors.blockBackground
+    imageContainerView.fillColor = Colors.blockBackground
+    titleViewTextStyle = TextStyles.pageLink
+    titleView.attributedStringValue = titleViewTextStyle.apply(to: titleView.attributedStringValue)
   }
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
     imageContainerView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.translatesAutoresizingMaskIntoConstraints = false
+    titleView.translatesAutoresizingMaskIntoConstraints = false
     imageContentView.translatesAutoresizingMaskIntoConstraints = false
     overflowMenuButtonView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -165,47 +149,67 @@ public class ImageBlock: NSBox {
     let imageContainerViewLeadingAnchorConstraint = imageContainerView.leadingAnchor.constraint(equalTo: leadingAnchor)
     let imageContainerViewTrailingAnchorConstraint = imageContainerView
       .trailingAnchor
-      .constraint(lessThanOrEqualTo: trailingAnchor)
-    let imageViewWidthAnchorParentConstraint = imageView
-      .widthAnchor
-      .constraint(lessThanOrEqualTo: imageContainerView.widthAnchor)
-    let imageViewTopAnchorConstraint = imageView.topAnchor.constraint(equalTo: imageContainerView.topAnchor)
-    let imageViewBottomAnchorConstraint = imageView.bottomAnchor.constraint(equalTo: imageContainerView.bottomAnchor)
-    let imageViewLeadingAnchorConstraint = imageView.leadingAnchor.constraint(equalTo: imageContainerView.leadingAnchor)
-    let imageViewHeightAnchorConstraint = imageView.heightAnchor.constraint(equalToConstant: 100)
-    let imageViewWidthAnchorConstraint = imageView.widthAnchor.constraint(equalToConstant: 100)
-    let imageContentViewTopAnchorImageViewTopAnchorConstraint = imageContentView
-      .topAnchor
-      .constraint(equalTo: imageView.topAnchor)
-    let imageContentViewBottomAnchorImageViewBottomAnchorConstraint = imageContentView
-      .bottomAnchor
-      .constraint(equalTo: imageView.bottomAnchor)
-    let imageContentViewLeadingAnchorImageViewLeadingAnchorConstraint = imageContentView
+      .constraint(equalTo: trailingAnchor)
+    let titleViewHeightAnchorParentConstraint = titleView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: imageContainerView.heightAnchor, constant: -16)
+    let titleViewLeadingAnchorConstraint = titleView
       .leadingAnchor
-      .constraint(equalTo: imageView.leadingAnchor)
-    let imageContentViewTrailingAnchorImageViewTrailingAnchorConstraint = imageContentView
+      .constraint(equalTo: imageContainerView.leadingAnchor, constant: 8)
+    let titleViewTopAnchorConstraint = titleView
+      .topAnchor
+      .constraint(equalTo: imageContainerView.topAnchor, constant: 8)
+    let titleViewBottomAnchorConstraint = titleView
+      .bottomAnchor
+      .constraint(equalTo: imageContainerView.bottomAnchor, constant: -8)
+    let titleViewTrailingAnchorImageContainerViewTrailingAnchorConstraint = titleView
       .trailingAnchor
-      .constraint(equalTo: imageView.trailingAnchor)
+      .constraint(equalTo: imageContainerView.trailingAnchor, constant: -8)
+    let imageContentViewHeightAnchorParentConstraint = imageContentView
+      .heightAnchor
+      .constraint(lessThanOrEqualTo: imageContainerView.heightAnchor, constant: -16)
+    let imageContentViewTrailingAnchorImageContainerViewTrailingAnchorConstraint = imageContentView
+      .trailingAnchor
+      .constraint(equalTo: imageContainerView.trailingAnchor, constant: -8)
+    let imageContentViewLeadingAnchorTitleViewTrailingAnchorConstraint = imageContentView
+      .leadingAnchor
+      .constraint(equalTo: titleView.trailingAnchor)
+    let imageContentViewTopAnchorImageContainerViewTopAnchorConstraint = imageContentView
+      .topAnchor
+      .constraint(equalTo: imageContainerView.topAnchor, constant: 8)
+    let imageContentViewBottomAnchorImageContainerViewBottomAnchorConstraint = imageContentView
+      .bottomAnchor
+      .constraint(equalTo: imageContainerView.bottomAnchor, constant: -8)
+    let overflowMenuButtonViewWidthAnchorParentConstraint = overflowMenuButtonView
+      .widthAnchor
+      .constraint(lessThanOrEqualTo: imageContentView.widthAnchor, constant: -2)
     let overflowMenuButtonViewTopAnchorImageContentViewTopAnchorConstraint = overflowMenuButtonView
       .topAnchor
-      .constraint(equalTo: imageContentView.topAnchor, constant: 4)
+      .constraint(equalTo: imageContentView.topAnchor, constant: 2)
     let overflowMenuButtonViewTrailingAnchorImageContentViewTrailingAnchorConstraint = overflowMenuButtonView
       .trailingAnchor
-      .constraint(equalTo: imageContentView.trailingAnchor, constant: -4)
+      .constraint(equalTo: imageContentView.trailingAnchor, constant: -2)
     let overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonView
       .heightAnchor
       .constraint(equalToConstant: 13)
     let overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonView.widthAnchor.constraint(equalToConstant: 23)
 
-    imageViewWidthAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    titleViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    imageContentViewHeightAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
+    overflowMenuButtonViewWidthAnchorParentConstraint.priority = NSLayoutConstraint.Priority.defaultLow
 
-    self.imageContentViewTopAnchorImageViewTopAnchorConstraint = imageContentViewTopAnchorImageViewTopAnchorConstraint
-    self.imageContentViewBottomAnchorImageViewBottomAnchorConstraint =
-      imageContentViewBottomAnchorImageViewBottomAnchorConstraint
-    self.imageContentViewLeadingAnchorImageViewLeadingAnchorConstraint =
-      imageContentViewLeadingAnchorImageViewLeadingAnchorConstraint
-    self.imageContentViewTrailingAnchorImageViewTrailingAnchorConstraint =
-      imageContentViewTrailingAnchorImageViewTrailingAnchorConstraint
+    self.titleViewTrailingAnchorImageContainerViewTrailingAnchorConstraint =
+      titleViewTrailingAnchorImageContainerViewTrailingAnchorConstraint
+    self.imageContentViewHeightAnchorParentConstraint = imageContentViewHeightAnchorParentConstraint
+    self.imageContentViewTrailingAnchorImageContainerViewTrailingAnchorConstraint =
+      imageContentViewTrailingAnchorImageContainerViewTrailingAnchorConstraint
+    self.imageContentViewLeadingAnchorTitleViewTrailingAnchorConstraint =
+      imageContentViewLeadingAnchorTitleViewTrailingAnchorConstraint
+    self.imageContentViewTopAnchorImageContainerViewTopAnchorConstraint =
+      imageContentViewTopAnchorImageContainerViewTopAnchorConstraint
+    self.imageContentViewBottomAnchorImageContainerViewBottomAnchorConstraint =
+      imageContentViewBottomAnchorImageContainerViewBottomAnchorConstraint
+    self.overflowMenuButtonViewWidthAnchorParentConstraint = overflowMenuButtonViewWidthAnchorParentConstraint
     self.overflowMenuButtonViewTopAnchorImageContentViewTopAnchorConstraint =
       overflowMenuButtonViewTopAnchorImageContentViewTopAnchorConstraint
     self.overflowMenuButtonViewTrailingAnchorImageContentViewTrailingAnchorConstraint =
@@ -213,21 +217,16 @@ public class ImageBlock: NSBox {
     self.overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonViewHeightAnchorConstraint
     self.overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonViewWidthAnchorConstraint
 
-    self.imageViewHeightAnchorConstraint = imageViewHeightAnchorConstraint
-    self.imageViewWidthAnchorConstraint = imageViewWidthAnchorConstraint
-
     NSLayoutConstraint.activate(
       [
         imageContainerViewTopAnchorConstraint,
         imageContainerViewBottomAnchorConstraint,
         imageContainerViewLeadingAnchorConstraint,
         imageContainerViewTrailingAnchorConstraint,
-        imageViewWidthAnchorParentConstraint,
-        imageViewTopAnchorConstraint,
-        imageViewBottomAnchorConstraint,
-        imageViewLeadingAnchorConstraint,
-        imageViewHeightAnchorConstraint,
-        imageViewWidthAnchorConstraint
+        titleViewHeightAnchorParentConstraint,
+        titleViewLeadingAnchorConstraint,
+        titleViewTopAnchorConstraint,
+        titleViewBottomAnchorConstraint
       ] +
         conditionalConstraints(imageContentViewIsHidden: imageContentView.isHidden))
   }
@@ -237,13 +236,15 @@ public class ImageBlock: NSBox {
 
     switch (imageContentViewIsHidden) {
       case (true):
-        constraints = []
+        constraints = [titleViewTrailingAnchorImageContainerViewTrailingAnchorConstraint]
       case (false):
         constraints = [
-          imageContentViewTopAnchorImageViewTopAnchorConstraint,
-          imageContentViewBottomAnchorImageViewBottomAnchorConstraint,
-          imageContentViewLeadingAnchorImageViewLeadingAnchorConstraint,
-          imageContentViewTrailingAnchorImageViewTrailingAnchorConstraint,
+          imageContentViewHeightAnchorParentConstraint,
+          imageContentViewTrailingAnchorImageContainerViewTrailingAnchorConstraint,
+          imageContentViewLeadingAnchorTitleViewTrailingAnchorConstraint,
+          imageContentViewTopAnchorImageContainerViewTopAnchorConstraint,
+          imageContentViewBottomAnchorImageContainerViewBottomAnchorConstraint,
+          overflowMenuButtonViewWidthAnchorParentConstraint,
           overflowMenuButtonViewTopAnchorImageContentViewTopAnchorConstraint,
           overflowMenuButtonViewTrailingAnchorImageContentViewTrailingAnchorConstraint,
           overflowMenuButtonViewHeightAnchorConstraint,
@@ -259,11 +260,9 @@ public class ImageBlock: NSBox {
 
     alphaValue = 1
     imageContentView.isHidden = !false
-    imageViewHeightAnchorConstraint?.constant = imageHeight
-    imageViewWidthAnchorConstraint?.constant = imageWidth
-    imageView.image = image
-    imageContainerViewOnPress = handleOnPressImage
+    imageContainerViewOnPress = handleOnPressBlock
     overflowMenuButtonView.onPressButton = handleOnPressOverflowMenu
+    titleView.attributedStringValue = titleViewTextStyle.apply(to: titleText)
     if imageContainerViewHovered {
       imageContentView.isHidden = !true
       alphaValue = 0.75
@@ -275,8 +274,8 @@ public class ImageBlock: NSBox {
     }
   }
 
-  private func handleOnPressImage() {
-    onPressImage?()
+  private func handleOnPressBlock() {
+    onPressBlock?()
   }
 
   private func handleOnPressOverflowMenu() {
@@ -339,46 +338,43 @@ public class ImageBlock: NSBox {
 
 // MARK: - Parameters
 
-extension ImageBlock {
+extension PageBlock {
   public struct Parameters: Equatable {
-    public var imageWidth: CGFloat
-    public var imageHeight: CGFloat
-    public var image: NSImage
-    public var onPressImage: (() -> Void)?
+    public var titleText: String
+    public var linkTarget: String
+    public var onPressBlock: (() -> Void)?
     public var onPressOverflowMenu: (() -> Void)?
 
     public init(
-      imageWidth: CGFloat,
-      imageHeight: CGFloat,
-      image: NSImage,
-      onPressImage: (() -> Void)? = nil,
+      titleText: String,
+      linkTarget: String,
+      onPressBlock: (() -> Void)? = nil,
       onPressOverflowMenu: (() -> Void)? = nil)
     {
-      self.imageWidth = imageWidth
-      self.imageHeight = imageHeight
-      self.image = image
-      self.onPressImage = onPressImage
+      self.titleText = titleText
+      self.linkTarget = linkTarget
+      self.onPressBlock = onPressBlock
       self.onPressOverflowMenu = onPressOverflowMenu
     }
 
     public init() {
-      self.init(imageWidth: 0, imageHeight: 0, image: NSImage())
+      self.init(titleText: "", linkTarget: "")
     }
 
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
-      return lhs.imageWidth == rhs.imageWidth && lhs.imageHeight == rhs.imageHeight && lhs.image == rhs.image
+      return lhs.titleText == rhs.titleText && lhs.linkTarget == rhs.linkTarget
     }
   }
 }
 
 // MARK: - Model
 
-extension ImageBlock {
+extension PageBlock {
   public struct Model: LonaViewModel, Equatable {
     public var id: String?
     public var parameters: Parameters
     public var type: String {
-      return "ImageBlock"
+      return "PageBlock"
     }
 
     public init(id: String? = nil, parameters: Parameters) {
@@ -391,24 +387,22 @@ extension ImageBlock {
     }
 
     public init(
-      imageWidth: CGFloat,
-      imageHeight: CGFloat,
-      image: NSImage,
-      onPressImage: (() -> Void)? = nil,
+      titleText: String,
+      linkTarget: String,
+      onPressBlock: (() -> Void)? = nil,
       onPressOverflowMenu: (() -> Void)? = nil)
     {
       self
         .init(
           Parameters(
-            imageWidth: imageWidth,
-            imageHeight: imageHeight,
-            image: image,
-            onPressImage: onPressImage,
+            titleText: titleText,
+            linkTarget: linkTarget,
+            onPressBlock: onPressBlock,
             onPressOverflowMenu: onPressOverflowMenu))
     }
 
     public init() {
-      self.init(imageWidth: 0, imageHeight: 0, image: NSImage())
+      self.init(titleText: "", linkTarget: "")
     }
   }
 }

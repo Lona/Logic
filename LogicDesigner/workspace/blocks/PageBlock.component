@@ -1,0 +1,185 @@
+{
+  "devices" : [
+    {
+      "deviceId" : "iPhone SE",
+      "heightMode" : "At Least"
+    },
+    {
+      "deviceId" : "Pixel 2",
+      "heightMode" : "At Least"
+    }
+  ],
+  "examples" : [
+    {
+      "id" : "Default",
+      "name" : "Default",
+      "params" : {
+        "titleText" : "Child Page"
+      }
+    }
+  ],
+  "logic" : [
+    {
+      "assignee" : [
+        "layers",
+        "ImageContainer",
+        "onPress"
+      ],
+      "content" : [
+        "parameters",
+        "onPressBlock"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "OverflowMenuButton",
+        "onPressButton"
+      ],
+      "content" : [
+        "parameters",
+        "onPressOverflowMenu"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "Title",
+        "text"
+      ],
+      "content" : [
+        "parameters",
+        "titleText"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "ImageContent",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "Container",
+            "opacity"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : 0.75,
+              "type" : "Number"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "left" : [
+          "layers",
+          "ImageContainer",
+          "hovered"
+        ],
+        "op" : "==",
+        "right" : {
+          "type" : "LitExpr",
+          "value" : {
+            "data" : true,
+            "type" : "Boolean"
+          }
+        },
+        "type" : "BinExpr"
+      },
+      "type" : "IfExpr"
+    }
+  ],
+  "params" : [
+    {
+      "name" : "onPressBlock",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressOverflowMenu",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "titleText",
+      "type" : "String"
+    },
+    {
+      "name" : "linkTarget",
+      "type" : "String"
+    }
+  ],
+  "root" : {
+    "children" : [
+      {
+        "children" : [
+          {
+            "id" : "Title",
+            "params" : {
+              "flex" : 1,
+              "text" : "Link",
+              "textStyle" : "pageLink"
+            },
+            "type" : "Lona:Text"
+          },
+          {
+            "children" : [
+              {
+                "id" : "OverflowMenuButton",
+                "params" : {
+
+                },
+                "type" : "OverflowMenuButton"
+              }
+            ],
+            "id" : "ImageContent",
+            "params" : {
+              "alignItems" : "flex-end",
+              "alignSelf" : "stretch",
+              "paddingRight" : 2,
+              "paddingTop" : 2,
+              "visible" : false
+            },
+            "type" : "Lona:View"
+          }
+        ],
+        "id" : "ImageContainer",
+        "params" : {
+          "alignSelf" : "stretch",
+          "backgroundColor" : "blockBackground",
+          "flexDirection" : "row",
+          "paddingBottom" : 8,
+          "paddingLeft" : 8,
+          "paddingRight" : 8,
+          "paddingTop" : 8
+        },
+        "type" : "Lona:View"
+      }
+    ],
+    "id" : "Container",
+    "params" : {
+      "alignSelf" : "stretch"
+    },
+    "type" : "Lona:View"
+  }
+}

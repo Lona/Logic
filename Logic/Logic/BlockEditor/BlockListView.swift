@@ -308,6 +308,10 @@ public class BlockListView: NSBox {
 
     public var onClickLink: ((String) -> Bool)?
 
+    public var onClickPageLink: ((String) -> Bool)?
+
+    public var onRequestCreatePage: ((Int, Bool) -> Void)?
+
     // MARK: Private
 
     private var selection: BlockListSelection = .none {
@@ -1669,6 +1673,12 @@ extension BlockListView: NSTableViewDelegate {
             }
         case .divider:
             break
+        case .page(_, let target):
+            let view = item.view as! PageBlock
+
+            view.onPressBlock = { [unowned self] in
+                _ = self.onClickPageLink?(target)
+            }
         case .image(let url):
             let view = item.view as! ImageBlock
 
@@ -1784,6 +1794,7 @@ extension BlockListView: NSTableViewDelegate {
 
         static var bulletedList = SuggestionListItem.row("Bulleted List", "Create a bulleted list", false, nil, MenuThumbnailImage.unorderedList)
         static var numberedList = SuggestionListItem.row("Numbered List", "Create a numbered list", false, nil, MenuThumbnailImage.orderedList)
+        static var page = SuggestionListItem.row("Page", "Create a sub-page of this page", false, nil, MenuThumbnailImage.page)
     }
 
     func showCommandPalette(line: Int, query: String, rect: NSRect) {
@@ -1803,6 +1814,7 @@ extension BlockListView: NSTableViewDelegate {
             (Suggestion.bulletedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .unordered(depth: 1))),
             (Suggestion.numberedList, EditableBlock(id: UUID(), content: .text(.init(), .paragraph), listDepth: .ordered(depth: 1, index: 1))),
             (Suggestion.tokensSectionHeader, EditableBlock.makeDefaultEmptyBlock()),
+            (Suggestion.page, EditableBlock(id: UUID(), content: .page(title: "", target: ""), listDepth: .none)),
             (
                 SuggestionListItem.row("Color token", "Define a color variable", false, nil, MenuThumbnailImage.tokens),
                 EditableBlock(
@@ -1910,6 +1922,14 @@ extension BlockListView: NSTableViewDelegate {
 
             let newBlock = menuItems[originalIndex].1
 
+            if case .page(_) = menuItems[originalIndex].1.content {
+                self.hideCommandPalette()
+
+                self.onRequestCreatePage?(line, true)
+
+                return
+            }
+
             Swift.print("new block", newBlock)
 
             var replacementBlock: EditableBlock?
@@ -1927,7 +1947,7 @@ extension BlockListView: NSTableViewDelegate {
                 if mutable.length > 1 {
                     replacementBlock = .init(id: self.blocks[line].id, content: .text(mutable, sizeLevel), listDepth: .none)
                 }
-            case .tokens, .divider, .image:
+            case .tokens, .divider, .image, .page:
                 break
             }
 
