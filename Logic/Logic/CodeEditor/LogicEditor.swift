@@ -456,7 +456,9 @@ extension LogicEditor {
 
             select(nodeByID: id)
         } else {
-            self.hideSuggestionWindow()
+            hideSuggestionWindow()
+            hideActionWindow()
+            canvasView.selectedRange = nil
 
             if let nextKeyView = nextKeyView {
                 window?.makeFirstResponder(nextKeyView)
@@ -470,7 +472,9 @@ extension LogicEditor {
 
             select(nodeByID: id)
         } else {
-            self.hideSuggestionWindow()
+            hideSuggestionWindow()
+            hideActionWindow()
+            canvasView.selectedRange = nil
 
             if let previousKeyView = previousKeyView {
                 window?.makeFirstResponder(previousKeyView)
@@ -481,23 +485,27 @@ extension LogicEditor {
     public func select(nodeByID originalId: UUID?) {
         let syntaxNodeId = willSelectNode?(rootNode, originalId) ?? originalId
 
-        self.canvasView.selectedLine = nil
-        self.suggestionText = ""
+        canvasView.selectedLine = nil
+        suggestionText = ""
 
         if let syntaxNodeId = syntaxNodeId {
             let topNode = context.topNodeWithEqualElements(as: syntaxNodeId, includeTopLevel: false)
 
             if let selectedRange = context.elementRange(for: topNode.uuid, includeTopLevel: false) {
-                self.canvasView.selectedRange = selectedRange
-
-                self.showActionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
+                canvasView.selectedRange = selectedRange
+                canvasView.hasFocus = true
+                showActionWindow(for: selectedRange.lowerBound, syntaxNode: topNode)
             } else {
-                self.canvasView.selectedRange = nil
-                self.hideSuggestionWindow()
+                canvasView.selectedRange = nil
+                canvasView.hasFocus = false
+                hideSuggestionWindow()
+                hideActionWindow()
             }
         } else {
-            self.canvasView.selectedRange = nil
-            self.hideSuggestionWindow()
+            canvasView.selectedRange = nil
+            canvasView.hasFocus = false
+            hideSuggestionWindow()
+            hideActionWindow()
         }
     }
 
@@ -608,8 +616,7 @@ extension LogicEditor {
         let hideWindow = { [unowned self] in
             if didHide { return }
             didHide = true
-            window.removeChildWindow(self.subwindow)
-            self.subwindow.setIsVisible(false)
+            self.subwindow.orderOut(nil)
         }
 
         subwindow.onPressEscapeKey = hideWindow
@@ -625,8 +632,6 @@ extension LogicEditor {
             hideWindow()
 
             didHide = true
-
-            self.update()
         }
     }
 
@@ -705,30 +710,23 @@ extension LogicEditor {
         window.addChildWindow(subwindow, ordered: .above)
         subwindow.focusSearchField()
 
-        var didHide: Bool = false
-
-        let hideWindow = { [unowned self] in
-            if didHide { return }
-            didHide = true
-            window.removeChildWindow(self.subwindow)
-            self.subwindow.setIsVisible(false)
+        subwindow.onPressEscapeKey = self.handleBlur
+        subwindow.onRequestHide = self.handleBlur
+        subwindow.onPressTabKey = {
+            self.hideActionWindow()
+            self.nextNode()
+        }
+        subwindow.onPressShiftTabKey = {
+            self.hideActionWindow()
+            self.previousNode()
         }
 
-        subwindow.onPressEscapeKey = hideWindow
-        subwindow.onRequestHide = hideWindow
-
         subwindow.onSubmit = { [unowned self] index in
-            self.canvasView.selectedRange = nil
+            self.hideActionWindow()
 
             let originalIndex = filteredSuggestionItems(query: self.subwindow.suggestionText).map { offset, item in offset }[index]
             let item = menu[originalIndex]
             item.action()
-
-            hideWindow()
-
-            didHide = true
-
-            self.update()
         }
     }
 
@@ -948,7 +946,7 @@ extension LogicEditor {
             childWindow.showsDropdown = showsDropdown
         }
 
-        childWindow.onRequestHide = hideSuggestionWindow
+        childWindow.onRequestHide = self.handleBlur
         childWindow.selectedIndex = initialIndex
         childWindow.detailView = makeDetailView(
             for: logicSuggestions.first,
@@ -981,13 +979,17 @@ extension LogicEditor {
             }
         }
 
-        childWindow.onPressEscapeKey = {
+        childWindow.onPressEscapeKey = self.handleBlur
+
+        childWindow.onPressTabKey = {
             self.hideSuggestionWindow()
+            self.nextNode()
         }
 
-        childWindow.onPressTabKey = self.nextNode
-
-        childWindow.onPressShiftTabKey = self.previousNode
+        childWindow.onPressShiftTabKey = {
+            self.hideSuggestionWindow()
+            self.previousNode()
+        }
 
         childWindow.onHighlightDropdownIndex = { [unowned self] highlightedIndex in
             if let highlightedIndex = highlightedIndex {
@@ -1006,6 +1008,8 @@ extension LogicEditor {
         }
 
         childWindow.onSubmit = { [unowned self] index in
+            self.hideSuggestionWindow()
+
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
             let logicSuggestionItem = logicSuggestions[indexedSuggestions[index].offset]
 
@@ -1069,10 +1073,10 @@ extension LogicEditor {
     }
 
     private func hideSuggestionWindow() {
-        guard let window = self.window else { return }
+        childWindow.orderOut(nil)
+    }
 
-        window.removeChildWindow(childWindow)
-        childWindow.setIsVisible(false)
-        canvasView.hasFocus = false
+    private func hideActionWindow() {
+        subwindow.orderOut(nil)
     }
 }

@@ -219,7 +219,9 @@ public class SuggestionWindow: NSWindow {
     var suggestionView = SuggestionView()
 
     private func handleHide() {
-        self.onRequestHide?()
+        if let _ = parent {
+            self.onRequestHide?()
+        }
     }
 
     // MARK: Public
