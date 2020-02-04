@@ -333,8 +333,8 @@ public class TextBlockView: AttributedTextView {
             case .paragraph, .quote: return 16
             case .h6, .h5, .h4: return 16
             case .h3: return 22
-            case .h2: return 28
-            case .h1: return 36
+            case .h2: return 30
+            case .h1: return 42
             }
         }
 
@@ -343,8 +343,8 @@ public class TextBlockView: AttributedTextView {
             case .paragraph, .quote: return .light
             case .h6, .h5, .h4: return .regular
             case .h3: return .medium
-            case .h2: return .medium
-            case .h1: return .semibold
+            case .h2: return .semibold
+            case .h1: return .bold
             }
         }
 
@@ -353,8 +353,8 @@ public class TextBlockView: AttributedTextView {
             case .paragraph, .quote: return .bold
             case .h6, .h5, .h4: return .bold
             case .h3: return .bold
-            case .h2: return .bold
-            case .h1: return .heavy
+            case .h2: return .heavy
+            case .h1: return .black
             }
         }
 

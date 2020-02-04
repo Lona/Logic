@@ -411,10 +411,12 @@ public class EditableBlock: Equatable {
         switch (a.content, b.content) {
         case (.text(_, .h1), .text(_, .h2)),
              (.text(_, .h1), .text(_, .h3)):
-            return 12
+            return 24
         case (.text(_, .h2), .text(_, .h3)):
-            return 8
-        case (.text(_, .h3), .text(_, .paragraph)):
+            return 16
+        case (.text(_, .h1), .text(_, .paragraph)),
+             (.text(_, .h2), .text(_, .paragraph)),
+             (.text(_, .h3), .text(_, .paragraph)):
             return 4
         case (.text(_, .paragraph), .text(_, .h1)),
              (.text(_, .quote), .text(_, .h1)),
