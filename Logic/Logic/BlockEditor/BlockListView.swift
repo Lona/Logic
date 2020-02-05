@@ -1868,6 +1868,31 @@ extension BlockListView: NSTableViewDelegate {
                     ),
                     listDepth: .none
                 )
+            ),
+            (
+                SuggestionListItem.row("Variable token", "Define a variable", false, nil, MenuThumbnailImage.variable),
+                EditableBlock(
+                    id: UUID(),
+                    content: .tokens(
+                        LGCSyntaxNode.declaration(
+                            .variable(
+                                id: UUID(),
+                                name: .init(id: UUID(), name: "variable1"),
+                                annotation: .typeIdentifier(
+                                    id: UUID(),
+                                    identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
+                                    genericArguments: .empty
+                                ),
+                                initializer: .identifierExpression(
+                                    id: UUID(),
+                                    identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                                ),
+                                comment: nil
+                            )
+                        )
+                    ),
+                    listDepth: .none
+                )
             )
         ]
 

@@ -662,7 +662,7 @@ extension LogicEditor {
             })
 
             let functionCallItem: LogicEditor.MenuItem = .init(row: functionCallRow, action: { [unowned self] in
-                self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode)
+                self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: LGCExpression.Suggestion.functionCallCategoryTitle)
             })
 
             menu = [customValueItem, variableReferenceItem, functionCallItem]
@@ -775,10 +775,21 @@ extension LogicEditor {
             category.list.forEach { logicItem in
                 switch logicItem.item.style {
                 case .normal:
+                    let image: NSImage?
+
+                    switch logicItem.item.category {
+                    case LGCExpression.Suggestion.functionCallCategoryTitle:
+                        image = MenuThumbnailImage.function
+                    case LGCExpression.Suggestion.variablesCategoryTitle:
+                        image = MenuThumbnailImage.variable
+                    default:
+                        image = nil
+                    }
+
                     suggestionListItems.append(
                         (
                             logicItem.offset,
-                            .row(logicItem.item.title, logicItem.item.subtitle, logicItem.item.disabled, logicItem.item.badge, nil)
+                            .row(logicItem.item.title, logicItem.item.subtitle, logicItem.item.disabled, logicItem.item.badge, image)
                         )
                     )
                 case .colorPreview(code: let code, let color):

@@ -47,6 +47,7 @@ public struct LogicSuggestionItem {
         title: String,
         subtitle: String? = nil,
         badge: String? = nil,
+        image: NSImage? = nil,
         category: String,
         node: LGCSyntaxNode,
         suggestionFilters: [SuggestionView.SuggestionFilter] = [.all],
@@ -57,6 +58,7 @@ public struct LogicSuggestionItem {
         self.title = title
         self.subtitle = subtitle
         self.badge = badge
+        self.image = image
         self.category = category
         self.node = node
         self.suggestionFilters = suggestionFilters
@@ -69,6 +71,7 @@ public struct LogicSuggestionItem {
     public var title: String
     public var subtitle: String?
     public var badge: String?
+    public var image: NSImage?
     public var category: String
     public var node: LGCSyntaxNode
     public var suggestionFilters: [SuggestionView.SuggestionFilter]
@@ -678,7 +681,7 @@ public extension LGCExpression {
                 title: title,
                 subtitle: keyPath.count > 1 ? keyPath.dropLast().joined(separator: ".") : nil,
                 badge: "ƒ",
-                category: "FUNCTIONS",
+                category: functionCallCategoryTitle,
                 node: .expression(
                     .functionCallExpression(
                         id: UUID(),
@@ -688,6 +691,8 @@ public extension LGCExpression {
                 )
             )
         }
+
+        public static let functionCallCategoryTitle = "Functions".uppercased()
 
         public static let categoryTitle = "Expressions".uppercased()
 
@@ -935,11 +940,11 @@ extension LGCDeclaration {
 
     public static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
         let items = [
-            Suggestion.variable(query: prefix),
-            Suggestion.function(query: prefix),
-            Suggestion.enum(query: prefix),
-            Suggestion.record(query: prefix),
-            Suggestion.namespace(query: prefix),
+            Suggestion.variable(query: ""),
+            Suggestion.function(query: ""),
+            Suggestion.enum(query: ""),
+            Suggestion.record(query: ""),
+            Suggestion.namespace(query: ""),
             Suggestion.genericFunction,
             Suggestion.genericEnum,
             Suggestion.genericRecord,
