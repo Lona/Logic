@@ -140,6 +140,10 @@ open class LogicEditor: NSBox {
         }
     }
 
+    public var onFocusPreviousView: (() -> Void)?
+
+    public var onFocusNextView: (() -> Void)?
+
     public var onChangeSuggestionFilter: ((SuggestionView.SuggestionFilter) -> Void)?
 
     public var defaultSuggestionWindowSize = CGSize(width: 610 - 24, height: 380 - 24)
@@ -329,8 +333,6 @@ open class LogicEditor: NSBox {
         canvasView.onPressDeleteKey = handleDelete
         canvasView.onDuplicateCommand = handleDuplicateCommand
         canvasView.onMoveLine = handleMoveLine
-        canvasView.onBlur = handleBlur
-        canvasView.onFocus = handleFocus
         canvasView.getLineShowsButtons = handleLineShowsButtons
     }
 
@@ -348,13 +350,33 @@ open class LogicEditor: NSBox {
     private func update() {}
 }
 
+// MARK: - First Responder
+
+extension LogicEditor {
+    open override var acceptsFirstResponder: Bool { return true }
+
+    open override func becomeFirstResponder() -> Bool {
+        handleFocus()
+
+        return true
+    }
+
+    open override func resignFirstResponder() -> Bool {
+        handleBlur()
+
+        return true
+    }
+}
+
 // MARK: - Selection
 
 extension LogicEditor {
 
     private func handleFocus() {
-        if let firstIndex = context.formatted.elements.firstIndex(where: { $0.isActivatable }) {
-            canvasView.selectedRange = firstIndex..<firstIndex + 1
+        if let index = context.formatted.nextActivatableElementIndex(after: nil),
+            let id = context.formatted.elements[index].syntaxNodeID {
+
+            select(nodeByID: id)
         }
     }
 
@@ -460,9 +482,7 @@ extension LogicEditor {
             hideActionWindow()
             canvasView.selectedRange = nil
 
-            if let nextKeyView = nextKeyView {
-                window?.makeFirstResponder(nextKeyView)
-            }
+            onFocusNextView?()
         }
     }
 
@@ -476,9 +496,7 @@ extension LogicEditor {
             hideActionWindow()
             canvasView.selectedRange = nil
 
-            if let previousKeyView = previousKeyView {
-                window?.makeFirstResponder(previousKeyView)
-            }
+            onFocusPreviousView?()
         }
     }
 

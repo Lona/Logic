@@ -150,8 +150,6 @@ public class LogicCanvasView: NSView {
     public var onPressShiftTabKey: (() -> Void)?
     public var onPressDeleteKey: (() -> Void)?
     public var onMoveLine: ((Int, Int) -> Void)?
-    public var onFocus: (() -> Void)?
-    public var onBlur: (() -> Void)?
     public var onClickBackground: (() -> Void)?
     public var onClickLinePlus: ((Int, NSRect) -> Void)?
     public var onClickLineMore: ((Int, NSRect) -> Void)?
@@ -189,20 +187,6 @@ public class LogicCanvasView: NSView {
 
     public override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
         return true
-    }
-
-    public override var acceptsFirstResponder: Bool {
-        return true
-    }
-
-    public override func becomeFirstResponder() -> Bool {
-        onFocus?()
-        return super.becomeFirstResponder()
-    }
-
-    public override func resignFirstResponder() -> Bool {
-        onBlur?()
-        return super.resignFirstResponder()
     }
 
     public func getElementRect(for index: Int) -> CGRect? {

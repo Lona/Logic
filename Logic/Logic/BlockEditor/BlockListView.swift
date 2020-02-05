@@ -1203,6 +1203,12 @@ extension BlockListView: NSTableViewDelegate {
 
                 return true
             }
+
+            view.onFocusNextView = { [unowned self] in
+                if self.blocks.count > row {
+                    self.blocks[row + 1].focus()
+                }
+            }
         case .text(let textValue, let sizeLevel):
             let view = item.view as! TextBlockContainerView
 
