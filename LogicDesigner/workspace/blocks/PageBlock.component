@@ -22,24 +22,12 @@
     {
       "assignee" : [
         "layers",
-        "ImageContainer",
+        "Container",
         "onPress"
       ],
       "content" : [
         "parameters",
         "onPressBlock"
-      ],
-      "type" : "AssignExpr"
-    },
-    {
-      "assignee" : [
-        "layers",
-        "OverflowMenuButton",
-        "onPressButton"
-      ],
-      "content" : [
-        "parameters",
-        "onPressOverflowMenu"
       ],
       "type" : "AssignExpr"
     },
@@ -60,21 +48,6 @@
         {
           "assignee" : [
             "layers",
-            "ImageContent",
-            "visible"
-          ],
-          "content" : {
-            "type" : "LitExpr",
-            "value" : {
-              "data" : true,
-              "type" : "Boolean"
-            }
-          },
-          "type" : "AssignExpr"
-        },
-        {
-          "assignee" : [
-            "layers",
             "Container",
             "opacity"
           ],
@@ -91,7 +64,7 @@
       "condition" : {
         "left" : [
           "layers",
-          "ImageContainer",
+          "Container",
           "hovered"
         ],
         "op" : "==",
@@ -115,12 +88,6 @@
       }
     },
     {
-      "name" : "onPressOverflowMenu",
-      "type" : {
-        "name" : "Function"
-      }
-    },
-    {
       "name" : "titleText",
       "type" : "String"
     },
@@ -132,53 +99,23 @@
   "root" : {
     "children" : [
       {
-        "children" : [
-          {
-            "id" : "Title",
-            "params" : {
-              "flex" : 1,
-              "text" : "Link",
-              "textStyle" : "pageLink"
-            },
-            "type" : "Lona:Text"
-          },
-          {
-            "children" : [
-              {
-                "id" : "OverflowMenuButton",
-                "params" : {
-
-                },
-                "type" : "OverflowMenuButton"
-              }
-            ],
-            "id" : "ImageContent",
-            "params" : {
-              "alignItems" : "flex-end",
-              "alignSelf" : "stretch",
-              "paddingRight" : 2,
-              "paddingTop" : 2,
-              "visible" : false
-            },
-            "type" : "Lona:View"
-          }
-        ],
-        "id" : "ImageContainer",
+        "id" : "Title",
         "params" : {
           "alignSelf" : "stretch",
-          "backgroundColor" : "blockBackground",
-          "flexDirection" : "row",
-          "paddingBottom" : 8,
-          "paddingLeft" : 8,
-          "paddingRight" : 8,
-          "paddingTop" : 8
+          "text" : "Link",
+          "textStyle" : "pageLink"
         },
-        "type" : "Lona:View"
+        "type" : "Lona:Text"
       }
     ],
     "id" : "Container",
     "params" : {
-      "alignSelf" : "stretch"
+      "alignSelf" : "stretch",
+      "backgroundColor" : "blockBackground",
+      "paddingBottom" : 8,
+      "paddingLeft" : 8,
+      "paddingRight" : 8,
+      "paddingTop" : 8
     },
     "type" : "Lona:View"
   }

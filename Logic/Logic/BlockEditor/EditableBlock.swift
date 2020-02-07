@@ -76,31 +76,97 @@ public class EditableBlockView: NSView {
             oldValue?.removeFromSuperview()
 
             if let contentView = contentView {
-                addSubview(contentView)
-
-                contentView.translatesAutoresizingMaskIntoConstraints = false
-                contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-                contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-
-                bottomAnchorConstraint = contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
-                bottomAnchorConstraint?.isActive = true
-
-                leadingAnchorConstraint = contentView.leadingAnchor.constraint(equalTo: leadingAnchor)
-                leadingAnchorConstraint?.isActive = true
+                overflowMenuContainer.innerContentView = contentView
             }
         }
     }
 
+    public var onOpenOverflowMenu: (() -> Void)?
+
+    public var overflowMenu: (() -> [SuggestionListItem])?
+
+    public var onActivateOverflowMenuItem: ((Int) -> Void)?
+
+    public var onDeleteBlock: (() -> Void)?
+
+    public var overflowMenuButton: OverflowMenuButton {
+        return overflowMenuContainer.overflowMenuButton
+    }
+
+    public func showOverflowMenu(at screenRect: NSRect) {
+        guard let window = self.window else { return }
+
+        let contextMenu = EditableBlockView.contextMenu
+
+        let adjustedRect = NSRect(
+            x: screenRect.midX - contextMenu.defaultContentWidth / 2,
+            y: screenRect.maxY,
+            width: 0,
+            height: 0
+        )
+
+        contextMenu.suggestionText = ""
+        contextMenu.suggestionItems = self.overflowMenu?() ?? []
+        contextMenu.onSelectIndex = { index in
+            contextMenu.selectedIndex = index
+        }
+        contextMenu.onChangeSuggestionText = { text in
+            let menu = self.overflowMenu?() ?? []
+            contextMenu.suggestionText = text
+            contextMenu.suggestionItems = menu.filter { text.isEmpty || $0.title.lowercased().contains(text.lowercased()) }
+        }
+        contextMenu.onSubmit = { [unowned self] index in
+            contextMenu.orderOut(nil)
+            self.onActivateOverflowMenuItem?(index)
+        }
+        contextMenu.onDeleteEmptyInput = { [unowned self] in
+            contextMenu.orderOut(nil)
+            self.onDeleteBlock?()
+        }
+
+        window.addChildWindow(contextMenu, ordered: .above)
+
+        contextMenu.anchorTo(rect: adjustedRect, verticalOffset: -10)
+        contextMenu.focusSearchField()
+
+        self.onOpenOverflowMenu?()
+    }
+
     // MARK: Private
+
+    private let overflowMenuContainer = OverflowMenuContainer()
 
     private var bottomAnchorConstraint: NSLayoutConstraint?
 
     private var leadingAnchorConstraint: NSLayoutConstraint?
 
-    private func setUpViews() {}
+    private func setUpViews() {
+        addSubview(overflowMenuContainer)
+
+        overflowMenuContainer.onPressButton = { [unowned self] in
+            guard let window = self.window else { return }
+
+            let clickedView = self.overflowMenuContainer.overflowMenuButton
+            let windowRect = self.overflowMenuContainer.convert(clickedView.frame, to: nil)
+            let screenRect = window.convertToScreen(windowRect)
+
+            self.showOverflowMenu(at: screenRect)
+        }
+
+    }
 
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
+        overflowMenuContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        overflowMenuContainer.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        overflowMenuContainer.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+
+        bottomAnchorConstraint = overflowMenuContainer.bottomAnchor.constraint(equalTo: bottomAnchor)
+        bottomAnchorConstraint?.isActive = true
+
+        leadingAnchorConstraint = overflowMenuContainer.leadingAnchor.constraint(equalTo: leadingAnchor)
+        leadingAnchorConstraint?.isActive = true
     }
 
     private func update() {
@@ -161,9 +227,35 @@ public class EditableBlockView: NSView {
     }
 }
 
+// MARK: - Context Menu
+
+extension EditableBlockView {
+
+    public static var contextMenu: SuggestionWindow = {
+        let suggestionWindow = SuggestionWindow()
+
+        suggestionWindow.showsSearchBar = true
+        suggestionWindow.showsSuggestionDetails = false
+        suggestionWindow.defaultContentWidth = 236
+        suggestionWindow.placeholderText = "Filter actions..."
+
+        suggestionWindow.onRequestHide = {
+            suggestionWindow.orderOut(nil)
+        }
+
+        suggestionWindow.onPressEscapeKey = {
+            suggestionWindow.orderOut(nil)
+        }
+
+        return suggestionWindow
+    }()
+}
 
 // MARK: - EditableBlock
 
+// EditableBlocks are initialized and deallocated frequently.
+// Any data that needs to persist across re-renders should live on the EditableBlockView,
+// which is cached based on the block's id.
 public class EditableBlock: Equatable {
     public let id: UUID
     public let content: EditableBlockContent
@@ -176,6 +268,26 @@ public class EditableBlock: Equatable {
                 wrapperView.bottomMargin = newValue
             }
         }
+    }
+
+    public var onOpenOverflowMenu: (() -> Void)? {
+        get { return wrapperView.onOpenOverflowMenu }
+        set { wrapperView.onOpenOverflowMenu = newValue }
+    }
+
+    public var overflowMenu: (() -> [SuggestionListItem])? {
+        get { return wrapperView.overflowMenu }
+        set { wrapperView.overflowMenu = newValue }
+    }
+
+    public var onActivateOverflowMenuItem: ((Int) -> Void)? {
+        get { return wrapperView.onActivateOverflowMenuItem }
+        set { wrapperView.onActivateOverflowMenuItem = newValue }
+    }
+
+    public var onDeleteBlock: (() -> Void)? {
+        get { return wrapperView.onDeleteBlock }
+        set { wrapperView.onDeleteBlock = newValue }
     }
 
     public init(id: UUID, content: EditableBlockContent, listDepth: EditableBlockListDepth) {
@@ -281,8 +393,11 @@ public class EditableBlock: Equatable {
         if let wrapperView = EditableBlock.wrapperViewCache[id] { return wrapperView }
 
         let wrapperView = EditableBlockView()
+
         wrapperView.contentView = self.view
+
         EditableBlock.wrapperViewCache[id] = wrapperView
+        
         return wrapperView
     }
 

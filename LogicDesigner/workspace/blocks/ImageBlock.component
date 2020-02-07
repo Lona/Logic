@@ -68,7 +68,7 @@
     {
       "assignee" : [
         "layers",
-        "ImageContainer",
+        "Container",
         "onPress"
       ],
       "content" : [
@@ -78,34 +78,7 @@
       "type" : "AssignExpr"
     },
     {
-      "assignee" : [
-        "layers",
-        "OverflowMenuButton",
-        "onPressButton"
-      ],
-      "content" : [
-        "parameters",
-        "onPressOverflowMenu"
-      ],
-      "type" : "AssignExpr"
-    },
-    {
       "body" : [
-        {
-          "assignee" : [
-            "layers",
-            "ImageContent",
-            "visible"
-          ],
-          "content" : {
-            "type" : "LitExpr",
-            "value" : {
-              "data" : true,
-              "type" : "Boolean"
-            }
-          },
-          "type" : "AssignExpr"
-        },
         {
           "assignee" : [
             "layers",
@@ -125,7 +98,7 @@
       "condition" : {
         "left" : [
           "layers",
-          "ImageContainer",
+          "Container",
           "hovered"
         ],
         "op" : "==",
@@ -167,12 +140,6 @@
       "type" : {
         "name" : "Function"
       }
-    },
-    {
-      "name" : "onPressOverflowMenu",
-      "type" : {
-        "name" : "Function"
-      }
     }
   ],
   "root" : {
@@ -180,29 +147,6 @@
       {
         "children" : [
           {
-            "children" : [
-              {
-                "children" : [
-                  {
-                    "id" : "OverflowMenuButton",
-                    "params" : {
-
-                    },
-                    "type" : "OverflowMenuButton"
-                  }
-                ],
-                "id" : "ImageContent",
-                "params" : {
-                  "alignItems" : "flex-end",
-                  "alignSelf" : "stretch",
-                  "flex" : 1,
-                  "paddingRight" : 4,
-                  "paddingTop" : 4,
-                  "visible" : false
-                },
-                "type" : "Lona:View"
-              }
-            ],
             "id" : "Image",
             "params" : {
               "backgroundColor" : "blockBackground",

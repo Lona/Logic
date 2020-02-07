@@ -51,6 +51,7 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     public var onPressShiftTab: (() -> Void)?
     public var onPressCommandUpKey: (() -> Void)?
     public var onPressCommandDownKey: (() -> Void)?
+    public var onPressDeleteField: (() -> Void)?
 
     public var placeholderText: String? {
         get { return placeholderString }
@@ -162,6 +163,11 @@ extension ControlledSearchInput: NSTextFieldDelegate {
         } else if let onPressDownKey = onPressDownKey, commandSelector == #selector(moveDown(_:)) {
             onPressDownKey()
             return true
+        } else if commandSelector == #selector(NSResponder.deleteBackward) {
+            if textValue.isEmpty {
+                onPressDeleteField?()
+                return true
+            }
         }
 
         return false

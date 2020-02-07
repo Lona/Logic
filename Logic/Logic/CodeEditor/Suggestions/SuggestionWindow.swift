@@ -108,6 +108,9 @@ public class SuggestionWindow: NSWindow {
         suggestionView.searchInput.isBordered = false
         suggestionView.searchInput.focusRingType = .none
         suggestionView.searchInput.font = NSFont.systemFont(ofSize: 18, weight: .light)
+        suggestionView.searchInput.onPressDeleteField = { [unowned self] in
+            self.onDeleteEmptyInput?()
+        }
 
         suggestionView.onSubmit = {
             self.onPressEnter?()
@@ -287,6 +290,8 @@ public class SuggestionWindow: NSWindow {
         get { return suggestionView.selectedIndex }
         set { suggestionView.selectedIndex = newValue }
     }
+
+    public var onDeleteEmptyInput: (() -> Void)?
 
     public var onPressEscapeKey: (() -> Void)? {
         get { return suggestionView.onPressEscapeKey }

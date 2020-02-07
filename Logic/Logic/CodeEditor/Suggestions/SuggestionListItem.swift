@@ -14,6 +14,19 @@ public enum SuggestionListItem {
     case colorRow(name: String, code: String, NSColor, Bool)
     case textStyleRow(String, TextStyle, Bool)
 
+    public var title: String {
+        switch self {
+        case .row(let title, _, _, _, _):
+            return title
+        case .sectionHeader(let title):
+            return title
+        case .colorRow(let title, _, _, _):
+            return title
+        case .textStyleRow(let title, _, _):
+            return title
+        }
+    }
+
     public var isSelectable: Bool {
         switch self {
         case .row, .colorRow, .textStyleRow:

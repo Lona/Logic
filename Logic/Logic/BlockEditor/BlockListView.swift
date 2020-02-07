@@ -200,7 +200,12 @@ public class BlockListView: NSBox {
     private func handlePressMore(line: Int) {
         TooltipManager.shared.hideTooltip()
 
-        selection = .blocks(NSRange(location: line, length: 1))
+        guard let window = window else { return }
+
+        let windowRect = convert(moreButtonRect(for: line), to: nil)
+        let screenRect = window.convertToScreen(windowRect)
+
+        blocks[line].wrapperView.showOverflowMenu(at: screenRect)
     }
 
     private func handlePressPlus(line: Int) {
@@ -714,6 +719,10 @@ public class BlockListView: NSBox {
             subwindow.suggestionText = value
         }
 
+        subwindow.onRequestHide = {
+            subwindow.orderOut(nil)
+        }
+
         return subwindow
     }()
 
@@ -823,6 +832,18 @@ public class BlockListView: NSBox {
     public override func hitTest(_ point: NSPoint) -> NSView? {
         if let scroller = scrollView.verticalScroller, let view = scroller.hitTest(point) {
             return view
+        }
+
+        for (_, index) in tableView.availableRows {
+            if let editableBlockView = tableView.view(atColumn: 0, row: index, makeIfNecessary: false) as? EditableBlockView {
+
+                let view = editableBlockView.overflowMenuButton
+                let converted = superview!.convert(point, to: view)
+
+                if view.bounds.contains(converted) {
+                    return view
+                }
+            }
         }
 
         if bounds.contains(point) {
@@ -1177,6 +1198,56 @@ extension BlockListView: NSTableViewDelegate {
 
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
+
+        let deleteItemTitle = "Delete"
+        let duplicateItemTitle = "Duplicate"
+
+        let standardOverflowMenu: [SuggestionListItem] = [
+            .row(duplicateItemTitle, nil, false, nil, nil),
+            .row(deleteItemTitle, nil, false, nil, nil),
+        ]
+
+        let standardActivateOverflowMenuItem: (Int) -> Void = { [unowned self] index in
+            guard let menuItems = item.overflowMenu?() else { return }
+
+            let menuItem = menuItems[index]
+
+            guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+            switch menuItem.title {
+            case deleteItemTitle:
+                if self.handleChangeBlocks(self.blocks.removing(at: line)) {
+                    self.window?.makeFirstResponder(nil)
+                }
+            case duplicateItemTitle:
+                let original = self.blocks[line]
+                let copy = EditableBlock(id: UUID(), content: original.content, listDepth: original.listDepth)
+                if self.handleChangeBlocks(self.blocks.inserting(copy, at: line + 1)) {
+                    self.window?.makeFirstResponder(nil)
+                    self.selection = .blocks(.init(location: line + 1, length: 1))
+                }
+            default:
+                break
+            }
+        }
+
+        item.overflowMenu = { return standardOverflowMenu }
+
+        item.onActivateOverflowMenuItem = standardActivateOverflowMenuItem
+
+        item.onOpenOverflowMenu = {
+            guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+            self.selection = .blocks(.init(location: line, length: 1))
+        }
+
+        item.onDeleteBlock = {
+            guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+            if self.handleChangeBlocks(self.blocks.removing(at: line)) {
+                self.window?.makeFirstResponder(nil)
+            }
+        }
 
         switch item.content {
         case .tokens:
@@ -1688,18 +1759,19 @@ extension BlockListView: NSTableViewDelegate {
         case .image(let url):
             let view = item.view as! ImageBlock
 
-            view.onPressImage = {
-                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+            let replaceImageTitle = "Replace image..."
 
-                self.selection = .blocks(.init(location: line, length: 1))
-            }
-
-            view.onPressOverflowMenu = { [unowned self] in
+            let handleReplaceImage: () -> Void = {
                 guard let window = self.window else { return }
 
                 let windowRect = view.convert(view.frame, to: nil)
                 let screenRect = window.convertToScreen(windowRect)
-                let adjustedRect = NSRect(x: screenRect.minX, y: screenRect.maxY, width: 0, height: 0)
+                let adjustedRect = NSRect(
+                    x: screenRect.midX - BlockListView.linkEditor.defaultContentWidth / 2,
+                    y: screenRect.maxY,
+                    width: 0,
+                    height: 0
+                )
 
                 self.showLinkEditor(rect: adjustedRect, initialValue: url?.absoluteString ?? "")
 
@@ -1723,6 +1795,45 @@ extension BlockListView: NSTableViewDelegate {
 
                 BlockListView.linkEditor.onPressEscapeKey = { [unowned self] in
                     self.hideLinkEditor()
+                }
+
+                BlockListView.linkEditor.onDeleteEmptyInput = { [unowned self] in
+                    guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                    if self.handleChangeBlocks(self.blocks.removing(at: line)) {
+                        self.hideLinkEditor()
+                        self.window?.makeFirstResponder(nil)
+                    }
+                }
+            }
+
+            view.onPressImage = {
+                guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
+
+                self.selection = .blocks(.init(location: line, length: 1))
+
+                // Open the link editor if there's no image
+                if url == nil {
+                    handleReplaceImage()
+                }
+            }
+
+            item.overflowMenu = {
+                return [.row(replaceImageTitle, nil, false, nil, nil)] + standardOverflowMenu
+            }
+
+            item.onActivateOverflowMenuItem = { index in
+                standardActivateOverflowMenuItem(index)
+
+                guard let menuItems = item.overflowMenu?() else { return }
+
+                let menuItem = menuItems[index]
+
+                switch menuItem.title {
+                case replaceImageTitle:
+                    handleReplaceImage()
+                default:
+                    break
                 }
             }
         }
@@ -2105,5 +2216,20 @@ class BlockListTableView: NSTableView {
         enumerateAvailableRowViews { rowView, row in
             self.blocks[row].updateViewWidth(bounds.width)
         }
+    }
+}
+
+// MARK: - Table View Helpers
+
+extension NSTableView {
+
+    var availableRows: [(NSTableRowView, Int)] {
+        var rows: [(NSTableRowView, Int)] = []
+
+        enumerateAvailableRowViews { rowView, row in
+            rows.append((rowView, row))
+        }
+
+        return rows
     }
 }
