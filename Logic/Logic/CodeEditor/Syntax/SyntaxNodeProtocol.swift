@@ -1233,14 +1233,40 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         return .declaration(self)
     }
 
+    public var namePattern: LGCPattern? {
+        switch self {
+        case .variable(let value):
+            return value.name
+        case .enumeration(let value):
+            return value.name
+        case .record(let value):
+            return value.name
+        case .namespace(let value):
+            return value.name
+        case .function(let value):
+            return value.name
+        case .importDeclaration(let value):
+            return value.name
+        case .placeholder:
+            return nil
+        }
+    }
+
     public func delete(id: UUID) -> LGCDeclaration {
         switch self {
         case .variable(let value):
+            let shouldDeleteAnnotation = value.annotation?.uuid == id
+            let shouldDeleteInitializer = value.initializer?.uuid == id
+
             return .variable(
                 id: value.id,
                 name: value.name.delete(id: id),
-                annotation: value.annotation?.delete(id: id),
-                initializer: value.initializer?.delete(id: id),
+                annotation: shouldDeleteAnnotation
+                    ? LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true), genericArguments: .empty)
+                    : value.annotation?.delete(id: id),
+                initializer: shouldDeleteAnnotation || shouldDeleteInitializer
+                    ? LGCExpression.identifierExpression(id: UUID(), identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true))
+                    : value.initializer?.delete(id: id),
                 comment: value.comment?.delete(id: id)
             )
         case .enumeration(let value):
@@ -1678,7 +1704,13 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
     }
 
     public func delete(id: UUID) -> LGCTopLevelDeclarations {
-        let updated = declarations.filter { $0.uuid != id }.map { $0.delete(id: id) }
+        let updated = declarations.filter {
+            if let namePattern = $0.namePattern, namePattern.id == id {
+                return false
+            }
+
+            return $0.uuid != id
+        }.map { $0.delete(id: id) }
 
         return LGCTopLevelDeclarations(
             id: self.uuid,

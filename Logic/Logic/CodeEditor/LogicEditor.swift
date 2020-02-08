@@ -728,6 +728,7 @@ extension LogicEditor {
         window.addChildWindow(subwindow, ordered: .above)
         subwindow.focusSearchField()
 
+        subwindow.onDeleteEmptyInput = self.handleDelete
         subwindow.onPressEscapeKey = self.handleBlur
         subwindow.onRequestHide = self.handleBlur
         subwindow.onPressTabKey = {
@@ -991,6 +992,7 @@ extension LogicEditor {
             self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: categoryFilter)
         }
 
+        childWindow.onDeleteEmptyInput = handleDelete
         childWindow.onSelectIndex = { index in
             self.selectedSuggestionIndex = index
 
