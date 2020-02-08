@@ -802,7 +802,9 @@ public class TextBlockView: AttributedTextView {
     }
 
     public override func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
-        if item.action == #selector(NSTextView.pasteAsPlainText) && NSPasteboard.general.availableType(from: [.blocks]) == .blocks {
+        if item.action == #selector(paste) && NSPasteboard.general.availableType(from: [.blocks, .mdx, .string]) != nil {
+            return true
+        } else if item.action == #selector(NSTextView.pasteAsPlainText) && NSPasteboard.general.availableType(from: [.blocks]) == .blocks {
             return true
         }
 
