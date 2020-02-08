@@ -771,6 +771,10 @@ public class TextBlockView: AttributedTextView {
         NSPasteboard.general.setData(data, forType: .mdx)
     }
 
+    public override func paste(_ sender: Any?) {
+        pasteAsPlainText(sender)
+    }
+
     public override func pasteAsPlainText(_ sender: Any?) {
         if NSPasteboard.general.availableType(from: [.blocks]) == .blocks {
             onPasteBlocks?()

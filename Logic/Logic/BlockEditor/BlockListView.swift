@@ -2165,6 +2165,10 @@ extension BlockListView {
         }
     }
 
+    @IBAction public func paste(_ sender: Any?) {
+        pasteAsPlainText(sender)
+    }
+
     @IBAction public func pasteAsPlainText(_ sender: Any?) {
         guard let pastedBlocks = NSPasteboard.general.blocks else { return }
 
