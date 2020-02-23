@@ -336,21 +336,9 @@ public class EditableBlock: Equatable {
         case .divider:
             return DividerBlock()
         case .image:
-            let view = ImageBlock()
-
-            view.image = EditableBlock.placeholderImage
-            view.imageWidth = 100
-            view.imageHeight = 100
-
-            return view
+            return ImageBackground()
         }
     }
-
-    static var placeholderImage: NSImage = {
-        let image = NSImage()
-        image.size = .init(width: 100, height: 100)
-        return image
-    }()
 
     private func configure(view: NSView) {
         switch self.content {
@@ -361,7 +349,7 @@ public class EditableBlock: Equatable {
             view.onRequestInvalidateIntrinsicContentSize = { [weak self] in
                 self?.wrapperView.invalidateIntrinsicContentSize()
             }
-        case .page(title: let title, target: let target):
+        case .page(title: let title, _):
             let view = view as! PageBlock
             view.title = title
         case .tokens(let value):
@@ -370,12 +358,12 @@ public class EditableBlock: Equatable {
         case .divider:
             break
         case .image(let url):
-            let view = view as! ImageBlock
+            let view = view as! ImageBackground
 
             if let url = url, let image = EditableBlock.fetchImage(url) {
                 view.image = image
             } else {
-                view.image = EditableBlock.placeholderImage
+                view.image = nil
             }
         }
     }
@@ -448,21 +436,6 @@ public class EditableBlock: Equatable {
         case .text:
             let view = self.view as! TextBlockContainerView
             view.width = width
-        case .image(let url):
-            let view = self.view as! ImageBlock
-            if let _ = url {
-                let imageSize = view.image.size
-                if imageSize.width > width {
-                    view.imageWidth = width
-                    view.imageHeight = ceil(imageSize.height * (width / imageSize.width))
-                } else  {
-                    view.imageWidth = imageSize.width
-                    view.imageHeight = imageSize.height
-                }
-            } else {
-                view.imageWidth = 100
-                view.imageHeight = 100
-            }
         default:
             break
         }

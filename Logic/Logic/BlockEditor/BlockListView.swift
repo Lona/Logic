@@ -469,6 +469,18 @@ public class BlockListView: NSBox {
         tableView.intercellSpacing = .init(width: 0, height: 6)
     }
 
+    public override func viewWillMove(toWindow newWindow: NSWindow?) {
+        if let window = newWindow {
+            NotificationCenter.default.addObserver(forName: NSWindow.didResizeNotification, object: window, queue: nil, using: { [weak self] _ in
+                guard let self = self else { return }
+
+                self.tableView.enumerateAvailableRowViews { rowView, row in
+                    self.blocks[row].updateViewWidth(self.tableView.bounds.width)
+                }
+            })
+        }
+    }
+
     private func setUpConstraints() {
         translatesAutoresizingMaskIntoConstraints = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -1757,7 +1769,7 @@ extension BlockListView: NSTableViewDelegate {
                 _ = self.onClickPageLink?(target)
             }
         case .image(let url):
-            let view = item.view as! ImageBlock
+            let view = item.view as! ImageBackground
 
             let replaceImageTitle = "Replace image..."
 
@@ -2212,14 +2224,6 @@ class BlockListTableView: NSTableView {
     // Allows clicking into NSTextFields directly (otherwise the NSTableView captures the first click)
     override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
         return true
-    }
-
-    override func layout() {
-        super.layout()
-
-        enumerateAvailableRowViews { rowView, row in
-            self.blocks[row].updateViewWidth(bounds.width)
-        }
     }
 }
 
