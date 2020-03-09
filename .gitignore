@@ -9,6 +9,9 @@ DerivedData/
 # Ignore OS File
 .DS_Store
 
+# Npm
+node_modules
+
 ## Various settings
 *.pbxuser
 !default.pbxuser
