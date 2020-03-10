@@ -110,15 +110,6 @@ public enum StandardConfiguration {
             Swift.print("Resolved type: \(type)")
         }
 
-        var common: [LogicSuggestionItem] = []
-
-        switch type {
-        case .bool:
-            common.append(LGCExpression.Suggestion.comparison)
-        default:
-            break
-        }
-
         switch type {
         case .gen:
             return []
@@ -136,7 +127,7 @@ public enum StandardConfiguration {
 
             let identifiers: [LogicSuggestionItem] = matchingIdentifiers.map(LGCExpression.Suggestion.identifier)
 
-            return (literals + identifiers + common).titleContains(prefix: query)
+            return (literals + identifiers).titleContains(prefix: query)
         case .cons:
             // If we're within a variable declaration, we don't want to suggest the variable name as an identifier.
             // This will cause an infinite loop/crash during execution
@@ -313,7 +304,7 @@ public enum StandardConfiguration {
                 break
             }
 
-            return literals + nested.sortedByPrefix() + (matchingSuggestions.sortedByPrefix() + common).titleContains(prefix: query)
+            return literals + nested.sortedByPrefix() + (matchingSuggestions.sortedByPrefix()).titleContains(prefix: query)
         }
     }
 

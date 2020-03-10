@@ -11,7 +11,7 @@ import AppKit
 public extension LGCExpression {
     func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         switch self {
-        case .assignmentExpression(let value):
+        case .assignmentExpression:
             return LightMark.makeScrollView(markdown: """
 # Assignment
 
