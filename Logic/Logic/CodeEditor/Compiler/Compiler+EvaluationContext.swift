@@ -271,8 +271,6 @@ extension Compiler {
             context.add(uuid: node.uuid, EvaluationThunk(label: "Member expression",  dependencies: [patternId], { values in
                 return values[0]
             }))
-        case .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _)):
-            Swift.print("binary expr", left, right, op)
         case .expression(.functionCallExpression(id: _, expression: let expression, arguments: let arguments)):
 
             // Determine type based on return value of constructor function

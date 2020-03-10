@@ -146,12 +146,12 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@lona/compiler@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@lona/compiler/-/compiler-0.1.7.tgz#3f005929451987673f73b165eefa6a2f4c0b2c43"
-  integrity sha512-b8IW2LB8OaM8h0HUktaGRqAGl4mxAAclzD2HuxgmJRwbNeGWAF5VCyFR40BoGkg+wo9yxP9cLwNU7H/ssbjKCg==
+"@lona/compiler@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@lona/compiler/-/compiler-0.1.8.tgz#2ff72cdc91e3603f954a844d4ab778b65b917ad1"
+  integrity sha512-o8F9l1p1Nh+V3xCUv1yFGhZHpNu186xRPBXPO9Ls5jjXKvSRb/y6g/xa81MIty2WVa/Thxar3vPeIzg2Bull1Q==
   dependencies:
-    "@lona/serialization" "^0.1.0"
+    "@lona/serialization" "^0.2.1"
     color "^3.1.2"
     glob "^7.1.6"
     lodash.camelcase "^4.3.0"
@@ -163,27 +163,10 @@
     prettier "^1.19.1"
     yargs "^15.1.0"
 
-"@lona/serialization@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.1.0.tgz#bd0b5ed027dc96e5edc0a08fbc1e822e61fa678e"
-  integrity sha512-a0i8RPdLoJDCCB4cZkH55IbHgj3N5KOhusAYRcgP09g7n3K4zUGOjVQCFJ1vSOhLbBfVCDMQGRtDWV1YoDyT7Q==
-  dependencies:
-    "@mdx-js/mdx" "^1.5.0"
-    json-stable-stringify "^1.0.1"
-    mdast-flatten-image-paragraphs "^1.0.0"
-    mdast-move-images-to-root "^1.0.0"
-    pegjs "^0.10.0"
-    rehype "^9.0.1"
-    unist-util-flatmap "^1.0.0"
-    uuid "^3.3.2"
-    xml2js "^0.4.19"
-    xmlbuilder "^14.0.0"
-    yargs "^15.1.0"
-
-"@lona/serialization@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.2.0.tgz#8e9b23e9f4976e0a250ef9c28446ff399083cae9"
-  integrity sha512-yWoP8UUcJcxfY39hhkLK8J/r5UlQzC4uf/ajmMJ/wbX1JjxTL5qnIrhmVGfHxCvnhLbt8USalwpdib1titTEgg==
+"@lona/serialization@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.2.1.tgz#9fdce27c4331b257db87bc16fa81fa9749cb63cf"
+  integrity sha512-MimtoqMFvzjvMrvRWMmub7KbLJLdge4JFjwkN4AhGYwaJ5PPl7hOPJVr2mV74n4KcuoINrkz6lT+9x0sUDtQhw==
   dependencies:
     "@mdx-js/mdx" "^1.5.0"
     ajv "^6.12.0"
@@ -1003,11 +986,6 @@ safe-buffer@~5.1.1:
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
   integrity sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
 
-sax@>=0.6.0:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
-  integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
-
 semver@^5.4.1:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
@@ -1221,11 +1199,6 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
-uuid@^3.3.2:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
-  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
-
 uuid@^7.0.2:
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
@@ -1278,24 +1251,6 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
-
-xml2js@^0.4.19:
-  version "0.4.23"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
-  integrity sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "~11.0.0"
-
-xmlbuilder@^14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-14.0.0.tgz#876b5aec4f05ffd5feb97b0a871c855d16fbeb8c"
-  integrity sha512-ts+B2rSe4fIckR6iquDjsKbQFK2NlUk6iG5nf14mDEyldgoc2nEKZ3jZWMPTxGQwVgToSjt6VGIho1H8/fNFTg==
-
-xmlbuilder@~11.0.0:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-11.0.1.tgz#be9bae1c8a046e76b31127726347d0ad7002beb3"
-  integrity sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
 
 xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.2"
