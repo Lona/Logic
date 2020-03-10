@@ -173,12 +173,6 @@ extension LGCPattern: SyntaxNodeFormattable {
     }
 }
 
-extension LGCBinaryOperator: SyntaxNodeFormattable {
-    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
-        return .element(LogicElement.dropdown(uuid, displayText, .source))
-    }
-}
-
 extension LGCLiteral: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
         switch self {
@@ -375,25 +369,14 @@ extension LGCExpression: SyntaxNodeFormattable {
         switch self {
         case .identifierExpression(let value):
             return value.identifier.formatted(using: options)
-        case .binaryExpression(let value):
-            switch value.op {
-            case .setEqualTo:
-                return .concat(
-                    [
-                        value.left.formatted(using: options),
-                        .element(.text("=")),
-                        value.right.formatted(using: options)
-                    ]
-                )
-            default:
-                return .concat(
-                    [
-                        value.left.formatted(using: options),
-                        value.op.formatted(using: options),
-                        value.right.formatted(using: options)
-                    ]
-                )
-            }
+        case .assignmentExpression(let value):
+            return .concat(
+                [
+                    value.left.formatted(using: options),
+                    .element(.text("=")),
+                    value.right.formatted(using: options)
+                ]
+            )
         case .functionCallExpression(let value):
             let argumentOptions = options.getArguments(value.expression.uuid) ?? (Int.max, true, true)
             let argumentsWithoutPlaceholder = value.arguments.filter { !$0.isPlaceholder }

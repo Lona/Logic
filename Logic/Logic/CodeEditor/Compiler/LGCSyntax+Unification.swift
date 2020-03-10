@@ -223,15 +223,6 @@ extension LGCSyntaxNode {
                 result.nodes[node.uuid] = result.nodes[literal.uuid]!
 
                 return result
-            case (true, .expression(.binaryExpression(left: let left, right: let right, op: let op, id: _))):
-                switch op {
-                case .isEqualTo, .isNotEqualTo, .isLessThan, .isGreaterThan, .isLessThanOrEqualTo, .isGreaterThanOrEqualTo:
-                    result.nodes[node.uuid] = .cons(name: "Boolean")
-                    result.constraints.append(Unification.Constraint(result.nodes[left.uuid]!, result.nodes[right.uuid]!))
-                    return result
-                case .setEqualTo: // TODO
-                    break
-                }
             case (true, .literal(.boolean)):
                 result.nodes[node.uuid] = .cons(name: "Boolean")
 

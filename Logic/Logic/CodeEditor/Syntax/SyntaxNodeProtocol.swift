@@ -155,7 +155,7 @@ extension LGCPattern: SyntaxNodeProtocol {
             return self
         }
     }
-    
+
     public var uuid: UUID { return id }
 
     public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
@@ -800,95 +800,11 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
     }
 }
 
-extension LGCBinaryOperator: SyntaxNodeProtocol {
-    public var subnodes: [LGCSyntaxNode] {
-        return []
-    }
-
-    public var nodeTypeDescription: String {
-        return "Binary Operator"
-    }
-
-    public var node: LGCSyntaxNode {
-        return .binaryOperator(self)
-    }
-
-    public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCBinaryOperator {
-        switch syntaxNode {
-        case .binaryOperator(let newNode) where id == uuid:
-            return newNode
-        default:
-            switch self {
-            case .isEqualTo(let value):
-                return LGCBinaryOperator.isEqualTo(id: value)
-            case .isNotEqualTo(let value):
-                return LGCBinaryOperator.isNotEqualTo(id: value)
-            case .isLessThan(let value):
-                return LGCBinaryOperator.isLessThan(id: value)
-            case .isGreaterThan(let value):
-                return LGCBinaryOperator.isGreaterThan(id: value)
-            case .isLessThanOrEqualTo(let value):
-                return LGCBinaryOperator.isLessThanOrEqualTo(id: value)
-            case .isGreaterThanOrEqualTo(let value):
-                return LGCBinaryOperator.isGreaterThanOrEqualTo(id: value)
-            case .setEqualTo(let value):
-                return LGCBinaryOperator.setEqualTo(id: value)
-            }
-        }
-    }
-
-    public func copy(deep: Bool) -> LGCBinaryOperator {
-        switch self {
-        case .isEqualTo:
-            return LGCBinaryOperator.isEqualTo(id: UUID())
-        case .isNotEqualTo:
-            return LGCBinaryOperator.isNotEqualTo(id: UUID())
-        case .isLessThan:
-            return LGCBinaryOperator.isLessThan(id: UUID())
-        case .isGreaterThan:
-            return LGCBinaryOperator.isGreaterThan(id: UUID())
-        case .isLessThanOrEqualTo:
-            return LGCBinaryOperator.isLessThanOrEqualTo(id: UUID())
-        case .isGreaterThanOrEqualTo:
-            return LGCBinaryOperator.isGreaterThanOrEqualTo(id: UUID())
-        case .setEqualTo:
-            return LGCBinaryOperator.setEqualTo(id: UUID())
-        }
-    }
-
-    public var uuid: UUID {
-        switch self {
-        case .isEqualTo(let value):
-            return value
-        case .isNotEqualTo(let value):
-            return value
-        case .isLessThan(let value):
-            return value
-        case .isGreaterThan(let value):
-            return value
-        case .isLessThanOrEqualTo(let value):
-            return value
-        case .isGreaterThanOrEqualTo(let value):
-            return value
-        case .setEqualTo(let value):
-            return value
-        }
-    }
-
-    public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
-        return .next
-    }
-
-    public func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool {
-        return false
-    }
-}
-
 extension LGCExpression: SyntaxNodeProtocol {
     public var subnodes: [LGCSyntaxNode] {
         switch self {
-        case .binaryExpression(let value):
-            return [value.left.node, value.op.node, value.right.node]
+        case .assignmentExpression(let value):
+            return [value.left.node, value.right.node]
         case .identifierExpression(let value):
             return [value.identifier.node]
         case .functionCallExpression(let value):
@@ -917,11 +833,10 @@ extension LGCExpression: SyntaxNodeProtocol {
         // Identifier can become an IdentifierExpression and replace an expression
         case (.identifier(let newNode), _) where id == uuid:
             return .identifierExpression(id: UUID(), identifier: newNode)
-        case (_, .binaryExpression(let value)):
-            return .binaryExpression(
+        case (_, .assignmentExpression(let value)):
+            return .assignmentExpression(
                 left: value.left.replace(id: id, with: syntaxNode),
                 right: value.right.replace(id: id, with: syntaxNode),
-                op: value.op.replace(id: id, with: syntaxNode),
                 id: value.id
             )
         case (_, .identifierExpression(let value)):
@@ -953,11 +868,10 @@ extension LGCExpression: SyntaxNodeProtocol {
 
     public func copy(deep: Bool) -> LGCExpression {
         switch self {
-        case .binaryExpression(let value):
-            return .binaryExpression(
+        case .assignmentExpression(let value):
+            return .assignmentExpression(
                 left: value.left.copy(deep: deep),
                 right: value.right.copy(deep: deep),
-                op: value.op.copy(deep: deep),
                 id: UUID()
             )
         case .identifierExpression(let value):
@@ -1020,14 +934,14 @@ extension LGCExpression: SyntaxNodeProtocol {
             )
         case .literalExpression(let value):
             return .literalExpression(id: value.id, literal: value.literal.delete(id: id))
-        case .binaryExpression, .identifierExpression, .memberExpression, .placeholder:
+        case .assignmentExpression, .identifierExpression, .memberExpression, .placeholder:
             return self
         }
     }
 
     public var uuid: UUID {
         switch self {
-        case .binaryExpression(let value):
+        case .assignmentExpression(let value):
             return value.id
         case .identifierExpression(let value):
             return value.id
@@ -1044,7 +958,7 @@ extension LGCExpression: SyntaxNodeProtocol {
 
     public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         switch self {
-        case .binaryExpression:
+        case .assignmentExpression:
             return .none
         case .identifierExpression:
             return .next
@@ -1894,8 +1808,6 @@ extension LGCSyntaxNode {
         case .identifier(let value):
             return value
         case .pattern(let value):
-            return value
-        case .binaryOperator(let value):
             return value
         case .program(let value):
             return value

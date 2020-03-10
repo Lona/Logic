@@ -11,21 +11,12 @@ import AppKit
 public extension LGCExpression {
     func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
         switch self {
-        case .binaryExpression(let value):
-            switch value.op {
-            case .setEqualTo:
-                return LightMark.makeScrollView(markdown: """
+        case .assignmentExpression(let value):
+            return LightMark.makeScrollView(markdown: """
 # Assignment
 
 Use an assignment expression to update the value of an existing variable.
 """, renderingOptions: .init(formattingOptions: formattingOptions))
-            default:
-                return LightMark.makeScrollView(markdown: """
-# Comparison
-
-Compare two variables.
-""", renderingOptions: .init(formattingOptions: formattingOptions))
-            }
         default:
             return NSView()
         }

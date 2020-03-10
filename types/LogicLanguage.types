@@ -114,29 +114,6 @@
       <Record.Param name="name" type="String"/>
     </Record>
   </Type>
-  <Type name="BinaryOperator">
-    <Record name="isEqualTo">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="isNotEqualTo">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="isLessThan">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="isGreaterThan">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="isLessThanOrEqualTo">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="isGreaterThanOrEqualTo">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-    <Record name="setEqualTo">
-      <Record.Param name="id" type="UUID"/>
-    </Record>
-  </Type>
   <Type name="FunctionCallArgument">
     <Record name="argument">
       <Record.Param name="id" type="UUID"/>
@@ -150,10 +127,9 @@
     </Record>
   </Type>
   <Type name="Expression">
-    <Record name="binaryExpression">
+    <Record name="assignmentExpression">
       <Record.Param name="left" type="Expression"/>
       <Record.Param name="right" type="Expression"/>
-      <Record.Param name="op" type="BinaryOperator"/>
       <Record.Param name="id" type="UUID"/>
     </Record>
     <Record name="identifierExpression">
@@ -231,9 +207,6 @@
     </Case>
     <Case name="pattern">
       <Case.Param type="Pattern"/>
-    </Case>
-    <Case name="binaryOperator">
-      <Case.Param type="BinaryOperator"/>
     </Case>
     <Case name="program">
       <Case.Param type="Program"/>

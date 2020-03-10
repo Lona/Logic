@@ -572,46 +572,6 @@ public extension LGCEnumerationCase {
     }
 }
 
-public extension LGCBinaryOperator {
-    var displayText: String {
-        switch self {
-        case .isEqualTo:
-            return "is equal to"
-        case .isGreaterThan:
-            return "is greater than"
-        case .isGreaterThanOrEqualTo:
-            return "is greater than or equal to"
-        case .isLessThan:
-            return "is less than"
-        case .isLessThanOrEqualTo:
-            return "is less than or equal to"
-        case .isNotEqualTo:
-            return "is not equal to"
-        case .setEqualTo:
-            return "now equals"
-        }
-    }
-
-    static func suggestions(for prefix: String) -> [LogicSuggestionItem] {
-        let operatorNodes = [
-            LGCBinaryOperator.isEqualTo(id: UUID()),
-            LGCBinaryOperator.isNotEqualTo(id: UUID()),
-            LGCBinaryOperator.isGreaterThan(id: UUID()),
-            LGCBinaryOperator.isGreaterThanOrEqualTo(id: UUID()),
-            LGCBinaryOperator.isLessThan(id: UUID()),
-            LGCBinaryOperator.isLessThanOrEqualTo(id: UUID())
-        ]
-
-        return operatorNodes.map { node in
-            LogicSuggestionItem(
-                title: node.displayText,
-                category: "Operators".uppercased(),
-                node: LGCSyntaxNode.binaryOperator(node)
-            )
-        }.titleContains(prefix: prefix)
-    }
-}
-
 public extension LGCExpression {
     enum Suggestion {
         public static func from(literalSuggestion suggestion: LogicSuggestionItem) -> LogicSuggestionItem? {
@@ -634,27 +594,6 @@ public extension LGCExpression {
             default:
                 return nil
             }
-        }
-
-        public static var comparison: LogicSuggestionItem {
-            return LogicSuggestionItem(
-                title: "Comparison",
-                category: categoryTitle,
-                node: LGCSyntaxNode.expression(
-                    LGCExpression.binaryExpression(
-                        left: LGCExpression.identifierExpression(
-                            id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "left", isPlaceholder: true)
-                        ),
-                        right: LGCExpression.identifierExpression(
-                            id: UUID(),
-                            identifier: LGCIdentifier(id: UUID(), string: "right", isPlaceholder: true)
-                        ),
-                        op: .isEqualTo(id: UUID()),
-                        id: UUID()
-                    )
-                )
-            )
         }
 
         public static func memberExpression(names: [String]) -> LogicSuggestionItem {
@@ -704,7 +643,7 @@ public extension LGCExpression {
             title: "Assignment",
             category: "Expressions".uppercased(),
             node: LGCSyntaxNode.expression(
-                LGCExpression.binaryExpression(
+                LGCExpression.assignmentExpression(
                     left: LGCExpression.identifierExpression(
                         id: UUID(),
                         identifier: LGCIdentifier(id: UUID(), string: "variable", isPlaceholder: true)
@@ -713,7 +652,6 @@ public extension LGCExpression {
                         id: UUID(),
                         identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
                     ),
-                    op: .setEqualTo(id: UUID()),
                     id: UUID()
                 )
             )
@@ -1072,8 +1010,6 @@ public extension LGCSyntaxNode {
             return contents.suggestions(within: root, for: prefix)
         case .expression:
             return LGCExpression.suggestions(for: prefix)
-        case .binaryOperator:
-            return LGCBinaryOperator.suggestions(for: prefix)
         case .program:
             return []
         case .functionParameter:
