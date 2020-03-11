@@ -165,7 +165,7 @@ extension Compiler {
 
                 parameters.forEach { parameter in
                     switch parameter {
-                    case .parameter(id: _, externalName: _, localName: let pattern, annotation: let annotation, defaultValue: _, _):
+                    case .parameter(id: _, localName: let pattern, annotation: let annotation, defaultValue: _, _):
                         let annotationType = annotation.unificationType(genericsInScope: genericInScope) { result.makeGenericName() }
 
                         parameterTypes.append(Unification.FunctionArgument(label: pattern.name, type: annotationType))

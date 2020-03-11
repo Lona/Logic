@@ -507,7 +507,6 @@ public extension LGCFunctionParameter {
             case .placeholder:
                 return LGCFunctionParameter.parameter(
                     id: UUID(),
-                    externalName: nil,
                     localName: LGCPattern(id: UUID(), name: prefix),
                     annotation: LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
@@ -520,7 +519,6 @@ public extension LGCFunctionParameter {
             case .parameter(let value):
                 return LGCFunctionParameter.parameter(
                     id: UUID(),
-                    externalName: value.externalName,
                     localName: LGCPattern(id: UUID(), name: prefix),
                     annotation: value.annotation, // TODO: new id?
                     defaultValue: value.defaultValue, // TODO: new id?

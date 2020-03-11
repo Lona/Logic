@@ -179,6 +179,21 @@
     uuid "^7.0.2"
     yargs "^15.1.0"
 
+"@lona/serialization@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.2.6.tgz#c34a8ba06018311e55ec2248c5489ab7a64c9924"
+  integrity sha512-nZTgLChnZFgNvcI8cFo98hFDAI8VcheV7Sbkr/hQjfWGA3JukUmbHtgNXbD2Lse6oGQDh5NN9swwEWepipigEw==
+  dependencies:
+    "@mdx-js/mdx" "^1.5.0"
+    json-stable-stringify "^1.0.1"
+    mdast-flatten-image-paragraphs "^1.0.0"
+    mdast-move-images-to-root "^1.0.0"
+    pegjs "^0.10.0"
+    rehype "^9.0.1"
+    unist-util-flatmap "^1.0.0"
+    uuid "^7.0.2"
+    yargs "^15.1.0"
+
 "@mdx-js/mdx@^1.5.0":
   version "1.5.7"
   resolved "https://registry.yarnpkg.com/@mdx-js/mdx/-/mdx-1.5.7.tgz#9167273da888ef4c545a5601bc5da989dfccb3a7"

@@ -542,7 +542,6 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         case .parameter(let value):
             return LGCFunctionParameter.parameter(
                 id: value.id,
-                externalName: value.externalName,
                 localName: value.localName.delete(id: id),
                 annotation: value.annotation.delete(id: id),
                 defaultValue: value.defaultValue.delete(id: id),
@@ -562,7 +561,6 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
             case .parameter(let value):
                 return LGCFunctionParameter.parameter(
                     id: value.id,
-                    externalName: value.externalName,
                     localName: value.localName.replace(id: id, with: syntaxNode),
                     annotation: value.annotation.replace(id: id, with: syntaxNode),
                     defaultValue: value.defaultValue.replace(id: id, with: syntaxNode),
@@ -579,7 +577,6 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         case .parameter(let value):
             return LGCFunctionParameter.parameter(
                 id: UUID(),
-                externalName: value.externalName,
                 localName: value.localName.copy(deep: deep),
                 annotation: value.annotation.copy(deep: deep),
                 defaultValue: value.defaultValue.copy(deep: deep),
@@ -996,6 +993,8 @@ extension LGCStatement: SyntaxNodeProtocol {
             return [value.expression.node, value.pattern.node]
         case .expressionStatement(let value):
             return [value.expression.node]
+        case .returnStatement(let value):
+            return [value.expression.node]
         case .placeholder:
             return []
         }
@@ -1058,6 +1057,11 @@ extension LGCStatement: SyntaxNodeProtocol {
                     id: value.id,
                     expression: value.expression.replace(id: id, with: syntaxNode)
                 )
+            case .returnStatement(let value):
+                return LGCStatement.returnStatement(
+                    id: value.id,
+                    expression: value.expression.replace(id: id, with: syntaxNode)
+                )
             case .placeholder(_):
                 return self
             }
@@ -1089,6 +1093,11 @@ extension LGCStatement: SyntaxNodeProtocol {
                 id: UUID(),
                 expression: value.expression.copy(deep: deep)
             )
+        case .returnStatement(let value):
+            return LGCStatement.returnStatement(
+                id: UUID(),
+                expression: value.expression.copy(deep: deep)
+            )
         case .placeholder:
             return .makePlaceholder()
         }
@@ -1103,6 +1112,8 @@ extension LGCStatement: SyntaxNodeProtocol {
         case .loop(let value):
             return value.id
         case .expressionStatement(let value):
+            return value.id
+        case .returnStatement(let value):
             return value.id
         case .placeholder(let value):
             return value
