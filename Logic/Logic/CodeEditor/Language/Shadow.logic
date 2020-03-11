@@ -1,17 +1,17 @@
 {
   "type": "program",
   "data": {
-    "id": "17",
+    "id": "aad250e0-9065-4a13-ac06-3551f411391f",
     "block": [
       {
         "type": "declaration",
         "data": {
-          "id": "18",
+          "id": "d25a8927-2cd2-4023-b69d-87bfdd33fd34",
           "content": {
             "data": {
-              "id": "c117292b-f6eb-4461-9151-c82e13e5bf7e",
+              "id": "b4453156-1cf0-4b40-9e00-d65ae574cfae",
               "name": {
-                "id": "5666824f-ee8a-4b8f-a8c6-7f1841723612",
+                "id": "c941d1a8-ec3c-4287-9223-ee084f0aee66",
                 "name": "Prelude"
               }
             },
@@ -22,12 +22,12 @@
       {
         "type": "declaration",
         "data": {
-          "id": "19",
+          "id": "f01f0b0f-a858-4d24-a3e5-79c0047fa01e",
           "content": {
             "data": {
-              "id": "35f71ed4-b4eb-4593-b495-b26376cce425",
+              "id": "5fd0bbbc-aa28-4023-a408-5450ab92ac91",
               "name": {
-                "id": "609f3ba2-a8de-4198-8fd3-103daf8cb416",
+                "id": "19952ce4-2918-4f5e-8373-823f1d46ffcd",
                 "name": "Color"
               }
             },
@@ -38,11 +38,11 @@
       {
         "type": "declaration",
         "data": {
-          "id": "20",
+          "id": "ac57bf4a-25d5-4004-93b7-3acc133b473a",
           "content": {
             "data": {
               "comment": {
-                "id": "a8d48756-0141-49d8-b543-1eabaa35ba28",
+                "id": "a162555e-b9f4-4cd4-850b-77401b23425c",
                 "string": "I> Press enter to create a new shadow.\n\n# Shadow\n\nA drop shadow definition."
               },
               "declarations": [
@@ -51,9 +51,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "8f2c75d2-e9f2-440b-aa93-482cd0e6f475",
+                        "id": "f9e51946-3efc-436f-8c9e-1fe79b348be1",
                         "identifier": {
-                          "id": "7ae9831b-a725-49a5-9544-c7a8daaad5d4",
+                          "id": "5b60f037-f383-4458-9ff1-508e95963bed",
                           "isPlaceholder": false,
                           "string": "Number"
                         }
@@ -61,16 +61,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "36e5d07f-df47-4dfd-80e3-0b93c22925a3",
+                      "id": "edd99117-abe4-4cb2-88bd-451299d254af",
                       "string": "# x\n\nThe horizontal offset of the shadow."
                     },
-                    "id": "84d2ea74-5ffd-4092-ac09-efbc341e6dde",
+                    "id": "ed17dfc1-1808-49a6-adca-02602be6fee2",
                     "initializer": {
                       "data": {
-                        "id": "cc6500fa-57c2-447d-9007-ecc117e5401d",
+                        "id": "897d6dfa-7d48-4dcc-abae-fdb8cfdbfb86",
                         "literal": {
                           "data": {
-                            "id": "983d702a-e04f-49e3-b888-352f4a76d391",
+                            "id": "9434ef9b-caa9-43d1-b9bc-a9b9fe55c1e9",
                             "value": 0
                           },
                           "type": "number"
@@ -79,7 +79,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "4c4b4f5f-a636-4c69-b4ce-f4965b2bb5a9",
+                      "id": "f238db27-4fda-4000-976c-a1aae2318bdb",
                       "name": "x"
                     }
                   },
@@ -90,9 +90,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "399e0738-ab29-447a-8ac4-f2b3cc4f09d7",
+                        "id": "3bdb6508-3d38-414d-b36a-118fcdd4cfd8",
                         "identifier": {
-                          "id": "66a89442-c642-493f-8902-66153571d91c",
+                          "id": "790a515e-d2cb-45de-981d-772dab347f94",
                           "isPlaceholder": false,
                           "string": "Number"
                         }
@@ -100,16 +100,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "86e7989b-50f6-4022-acc3-12ca27812cbf",
+                      "id": "8de870ff-48a1-4c36-b7f9-6c8bfc6e09d2",
                       "string": "# y\n\nThe vertical of the shadow."
                     },
-                    "id": "5b465323-a9ab-4481-b48c-4e58bc161fb9",
+                    "id": "320894f0-ecaa-4d4c-98da-62cb01bd7c04",
                     "initializer": {
                       "data": {
-                        "id": "0e81026a-06eb-4807-a1b0-2bf0adb5dfb9",
+                        "id": "9b6183b0-2cb5-428e-adcf-faa3f659c50a",
                         "literal": {
                           "data": {
-                            "id": "1fca9a2f-b8a8-448e-ba40-d6d432869975",
+                            "id": "07627b57-20a5-4944-8728-b4c9b97cf965",
                             "value": 0
                           },
                           "type": "number"
@@ -118,7 +118,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "c6d75f69-aad0-46c2-8cce-18c6ba751282",
+                      "id": "09169f4c-202e-4d49-bb30-763238381151",
                       "name": "y"
                     }
                   },
@@ -129,9 +129,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "9408b32d-00eb-46ea-aedc-95e24147f2bb",
+                        "id": "3642c4fd-ac68-44d1-85f4-ced35983532a",
                         "identifier": {
-                          "id": "6785323f-1193-4084-989b-2b5b4cc859d1",
+                          "id": "60ebbd99-e0f7-4991-a97d-4808136b08e1",
                           "isPlaceholder": false,
                           "string": "Number"
                         }
@@ -139,16 +139,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "9d0f713a-a43a-42f6-a844-0c9ff38866ca",
+                      "id": "df2993ba-aea7-446e-9759-8b4617bbea67",
                       "string": "# Blur\n\nThe blur radius of the shadow."
                     },
-                    "id": "7add8ea5-0e15-4939-b4b7-7b0a7cfb1880",
+                    "id": "387de933-f79e-4419-b97a-61a52140c5a1",
                     "initializer": {
                       "data": {
-                        "id": "cbbb2171-95e9-495f-aa93-4d24bcb6aff4",
+                        "id": "a9a252bf-a49f-4d94-8fcb-3b0bb9153a9b",
                         "literal": {
                           "data": {
-                            "id": "d5694de7-7e68-4949-bfe7-1d84f5b93d0c",
+                            "id": "7b2ded66-0d8d-47e6-9f20-f807698f7758",
                             "value": 0
                           },
                           "type": "number"
@@ -157,7 +157,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "5d185628-9256-47a2-ae91-d64e8e0097da",
+                      "id": "ab983679-e233-4e25-ab1c-d6d0ed50b918",
                       "name": "blur"
                     }
                   },
@@ -168,9 +168,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "1b384bca-bec6-4f02-98c7-22908e9f0ebe",
+                        "id": "65d7f7cb-335b-47e0-b7ac-37ff7a55675e",
                         "identifier": {
-                          "id": "5a52a0b5-37cc-4b7d-a058-40e370f9a5ea",
+                          "id": "e3321845-8e59-450a-8765-2d02ede4c880",
                           "isPlaceholder": false,
                           "string": "Number"
                         }
@@ -178,16 +178,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "60730fd1-bf75-4944-a0ee-6fd8f680c0bd",
+                      "id": "c614c95c-f5c8-4115-b26b-a62e111c710e",
                       "string": "W> This property is not supported on iOS or Android.\n\n# Radius\n\nThe spread radius of the shadow."
                     },
-                    "id": "501aa517-26d2-4ad4-8de8-64999a99f979",
+                    "id": "37b2b474-6c55-42cf-9b57-dc35d48c07d1",
                     "initializer": {
                       "data": {
-                        "id": "f261eae8-078c-4c4c-8af9-dac9e87668cc",
+                        "id": "edc0de0d-a0b0-4fee-901b-c6147b7bc2e9",
                         "literal": {
                           "data": {
-                            "id": "1d897e94-1b52-446c-99ff-1ea580461084",
+                            "id": "59f28545-9c0d-4084-a6e4-face547ed171",
                             "value": 0
                           },
                           "type": "number"
@@ -196,7 +196,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "98bd435f-a67f-4ef3-b19f-2284c5f0e67e",
+                      "id": "8960381e-409b-43a9-b23b-9230fffca802",
                       "name": "radius"
                     }
                   },
@@ -207,9 +207,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "545da346-383c-4182-b07e-2057d1c2a1c1",
+                        "id": "262e5aba-b1fc-4544-af81-dfe210d2f664",
                         "identifier": {
-                          "id": "46c42c40-1bcd-4cff-80d6-a721adc1b8b2",
+                          "id": "e8fe0082-46e0-464c-8f2d-55a193a6848c",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -217,16 +217,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "d72657c7-ebe5-4938-86e0-f90f5abc23c0",
+                      "id": "cbe8816d-f0cd-420c-ba1a-0704ecf6f081",
                       "string": "# Color\n\nThe shadow color."
                     },
-                    "id": "ae174bcd-1082-4471-ab4a-87d76ddf832e",
+                    "id": "2c915a7e-eec7-4788-8820-2711774581b3",
                     "initializer": {
                       "data": {
-                        "id": "485c4b4e-eeae-4028-805b-ff169705495d",
+                        "id": "ad3bca13-ba16-4f48-9485-7707cdd354ed",
                         "literal": {
                           "data": {
-                            "id": "ff17104b-3d95-4306-8783-2660485e8d75",
+                            "id": "25b1bbb8-53a7-4912-8a3b-54316e6ac969",
                             "value": "black"
                           },
                           "type": "color"
@@ -235,7 +235,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "53a27a5c-2385-4ec9-bfd8-b2bb8fe465cb",
+                      "id": "4e046359-0c05-4d60-8627-381f4f993a55",
                       "name": "color"
                     }
                   },
@@ -243,7 +243,7 @@
                 },
                 {
                   "data": {
-                    "id": "d9fc58c8-6af0-4b3c-9b1e-6d8733a100d3"
+                    "id": "cdf3e8b7-6da7-4de3-a323-95fb5f0e4305"
                   },
                   "type": "placeholder"
                 }
@@ -251,14 +251,14 @@
               "genericParameters": [
                 {
                   "data": {
-                    "id": "93482abe-83b8-4574-8560-ef6d3dfb1cb8"
+                    "id": "9d8c85be-3783-4116-82be-1559a6f0f3ea"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "56e6ac22-ef1e-4896-b885-ce6b5ec448e7",
+              "id": "3f126a6d-16ee-4e58-a5ce-b99dc9f431a8",
               "name": {
-                "id": "e5557c82-1b34-4a50-8a65-702d17ed21d0",
+                "id": "e6753d2d-9b8f-4216-86d3-b6898b4f5dfa",
                 "name": "Shadow"
               }
             },
@@ -269,10 +269,10 @@
       {
         "type": "declaration",
         "data": {
-          "id": "21",
+          "id": "40546296-c63b-4887-881b-0f7dfd3ffaf5",
           "content": {
             "data": {
-              "id": "77d2f79d-4e61-45a3-adee-5a3890d4559a"
+              "id": "5bc0711e-95dc-46b5-885e-609443149f7d"
             },
             "type": "placeholder"
           }
