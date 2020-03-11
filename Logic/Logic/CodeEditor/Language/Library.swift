@@ -20,10 +20,20 @@ public enum Library {
 
         let bundle = BundleLocator.getBundle()
 
-        guard let libraryUrl = bundle.url(forResource: name, withExtension: "logic"),
-            let libraryScript = try? Data(contentsOf: libraryUrl),
-            let decoded = try? JSONDecoder().decode(LGCSyntaxNode.self, from: libraryScript)
+        guard
+            let libraryUrl = bundle.url(forResource: name, withExtension: "logic"),
+            let libraryScript = try? Data(contentsOf: libraryUrl)
         else {
+            Swift.print("Failed to find Logic library file for: \(name)")
+            return nil
+        }
+
+        let decoded: LGCSyntaxNode
+
+        do {
+            decoded = try JSONDecoder().decode(LGCSyntaxNode.self, from: libraryScript)
+        } catch {
+            Swift.print("Invalid Logic JSON:", error)
             return nil
         }
 
