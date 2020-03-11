@@ -179,10 +179,10 @@
     uuid "^7.0.2"
     yargs "^15.1.0"
 
-"@lona/serialization@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.2.4.tgz#96d47f73122651e1bd236cb5e4ac413e5a8e6f7c"
-  integrity sha512-MyPaXmfP4gxDAEpkURD9hatXqJG4ofjdHB1LxxMbB6DTog2+uK1A4zYl93DoE2sMhlJUfi4Zd6aoP8XxXNAXqQ==
+"@lona/serialization@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.2.6.tgz#c34a8ba06018311e55ec2248c5489ab7a64c9924"
+  integrity sha512-nZTgLChnZFgNvcI8cFo98hFDAI8VcheV7Sbkr/hQjfWGA3JukUmbHtgNXbD2Lse6oGQDh5NN9swwEWepipigEw==
   dependencies:
     "@mdx-js/mdx" "^1.5.0"
     json-stable-stringify "^1.0.1"

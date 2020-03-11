@@ -216,7 +216,7 @@ public extension Compiler {
                     switch parameter {
                     case .placeholder:
                         break
-                    case .parameter(id: _, externalName: _, localName: let pattern, annotation: _, defaultValue: _, _):
+                    case .parameter(id: _, localName: let pattern, annotation: _, defaultValue: _, _):
                         context.addToScope(pattern: pattern)
                     }
                 }

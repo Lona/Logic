@@ -468,7 +468,7 @@ public enum StandardConfiguration {
                             case .declaration(.function(let function)):
                                 function.parameters.forEach { parameter in
                                     switch parameter {
-                                    case .parameter(_, _, let localName, _, _, _) where localName.name == argument.label:
+                                    case .parameter(_, let localName, _, _, _) where localName.name == argument.label:
                                         if let comment = parameter.comment(within: rootNode) {
                                             labelComment = comment
                                         }
@@ -761,7 +761,6 @@ public enum StandardConfiguration {
                     with: .functionParameter(
                         .parameter(
                             id: UUID(),
-                            externalName: value.externalName,
                             localName: value.localName,
                             annotation: value.annotation,
                             defaultValue: value.defaultValue,

@@ -3,9 +3,9 @@
   "private": true,
   "dependencies": {
     "@lona/compiler": "^0.1.8",
-    "@lona/serialization": "^0.2.4"
+    "@lona/serialization": "^0.2.6"
   },
   "scripts": {
-    "postinstall": "cp -r node_modules/@lona/compiler/static/logic/* Logic/Logic/CodeEditor/Language && cp node_modules/@lona/serialization/dist/lona-serialization.umd.js Logic/Logic/Scripting/lona-serialization.umd.js"
+    "postinstall": "cp -r node_modules/@lona/compiler/static/logic/* Logic/Logic/CodeEditor/Language && cp node_modules/@lona/serialization/dist/lona-serialization.umd.js Logic/Logic/Scripting/lona-serialization.umd.js && cp node_modules/@lona/serialization/dist/LGCSyntax.swift Logic/Logic/CodeEditor/Syntax/LGCSyntax.swift"
   }
 }
