@@ -1,17 +1,17 @@
 {
   "type": "program",
   "data": {
-    "id": "22",
+    "id": "8a119a30-1e1e-4ce0-9c0a-4aff57c29df1",
     "block": [
       {
         "type": "declaration",
         "data": {
-          "id": "23",
+          "id": "a3b457c4-d662-4ae8-a605-d0b9ceb61cfd",
           "content": {
             "data": {
-              "id": "fd955746-b9ce-4e31-a6ff-5cd625a3fa75",
+              "id": "a3a604f7-de6f-4792-96d1-3511328deb2c",
               "name": {
-                "id": "1f1421e9-829c-4c6f-8f92-783df74724a1",
+                "id": "6b2b07c7-b461-46f6-ae81-d61d5a7ffb79",
                 "name": "Prelude"
               }
             },
@@ -22,12 +22,12 @@
       {
         "type": "declaration",
         "data": {
-          "id": "24",
+          "id": "6e6e28fb-5fb0-43b3-8da3-525535350c4b",
           "content": {
             "data": {
-              "id": "f5518e06-5864-4a78-8e96-8713c29a11bb",
+              "id": "f24b957d-edd8-467d-bde1-851d36db920a",
               "name": {
-                "id": "8265acf7-828e-4328-9215-fbde36453fe2",
+                "id": "da1e1edb-a2e0-4f20-872c-9a04b3e0b086",
                 "name": "Color"
               }
             },
@@ -38,7 +38,7 @@
       {
         "type": "declaration",
         "data": {
-          "id": "25",
+          "id": "2edeebd0-c455-4029-92c2-03bdea84d5bb",
           "content": {
             "data": {
               "cases": [
@@ -47,18 +47,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "61e8e7c5-db80-46a0-b8a7-14df9d273103"
+                          "id": "883ad5e6-46a8-4e71-9cf0-81175af51c49"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "6895dc14-99e7-4cfc-93b6-588442b06c55",
+                      "id": "cd96f1e2-f1de-4fe6-85ea-1d673f332426",
                       "string": "# Ultra Light\n\nThe lightest font weight, representing **100**."
                     },
-                    "id": "c1053c78-1290-468f-bd26-7eb1d26d07e5",
+                    "id": "ed8dbd82-21c4-406d-a6f3-7132356fb661",
                     "name": {
-                      "id": "f9bc366e-6271-442e-8c16-0755e7ce821d",
+                      "id": "db668a91-56b8-40a3-82e3-0e95a52bc605",
                       "name": "ultraLight"
                     }
                   },
@@ -69,18 +69,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "82b9a53d-f993-4c48-8dc7-0ef08213d004"
+                          "id": "b9b1fd0d-926c-4a40-85fb-c9cc21023b5b"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "a3d28b35-0315-47f4-9ceb-56462475b507",
+                      "id": "33685adf-c94c-49eb-ba5c-a689764752de",
                       "string": "# Thin\n\nA font weight, representing **200**."
                     },
-                    "id": "bcba35e9-8743-417e-9fde-9e95814fe677",
+                    "id": "93b00a29-efbd-48ae-b030-3fefaf7bcd25",
                     "name": {
-                      "id": "090a03f4-e77f-4780-9c1f-0fad1e9b4ded",
+                      "id": "733a2995-1982-4eea-8f39-a01a7b19c171",
                       "name": "thin"
                     }
                   },
@@ -91,18 +91,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "feaa5874-f922-47d1-a1f6-541f35c7c923"
+                          "id": "eafc40de-9584-4e1b-9056-e744245ba897"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "1a476e15-b190-490b-83b3-4928db7bbd17",
+                      "id": "c4f26123-06d3-4e6c-bb5a-2b068afda2db",
                       "string": "# Light\n\nA font weight, representing **300**."
                     },
-                    "id": "91745f8f-7d0d-4308-ba09-04b74b5636b1",
+                    "id": "a9b2b5ba-4a9d-47e6-806c-7527f0bace7b",
                     "name": {
-                      "id": "9e491495-039a-4cdd-beca-fb2fea909003",
+                      "id": "be4386b4-06e8-43d9-9c59-807328f4a880",
                       "name": "light"
                     }
                   },
@@ -113,18 +113,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "4201f37e-d00f-44ca-80af-64a9d2095db5"
+                          "id": "7db50455-2a00-4f11-8e1c-0f556003d71e"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "04fbb3bb-1d15-4dd6-8e23-a0cf708c80f7",
+                      "id": "58561f7f-e655-42ee-96cc-b5bd15dcad3c",
                       "string": "# Regular\n\nA font weight, representing **400**."
                     },
-                    "id": "513b78d0-f00e-492b-a19f-14378ddcbab5",
+                    "id": "8baad1d6-96a2-41c8-a329-fbc34e4e0e56",
                     "name": {
-                      "id": "39e7f28c-5ef1-4cda-a609-69789579bc11",
+                      "id": "303293e3-2c12-4dbc-a13b-fd9ebb74393f",
                       "name": "regular"
                     }
                   },
@@ -135,18 +135,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "d05ffcc8-b4fb-4b78-bf57-ad673e3c233b"
+                          "id": "545ca5d8-1c0b-4d91-b435-db3dd8b0fcc6"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "8ebe2c4e-932a-4f40-8ccb-f578f01b99ea",
+                      "id": "72d6188c-e9f9-4a5f-aba5-4f1ed2932b97",
                       "string": "# Medium\n\nA font weight, representing **500**."
                     },
-                    "id": "20ac8ccc-51e5-4b71-b17b-6ab430829e5a",
+                    "id": "7ec87783-47bf-42fb-a9dd-f2a628e893b8",
                     "name": {
-                      "id": "828d98d7-13ce-42c5-a332-416bae459ba1",
+                      "id": "b0da66d0-9923-4906-88c5-371bd88fbbe5",
                       "name": "medium"
                     }
                   },
@@ -157,18 +157,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "c876bfc6-4ba2-486c-9606-5fde718cbada"
+                          "id": "4b5e7d12-26ba-455f-a9dd-3494790ff976"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "c55ca214-67c7-46a8-8d1a-f3eca994e454",
+                      "id": "2fde5760-1d5c-4ec4-b9d7-ee66124b3827",
                       "string": "# Semibold\n\nA font weight, representing **600**."
                     },
-                    "id": "a153f669-02e2-4e29-871e-dce3046c86d8",
+                    "id": "47d307d8-a9a2-4993-a49f-916e572fdfed",
                     "name": {
-                      "id": "682a6a55-28ab-4f00-8b42-578873a256f6",
+                      "id": "a9ebf52a-eaef-45f1-80fb-034482adaf98",
                       "name": "semibold"
                     }
                   },
@@ -179,18 +179,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "aa254d3a-b000-47d4-81fc-639e4a31d6d3"
+                          "id": "a661970b-40da-4ff9-9d21-b4de037aa1ea"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "7ffc6109-169f-4148-8285-3344e7f3b0b2",
+                      "id": "19ae08f6-1ab1-4612-b2dd-b747fe30a0ba",
                       "string": "# Bold\n\nA font weight, representing **700**."
                     },
-                    "id": "ee4dceb3-d851-4bfd-b194-75b87c436e8e",
+                    "id": "3e9f8bb6-534d-4172-8d14-11bcfaf48aed",
                     "name": {
-                      "id": "6c8e7684-3859-46c1-860d-494da0f57f45",
+                      "id": "76c36b35-10cd-4656-9f7e-5870ef3e7c84",
                       "name": "bold"
                     }
                   },
@@ -201,18 +201,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "950cf620-d530-400d-a769-907b7e44b1ab"
+                          "id": "9c3bea0c-5b7b-4262-bec7-294b9d46bf9a"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "efc7064a-48f4-4f32-a2ab-e2dd588796f3",
+                      "id": "53dc9af4-cf2b-4c1e-9efd-745b7d584981",
                       "string": "# Heavy\n\nA font weight, representing **800**."
                     },
-                    "id": "5b3f1b81-96a0-4ffd-91e4-cf04542e290c",
+                    "id": "0e282711-551d-41e2-94f2-d85e74dd7fc0",
                     "name": {
-                      "id": "23d51ed0-85fb-4ffb-a911-0671a2d8ec68",
+                      "id": "c35d6042-5ae3-4c8c-884c-b241501b365a",
                       "name": "heavy"
                     }
                   },
@@ -223,18 +223,18 @@
                     "associatedValueTypes": [
                       {
                         "data": {
-                          "id": "c7a85f74-4e20-4b12-8ce6-ef9b9a573c24"
+                          "id": "9b25130e-9754-474a-b19e-aca3d8df9c7d"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "ce3c0d3d-c3bc-472a-a8ca-8bbaec98c733",
+                      "id": "1e7a7141-1a33-4f13-b4b0-3cd8dfa9999b",
                       "string": "# Black\n\nThe heaviest font weight, representing **900**."
                     },
-                    "id": "6659c40d-5fb9-4748-8a07-8e5f43bb8c60",
+                    "id": "77de519a-7d89-4b7a-97f4-c1acaeb68c78",
                     "name": {
-                      "id": "e54ebd74-5c56-45f8-ad6e-8e143996884c",
+                      "id": "915a2d6f-a101-4a22-a816-c3faf4f6855a",
                       "name": "black"
                     }
                   },
@@ -242,26 +242,26 @@
                 },
                 {
                   "data": {
-                    "id": "21c6fa6a-0fff-40a3-9514-fd0170f6f2b0"
+                    "id": "0ebada2b-c9fb-4978-b218-12eb311abf8c"
                   },
                   "type": "placeholder"
                 }
               ],
               "comment": {
-                "id": "1a054b9e-41c9-4d8c-b2a0-efff7eb9ab20",
+                "id": "acf19741-5290-4589-9e75-4fb613a80938",
                 "string": "# Font Weight\n\nFont thickness.\n\nAn individual font may support multiple weights. However, specifying a weight that isn't supported will generally result in the **regular (400)** weight being displayed."
               },
               "genericParameters": [
                 {
                   "data": {
-                    "id": "6d01dfca-c01a-467f-882b-6503fea52bbd"
+                    "id": "2863b64b-cef6-41d4-8e22-82c047c98552"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "1c625480-1a4f-4fdd-a88f-ef242b621bdf",
+              "id": "f5cc0bfb-c122-4c4a-96f4-349959b785d9",
               "name": {
-                "id": "4629f5a7-53bf-4261-a71f-5c618256227d",
+                "id": "2b1aaad7-f088-4c12-9e61-dfce18f10949",
                 "name": "FontWeight"
               }
             },
@@ -272,7 +272,7 @@
       {
         "type": "declaration",
         "data": {
-          "id": "26",
+          "id": "c8c7f1f9-23ef-40d1-9f0f-5588a2f78005",
           "content": {
             "data": {
               "declarations": [
@@ -281,22 +281,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "fce4133a-2a50-48f0-8195-9ab77cbbfd77",
+                        "id": "4f22ab31-0f69-4088-bfd6-b9fc0dd8c16f",
                         "identifier": {
-                          "id": "eaa48f2c-5e5b-4b80-8437-f52e3c3037a6",
+                          "id": "427fa2fc-04b2-4249-bcfb-624d4abdff65",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "243aea64-e10a-4539-94a3-ff801462a99c",
+                    "id": "612a6e63-4028-42ca-b005-a560a37fbe03",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "6ddca981-b45a-4aff-9ec7-c8027ec46b0c"
+                              "id": "65420756-d671-4b52-85f5-4db483520ab0"
                             },
                             "type": "placeholder"
                           }
@@ -305,30 +305,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "a80031e1-3ba6-4cfd-918b-bec90a018df8",
+                                "id": "3ba2ea27-b090-4691-8597-8e61a98e5333",
                                 "identifier": {
-                                  "id": "e9e1ecf9-2b3b-4777-977a-a8f790bde660",
+                                  "id": "eef9b738-dab3-4df7-9681-6eaf4eac78ee",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "1c0eca71-2c07-4d09-96dd-89eeafcd6e62",
+                            "id": "4e8378f4-73cb-4d12-b432-3c3f4ebb5384",
                             "memberName": {
-                              "id": "66ba0da8-f36a-42a0-a0c0-44702e9dc6c6",
+                              "id": "a7da6f6e-4869-4b72-ae69-4c4455922f1f",
                               "isPlaceholder": false,
                               "string": "ultraLight"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "2984d8fb-6ce5-45fd-8426-6f35d5793269"
+                        "id": "bc16abe3-c5c6-4846-8984-99aa56da5634"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "9c2776ba-e1db-4914-9397-1e6072952c06",
+                      "id": "115781ce-7f57-416b-a289-9b0ffb1d87ae",
                       "name": "w100"
                     }
                   },
@@ -339,22 +339,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "823cf1c4-c9b9-4c74-9edf-c85fc62b028b",
+                        "id": "656e3a33-d8f5-41ec-9069-5251f130b508",
                         "identifier": {
-                          "id": "53afce94-3871-44ec-91dd-f9fbc17bae0f",
+                          "id": "0ea07a62-c25c-43b0-b9ef-90d59fb72253",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "6f080e9f-526d-4f92-afbf-198c88e0789a",
+                    "id": "2f24f946-c322-4394-855a-71261c774cc7",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "64a7f1f9-8f5e-4fbf-87af-3677d836cd85"
+                              "id": "0c1777f0-bf31-4460-9d99-812663956e57"
                             },
                             "type": "placeholder"
                           }
@@ -363,30 +363,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "e33f9f69-b816-4fe2-8017-d0f8c19b2f64",
+                                "id": "5b5a54c4-23dd-4ecb-a87a-8a7cf1daf828",
                                 "identifier": {
-                                  "id": "63c482f3-a24d-4bd5-b291-2439f9f7a368",
+                                  "id": "7249a057-b41b-4355-b144-cb6471adebd6",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "df44fd04-8d61-4633-b70f-6c53591e5c28",
+                            "id": "d8e1fbb9-86b3-4bbd-883b-601f25172b08",
                             "memberName": {
-                              "id": "0413d967-7377-46c0-bc07-8e15ea6234a2",
+                              "id": "58c2b51a-3279-4107-871f-6a131927fac0",
                               "isPlaceholder": false,
                               "string": "thin"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "7b8e7013-2f64-48aa-81ad-9aafd8560e03"
+                        "id": "255de140-1e8c-4427-9e7a-e737bbc968b5"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "5b504294-7e72-4db5-a7d3-a20fd8381bc0",
+                      "id": "135edf97-eb2b-408f-b16a-1c8ddee55414",
                       "name": "w200"
                     }
                   },
@@ -397,22 +397,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "57189ba5-6da7-41ce-99a3-6f1090278562",
+                        "id": "eab66c82-2a3d-4be5-b3a0-f9c3b2aa1080",
                         "identifier": {
-                          "id": "09d27ac3-fee3-41b4-a243-1cbcabcf2c34",
+                          "id": "4ec0f45a-99dd-4b63-9ad8-87032c07490a",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "ff8be423-264f-4c2d-b81d-9095bbbaea46",
+                    "id": "12e8909d-9aa0-439f-b93b-c15e80d75882",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "7bbcb598-de56-485c-948b-4248c0f7173b"
+                              "id": "33814fa3-09e3-4563-9377-ed4821b073f0"
                             },
                             "type": "placeholder"
                           }
@@ -421,30 +421,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "624b4c6b-0bd9-4def-bfae-e9de79d3a43e",
+                                "id": "c0955d00-a033-4997-aa70-adca4c30c7ce",
                                 "identifier": {
-                                  "id": "43faea46-f6a7-4b57-944f-be8809aaa584",
+                                  "id": "d59b2b91-f68d-401b-8037-1d697a2dc28d",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "3e46d6da-aa1f-4c44-953f-2c47e59ab8dc",
+                            "id": "9b2b7efd-aed2-4b45-a62e-9098624d6ea0",
                             "memberName": {
-                              "id": "434e54c8-9cd2-4940-8fc9-72c7db04aabf",
+                              "id": "23801d87-cfcb-409d-9452-0c535ac19863",
                               "isPlaceholder": false,
                               "string": "light"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "081f2284-7bda-4a99-877b-57cac0809f25"
+                        "id": "497bbf9d-9375-4a32-98e3-c17e111599bd"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "f800ab04-fb2a-4206-8ef7-b88faac0c83a",
+                      "id": "a224eb4e-d2b0-43f9-a663-5cbdffc23841",
                       "name": "w300"
                     }
                   },
@@ -455,22 +455,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "dfe3e09b-7f85-41ad-a1a2-966fac935676",
+                        "id": "57e0be5c-7d07-4d03-a1e7-c21b505072c0",
                         "identifier": {
-                          "id": "c15bf593-d8c1-4147-a477-9ccb96700a66",
+                          "id": "fa32dc4b-2e6e-4532-bf71-5b4401b52697",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "92843186-296d-4d4a-95c2-38e53829aa79",
+                    "id": "32ec9aff-54eb-4e18-96f2-0aebc76fceb8",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "34a2b064-6e4a-418b-aba1-6606d307ce2b"
+                              "id": "ced43881-92f5-45ed-b9b8-aea5cb80fa3b"
                             },
                             "type": "placeholder"
                           }
@@ -479,30 +479,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "63936746-a931-4891-8b5c-eb32f6e2b6ff",
+                                "id": "01526be2-7568-4a0a-a004-c2b84122f08f",
                                 "identifier": {
-                                  "id": "12aca888-0877-4347-a9ba-b47514fcc82b",
+                                  "id": "b99b9eb9-d6ba-4efb-8813-e9bf4fe06a9d",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "eae56007-e30d-45ad-9c67-70e7f1b38c92",
+                            "id": "1431be8f-b727-4635-817f-0023ad3b6f21",
                             "memberName": {
-                              "id": "8b654791-5d42-4175-b99f-6f7d393d8dde",
+                              "id": "d264b82d-dd21-438d-a4c4-df2689eee140",
                               "isPlaceholder": false,
                               "string": "regular"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "2a36b3af-5011-4ee1-a16e-ec991a43d205"
+                        "id": "2efe85f0-e0b0-4c7a-be42-2d44c460cee2"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "ebf1092b-216c-4de1-8ea1-ad334deef36a",
+                      "id": "9fd2fad3-8871-460b-9296-492b9bf587f3",
                       "name": "w400"
                     }
                   },
@@ -513,22 +513,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "5c636ada-f9fd-4a0a-9e2d-fb5a5294fb20",
+                        "id": "b56926f3-57eb-456d-916d-01b6abfea896",
                         "identifier": {
-                          "id": "a5ac25b2-a95c-431f-ae9c-6fd05addacc6",
+                          "id": "255acb86-131f-40b0-9da3-cc9c720b4bb2",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "9b2c667f-d943-4283-8e9a-d0b12c4ea29c",
+                    "id": "a83ab7e7-3c3e-42de-8ccc-515ab4ba3312",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "d720e5bd-c22f-4564-9207-3cfc6b71e5f7"
+                              "id": "1d746cc3-c487-410f-92ea-df64d49b0621"
                             },
                             "type": "placeholder"
                           }
@@ -537,30 +537,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "3f6f639d-11e3-4bd9-aa23-f71adb1259a3",
+                                "id": "9a908815-c76f-4284-ac1d-02503f28c0e4",
                                 "identifier": {
-                                  "id": "cb70fe7e-d5f0-44de-8c52-4ffe9c461cb9",
+                                  "id": "1444e308-db8d-40e1-81ef-643df05810e4",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "92be31ac-85bd-4ed1-854e-a0bb01dec0af",
+                            "id": "c6ee86dd-3ab5-4142-b612-2effe9808448",
                             "memberName": {
-                              "id": "6d7f514e-66b9-41d9-8908-a18093da4a5c",
+                              "id": "8e50bbbb-4731-41b9-8d5c-32ff10585339",
                               "isPlaceholder": false,
                               "string": "medium"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "2d99fe67-8dc5-4c35-b31c-0a1be4e7cf5f"
+                        "id": "c4016653-cf2f-4d03-a8fc-a65f9bbcf64e"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "83efa39e-b3c7-4ed0-990c-9e6a53621cf8",
+                      "id": "4c845cf8-91f4-4289-945b-2db4371a8247",
                       "name": "w500"
                     }
                   },
@@ -571,22 +571,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "42b3ab32-a6ac-4033-973d-75308d5415ac",
+                        "id": "bde307cc-afb2-4384-ae44-e1a6368b7099",
                         "identifier": {
-                          "id": "8b066406-c20a-4678-b08c-be3b89486d4f",
+                          "id": "7873fc32-1792-4331-b631-510173677816",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "1645435d-deac-4dae-b49a-4f5d0a3e1dbf",
+                    "id": "659b20e3-8d90-4283-ab11-e4f8478f6c16",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "e37f4662-edab-4359-a002-cbe46e6ea31d"
+                              "id": "b3946cce-3802-4f94-a92b-0054cd4bb8a3"
                             },
                             "type": "placeholder"
                           }
@@ -595,30 +595,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "fcaeca42-4cac-488b-900a-38eb8a45fbaa",
+                                "id": "d15452b2-40a2-41a3-b7bc-129afc1e41cc",
                                 "identifier": {
-                                  "id": "68b4d608-4fe2-4c00-8459-190c79c98108",
+                                  "id": "0f68cce5-82f4-42d9-8795-84399ce0ec70",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "ac68c850-7c39-4646-8671-f7fb94f6c63e",
+                            "id": "8deb813c-697f-4b43-a7b8-12418f42da31",
                             "memberName": {
-                              "id": "d3485255-a114-4d33-8c15-d6baba0f4c71",
+                              "id": "39f8bc3d-e6fe-4bfd-ad3e-c3675a65dec0",
                               "isPlaceholder": false,
                               "string": "semibold"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "422bb428-e6f9-4868-9bd5-007fa7c5b7b7"
+                        "id": "196dde84-888d-4995-9a78-aff809fc7562"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "4cc91633-5686-4b09-b587-66912b5c6d61",
+                      "id": "9ff10a05-ad26-46cd-8ac1-c4e07854e750",
                       "name": "w600"
                     }
                   },
@@ -629,22 +629,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "57580681-853b-4608-8c3d-b31e4a36dbae",
+                        "id": "46b21bc0-0cb8-49ac-948c-9801c3887eb7",
                         "identifier": {
-                          "id": "27307510-4ca8-4fcd-b4e6-0523554f25ae",
+                          "id": "60ddd6f4-88b1-4326-b955-d834fcad9d11",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "6d202e36-ef7b-41e7-b76f-8640e05f695d",
+                    "id": "947dc247-aa3f-4285-a5a1-1eac389476c9",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "fd25613e-1c04-4b84-843f-33e68c9872ad"
+                              "id": "5ad4df50-3f38-451d-a07d-3c80c14494fc"
                             },
                             "type": "placeholder"
                           }
@@ -653,30 +653,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "9e75865c-f784-47dc-9d9f-e12425607dba",
+                                "id": "80a5895c-2478-41ad-aa22-ccaa6711d8b5",
                                 "identifier": {
-                                  "id": "2ceb4bfa-d544-40a6-9eab-2b031e17858b",
+                                  "id": "54819d8e-5e98-4af0-a066-b849c3b40661",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "f08913a4-3cdd-4fb9-9ef3-43c715e86bf8",
+                            "id": "3c53301f-142c-4704-a030-add228fae720",
                             "memberName": {
-                              "id": "f80d19a9-5134-46cc-a2c4-b4369c7394ac",
+                              "id": "ac6dfda4-138f-4573-80aa-1c8d928e42ce",
                               "isPlaceholder": false,
                               "string": "bold"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "1d1d6bd5-f254-4f3c-9b21-1031b7ec4bac"
+                        "id": "16953ac6-82fc-45a1-917c-90aa36aa600d"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "ecef49d1-702e-4cf5-8669-c481935553e7",
+                      "id": "10c6be22-c638-426e-8925-74cb68e68b0d",
                       "name": "w700"
                     }
                   },
@@ -687,22 +687,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "973adae2-762a-414a-957a-f955f9aa9c17",
+                        "id": "4e64cfab-3760-4fa1-8877-01b09e645e62",
                         "identifier": {
-                          "id": "02eba4c0-4dcc-4966-a6af-e4ff50f18e75",
+                          "id": "200e5684-9ad9-4052-af24-00a9fa518b2b",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "ffc4a24b-ccc1-4f96-a7c4-01c889902ab6",
+                    "id": "a79e3de5-73f2-4a2b-98a5-da0f790c5924",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "45cd6a38-b192-47ee-9fc8-c62df691b0f7"
+                              "id": "511a60cd-93c4-4e67-affb-7c36def7f959"
                             },
                             "type": "placeholder"
                           }
@@ -711,30 +711,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "677e00d2-a2ef-4dbf-a1ea-1cd2441e242f",
+                                "id": "58cfea5d-355e-42c6-b129-ac21f1d2bfe2",
                                 "identifier": {
-                                  "id": "4dfe9ef5-ff72-429b-8dcd-b721c525bdfe",
+                                  "id": "0ef90fcd-1feb-42b5-8e66-432cafd0a5bd",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "69185ec1-9d33-4ca6-bcb5-2c84e5688500",
+                            "id": "881707a7-5e99-4d3e-8f9f-2d0de0d3adbb",
                             "memberName": {
-                              "id": "06b2b73f-a713-4145-ad55-cea94f75c303",
+                              "id": "714ab48b-d063-40b1-aabd-7055a3eb5d95",
                               "isPlaceholder": false,
                               "string": "heavy"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "2b25fd50-0878-42a5-941e-cebe760d643c"
+                        "id": "7b5d3d76-6986-4ae8-b0ea-b5070d716cab"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "e8c88a39-4cbf-44a9-97eb-f8a0c74d03f5",
+                      "id": "78476fe3-be15-4170-8ea9-4fc817b0b95d",
                       "name": "w800"
                     }
                   },
@@ -745,22 +745,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "9360f2c8-f8d9-4aa9-a973-dc7cded6335c",
+                        "id": "036d0d94-3791-4ba6-bd36-6a2fc6407edd",
                         "identifier": {
-                          "id": "5a46b879-37d8-45b4-b211-09bb518c6198",
+                          "id": "8ca0a43c-caa0-49bb-a4f5-fb6f22ac4982",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "d0ced8b0-db2c-4bb6-a9fe-259a3a2ab6d0",
+                    "id": "7dcec428-c200-4e57-8079-cdce49e3261b",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "afc12d7d-030a-45db-b31d-ef253a07d2ad"
+                              "id": "c8be32c1-c918-4c79-ad10-1950bdcb9d35"
                             },
                             "type": "placeholder"
                           }
@@ -769,30 +769,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "61ad9d59-fd88-4b0c-aa33-6603613807b8",
+                                "id": "0cf5b27d-8019-4afc-8f58-c257c9348940",
                                 "identifier": {
-                                  "id": "c9e23d96-d41e-402b-89bc-a79c2c22c33e",
+                                  "id": "f1fe46fb-a8c2-4596-ad22-a2b5c177bfc1",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "866356ae-a5c4-480c-9e3d-f528ade7b4e3",
+                            "id": "9887eabb-de1e-452c-91b0-d4d96324d1bc",
                             "memberName": {
-                              "id": "a6ccfcf1-9535-4eb1-a830-264e8aa81bfe",
+                              "id": "27658356-b404-4e49-bd2b-a494ae804222",
                               "isPlaceholder": false,
                               "string": "black"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "3d79e976-cd13-46c7-8865-f02f03648510"
+                        "id": "3d9f7d50-784c-49bb-85d2-1e8db7d0996f"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "f347496f-6580-4b49-aeec-0e14b060aad8",
+                      "id": "c441c1bb-8868-40d3-80c2-8fb67d2b862a",
                       "name": "w900"
                     }
                   },
@@ -800,14 +800,14 @@
                 },
                 {
                   "data": {
-                    "id": "7bfca679-ae4e-4a7e-9db6-17ad5d0267ee"
+                    "id": "78782300-b010-449f-9e21-67f8dbecf8e8"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "0bcb1130-abda-44e0-bc84-219b800fa250",
+              "id": "469cb0dc-b34e-4250-98f9-8a47ce8ed27f",
               "name": {
-                "id": "360d9561-bb8d-42c9-b5ec-f437331af059",
+                "id": "5dd6778e-a5aa-42d7-920c-27932b999622",
                 "name": "FontWeight"
               }
             },
@@ -818,11 +818,11 @@
       {
         "type": "declaration",
         "data": {
-          "id": "27",
+          "id": "7ef5e5bd-e314-4449-af02-af0655921d8c",
           "content": {
             "data": {
               "comment": {
-                "id": "18360f1a-2ce9-4bfc-b330-88fe1d6d183d",
+                "id": "9d158aea-4771-4ea9-b735-755f0e5f72ea",
                 "string": "I> Press enter to create a new Text Style.\n\n# Text Style\n\nThis represents a specific configuration of text parameters such as font and color."
               },
               "declarations": [
@@ -834,9 +834,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "4b5c1bd9-6a5e-45ce-8fa5-ab2ae91349ee",
+                              "id": "7b63aba2-92ba-4cde-b8f0-4ec36fc31f9f",
                               "identifier": {
-                                "id": "5c9cd27d-e1af-4256-81ac-cd80932cc539",
+                                "id": "f89d7a7b-0064-4bdc-ada6-f7956525bdf4",
                                 "isPlaceholder": false,
                                 "string": "String"
                               }
@@ -844,9 +844,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "5c5c7904-1abf-4e3e-a1cb-67bed26d7bc5",
+                        "id": "44ea1272-f547-4ed1-8aad-52f6be441bc5",
                         "identifier": {
-                          "id": "c3968691-67a7-4034-be88-804d36160260",
+                          "id": "693c3ef6-c009-450d-9a5a-872af7204aa1",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -854,16 +854,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "fba50b10-2a1e-42b2-8c45-b77e6ef5373d",
+                      "id": "aeba52b2-e4ef-4794-ade0-e19719ba1d0b",
                       "string": "W> This parameter is not supported on the web.\n\n# Font Name\n\nThe exact name of a font file, e.g. \"Helvetica-Oblique\". Generally, you should use the `fontFamily` parameter where possible instead."
                     },
-                    "id": "17c66b1b-7f98-42bb-be38-e43a3d2a00e3",
+                    "id": "d14b08a8-a8c3-40af-83f9-409bb50664cf",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "65149905-dec4-4814-a3fb-a6350c05ea1f"
+                              "id": "ea7d93d1-55cc-43c2-9f2d-859f244b3f4d"
                             },
                             "type": "placeholder"
                           }
@@ -872,30 +872,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "7eadef4c-c680-4888-8d31-de56f96c160f",
+                                "id": "dba1f496-2164-4d1f-b747-fd28f9e9e50b",
                                 "identifier": {
-                                  "id": "62a48643-6473-4205-a356-31d46723ae0c",
+                                  "id": "705930b3-1b73-404b-bcfb-89f887ecad68",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "d76bc79d-ced5-4d4d-aa39-8f8353bc6405",
+                            "id": "a202a484-3fbf-4afa-9c68-cb0463db8937",
                             "memberName": {
-                              "id": "c213ebba-6751-4760-ade3-ad6e1a193dc6",
+                              "id": "4f6d144b-7db9-4afd-91c9-ee0b91ffade6",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "98a4e55e-3314-42b6-8028-1cddaeb56178"
+                        "id": "ae6dacc9-80f6-4c4e-8597-fe00e5a61c42"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "ca5f3e1e-4fbd-472c-bd56-7e85c3b6b1f8",
+                      "id": "0f948775-6f32-4468-b1ad-942a146875ca",
                       "name": "fontName"
                     }
                   },
@@ -909,9 +909,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "fa49357e-2bd8-404b-ba28-ebd30a4dc9d4",
+                              "id": "42913ca4-7611-40eb-9a59-ba8ae8a1b48b",
                               "identifier": {
-                                "id": "bcee0636-6a5b-4a7c-93e7-2ab341450d7d",
+                                "id": "90f0c7b9-3306-456b-ba3c-862c8c815d72",
                                 "isPlaceholder": false,
                                 "string": "String"
                               }
@@ -919,9 +919,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "bb0f7b93-0c21-464b-ad40-2fae1c68018b",
+                        "id": "a1f6ebd2-999f-465d-8ae7-64e72c301089",
                         "identifier": {
-                          "id": "ad7451f1-e044-40fd-b21c-a52f83c3f657",
+                          "id": "8252922e-d934-4d17-9074-c4c3e5227234",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -929,16 +929,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "f1988160-66b3-4552-a8ea-3ae903a31c00",
+                      "id": "322f6ac2-8217-4417-af06-43b4a55c8b40",
                       "string": "# Font Family\n\nThe family name of the font - for example, \"Times\" or \"Helvetica.\""
                     },
-                    "id": "ebc7ddbd-f288-48bc-aa87-c17e0691fabb",
+                    "id": "960f5166-c0aa-46e1-83f6-9f1aba633e1e",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "654df2a5-5fb0-4420-a8a3-f3cde9e9f95a"
+                              "id": "ec8297e4-bb68-4a02-9d46-5dadcdb490e2"
                             },
                             "type": "placeholder"
                           }
@@ -947,30 +947,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "c09cc066-21c4-4583-8e34-c65da513395e",
+                                "id": "58d6463a-1e9b-4e0f-a525-c5189e492758",
                                 "identifier": {
-                                  "id": "270600f5-737a-47cb-99c5-8b7736374bf9",
+                                  "id": "eae008e8-24ad-4137-8d24-11774a673e9e",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "495342c4-bffd-48a5-8eda-6d8332b803de",
+                            "id": "6533133c-3a46-42e9-a5c1-283fa94dcffd",
                             "memberName": {
-                              "id": "715b7714-2fb5-4059-89d8-3e92a7a8ca25",
+                              "id": "5380366d-3419-488b-8429-cd9fdc634429",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "86dd4b41-4eff-41a6-a023-41cef3f635b8"
+                        "id": "f12cac3f-aec0-4aec-afb1-566665fac2c2"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "f2159f8f-c218-4a7f-a05e-c7cf2f77f6a2",
+                      "id": "a9583133-5013-411c-9cc4-91b4077a70a1",
                       "name": "fontFamily"
                     }
                   },
@@ -981,9 +981,9 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "4e13cc36-4047-4e46-9ee1-a50d2c2002f1",
+                        "id": "a2cf49e7-7d48-48c0-aee5-61a3526eb8b2",
                         "identifier": {
-                          "id": "790915cd-f560-4a58-97bf-a784b8557142",
+                          "id": "4bc4f57f-b6c7-4491-8a30-146776d29fdd",
                           "isPlaceholder": false,
                           "string": "FontWeight"
                         }
@@ -991,16 +991,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "9ce58dff-01c1-47a2-9350-adc312594022",
+                      "id": "360c21fb-8263-45fa-9fc4-9da629a3cc3b",
                       "string": "# Font Weight\n\nThe thickness of a font, ranging from `black` to `ultraLight`. The default value is `regular`."
                     },
-                    "id": "38a5439c-4e1c-4125-aeb8-7b6feee8fb02",
+                    "id": "d36bb074-214b-4877-8577-904e12c235ac",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "2da237f0-9b5a-49c5-ac5d-b89eb3053f7c"
+                              "id": "4f1be995-a937-4cb2-a421-a61f4a1cae87"
                             },
                             "type": "placeholder"
                           }
@@ -1009,30 +1009,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "afceff34-f620-4d38-872a-f3c090190cd7",
+                                "id": "d1be720a-32e5-4673-b8ac-f54275d07502",
                                 "identifier": {
-                                  "id": "66c8e7af-0d0d-409c-ac41-9b6ecaa5fa34",
+                                  "id": "ee7ccc5a-299b-4be0-9b86-2096fad07431",
                                   "isPlaceholder": false,
                                   "string": "FontWeight"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "9b22d337-a0d9-40f8-85a4-9014848093df",
+                            "id": "e49ff6fa-a210-4a15-aaef-ad1fd0553ae2",
                             "memberName": {
-                              "id": "c219a709-14d4-403d-a248-c9ecae02390c",
+                              "id": "65eb3030-35ed-4eb5-9ed6-f0b133b7b49e",
                               "isPlaceholder": false,
                               "string": "regular"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "5f35f004-3d87-4a31-b822-43b05968fa9d"
+                        "id": "8a9de40d-9998-4076-ad18-8ff9904ff2b9"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "3af6f530-86be-477a-9501-3f0b6921554b",
+                      "id": "3ee9ecf9-b9e1-49d9-8cf3-7449be9ba414",
                       "name": "fontWeight"
                     }
                   },
@@ -1046,9 +1046,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "4209384a-458d-4813-bc61-165eb81fdfa0",
+                              "id": "5e4bb75d-bb3f-40ff-8d71-73f4e1a90502",
                               "identifier": {
-                                "id": "b053786a-436b-4d77-9fcc-4cc0da9d2176",
+                                "id": "ce2d274a-dbdb-4159-844e-05b0f4a1903d",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -1056,9 +1056,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "dd998662-9d89-45ec-84d0-fdb73a2d858a",
+                        "id": "4bf17331-a485-4049-b653-01b401cccc69",
                         "identifier": {
-                          "id": "7620ca26-e081-4a00-8d19-4cce0a2177b5",
+                          "id": "d06aeb1b-9656-4333-8042-1e6e41e4f4de",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -1066,16 +1066,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "054f4e53-c5c1-441d-93de-dce3771c4755",
+                      "id": "a0fdf638-6904-4c7e-aa4a-8acde9415c44",
                       "string": "# Font Size\n\nThe size of the font, measured in pixels."
                     },
-                    "id": "b926e806-20e1-4221-b4d1-55362139792a",
+                    "id": "241a1a8c-3d20-4750-9be7-127af8b6c6ab",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "9b0ccc90-2b00-48e7-822b-dce6c553632f"
+                              "id": "bcfb3eb2-4205-4554-8592-9ac0a45b371c"
                             },
                             "type": "placeholder"
                           }
@@ -1084,30 +1084,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "84ab68c8-60b6-4ddd-89b2-11224e0d0cd0",
+                                "id": "a2fc1001-cc03-4e96-a01e-576a05065fdd",
                                 "identifier": {
-                                  "id": "64bac8e2-4114-4d65-a578-ac3c5f38692a",
+                                  "id": "3dda240a-d2ad-417c-9523-55d98f899088",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "c43ae34a-1844-4f83-9aac-b1b780f6f2fc",
+                            "id": "84d51a70-a2b8-46b1-aa9a-ed6bfa2fecc1",
                             "memberName": {
-                              "id": "4b62c467-d618-44f6-b511-49b383942ba7",
+                              "id": "f9f14875-46c9-44fe-b19e-2c21b2e4d44b",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "8156d75a-54fa-480e-bc0c-83d1cf4a8e1a"
+                        "id": "ad64b785-2bed-4832-809f-95688a2639fc"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "590b16ed-05c4-40d9-8d52-5e000d71c16e",
+                      "id": "8f360434-0d9d-430e-aae8-df74b21c2112",
                       "name": "fontSize"
                     }
                   },
@@ -1121,9 +1121,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "9c591f8d-b9ea-466d-ac60-5cbb7fce3066",
+                              "id": "9cca6f26-75d6-43e6-af24-cf712158c47a",
                               "identifier": {
-                                "id": "51b2b00f-43fc-4706-ac02-8b422b38b6c2",
+                                "id": "b4133fd5-9362-4412-868c-5a02eaa67c78",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -1131,9 +1131,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "eb162bb7-bd17-4b60-a5de-008dc80e64cb",
+                        "id": "639da457-272e-4bed-9241-3d88c5b55d84",
                         "identifier": {
-                          "id": "e2d199f3-709d-4eac-aea4-5c4b320a815f",
+                          "id": "2ab3e012-c788-4224-9579-d39a415d5716",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -1141,16 +1141,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "f18149ec-285d-4306-9a29-a34a3c74697a",
+                      "id": "785b198e-6d28-4317-9f15-be7c67b3c99c",
                       "string": "# Line Height\n\nThe line height, measured in pixels. The default is `none`, in which case the text style will default to the system-calculated line height."
                     },
-                    "id": "bce9d445-4817-45af-acf1-6135fbccc24e",
+                    "id": "ac2947b1-c03d-41a4-883f-1e190b08185c",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "c77c1557-200c-454a-b0fe-f0857314aea8"
+                              "id": "1797eb03-5cd1-4059-b038-02337c6e7e11"
                             },
                             "type": "placeholder"
                           }
@@ -1159,30 +1159,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "d0a4b9d3-acf0-4dc7-ad2c-702d213009f6",
+                                "id": "14ec95a3-958d-497e-9d30-0b87c7f30623",
                                 "identifier": {
-                                  "id": "075b7699-81b6-48ba-ad35-dec6dc995b23",
+                                  "id": "a82eab7a-b64a-4c26-9644-e1420b997215",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "bdcbf5d7-97da-4eb0-a950-47c125f23d23",
+                            "id": "6dc28875-14ef-4ac5-a292-ce860e0bc83a",
                             "memberName": {
-                              "id": "1a81fbaa-4c8b-41b4-be8b-caac130d7f82",
+                              "id": "7249e4d4-c2d2-420f-9746-e6f13031992e",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "89582e9c-7890-43aa-a514-da638d44f381"
+                        "id": "c9e58cd3-7700-4bd2-9d90-3d0d9ef5c087"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "7f413cdf-f220-4220-b0a9-bec8bc739a10",
+                      "id": "97248853-0c57-4134-90f4-5cb91db20474",
                       "name": "lineHeight"
                     }
                   },
@@ -1196,9 +1196,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "3d0d0742-eb9e-422a-93db-1ef6bf169dbc",
+                              "id": "4f44530b-d490-45b9-98a1-7880c1cd62ea",
                               "identifier": {
-                                "id": "0929d342-8a0b-46e3-bb55-48eef432fed2",
+                                "id": "ad423ba2-0be8-4fa1-8b55-b819f57e38f9",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -1206,9 +1206,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "35ad8e3a-a726-4153-996d-913962d418cc",
+                        "id": "cb8746ca-fa1d-4fd8-830b-a6eb79f56457",
                         "identifier": {
-                          "id": "81abb203-aaec-42ea-b713-f9035bc4702a",
+                          "id": "5a1670c5-c889-4e3e-9671-47e9ea86c234",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -1216,16 +1216,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "571cba1b-1890-4eaa-8cf2-8592bc304066",
+                      "id": "577ed67f-0ee3-4995-8ccc-681d3edf5226",
                       "string": "# Letter Spacing\n\nIncrease or decrease the kerning (spacing between characters). The default is `none`, which uses the font's built-in kerning."
                     },
-                    "id": "727d378c-0ed1-41b4-a82c-74133145cd67",
+                    "id": "6726a5d2-77cd-475c-b8e2-fd9cda756b9d",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "71a61d59-6c2b-44b7-a136-46098af303e9"
+                              "id": "90b8025b-55f1-42f5-bf90-5b609047ca20"
                             },
                             "type": "placeholder"
                           }
@@ -1234,30 +1234,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "b870363c-0ee3-41e4-8c57-257deae4f199",
+                                "id": "ad3893d2-e897-4013-96bf-84bd0565fc29",
                                 "identifier": {
-                                  "id": "fabf214d-dcfe-44a2-938d-9b9be943db73",
+                                  "id": "86c918ed-b856-467b-bfa8-637119db4971",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "4709310c-dc8b-4821-b5c5-959fb300d037",
+                            "id": "1e53ace4-7340-4c12-9ca4-fed9d32061ad",
                             "memberName": {
-                              "id": "99eaa5b7-fbed-451e-aaa0-eb5773ac4f36",
+                              "id": "0ced72f7-970b-40fe-b4ab-c64a00e3bd11",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "ee5252ac-3489-4f9b-acf2-f20a85bfb622"
+                        "id": "5b6c2ac2-7e49-45d4-9302-e078cf8a390d"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "1b837d40-3ae1-464a-bfaa-3dfa1da6e7e5",
+                      "id": "2d9c281e-e88f-4647-8b92-1067f32be919",
                       "name": "letterSpacing"
                     }
                   },
@@ -1271,9 +1271,9 @@
                           {
                             "data": {
                               "genericArguments": [],
-                              "id": "7f91b53e-2023-4be5-bf91-fb6857761199",
+                              "id": "4739d548-2248-4e67-9d8c-2844ad1588ae",
                               "identifier": {
-                                "id": "6c795eb8-5523-42c8-add9-8b93174773ea",
+                                "id": "299ac7d2-8080-42b1-8027-f73c2c7115ee",
                                 "isPlaceholder": false,
                                 "string": "Color"
                               }
@@ -1281,9 +1281,9 @@
                             "type": "typeIdentifier"
                           }
                         ],
-                        "id": "49ec8fac-8663-4b11-89b9-df4968934a8e",
+                        "id": "f000f8cc-5dc7-468b-9ae7-6436a94ea1f5",
                         "identifier": {
-                          "id": "f6b8ad05-c88c-412b-b3a8-ad9a7ad04541",
+                          "id": "e210a2e1-1361-45e0-aa38-33aa1c2cc3da",
                           "isPlaceholder": false,
                           "string": "Optional"
                         }
@@ -1291,16 +1291,16 @@
                       "type": "typeIdentifier"
                     },
                     "comment": {
-                      "id": "bd47359d-c46c-4a66-ad8f-f107aa498a5e",
+                      "id": "a21f6298-f7b4-4f06-8d13-beb75c31f2df",
                       "string": "# Color\n\nThe color of the text."
                     },
-                    "id": "96cfc27a-98a2-4dca-aa0f-dcf93a86f951",
+                    "id": "ade6b062-2374-4681-bdbb-e55dab19cfc5",
                     "initializer": {
                       "data": {
                         "arguments": [
                           {
                             "data": {
-                              "id": "13ae9279-6d5e-4dfc-bfae-739d428fe25d"
+                              "id": "08a1ef09-d364-4edb-89e1-4338124d46d1"
                             },
                             "type": "placeholder"
                           }
@@ -1309,30 +1309,30 @@
                           "data": {
                             "expression": {
                               "data": {
-                                "id": "3b886a60-a71d-4f32-8055-f833011876cd",
+                                "id": "368eb3d3-39eb-4434-973f-df466dc0805c",
                                 "identifier": {
-                                  "id": "19e94bad-a614-415f-83d1-ed10ddb19108",
+                                  "id": "6273033d-39c7-42a3-9618-0e083ad39b00",
                                   "isPlaceholder": false,
                                   "string": "Optional"
                                 }
                               },
                               "type": "identifierExpression"
                             },
-                            "id": "1e5eb77c-5f9f-4361-9eff-25c7760afe0f",
+                            "id": "f584305e-0c17-4e73-bd97-3a0fa88baee5",
                             "memberName": {
-                              "id": "e6110993-7d9a-4413-95bf-3b730e9213cb",
+                              "id": "6883b0e6-2f9b-491e-a3b3-494701345427",
                               "isPlaceholder": false,
                               "string": "none"
                             }
                           },
                           "type": "memberExpression"
                         },
-                        "id": "a6b1a026-12a4-4efd-ae98-46bb228458ed"
+                        "id": "69e53792-2107-403c-9099-5f947f78201a"
                       },
                       "type": "functionCallExpression"
                     },
                     "name": {
-                      "id": "0e50a876-2bb1-44df-bff7-5ba7246e4bdd",
+                      "id": "d129b23e-f80e-48df-a8fb-b62ae5204479",
                       "name": "color"
                     }
                   },
@@ -1340,7 +1340,7 @@
                 },
                 {
                   "data": {
-                    "id": "01d43c94-dc2d-4ac1-a48c-d6dd7f490af7"
+                    "id": "5e6a379b-205c-4ffe-9e71-207435aba90f"
                   },
                   "type": "placeholder"
                 }
@@ -1348,14 +1348,14 @@
               "genericParameters": [
                 {
                   "data": {
-                    "id": "e2ebf08d-848a-405e-9843-ae39d4926488"
+                    "id": "29c3812c-ad73-4ef0-af0f-8609355b6ea8"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "0c703c3f-86aa-46c4-b11f-0c6c1f03d12a",
+              "id": "fa19d79e-d05d-4bfb-a193-688dad2a5f1d",
               "name": {
-                "id": "b28482b6-5ab4-495f-9edd-3c0a7eb49487",
+                "id": "7ee2c649-e084-4571-b899-2c2caf1c2f62",
                 "name": "TextStyle"
               }
             },
@@ -1366,10 +1366,10 @@
       {
         "type": "declaration",
         "data": {
-          "id": "28",
+          "id": "6907973f-b180-4cdb-a650-7cafdf997500",
           "content": {
             "data": {
-              "id": "85e57bee-447a-4570-b871-0cb62842dd57"
+              "id": "f8c2e316-2b4b-4fa7-8df8-463ad269439f"
             },
             "type": "placeholder"
           }
