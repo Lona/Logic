@@ -1179,11 +1179,29 @@ public class BlockListView: NSBox {
             }
         }
 
-        let row = tableView.row(at: convert(point, to: tableView))
+        let tableViewPoint = convert(point, to: tableView)
+        let row = tableView.row(at: tableViewPoint)
 
         if row >= 0 {
             return .item(row, point)
         } else {
+            // Clicking anywhere below the last row behaves the same as clicking the bottom right of the last row
+            if blocks.count > 0 {
+                let lastRow = blocks.count - 1
+                let lastRowRect = tableView.rect(ofRow: lastRow)
+
+                // Extend the rect of the last row down vertically
+                let lastRowRectExtended = NSRect(
+                    origin: lastRowRect.origin,
+                    size: .init(width: lastRowRect.width, height: .greatestFiniteMagnitude)
+                )
+
+                if lastRowRectExtended.contains(tableViewPoint) {
+                    let boundedPoint = NSPoint(x: lastRowRect.maxX, y: lastRowRect.maxY)
+                    return .item(lastRow, convert(boundedPoint, from: tableView))
+                }
+            }
+
             return .background
         }
     }
