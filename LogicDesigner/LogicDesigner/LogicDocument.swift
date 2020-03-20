@@ -282,7 +282,11 @@ class LogicDocument: NSDocument {
 
         let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
+        debugWindowController.rootNode = program
+
         let scopeContext = Compiler.scopeContext(program)
+
+        debugWindowController.scopeContext = scopeContext
 
         var errors: [LogicEditor.ElementError] = []
 
@@ -309,11 +313,15 @@ class LogicDocument: NSDocument {
 
         let unificationContext = Compiler.makeUnificationContext(program, scopeContext: scopeContext)
 
+        debugWindowController.unificationContext = unificationContext
+
         guard case .success(let substitution) = Unification.unify(constraints: unificationContext.constraints) else {
             self.logicEditor.rootNode = rootNode
 
             return true
         }
+
+        debugWindowController.substitution = substitution
 
         successfulUnification = (unificationContext, substitution)
 
@@ -364,18 +372,11 @@ class LogicDocument: NSDocument {
         logicEditor.rootNode = try JSONDecoder().decode(LGCSyntaxNode.self, from: jsonData)
     }
 
-//    override func data(ofType typeName: String) throws -> Data {
-//        let encoder = JSONEncoder()
-//        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-//
-//        let jsonData = try encoder.encode(logicEditor.rootNode)
-//
-//        guard let xmlData = LogicFile.convert(jsonData, kind: .logic, to: .xml) else {
-//            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil)
-//        }
-//
-//        return xmlData
-//    }
-
+    var debugWindowController: DebugWindowController = DebugWindowController()
 }
 
+extension LogicDocument {
+    @IBAction func showDebugWindow(_ sender: AnyObject) {
+        debugWindowController.showWindow(self)
+    }
+}

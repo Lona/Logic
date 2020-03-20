@@ -261,7 +261,11 @@ public enum LightMark {
 
                 // links[prev.lowercased()] is reference to a link, e.g. [ref]
                 guard let link = inlineUrl ?? links[prev.lowercased()] else {
-                    fatalError("Missing link")
+//                    Swift.print("LightMark: Missing link for \(inlineUrl ?? prev.lowercased())")
+                    nodes.append(.text(content: inlineUrl ?? prev.lowercased()))
+
+                    flush()
+                    return
                 }
 
                 let lastAnchor = nodes.lastIndex(where: { node in

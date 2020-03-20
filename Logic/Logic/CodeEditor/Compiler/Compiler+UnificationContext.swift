@@ -11,6 +11,7 @@ import Foundation
 extension Compiler {
     public class UnificationContext {
         public var constraints: [Unification.Constraint] = []
+        public var constraintDebugInfo: [(String, [UUID])] = []
         public var nodes: [UUID: Unification.T] = [:]
         public var patternTypes: [UUID: Unification.T] = [:]
 
@@ -24,6 +25,11 @@ extension Compiler {
 
         func makeEvar() -> Unification.T {
             return .evar(makeGenericName())
+        }
+
+        func addConstraint(_ constraint: Unification.Constraint, _ description: String, _ nodes: [UUID]) {
+            constraints.append(constraint)
+            constraintDebugInfo.append((description, nodes))
         }
     }
 
@@ -200,7 +206,11 @@ extension Compiler {
 
                 // TODO: If this doesn't exist, we probably need to implement another node
                 if let initializerType = result.nodes[initializer.uuid] {
-                    result.constraints.append(Unification.Constraint(annotationType, initializerType))
+                    result.addConstraint(
+                        Unification.Constraint(annotationType, initializerType),
+                        "Variable Type Annotation <-> Initializer",
+                        [node.uuid, initializer.uuid]
+                    )
                 } else {
                     Swift.print("WARNING: No initializer type for \(initializer.uuid)")
                 }
@@ -236,7 +246,11 @@ extension Compiler {
                 }
                 let placeholderFunctionType: Unification.T = .fun(arguments: placeholderArgTypes, returnType: placeholderReturnType)
 
-                result.constraints.append(.init(calleeType, placeholderFunctionType))
+                result.addConstraint(
+                    .init(calleeType, placeholderFunctionType),
+                    "Function Call Expression <-> Callee Expression + [Args]",
+                    [node.uuid, expression.uuid] + arguments.filter { !$0.isPlaceholder }.map { LGCSyntaxNode.functionCallArgument($0).uuid }
+                )
 
                 result.nodes[node.uuid] = placeholderReturnType
 
@@ -250,7 +264,11 @@ extension Compiler {
                 }
 
                 zip(placeholderArgTypes, argumentValues).forEach { (argType, argValue) in
-                    result.constraints.append(Unification.Constraint(argType.type, result.nodes[argValue.uuid]!))
+                    result.addConstraint(
+                        Unification.Constraint(argType.type, result.nodes[argValue.uuid]!),
+                        "Function Call Argument",
+                        [argValue.uuid]
+                    )
                 }
             case (false, .expression(.memberExpression)):
                 // The only supported children are identifiers currently, and we will handle them here when we revisit them
@@ -289,7 +307,11 @@ extension Compiler {
                 expressions.forEach { expression in
                     let expressionType = result.nodes[expression.uuid] ?? result.makeEvar()
 //                    Swift.print("Evar for \(expression): \(expressionType)")
-                    result.constraints.append(Unification.Constraint(elementType, expressionType))
+                    result.addConstraint(
+                        Unification.Constraint(elementType, expressionType),
+                        "Array Literal <-> Element Expression",
+                        [node.uuid, expression.uuid]
+                    )
                 }
             default:
                 break

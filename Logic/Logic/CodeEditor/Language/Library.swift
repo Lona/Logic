@@ -13,18 +13,27 @@ public enum Library {
 
     private static var cache: [String: LGCSyntaxNode] = [:]
 
+    public static func url(for name: String) -> URL? {
+        let bundle = BundleLocator.getBundle()
+
+        guard let libraryUrl = bundle.url(forResource: name, withExtension: "logic") else {
+            Swift.print("Failed to find Logic library file for: \(name)")
+            return nil
+        }
+
+        return libraryUrl
+    }
+
     public static func load(name: String) -> LGCSyntaxNode? {
         if let cached = cache[name] {
             return cached
         }
 
-        let bundle = BundleLocator.getBundle()
-
         guard
-            let libraryUrl = bundle.url(forResource: name, withExtension: "logic"),
+            let libraryUrl = url(for: name),
             let libraryScript = try? Data(contentsOf: libraryUrl)
         else {
-            Swift.print("Failed to find Logic library file for: \(name)")
+            Swift.print("Failed to read Logic library file for: \(name)")
             return nil
         }
 

@@ -107,6 +107,7 @@
 		6B6E47492402EA040067B2FF /* ImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6E47482402EA040067B2FF /* ImageBackground.swift */; };
 		6B6F19D3230B3E1300E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D2230B3E1200E5AC60 /* Colors.framework */; };
 		6B6F19DD230B56C900E5AC60 /* LGCSyntax+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6F19DC230B56C900E5AC60 /* LGCSyntax+Dragging.swift */; };
+		6B82AD2F24255623004C6BC0 /* DebugWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B82AD2E24255623004C6BC0 /* DebugWindowController.swift */; };
 		6B858C21229DB13A00DE6216 /* ScopeStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C20229DB13A00DE6216 /* ScopeStack.swift */; };
 		6B858C23229DB19200DE6216 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C22229DB19200DE6216 /* Compiler.swift */; };
 		6B858C25229DB23400DE6216 /* Compiler+Namespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */; };
@@ -258,6 +259,7 @@
 		6B6E47482402EA040067B2FF /* ImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBackground.swift; sourceTree = "<group>"; };
 		6B6F19D2230B3E1200E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
 		6B6F19DC230B56C900E5AC60 /* LGCSyntax+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Dragging.swift"; sourceTree = "<group>"; };
+		6B82AD2E24255623004C6BC0 /* DebugWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugWindowController.swift; sourceTree = "<group>"; };
 		6B858C20229DB13A00DE6216 /* ScopeStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeStack.swift; sourceTree = "<group>"; };
 		6B858C22229DB19200DE6216 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
 		6B858C24229DB23400DE6216 /* Compiler+Namespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+Namespace.swift"; sourceTree = "<group>"; };
@@ -558,6 +560,7 @@
 				6B00CA2F23283C5F001907C6 /* BlockEditor */,
 				6B44E195223C19B100740318 /* CodeEditor */,
 				6B44E163223B3E2C00740318 /* Controlled */,
+				6B82AD2B24254850004C6BC0 /* Debug */,
 				6B44E197223C1A0000740318 /* Lona */,
 				6B34148B225417E500CC65D1 /* Scripting */,
 				6B44E13B223B3C9000740318 /* Types */,
@@ -601,6 +604,14 @@
 				6B4218B6223D82B10060CC9A /* NSOutlineView+Dragging.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6B82AD2B24254850004C6BC0 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				6B82AD2E24255623004C6BC0 /* DebugWindowController.swift */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		6B858C1F229C996800DE6216 /* Compiler */ = {
@@ -768,6 +779,7 @@
 				6B3414B6225D68E100CC65D1 /* ColorRow.swift in Sources */,
 				6B44E17A223B40BA00740318 /* LogicMeasuredElement.swift in Sources */,
 				6B44E160223B3DFF00740318 /* ForeignTypes.swift in Sources */,
+				6B82AD2F24255623004C6BC0 /* DebugWindowController.swift in Sources */,
 				6B6F19DD230B56C900E5AC60 /* LGCSyntax+Dragging.swift in Sources */,
 				6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */,
 				6BD9949923443CC100F3F173 /* MDXSyntax.swift in Sources */,

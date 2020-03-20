@@ -35,7 +35,9 @@ extension LightMark.HeadingLevel {
             return .regular
         case .level2:
             return .medium
-        case .level3, .level4, .level5, .level6:
+        case .level3:
+            return .heavy
+        case .level4, .level5, .level6:
             fatalError("Unhandled heading level")
         }
     }
@@ -46,7 +48,9 @@ extension LightMark.HeadingLevel {
             return 18
         case .level2:
             return 14
-        case .level3, .level4, .level5, .level6:
+        case .level3:
+            return 12
+        case .level4, .level5, .level6:
             fatalError("Unhandled heading level")
         }
     }
@@ -214,7 +218,7 @@ extension LightMark.BlockElement {
             let container = NSBox()
             container.boxType = .custom
             container.borderType = .noBorder
-            container.fillColor = LightMark.QuoteKind.none.backgroundColor
+            container.fillColor = Colors.blockBackground
             container.contentViewMargins = .zero
             container.cornerRadius = 4
 
@@ -259,7 +263,9 @@ extension LightMark.BlockElement {
                 return 24
             case .level2:
                 return 18
-            case .level3, .level4, .level5, .level6:
+            case .level3:
+                return 16
+            case .level4, .level5, .level6:
                 fatalError("Unhandled heading level")
             }
         case .paragraph, .block, .quote:
