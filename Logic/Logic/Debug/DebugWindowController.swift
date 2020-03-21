@@ -105,6 +105,9 @@ public class DebugWindowController: NSWindowController {
     private func setUpWindow() {
         suggestionWindow.style.suggestionListWidth = 260
 
+        suggestionWindow.placeholderText = "Filter"
+        suggestionWindow.isMovableByWindowBackground = true
+        suggestionWindow.shouldHideWithoutCheckingParentWindow = true
         suggestionWindow.showsSearchBar = true
         suggestionWindow.isReleasedWhenClosed = false
 
@@ -112,7 +115,11 @@ public class DebugWindowController: NSWindowController {
         suggestionWindow.onRequestHide = { [unowned self] in self.suggestionWindow.orderOut(nil) }
 
         suggestionWindow.onChangeSuggestionText = { value in
+            // This updates entries
             self.suggestionText = value
+
+            // Update index after updating entries
+            self.selectedIndex = self.suggestionWindow.suggestionItems.firstIndex(where: { $0.isSelectable })
         }
 
         suggestionWindow.onSelectIndex = { [unowned self] index in
@@ -166,14 +173,18 @@ public class DebugWindowController: NSWindowController {
         }
 
         let nameBindingEntries: [Entry] = filterEntries(
-            self.scopeContext.namespace.pairs.map { names, uuid in
-                return .nameBinding(name: names.joined(separator: "."), id: uuid)
-            }
+            self.scopeContext.namespace.pairs
+                .sorted(by: { a, b in
+                    a.key.joined(separator: ".").lowercased() < b.key.joined(separator: ".").lowercased()
+                })
+                .map({ names, uuid in
+                    return .nameBinding(name: names.joined(separator: "."), id: uuid)
+                })
         )
 
         if !nameBindingEntries.isEmpty {
            entries.append(.header(title: "NAME BINDINGS (SCOPE)"))
-           entries.append(contentsOf: nameBindingEntries)
+            entries.append(contentsOf: nameBindingEntries)
         }
 
         let typeBindingEntries: [Entry] = filterEntries(
@@ -432,10 +443,11 @@ public class DebugWindowController: NSWindowController {
 
         didShow = true
 
-        selectedIndex = nil
         suggestionText = ""
-
         updateEntries()
+
+        selectedIndex = suggestionWindow.suggestionItems.firstIndex(where: { $0.isSelectable })
+        update()
 
         suggestionWindow.setContentSize(.init(width: 1000, height: 800))
         suggestionWindow.center()

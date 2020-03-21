@@ -339,6 +339,10 @@ public enum StandardConfiguration {
         logLevel: LogLevel = LogLevel.none
         ) -> [LogicSuggestionItem]? {
 
+        if rootNode.pathTo(id: node.uuid) == nil {
+            Swift.print("WARNING: Called StandardConfiguration.suggestions with a node that isn't a descendant of the rootNode")
+        }
+
         switch node {
         case .functionCallArgument(let currentArgument):
             guard let parent = rootNode.pathTo(id: node.uuid)?.dropLast().last else { return nil }

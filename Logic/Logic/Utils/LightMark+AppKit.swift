@@ -47,9 +47,9 @@ extension LightMark.HeadingLevel {
         case .level1:
             return 18
         case .level2:
-            return 14
+            return 15
         case .level3:
-            return 12
+            return 13
         case .level4, .level5, .level6:
             fatalError("Unhandled heading level")
         }

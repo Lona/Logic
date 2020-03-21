@@ -59,6 +59,8 @@ class LogicDocument: NSDocument {
         let windowController = NSWindowController(window: window)
         windowController.showWindow(nil)
         addWindowController(windowController)
+
+        window.makeFirstResponder(nil)
     }
 
     override func makeWindowControllers() {

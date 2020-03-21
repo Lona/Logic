@@ -222,12 +222,20 @@ public class SuggestionWindow: NSWindow {
     var suggestionView = SuggestionView()
 
     private func handleHide() {
-        if let _ = parent {
+        if parent != nil || shouldHideWithoutCheckingParentWindow {
             self.onRequestHide?()
         }
     }
 
     // MARK: Public
+
+    // The easiest way to keep track of whether a window is visible is by checking
+    // if it has a parent. However, sometimes we use windows without ever adding them to a
+    // parent (i.e. a top-level window), so we expose this option.
+    //
+    // Hiding the window ourselves will still trigger the notification and `handleHide`,
+    // so we could be prepared to see `onRequestHide` called multiple times.
+    public var shouldHideWithoutCheckingParentWindow: Bool = false
 
     public var style: Style = Style() {
         didSet {
@@ -519,5 +527,12 @@ public class SuggestionWindow: NSWindow {
     public override func setFrameOrigin(_ point: NSPoint) {
         let offsetOrigin = NSPoint(x: point.x - SuggestionWindow.shadowViewMargin, y: point.y - SuggestionWindow.shadowViewMargin)
         super.setFrameOrigin(offsetOrigin)
+    }
+
+    private var _isMovableByWindowBackground: Bool = false
+
+    public override var isMovableByWindowBackground: Bool {
+        get { return _isMovableByWindowBackground }
+        set { _isMovableByWindowBackground = newValue }
     }
 }
