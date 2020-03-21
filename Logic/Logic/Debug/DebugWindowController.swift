@@ -66,6 +66,12 @@ public class DebugWindowController: NSWindowController {
         }
     }
 
+    public var evaluationContext: Compiler.EvaluationContext = .init() {
+        didSet {
+            updateEntries()
+        }
+    }
+
     // MARK: Private
 
     private var didShow: Bool = false
@@ -309,6 +315,20 @@ public class DebugWindowController: NSWindowController {
                 typeString = ""
             }
 
+            let valueString: String
+
+            if let value = evaluationContext.evaluate(uuid: uuid) {
+                valueString = """
+                ## Value
+                ```
+                \(value.debugDescription)
+                ```
+                """
+            } else {
+                // TODO: Report errors
+                valueString = ""
+            }
+
             let nodePathString: String
 
             if let path = rootNode.pathTo(id: uuid, includeTopLevel: true) {
@@ -320,7 +340,7 @@ public class DebugWindowController: NSWindowController {
                 nodePathString = ""
             }
 
-            return [nodeString, typeString, nodePathString].filter { !$0.isEmpty }.joined(separator: "\n")
+            return [nodeString, typeString, valueString, nodePathString].filter { !$0.isEmpty }.joined(separator: "\n")
         }
 
         if let selectedIndex = selectedIndex, entries.count > selectedIndex {

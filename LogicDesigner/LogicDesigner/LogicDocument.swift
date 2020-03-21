@@ -338,6 +338,8 @@ class LogicDocument: NSDocument {
 
         switch result {
         case .success(let evaluationContext):
+            debugWindowController.evaluationContext = evaluationContext
+
             successfulEvaluation = evaluationContext
 
             if evaluationContext.hasCycle {
