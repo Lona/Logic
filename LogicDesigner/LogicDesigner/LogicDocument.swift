@@ -365,7 +365,9 @@ class LogicDocument: NSDocument {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
-        return try encoder.encode(logicEditor.rootNode)
+        let data = try encoder.encode(logicEditor.rootNode)
+
+        return LogicFile.convert(data, kind: .logic, to: .source) ?? data
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
