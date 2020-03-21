@@ -33,6 +33,10 @@ public class DebugWindowController: NSWindowController {
 
     // MARK: Public
 
+    public var getLibraryURL: (String) -> URL? = Library.url
+
+    public var getLibraryContents: (String) -> LGCSyntaxNode? = Library.load
+
     public var rootNode: LGCSyntaxNode = .program(.join(programs: [])) {
         didSet {
             let imports = rootNode.reduce(initialResult: Set<String>()) { (result, node, config) -> Set<String> in
@@ -346,11 +350,11 @@ public class DebugWindowController: NSWindowController {
         if let selectedIndex = selectedIndex, entries.count > selectedIndex {
             switch entries[selectedIndex] {
             case .import(name: let name):
-                let libraryPath = Library.url(for: name)?.path
+                let libraryPath = getLibraryURL(name)?.path
 
                 let contents: String
 
-                if let library = Library.load(name: name),
+                if let library = getLibraryContents(name),
                     let libraryData = try? JSONEncoder().encode(library),
                     let librarySourceData = LogicFile.convert(libraryData, kind: .logic, to: .source),
                     let librarySourceString = String(data: librarySourceData, encoding: .utf8) {
