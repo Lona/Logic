@@ -19,7 +19,7 @@ public class LogicFormattingOptions: Equatable {
         return lhs.style == rhs.style && lhs.locale == rhs.locale
     }
 
-    public enum Style: String {
+    public enum Style: String, Codable {
         case natural, visual, js
 
         public var displayName: String {
@@ -34,7 +34,7 @@ public class LogicFormattingOptions: Equatable {
         }
     }
 
-    public enum Locale {
+    public enum Locale: String, Codable {
         case en_US, es_ES
 
         public var `true`: String {
