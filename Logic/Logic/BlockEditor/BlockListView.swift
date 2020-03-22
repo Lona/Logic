@@ -439,8 +439,7 @@ public class BlockListView: NSBox {
         boxType = .custom
         borderType = .noBorder
         contentViewMargins = .zero
-        fillColor = Colors.suggestionListBackground
-
+        
         tableView.usesAutomaticRowHeights = true
         tableView.addTableColumn(tableColumn)
         tableView.intercellSpacing = NSSize.zero
