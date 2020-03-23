@@ -1058,19 +1058,6 @@ extension LogicEditor {
             }
         }
 
-        switch syntaxNode {
-        case .pattern:
-            childWindow.style = .textInput
-        case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
-            childWindow.style = .detail
-        case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
-            childWindow.style = .contextMenu
-        default:
-            childWindow.style = .default
-            childWindow.showsFilterBar = showsFilterBar
-            childWindow.showsDropdown = showsDropdown
-        }
-
         childWindow.onRequestHide = self.handleBlur
         childWindow.selectedIndex = initialIndex
         childWindow.detailView = makeDetailView(
