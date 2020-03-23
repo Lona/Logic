@@ -29,6 +29,47 @@ open class LogicEditor: NSBox {
         case automatic
     }
 
+    /**
+     Which panes should the suggestion window display?
+     */
+    public enum SuggestionWindowConfiguration {
+        /**
+         Display every pane of the suggestion window.
+         */
+        case full
+
+        /**
+         Display only the text input.
+        */
+        case inputOnly
+
+        /**
+         Display the text input and suggestion list
+        */
+        case inputAndList
+
+        /**
+         Display the text input and suggestion detail view
+         */
+        case inputAndDetailView
+    }
+
+    public struct ConfiguredSuggestions {
+        public init(
+            _ items: [LogicSuggestionItem] = [],
+            windowConfiguration: LogicEditor.SuggestionWindowConfiguration? = nil,
+            placeholderText: String? = nil
+        ) {
+            self.items = items
+            self.windowConfiguration = windowConfiguration
+            self.placeholderText = placeholderText
+        }
+
+        public var items: [LogicSuggestionItem]
+        public var windowConfiguration: SuggestionWindowConfiguration?
+        public var placeholderText: String?
+    }
+
     // MARK: Lifecycle
 
     public init(
@@ -194,7 +235,7 @@ open class LogicEditor: NSBox {
 
     public var contextMenuForNode: ((LGCSyntaxNode, LGCSyntaxNode) -> [MenuItem]?) = {_, _ in nil}
 
-    public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = LogicEditor.defaultSuggestionsForNode
+    public var suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> ConfiguredSuggestions) = LogicEditor.defaultSuggestionsForNode
 
     public var documentationForSuggestion: (
         LGCSyntaxNode,
@@ -217,8 +258,9 @@ open class LogicEditor: NSBox {
     public static let defaultSuggestionsForNode: (
         LGCSyntaxNode,
         LGCSyntaxNode,
-        String) -> [LogicSuggestionItem] = { rootNode, node, query in
-            return node.suggestions(within: rootNode, for: query)
+        String
+    ) -> ConfiguredSuggestions = { rootNode, node, query in
+        return .init(node.suggestions(within: rootNode, for: query))
     }
 
     public static let defaultDocumentationForSuggestion: (
@@ -832,17 +874,27 @@ extension LogicEditor {
         return suggestionListItems
     }
 
-    private func logicSuggestionItems(for syntaxNode: LGCSyntaxNode, prefix: String, categoryFilter: String?) -> [LogicSuggestionItem] {
+    private func logicSuggestionItems(
+        for syntaxNode: LGCSyntaxNode,
+        prefix: String,
+        categoryFilter: String?
+    ) -> ([LogicSuggestionItem], SuggestionWindowConfiguration?, String?) {
         guard let range = context.elementRange(for: syntaxNode.uuid, includeTopLevel: false),
-            let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return [] }
+            let elementPath = rootNode.pathTo(id: syntaxNode.uuid) else { return ([], nil, nil) }
 
         let highestMatch = elementPath.first(where: { context.elementRange(for: $0.uuid, includeTopLevel: false) == range }) ?? syntaxNode
 
-        return suggestionsForNode(rootNode, highestMatch, prefix).filter {
-            !showsFilterBar || ($0.suggestionFilters.isEmpty || $0.suggestionFilters.contains(suggestionFilter))
-        }.filter {
-            categoryFilter == nil || $0.category == categoryFilter
-        }
+        let configuredSuggestions = suggestionsForNode(rootNode, highestMatch, prefix)
+
+        return (
+            configuredSuggestions.items.filter {
+                !showsFilterBar || ($0.suggestionFilters.isEmpty || $0.suggestionFilters.contains(suggestionFilter))
+            }.filter {
+                categoryFilter == nil || $0.category == categoryFilter
+            },
+            configuredSuggestions.windowConfiguration,
+            configuredSuggestions.placeholderText
+        )
     }
 }
 
@@ -919,7 +971,11 @@ extension LogicEditor {
         let syntaxNodePath = context.uniqueElementPathTo(id: syntaxNode.uuid, includeTopLevel: false)
         let dropdownNodes = Array(syntaxNodePath)
 
-        var logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: suggestionText, categoryFilter: categoryFilter)
+        var (logicSuggestions, customWindowConfiguration, customPlaceholderText) = self.logicSuggestionItems(
+            for: syntaxNode,
+            prefix: suggestionText,
+            categoryFilter: categoryFilter
+        )
 
         let originalIndexedSuggestions = indexedSuggestionListItems(for: logicSuggestions)
         let initialIndex = originalIndexedSuggestions.firstIndex { $0.item.isSelectable }
@@ -959,18 +1015,57 @@ extension LogicEditor {
             )
         }
 
+        if let customPlaceholderText = customPlaceholderText {
+            childWindow.placeholderText = customPlaceholderText
+        } else {
+            switch syntaxNode {
+            case .pattern:
+                childWindow.placeholderText = "Type a new name and press Enter"
+            case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
+                childWindow.placeholderText = "Type or pick a new value and press Enter"
+            case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
+                childWindow.placeholderText = "Filter variables"
+            default:
+                childWindow.placeholderText = placeholderText
+            }
+        }
+
+        if let customWindowConfiguration = customWindowConfiguration {
+            switch customWindowConfiguration {
+            case .inputOnly:
+                childWindow.style = .textInput
+            case .inputAndDetailView:
+                childWindow.style = .detail
+            case .inputAndList:
+                childWindow.style = .contextMenu
+            case .full:
+                childWindow.style = .default
+                childWindow.showsFilterBar = showsFilterBar
+                childWindow.showsDropdown = showsDropdown
+            }
+        } else {
+            switch syntaxNode {
+            case .pattern:
+                childWindow.style = .textInput
+            case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
+                childWindow.style = .detail
+            case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
+                childWindow.style = .contextMenu
+            default:
+                childWindow.style = .default
+                childWindow.showsFilterBar = showsFilterBar
+                childWindow.showsDropdown = showsDropdown
+            }
+        }
+
         switch syntaxNode {
         case .pattern:
-            childWindow.placeholderText = "Type a new name and press Enter"
             childWindow.style = .textInput
         case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
-            childWindow.placeholderText = "Type or pick a new value and press Enter"
             childWindow.style = .detail
         case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
-            childWindow.placeholderText = "Filter variables"
             childWindow.style = .contextMenu
         default:
-            childWindow.placeholderText = placeholderText
             childWindow.style = .default
             childWindow.showsFilterBar = showsFilterBar
             childWindow.showsDropdown = showsDropdown
@@ -1061,7 +1156,8 @@ extension LogicEditor {
             dynamicListItems.removeAll()
 
             // Update logicSuggestions
-            logicSuggestions = self.logicSuggestionItems(for: syntaxNode, prefix: value, categoryFilter: categoryFilter)
+            let configuredItems = self.logicSuggestionItems(for: syntaxNode, prefix: value, categoryFilter: categoryFilter)
+            logicSuggestions = configuredItems.0
 
             let indexedSuggestions = self.indexedSuggestionListItems(for: logicSuggestions)
             let index = indexedSuggestions.firstIndex(where: { $0.item.isSelectable })

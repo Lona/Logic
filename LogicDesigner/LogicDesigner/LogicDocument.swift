@@ -253,12 +253,12 @@ class LogicDocument: NSDocument {
         })
 
         logicEditor.suggestionsForNode = { [unowned self] rootNode, node, query in
-            guard let program = makeProgram(rootNode) else { return [] }
+            guard let program = makeProgram(rootNode) else { return .init([]) }
 
             let suggestionBuilder = makeSuggestionBuilder(program, node, self.logicEditor.formattingOptions)
 
             if let suggestionBuilder = suggestionBuilder, let suggestions = suggestionBuilder(query) {
-                return suggestions
+                return .init(suggestions)
             } else {
                 return LogicEditor.defaultSuggestionsForNode(program, node, query)
             }

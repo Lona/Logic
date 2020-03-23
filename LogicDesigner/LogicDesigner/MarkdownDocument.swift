@@ -174,15 +174,15 @@ class MarkdownDocument: NSDocument {
             })
         )
 
-        let suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> [LogicSuggestionItem]) = { _, node, query in
+        let suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> LogicEditor.ConfiguredSuggestions) = { _, node, query in
 //            Swift.print("-- Suggestion Root \(count) \(rootNode.uuid) --\n" + rootNode.hierarchyDescription())
 
             let suggestionBuilder = StandardConfiguration.suggestions(rootNode: program, node: node, formattingOptions: formattingOptions)
 
             if let suggestionBuilder = suggestionBuilder, let suggestions = suggestionBuilder(query) {
-                return suggestions
+                return .init(suggestions)
             } else {
-                return node.suggestions(within: rootNode, for: query)
+                return .init(node.suggestions(within: rootNode, for: query))
 //                return LogicEditor.defaultSuggestionsForNode(rootNode, node, query)
             }
         }
