@@ -1,17 +1,17 @@
 {
   "type": "program",
   "data": {
-    "id": "7af60412-436b-425f-884f-358885d17219",
+    "id": "53b18bb3-2d8b-40c4-b35a-316ebed52675",
     "block": [
       {
         "type": "declaration",
         "data": {
-          "id": "4d764c67-515f-4cb2-b052-3c72077069c3",
+          "id": "4214473a-8b53-498a-9cb9-f31e8ef31753",
           "content": {
             "data": {
-              "id": "9fa4e678-b06b-441a-a94d-3858fe6ce4bc",
+              "id": "6a8b9454-6e6a-4111-aa7d-47906f6a25b6",
               "name": {
-                "id": "d5c728f2-7e8a-4464-817d-32ab5ebcf775",
+                "id": "5f882d45-f87c-42c6-a1fa-8f934f1c6272",
                 "name": "Prelude"
               }
             },
@@ -22,11 +22,11 @@
       {
         "type": "declaration",
         "data": {
-          "id": "26705141-99b0-47b6-82f5-ab958ba83b83",
+          "id": "e22a9c3c-f1d7-4897-9b72-6de6ea685004",
           "content": {
             "data": {
               "comment": {
-                "id": "6cbc7dfa-e43c-4ac8-b37b-b6cabd2877a0",
+                "id": "0342a257-2a39-49a3-b8af-626848f8bcef",
                 "string": "# Color\n\nA color value. Colors can be defined using CSS color codes.\n\n## Example\n\nWe might declare a color variable, `ocean` to use throughout our design system to represent the hex code `#69D2E7`:\n\n```logic\n<Declarations>\n  <Variable name=\"ocean\" type=\"Color\" value=\"#69D2E7\"/>\n</Declarations>\n```"
               },
               "declarations": [
@@ -35,22 +35,22 @@
                     "annotation": {
                       "data": {
                         "genericArguments": [],
-                        "id": "79bec430-b352-43ac-bd44-ea3eb930313a",
+                        "id": "e36b4daf-b0d3-4433-9df7-0852e487d793",
                         "identifier": {
-                          "id": "1ae8a7c4-a3db-4732-b12b-c573bb4fc360",
+                          "id": "d0fab041-07b7-4c45-bc94-581a36b6e444",
                           "isPlaceholder": false,
                           "string": "String"
                         }
                       },
                       "type": "typeIdentifier"
                     },
-                    "id": "8f846956-251f-4646-90a5-7a29e680e154",
+                    "id": "733e8cc7-5002-4b39-88b6-fbbabb52cffe",
                     "initializer": {
                       "data": {
-                        "id": "8f3444e8-dd4f-4e44-9ced-e02b61dc7837",
+                        "id": "4aaea658-5755-4891-83fb-cf28df34cfd6",
                         "literal": {
                           "data": {
-                            "id": "0118ca86-6f7d-4689-b8b2-c295cd82b093",
+                            "id": "5369a4dd-b6bc-4f20-84bf-611fba38ae62",
                             "value": ""
                           },
                           "type": "string"
@@ -59,7 +59,7 @@
                       "type": "literalExpression"
                     },
                     "name": {
-                      "id": "8cf98093-6c86-4a86-a9f8-a76f3a838947",
+                      "id": "b81e9d31-76c8-4663-b933-0aae95609587",
                       "name": "value"
                     }
                   },
@@ -67,7 +67,7 @@
                 },
                 {
                   "data": {
-                    "id": "3c9c9c4d-29ca-4a00-b12a-fb73c7b0ff17"
+                    "id": "5d132dec-ed23-41e4-8bf6-d06d79114635"
                   },
                   "type": "placeholder"
                 }
@@ -75,14 +75,14 @@
               "genericParameters": [
                 {
                   "data": {
-                    "id": "7bf7d5e0-eafa-4109-ab8b-d475c5bd1d95"
+                    "id": "1bf66955-f88c-4e1c-bdb0-8f77d890c107"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "bbf3173e-bfbd-4886-92c5-1091b72fdfe7",
+              "id": "d97db39c-3f14-4284-8103-9ab82fce8a2b",
               "name": {
-                "id": "de4a1d63-add8-4527-9825-b654f4cde62f",
+                "id": "0207a406-d922-4d85-8e61-1504d005e069",
                 "name": "Color"
               }
             },
@@ -93,7 +93,7 @@
       {
         "type": "declaration",
         "data": {
-          "id": "737b3627-698b-4c53-8938-a2063d12cc90",
+          "id": "911295aa-578f-4d05-82e0-80eef606c890",
           "content": {
             "data": {
               "declarations": [
@@ -102,7 +102,7 @@
                     "block": [
                       {
                         "data": {
-                          "id": "76ae5f75-58c7-46dc-8616-29c0315c273d"
+                          "id": "d567a7be-8c1d-41cf-ba94-554cb57447d9"
                         },
                         "type": "placeholder"
                       }
@@ -110,14 +110,14 @@
                     "genericParameters": [
                       {
                         "data": {
-                          "id": "877e61b3-9e99-4b4a-b416-43ed45eb4d3f"
+                          "id": "ee326ae2-f484-4f41-bff0-fefcab117b68"
                         },
                         "type": "placeholder"
                       }
                     ],
-                    "id": "11a113cb-8e5f-4ca6-8d00-c6e6fa2ce698",
+                    "id": "c699be96-722e-451b-a974-c099052fc700",
                     "name": {
-                      "id": "3716733c-1f48-4133-8d94-0753707a108c",
+                      "id": "fc2c09c8-1959-4a78-a70d-19439cb3c2f5",
                       "name": "setHue"
                     },
                     "parameters": [
@@ -126,9 +126,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "8958dbad-74b9-490d-b99e-0cfeeb3b18f6",
+                              "id": "96f52616-febb-4d4b-9492-f6779597b6f6",
                               "identifier": {
-                                "id": "497cc7cf-a8d3-4800-b109-557469b4c766",
+                                "id": "0b8c9312-0c8e-41c4-92e9-ee7f32be87a2",
                                 "isPlaceholder": false,
                                 "string": "Color"
                               }
@@ -137,13 +137,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "22a1723b-6ef0-4681-a38b-9375daf6d85e"
+                              "id": "590d5054-8727-4e93-ba04-f4ba104155a1"
                             },
                             "type": "none"
                           },
-                          "id": "58b255dd-0563-4668-8577-cc2b7e11bdff",
+                          "id": "6112e3b1-81ef-4387-95f1-eafcfecc5104",
                           "localName": {
-                            "id": "9b165703-b124-4020-93f4-b84e67074cf2",
+                            "id": "7be3460b-f4a6-4284-9002-f1c7275fa8d0",
                             "name": "color"
                           }
                         },
@@ -154,9 +154,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "876c3122-d748-4b95-bd43-a64f1d008e54",
+                              "id": "9ae05189-5a76-41be-9f96-d1787c9092f8",
                               "identifier": {
-                                "id": "ebc06d7d-3744-41d7-8e6a-c67c999f05df",
+                                "id": "c54c103f-d1e2-4179-b1b3-3ede7b834a1a",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -165,13 +165,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "235e9742-5e2a-4b18-9f6d-246700684309"
+                              "id": "6d481c2f-fd38-40e2-a902-10b9855a1a19"
                             },
                             "type": "none"
                           },
-                          "id": "92c6f959-7404-4ac6-a4bf-f8c2273488f7",
+                          "id": "e4a35c72-8d6c-4ccc-a9fe-edaaab554db3",
                           "localName": {
-                            "id": "029082e8-e9be-433b-a350-83807f4d1585",
+                            "id": "9f1f38d4-b845-43a9-9dd6-e673e9cd172e",
                             "name": "hue"
                           }
                         },
@@ -179,7 +179,7 @@
                       },
                       {
                         "data": {
-                          "id": "a8fa40fc-a3fd-46e5-be03-67a74f68beeb"
+                          "id": "63f668a5-b9e3-4311-aaa8-edc1c8c845b4"
                         },
                         "type": "placeholder"
                       }
@@ -187,9 +187,9 @@
                     "returnType": {
                       "data": {
                         "genericArguments": [],
-                        "id": "2a960eaa-9ed3-46b1-b5e8-9431f28e7feb",
+                        "id": "bb45d649-7ae4-46a6-98b6-5ce3e5ab0eb7",
                         "identifier": {
-                          "id": "28c9ba51-a281-4f17-a61f-60f78bf0a687",
+                          "id": "14c10a2a-c8da-4a57-8abb-409824666ad2",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -204,26 +204,26 @@
                     "block": [
                       {
                         "data": {
-                          "id": "37d8834b-b43d-430b-ae45-18fee4c72100"
+                          "id": "edd844c0-2497-400b-a395-621aa7381842"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "16765c48-de1b-4729-9a24-4f8fbef1f1c7",
+                      "id": "9bafc4b0-5086-4d23-a9ee-48c7356de97e",
                       "string": "# Set Saturation\n\nAdjust the saturation of a color."
                     },
                     "genericParameters": [
                       {
                         "data": {
-                          "id": "be9a45a3-ec60-4f1b-b544-25b8f121169c"
+                          "id": "3fc19cc7-6d0b-4e33-bb46-2da9f8972466"
                         },
                         "type": "placeholder"
                       }
                     ],
-                    "id": "0f5bd898-77eb-4973-9245-475e6795ec79",
+                    "id": "a36cc1a5-443f-46b0-af1a-08626d83ae64",
                     "name": {
-                      "id": "4076e557-e04d-485a-961e-bcf8e6887315",
+                      "id": "671f100a-2d77-41e2-8ed5-216f768440b6",
                       "name": "setSaturation"
                     },
                     "parameters": [
@@ -232,9 +232,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "b470671e-b2c4-4cf6-a0de-a2ad599dd4c2",
+                              "id": "68e252d3-cc51-4a71-9bb8-dc8f438e64df",
                               "identifier": {
-                                "id": "6a9ae189-a441-42f5-a989-23195981c191",
+                                "id": "698fb50b-9770-4ab7-bf5c-77a3a0da0644",
                                 "isPlaceholder": false,
                                 "string": "Color"
                               }
@@ -242,18 +242,18 @@
                             "type": "typeIdentifier"
                           },
                           "comment": {
-                            "id": "1fcdd7a7-ab8b-41e6-8d62-d2e7362f9839",
+                            "id": "95b4394c-8edc-426f-af40-251455864551",
                             "string": "# Color\n\nThe base color to adjust."
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "62f6a859-5fcb-4b57-8366-0682b4e5a850"
+                              "id": "35fdd193-3927-4830-bdec-b0dd9f82efa2"
                             },
                             "type": "none"
                           },
-                          "id": "f634b196-11d9-4461-89a1-83adcf8cd6d1",
+                          "id": "0611d6d3-e106-4d7c-b23b-be36ead4cd3f",
                           "localName": {
-                            "id": "428de5b6-26f2-4c98-b87a-cc9b92705ce6",
+                            "id": "aa7d110c-2e16-4aad-9281-0d4824c42af7",
                             "name": "color"
                           }
                         },
@@ -264,9 +264,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "15450194-a0f7-48b7-910c-974c5fbbd73e",
+                              "id": "7982f420-3394-442e-bc2f-4fb066c093ad",
                               "identifier": {
-                                "id": "e83c7f81-35b9-44ad-bdce-c8a9a0d2fdca",
+                                "id": "a7698aab-9dc1-451f-9148-75bcefed9f17",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -275,13 +275,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "95595e51-b03f-4b86-ad50-2d115b3f2fb7"
+                              "id": "ef45101c-e7aa-46b7-9d2a-11c5117722fa"
                             },
                             "type": "none"
                           },
-                          "id": "dfc0eb85-1143-4db4-9aa4-a1778deac38e",
+                          "id": "40e4fc3d-e746-4ce3-9b4f-df3310aa6ad8",
                           "localName": {
-                            "id": "a8749610-73ce-4da1-8296-654aa3717d3b",
+                            "id": "4c804959-fd24-4785-bc81-4a02fa17237a",
                             "name": "saturation"
                           }
                         },
@@ -289,7 +289,7 @@
                       },
                       {
                         "data": {
-                          "id": "7c1b711f-f4f1-4dd1-8510-fab5f985c0e7"
+                          "id": "10b210c7-2ae0-4cb4-a1ce-894380f4a0b7"
                         },
                         "type": "placeholder"
                       }
@@ -297,9 +297,9 @@
                     "returnType": {
                       "data": {
                         "genericArguments": [],
-                        "id": "8929d95e-f96e-4316-821a-4db47f92a4e2",
+                        "id": "4ff10ef2-c634-47c4-b3a7-38efe480e459",
                         "identifier": {
-                          "id": "87be022d-6931-4040-bfaa-f62ed0ed6bc2",
+                          "id": "38c84323-f84a-44a5-8c6b-6e00e15f8955",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -314,7 +314,7 @@
                     "block": [
                       {
                         "data": {
-                          "id": "15c1090c-d133-41fe-969e-6983f899d685"
+                          "id": "7b7534a6-6269-4ad6-9c41-61deb59591d2"
                         },
                         "type": "placeholder"
                       }
@@ -322,14 +322,14 @@
                     "genericParameters": [
                       {
                         "data": {
-                          "id": "77b1c33f-7e2c-44f6-b59d-d2eba5fe40c1"
+                          "id": "945595c6-a75a-4947-bc12-64bf0211df79"
                         },
                         "type": "placeholder"
                       }
                     ],
-                    "id": "fd2d0b9b-5842-4859-bf04-777d99c02ed3",
+                    "id": "6aa2282b-d521-4dff-9f2f-217bb6def4df",
                     "name": {
-                      "id": "608fbb02-7837-4304-81f3-228691978fcb",
+                      "id": "32ad2cdc-b42f-4457-b64e-2bf0c5ece1c5",
                       "name": "setLightness"
                     },
                     "parameters": [
@@ -338,9 +338,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "29e8c1c9-4293-430c-a71a-0b136a5d70fe",
+                              "id": "4fc13af1-e862-4716-9ec1-33484770ec7d",
                               "identifier": {
-                                "id": "cdf91b7d-4ad7-421d-a90f-be8b70df13a4",
+                                "id": "43299889-a5d7-4408-884c-dec5bdee5d93",
                                 "isPlaceholder": false,
                                 "string": "Color"
                               }
@@ -349,13 +349,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "3dee9202-1e36-457a-bb5f-24d76344682b"
+                              "id": "ec8e596a-ceb9-4586-9405-1546b14add6f"
                             },
                             "type": "none"
                           },
-                          "id": "6293acea-5037-4672-b1ce-ae5219770f7b",
+                          "id": "3a728328-8293-4a94-97f1-17171077080b",
                           "localName": {
-                            "id": "b20e7a9a-dcfb-4a17-8805-471f252dafb7",
+                            "id": "4deb3293-674d-41e5-9a40-0d7b9a4b7e53",
                             "name": "color"
                           }
                         },
@@ -366,9 +366,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "b7a4a3cc-c93e-4eec-893f-a564d86429eb",
+                              "id": "31e37880-9d22-4200-b1b9-ab3859e62c14",
                               "identifier": {
-                                "id": "30551ac9-4c66-4710-972a-5ce30b778149",
+                                "id": "b63d96d8-e00d-4ca7-9215-73d67ee1aace",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -377,13 +377,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "a26e3018-ac66-46d7-8ce0-9c0976001876"
+                              "id": "14487b66-dc47-4c59-9978-2373eb295bdf"
                             },
                             "type": "none"
                           },
-                          "id": "48ce4961-0249-4cf0-bd98-25ed51da5b97",
+                          "id": "2b1723b9-624c-4a9c-b14f-94bde0dfa2d1",
                           "localName": {
-                            "id": "6db3b5ff-4918-46ac-bff7-14672cf55619",
+                            "id": "bc6b3cee-99c9-434d-9f44-8c8c9d78218f",
                             "name": "lightness"
                           }
                         },
@@ -391,7 +391,7 @@
                       },
                       {
                         "data": {
-                          "id": "9c205ffa-5be7-4c8d-a965-fabda124595a"
+                          "id": "1935154a-c390-4452-b072-2c209848533e"
                         },
                         "type": "placeholder"
                       }
@@ -399,9 +399,9 @@
                     "returnType": {
                       "data": {
                         "genericArguments": [],
-                        "id": "5b3df5ac-d97e-4543-8b59-8f5bcd9a48f2",
+                        "id": "97bd502b-5f5b-4431-80f5-89da541210c1",
                         "identifier": {
-                          "id": "28e4de34-7a26-41ff-ae21-7f1682f20fd6",
+                          "id": "78d73a10-c719-4d2c-925a-b055985b31b5",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -416,7 +416,7 @@
                     "block": [
                       {
                         "data": {
-                          "id": "fc828f3d-5d16-4143-bac8-ff6680ee00e1"
+                          "id": "71517ea5-ac6d-486a-8cb1-1169d795b8e8"
                         },
                         "type": "placeholder"
                       }
@@ -424,14 +424,14 @@
                     "genericParameters": [
                       {
                         "data": {
-                          "id": "a66d17a6-5f11-4753-9bcc-cb7ed1a7e43d"
+                          "id": "1ac9fe0c-71e9-4e5c-9ae4-0b1d53fb0be8"
                         },
                         "type": "placeholder"
                       }
                     ],
-                    "id": "89bf84f1-04f2-41de-9e23-787bc7721a41",
+                    "id": "f9b98f7f-5d63-4fb7-90f9-46405624b8dc",
                     "name": {
-                      "id": "78ef1d01-9d96-4be5-aedc-865e5826b946",
+                      "id": "bec18f7b-b20f-4d7d-aed4-825165d3659e",
                       "name": "fromHSL"
                     },
                     "parameters": [
@@ -440,9 +440,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "a58df084-8eea-46fc-8c46-a5a38834d96c",
+                              "id": "6417d250-3b4b-411c-a021-8edc032c74c1",
                               "identifier": {
-                                "id": "43eb9d98-41a2-4613-a320-15edf0c25042",
+                                "id": "3d1e310c-f20e-446a-ab84-c33311ff3ad1",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -451,13 +451,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "672e3425-a395-4496-9b8e-3720c9235aa4"
+                              "id": "ac8525d6-099f-49e5-b8b4-760f15beeee0"
                             },
                             "type": "none"
                           },
-                          "id": "aef91f1a-b68d-478a-b6a6-312bcae3a17e",
+                          "id": "93401054-fd06-45eb-a83d-840b807ec0b7",
                           "localName": {
-                            "id": "afaf4c7d-3b04-4918-b4da-34fb5c6be731",
+                            "id": "5a9aebe2-7770-4547-905f-800dab7e281f",
                             "name": "hue"
                           }
                         },
@@ -468,9 +468,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "f8d7458d-20fc-449c-a62e-1afef3665ce8",
+                              "id": "60931f81-cc2b-4051-8801-23149a6a5008",
                               "identifier": {
-                                "id": "9883bf4a-4e6c-434a-a07e-9c768f070101",
+                                "id": "a0325fac-4130-4f0b-8197-2f0775820236",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -479,13 +479,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "2be119c5-7060-48ce-b528-19e651d474fb"
+                              "id": "81365bec-07d4-48cb-b43e-ce7d8e592d71"
                             },
                             "type": "none"
                           },
-                          "id": "d6ddc613-ed1e-4e95-8e1e-e9769979712d",
+                          "id": "41519fbc-7379-440d-b226-938843c74a24",
                           "localName": {
-                            "id": "45e173d8-878c-43c0-b573-10d28f48836a",
+                            "id": "159b1d65-61aa-4cb5-9673-147b929e1e87",
                             "name": "saturation"
                           }
                         },
@@ -496,9 +496,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "a658a634-d4d7-4967-9095-99b7fd93624a",
+                              "id": "9252677a-2db7-4c68-bd15-508c8fbf5023",
                               "identifier": {
-                                "id": "8e4bc02a-2f6d-449b-b883-77973d7479db",
+                                "id": "08124875-39cc-478d-9f40-5bb77d534b84",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -507,13 +507,13 @@
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "9ce848c0-31e6-4dde-b875-47bed9bafb69"
+                              "id": "00cfaca8-9a4f-4410-b7a9-b54348101877"
                             },
                             "type": "none"
                           },
-                          "id": "5c9d0947-34d5-4e4e-b492-022ac31176c0",
+                          "id": "45f2df8d-dc2f-4340-a1e1-b95dd0422275",
                           "localName": {
-                            "id": "c559e837-25d1-48c7-afae-cde2458a4147",
+                            "id": "4b381229-f10f-4aa0-b97e-1095a3a363e4",
                             "name": "lightness"
                           }
                         },
@@ -521,7 +521,7 @@
                       },
                       {
                         "data": {
-                          "id": "7e5fa17d-ffcf-4942-81dc-a4de13abea11"
+                          "id": "4c7c6ad3-a7bc-4a68-887f-e15f3365b266"
                         },
                         "type": "placeholder"
                       }
@@ -529,9 +529,9 @@
                     "returnType": {
                       "data": {
                         "genericArguments": [],
-                        "id": "131df6dd-06a7-4fe5-ba8b-eb68b4a19d4b",
+                        "id": "4992a419-97cc-48f5-9009-f604d1e74b19",
                         "identifier": {
-                          "id": "0ad71f24-4d21-4a5e-a065-e0282269867b",
+                          "id": "32f6ae2d-11d5-4bd2-8bd6-349adedb28a7",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -546,26 +546,26 @@
                     "block": [
                       {
                         "data": {
-                          "id": "c00f18e7-3adc-46f8-b882-69cb15d0cadb"
+                          "id": "3b5f1882-221e-493b-bc1b-b507f5be8746"
                         },
                         "type": "placeholder"
                       }
                     ],
                     "comment": {
-                      "id": "a06cd33f-acd6-427e-90dd-ab978f724a5c",
+                      "id": "d7f6f440-49ac-45aa-885b-dd2e03c75505",
                       "string": "# Saturate\n\nAdjust color saturation."
                     },
                     "genericParameters": [
                       {
                         "data": {
-                          "id": "93c3dcba-7a0a-4e24-808b-be2acb8a8169"
+                          "id": "bf11a39e-a50f-4f0a-a7e2-f0879a866bc0"
                         },
                         "type": "placeholder"
                       }
                     ],
-                    "id": "f3a3ed3b-d4e7-45c6-bd5c-51ed96ecdd7a",
+                    "id": "1f3e4828-03ef-4b09-a7e1-a7920f12639c",
                     "name": {
-                      "id": "e5aebf17-7062-4dd5-9623-61ebed625192",
+                      "id": "dbe41146-2b7b-4ad6-87a2-1493861eaf06",
                       "name": "saturate"
                     },
                     "parameters": [
@@ -574,9 +574,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "8f90735c-7941-465d-a59f-6370ce470647",
+                              "id": "666f189c-f6ec-4099-956a-da0fb3da60cf",
                               "identifier": {
-                                "id": "52f527f6-459d-45a4-83be-b7f275912c8c",
+                                "id": "8b9a1a14-b807-407f-b5be-0851a16c077e",
                                 "isPlaceholder": false,
                                 "string": "Color"
                               }
@@ -584,18 +584,18 @@
                             "type": "typeIdentifier"
                           },
                           "comment": {
-                            "id": "d5a97fa1-755a-4b6a-bf17-2607980bfae1",
+                            "id": "60ecd03e-1435-4e28-938e-fb7f96f3349c",
                             "string": "# Color\n\nThe base color to adjust."
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "458b0c9b-8f4e-431d-a94b-6c8bb01b4a73"
+                              "id": "2baec523-83df-495d-a702-2f2dba417ead"
                             },
                             "type": "none"
                           },
-                          "id": "6d584b10-7302-498f-b1a5-c78a4b53ff44",
+                          "id": "9fc51d0f-9bc1-4f0d-97cf-6f89777c69bf",
                           "localName": {
-                            "id": "713ba6f2-d27b-495b-9088-c3b010f2886f",
+                            "id": "0852c291-510b-433f-9016-5ee6dc6e9bb7",
                             "name": "color"
                           }
                         },
@@ -606,9 +606,9 @@
                           "annotation": {
                             "data": {
                               "genericArguments": [],
-                              "id": "7fe97b59-21ca-4f8f-b256-660b2ee04e8d",
+                              "id": "44c01add-5e75-4d36-bf07-2e74e426b830",
                               "identifier": {
-                                "id": "5bc84aa0-c3b7-42c4-87ee-40c4464e9561",
+                                "id": "64597658-241d-4bd6-ab18-9dbb5240f544",
                                 "isPlaceholder": false,
                                 "string": "Number"
                               }
@@ -616,18 +616,18 @@
                             "type": "typeIdentifier"
                           },
                           "comment": {
-                            "id": "4c6afb03-273f-4898-a13c-7a02b50a930f",
+                            "id": "d1cc6d8b-92dc-455e-ad91-9563372974a6",
                             "string": "# Factor\n\nThis value will be multiplied with the current saturation value."
                           },
                           "defaultValue": {
                             "data": {
-                              "id": "0acf64f3-ec5e-4713-90c4-1bd9a95cd963"
+                              "id": "4794603f-4974-41b9-a320-bef7e70e063d"
                             },
                             "type": "none"
                           },
-                          "id": "af969bdd-6603-448c-98b0-b4215c60b969",
+                          "id": "7052ad7c-9abc-4701-87d3-38be3b28eca2",
                           "localName": {
-                            "id": "9fbc0d93-6792-4ada-882a-766ecd5371bc",
+                            "id": "7ba482bd-fc1e-4f6e-8a2a-0cf609cd741c",
                             "name": "factor"
                           }
                         },
@@ -635,7 +635,7 @@
                       },
                       {
                         "data": {
-                          "id": "3aeae5fc-901e-495c-9922-b16eeea0919e"
+                          "id": "36bc965c-d884-48f0-9646-3287aef1b1a0"
                         },
                         "type": "placeholder"
                       }
@@ -643,9 +643,9 @@
                     "returnType": {
                       "data": {
                         "genericArguments": [],
-                        "id": "a733e1bc-619e-4612-9f9f-7042475a2806",
+                        "id": "abd24790-0d84-4d28-9e52-3db76f40d5a8",
                         "identifier": {
-                          "id": "01fa8a8e-c476-4f0b-938e-47ebc134a681",
+                          "id": "bde13f14-d220-4b40-872f-bbb74203adbe",
                           "isPlaceholder": false,
                           "string": "Color"
                         }
@@ -657,14 +657,14 @@
                 },
                 {
                   "data": {
-                    "id": "b2804473-dc64-41d1-8026-c39e0269d547"
+                    "id": "e02eafb5-5ee0-493c-932a-9ac0560c27d7"
                   },
                   "type": "placeholder"
                 }
               ],
-              "id": "c8b4e34b-9d49-41d4-bdab-d049031986f0",
+              "id": "241fd785-9259-469b-a67d-5d8df469ffec",
               "name": {
-                "id": "ea69b325-8f84-4773-948c-6b23e559e87d",
+                "id": "f0475c6b-b00e-4418-b377-498a5df7463c",
                 "name": "Color"
               }
             },
@@ -675,10 +675,10 @@
       {
         "type": "declaration",
         "data": {
-          "id": "46ba096b-bbe9-493a-8415-189bd535176f",
+          "id": "c432301c-2c51-411a-86a7-82e5c9f5cc97",
           "content": {
             "data": {
-              "id": "031276a8-2a18-4c13-be93-8745df8c1bc9"
+              "id": "89f570a5-4615-4aea-9a71-dfa237588d53"
             },
             "type": "placeholder"
           }
