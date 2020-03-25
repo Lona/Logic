@@ -2,6 +2,7 @@ import Foundation
 
 public protocol Equivalentable {
   func isEquivalentTo(_ node: Optional<Self>) -> Bool
+  func isPlaceholderNode() -> Bool
 }
 
 public struct LGCComment: Codable & Equatable & Equivalentable {
@@ -16,6 +17,10 @@ public struct LGCComment: Codable & Equatable & Equivalentable {
   public func isEquivalentTo(_ node: Optional<LGCComment>) -> Bool {
     guard let node = node else { return false }
     return self.string == node.string
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
 
@@ -87,6 +92,13 @@ public indirect enum LGCEnumerationCase: Codable & Equatable & Equivalentable {
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
+  }
 }
 
 
@@ -152,6 +164,13 @@ public indirect enum LGCFunctionCallArgument: Codable & Equatable & Equivalentab
       default:
         return false
     }
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
   }
 }
 
@@ -225,6 +244,13 @@ public indirect enum LGCFunctionParameter: Codable & Equatable & Equivalentable 
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
+  }
 }
 
 
@@ -288,6 +314,10 @@ public indirect enum LGCFunctionParameterDefaultValue: Codable & Equatable & Equ
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
+  }
 }
 
 
@@ -349,6 +379,13 @@ public indirect enum LGCGenericParameter: Codable & Equatable & Equivalentable {
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
+  }
 }
 
 
@@ -366,6 +403,10 @@ public struct LGCIdentifier: Codable & Equatable & Equivalentable {
   public func isEquivalentTo(_ node: Optional<LGCIdentifier>) -> Bool {
     guard let node = node else { return false }
     return self.string == node.string && self.isPlaceholder == node.isPlaceholder
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
 
@@ -412,6 +453,10 @@ public indirect enum LGCList<T: Equatable & Codable & Equivalentable>: Codable &
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
+  }
 }
 
 
@@ -427,6 +472,10 @@ public struct LGCPattern: Codable & Equatable & Equivalentable {
   public func isEquivalentTo(_ node: Optional<LGCPattern>) -> Bool {
     guard let node = node else { return false }
     return self.name == node.name
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
 
@@ -444,6 +493,10 @@ public struct LGCProgram: Codable & Equatable & Equivalentable {
     guard let node = node else { return false }
     return self.block.isEquivalentTo(node.block)
   }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
+  }
 }
 
 public struct LGCTopLevelDeclarations: Codable & Equatable & Equivalentable {
@@ -459,6 +512,10 @@ public struct LGCTopLevelDeclarations: Codable & Equatable & Equivalentable {
     guard let node = node else { return false }
     return self.declarations.isEquivalentTo(node.declarations)
   }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
+  }
 }
 
 public struct LGCTopLevelParameters: Codable & Equatable & Equivalentable {
@@ -473,6 +530,10 @@ public struct LGCTopLevelParameters: Codable & Equatable & Equivalentable {
   public func isEquivalentTo(_ node: Optional<LGCTopLevelParameters>) -> Bool {
     guard let node = node else { return false }
     return self.parameters.isEquivalentTo(node.parameters)
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
 
@@ -636,6 +697,13 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
+  }
 }
 
 
@@ -760,6 +828,13 @@ public indirect enum LGCExpression: Codable & Equatable & Equivalentable {
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
+  }
 }
 
 
@@ -856,6 +931,10 @@ public indirect enum LGCLiteral: Codable & Equatable & Equivalentable {
       default:
         return false
     }
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
 
@@ -978,6 +1057,19 @@ public indirect enum LGCStatement: Codable & Equatable & Equivalentable {
         return false
     }
   }
+
+  public func isPlaceholderNode() -> Bool {
+    switch self {
+      case .placeholder(_):
+        return true
+      case .declaration(let value):
+        return value.content.isPlaceholderNode()
+      case .expression(let value):
+        return value.expression.isPlaceholderNode()
+      default:
+        return false
+    }
+  }
 }
 
 
@@ -1059,6 +1151,13 @@ public indirect enum LGCTypeAnnotation: Codable & Equatable & Equivalentable {
       default:
         return false
     }
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    if case .placeholder = self {
+      return true
+    }
+    return false
   }
 }
 
@@ -1224,5 +1323,9 @@ public indirect enum LGCSyntaxNode: Codable & Equatable & Equivalentable {
       default:
         return false
     }
+  }
+
+  public func isPlaceholderNode() -> Bool {
+    return false
   }
 }
