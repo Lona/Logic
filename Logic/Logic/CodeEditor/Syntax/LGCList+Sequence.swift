@@ -8,7 +8,7 @@
 
 import AppKit
 
-public struct LGCListIterator<T: Equatable & Codable>: IteratorProtocol {
+public struct LGCListIterator<T: Equatable & Codable & Equivalentable>: IteratorProtocol {
     var list: LGCList<T>
 
     init(_ list: LGCList<T>) {
