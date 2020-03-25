@@ -170,9 +170,9 @@
     yargs "^15.1.0"
 
 "@lona/serialization@^0.3.0":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.3.3.tgz#a133770c4fea97cb3f5d3d4492c8490137fe2fd5"
-  integrity sha512-FCpPlNDmIDTBKSgvFBs3H0uRM1/R6RU2lqNZKU3GvvlTz+NRQBsf79V3bVzIWBBv2j7Dt+I6bcl3U4vq9ZnMfw==
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@lona/serialization/-/serialization-0.3.4.tgz#924f9791da55996c2651a7e3b6429606b03c2cef"
+  integrity sha512-tmzhsHQdZVbFn+oSao372zqYc659co5pcU77yoql1xHvnU6frqrtztsHh2J5LFCxImXsBOpHOpoUP9TqtiTZ+A==
   dependencies:
     "@mdx-js/mdx" "^1.5.0"
     json-stable-stringify "^1.0.1"
