@@ -1064,7 +1064,7 @@ public indirect enum LGCStatement: Codable & Equatable & Equivalentable {
         return true
       case .declaration(let value):
         return value.content.isPlaceholderNode()
-      case .expression(let value):
+      case .expressionStatement(let value):
         return value.expression.isPlaceholderNode()
       default:
         return false
