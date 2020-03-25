@@ -447,10 +447,12 @@ public indirect enum LGCList<T: Equatable & Codable & Equivalentable>: Codable &
     switch (self, node) {
       case (.empty, .empty):
         return true
+      case (.empty,  .next(let b, let restB)):
+        return b.isPlaceholderNode() && self.isEquivalentTo(restB)
+      case (.next(let a, let restA), .empty):
+        return a.isPlaceholderNode() && node.isEquivalentTo(restA)
       case (.next(let a, let restA), .next(let b, let restB)):
         return a.isEquivalentTo(b) && restA.isEquivalentTo(restB)
-      default:
-        return false
     }
   }
 
