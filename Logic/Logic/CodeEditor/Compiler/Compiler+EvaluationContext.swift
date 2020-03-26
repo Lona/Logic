@@ -76,6 +76,11 @@ extension Compiler {
     }
 
     public class EvaluationContext {
+
+        public func copy() -> EvaluationContext {
+            return EvaluationContext(values: values, thunks: thunks)
+        }
+
         public init(values: [UUID: LogicValue] = [:], thunks: [UUID: EvaluationThunk] = [:]) {
             self.values = values
             self.thunks = thunks
@@ -165,6 +170,32 @@ extension Compiler {
     }
 
     public typealias EvaluationResult = Result<EvaluationContext, Error>
+
+    // TODO: This should work with structs, enums, and functions
+    private static func defaultValue(forType type: Unification.T) -> LogicValue {
+        switch type {
+        case .cons(name: let name, parameters: _):
+            switch name {
+            case "Boolean":
+                return .init(type, .bool(false))
+            case "Number":
+                return .init(type, .number(0))
+            case "String":
+                return .init(type, .string(""))
+            case "Color": // TODO: This could get picked up from our Color record definition
+                return .color("black")
+            case "Array":
+                return .init(type, .array([]))
+            default:
+                return .unit
+            }
+        case .fun(_, let returnType):
+            let returnValue = defaultValue(forType: returnType)
+            return .init(type, .function(.value(returnValue)))
+        case .evar, .gen:
+            return .unit
+        }
+    }
 
     public static func evaluate(
         _ node: LGCSyntaxNode,
@@ -297,12 +328,14 @@ extension Compiler {
                 }
             })
 
-            context.add(uuid: node.uuid, EvaluationThunk(label: "functionCallExpression",  dependencies: dependencies, { values in
+            context.add(uuid: node.uuid, EvaluationThunk(label: "functionCallExpression", dependencies: dependencies, { values in
                 let functionValue = values[0]
                 let args = Array(values.dropFirst())
 
                 if case .function(let f) = functionValue.memory {
                     switch f {
+                    case .value(let value):
+                        return value
                     case .colorFromHSL:
                         func makeColor(componentValues: [LogicValue]) -> LogicValue {
                             let numbers: [CGFloat] = componentValues.map { componentValue in
@@ -481,6 +514,92 @@ extension Compiler {
                         } else {
                             break
                         }
+                    case .impl(let declarationID):
+                        let currentScopeContext = scopeContext.copy()
+
+                        guard let functionDeclarationNode = rootNode.find(id: declarationID) else { return .unit }
+                        guard case .declaration(.function(let functionData)) = functionDeclarationNode else { return .unit }
+
+                        let functionEvaluationContext = context.copy()
+
+                        currentScopeContext.addToScope(pattern: functionData.name)
+                        currentScopeContext.pushScope()
+
+                        functionData.parameters.filter({ !$0.isPlaceholder }).enumerated().forEach { index, parameter in
+                            switch parameter {
+                            case .placeholder:
+                                break
+                            case .parameter(id: _, localName: let pattern, annotation: _, defaultValue: let defaultValue, _):
+                                currentScopeContext.addToScope(pattern: pattern)
+
+                                let expressionId: UUID? = arguments.reduce(nil, { acc, arg in
+                                    if acc != nil { return acc }
+
+                                    switch arg {
+                                    case .argument(id: _, label: .some(pattern.name), expression: let expression):
+                                        return expression.uuid
+                                    default:
+                                        return nil
+                                    }
+                                })
+
+                                if let expressionId = expressionId {
+                                    functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument passed for \(pattern.name)", dependencies: [expressionId], { values in
+                                        return values[0]
+                                    }))
+                                } else if case .value(id: _, expression: let expression) = defaultValue {
+                                    functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument default value for \(pattern.name)", dependencies: [expression.uuid], { values in
+                                        return values[0]
+                                    }))
+                                } else {
+                                    functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument from type annotation for \(pattern.name)", dependencies: [], { _ in
+                                        guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { return .unit }
+                                        let resolvedType = Unification.substitute(substitution, in: parameterType)
+                                        return self.defaultValue(forType: resolvedType)
+                                    }))
+                                }
+                            }
+                        }
+
+                        func processFunctionBody(result: Result<EvaluationContext, Error>) -> EvaluationResult {
+                            return functionDeclarationNode.subnodes.reduce(result, { result, child in
+                                switch result {
+                                case .failure:
+                                    return result
+                                case .success(let newContext):
+                                    return evaluate(
+                                        child,
+                                        rootNode: rootNode,
+                                        scopeContext: currentScopeContext,
+                                        unificationContext: unificationContext,
+                                        substitution: substitution,
+                                        context: newContext
+                                    )
+                                }
+                            })
+                        }
+
+                        let functionResult = processFunctionBody(result: .success(functionEvaluationContext))
+
+                        switch functionResult {
+                        case .success(let subcontext):
+                            // Find the return statement within the function body
+                            // TODO: Keep track of or figure out which return statement actually executed
+                            if let returnValue: LogicValue = functionDeclarationNode.reduce(initialResult: nil, f: { (acc, currentNode, config) in
+                                switch currentNode {
+                                case .statement(.returnStatement(id: _, expression: let expression)):
+                                    config.stopTraversal = true
+                                    return subcontext.evaluate(uuid: expression.uuid)
+                                default:
+                                    return nil
+                                }
+                            }) {
+                                return returnValue
+                            }
+                        case .failure(let error):
+                            Swift.print("Error: Failed to evaluate custom function implementation. \(error)")
+                            return .unit
+                        }
                     }
                 }
 
@@ -498,7 +617,7 @@ extension Compiler {
             let fullPath = rootNode.declarationPath(id: node.uuid)
 
             context.add(uuid: pattern.uuid, EvaluationThunk(label: "Function declaration for \(pattern.name)", { values in
-                guard let f = LogicValue.Function(qualifiedName: fullPath) else { return .unit }
+                let f = LogicValue.Function(qualifiedName: fullPath) ?? LogicValue.Function(declarationID: node.uuid)
                 return LogicValue(type, .function(f))
             }))
         case .declaration(.record(id: _, name: let functionName, genericParameters: _, declarations: let declarations, _)):

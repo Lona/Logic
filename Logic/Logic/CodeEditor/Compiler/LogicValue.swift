@@ -23,6 +23,8 @@ public struct LogicValue: CustomDebugStringConvertible {
         case stringConcat
         case enumInit(caseName: String)
         case recordInit(members: KeyValueList<String, (Unification.T, LogicValue?)>)
+        case impl(declarationID: UUID)
+        case value(LogicValue)
 
         init?(qualifiedName: [String]) {
             switch qualifiedName {
@@ -45,6 +47,14 @@ public struct LogicValue: CustomDebugStringConvertible {
             default:
                 return nil
             }
+        }
+
+        init(declarationID: UUID) {
+            self = .impl(declarationID: declarationID)
+        }
+
+        init(value: LogicValue) {
+            self = .value(value)
         }
     }
 

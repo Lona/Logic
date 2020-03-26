@@ -42,40 +42,55 @@ public extension Compiler {
 
         public init() {}
 
-        fileprivate func setInCurrentNamespace(key: String, value: UUID) {
+        public func copy() -> ScopeContext {
+            let other = ScopeContext()
+            other.namespace = namespace
+            other.typeNamespace = typeNamespace
+            other.currentNamespacePath = currentNamespacePath
+            other.patternToName = patternToName
+            other.identifierToPattern = identifierToPattern
+            other.patternToTypeName = patternToTypeName
+            other.undefinedIdentifiers = undefinedIdentifiers
+            other.undefinedMemberExpressions = undefinedMemberExpressions
+            other.patternNames = patternNames
+            other.typeNames = typeNames
+            return other
+        }
+
+        func setInCurrentNamespace(key: String, value: UUID) {
             namespace.set(currentNamespacePath + [key], setTo: value)
         }
 
-        fileprivate func setTypeInCurrentNamespace(key: String, value: UUID) {
+        func setTypeInCurrentNamespace(key: String, value: UUID) {
             typeNamespace.set(currentNamespacePath + [key], setTo: value)
         }
 
-        fileprivate func pushScope() {
+        func pushScope() {
             patternNames = patternNames.push()
             typeNames = typeNames.push()
         }
 
-        fileprivate func popScope() {
+        func popScope() {
             patternNames = patternNames.pop()
             typeNames = typeNames.pop()
         }
 
-        fileprivate func pushNamespace(name: String) {
+        func pushNamespace(name: String) {
             pushScope()
             currentNamespacePath = currentNamespacePath + [name]
         }
 
-        fileprivate func popNamespace() {
+        func popNamespace() {
             popScope()
             currentNamespacePath = currentNamespacePath.dropLast()
         }
 
-        fileprivate func addToScope(pattern: LGCPattern) {
+        func addToScope(pattern: LGCPattern) {
             patternToName[pattern.id] = pattern.name
             patternNames.set(pattern, for: pattern.name)
         }
 
-        fileprivate func addTypeToScope(pattern: LGCPattern) {
+        func addTypeToScope(pattern: LGCPattern) {
             patternToTypeName[pattern.id] = pattern.name
             typeNames.set(pattern, for: pattern.name)
         }

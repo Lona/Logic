@@ -926,7 +926,7 @@ extension LGCExpression: SyntaxNodeProtocol {
                         case .argument(let value):
                             return value.id != id
                         }
-                    })
+                    }).map { $0.delete(id: id) }
                 )
             )
         case .literalExpression(let value):
@@ -1012,6 +1012,8 @@ extension LGCStatement: SyntaxNodeProtocol {
         switch self {
         case .declaration(let value):
             return .declaration(id: value.id, content: value.content.delete(id: id))
+        case .returnStatement(let value):
+            return .returnStatement(id: value.id, expression: value.expression.delete(id: id))
         default:
             // TODO
             return self
@@ -1742,6 +1744,15 @@ extension LGCFunctionCallArgument: SyntaxNodeProtocol {
             case .placeholder:
                 return .placeholder(id: UUID())
             }
+        }
+    }
+
+    public func delete(id: UUID) -> LGCFunctionCallArgument {
+        switch self {
+        case .argument(let value):
+            return .argument(id: value.id, label: value.label, expression: value.expression.delete(id: id))
+        case .placeholder(let id):
+            return .placeholder(id: id)
         }
     }
 
