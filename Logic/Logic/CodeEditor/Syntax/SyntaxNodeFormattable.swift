@@ -465,7 +465,12 @@ extension LGCStatement: SyntaxNodeFormattable {
         case .expressionStatement(let value):
             return value.expression.formatted(using: options)
         case .returnStatement(let value):
-            return value.expression.formatted(using: options)
+            return .concat(
+                [
+                    .element(LogicElement.dropdown(value.id, "Return", .source)),
+                    value.expression.formatted(using: options)
+                ]
+            )
         case .declaration(let value):
             return value.content.formatted(using: options)
         }

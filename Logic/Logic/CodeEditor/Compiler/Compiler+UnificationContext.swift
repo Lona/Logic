@@ -62,6 +62,33 @@ extension Compiler {
                 result.nodes[condition.uuid] = .bool
 
                 return result
+            case (true, .statement(.returnStatement(id: let id, expression: let expression))):
+                guard let annotation: LGCTypeAnnotation = rootNode.pathTo(id: id)?.reversed().dropFirst().reduce(nil, { acc, item in
+                    if acc != nil { return acc }
+
+                    switch item {
+                    case .declaration(.function(id: _, name: _, returnType: let returnType, genericParameters: _, parameters: _, block: _, comment: _)):
+                        return returnType
+                    default:
+                        return nil
+                    }
+                }) else {
+                    Swift.print("WARNING: Return statement not within function (found during unification)")
+                    return result
+                }
+
+                let expressionType = result.nodes[expression.uuid] ?? result.makeEvar()
+
+                // TODO: Handle generic return
+                let returnType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
+
+                result.addConstraint(
+                    Unification.Constraint(expressionType, returnType),
+                    "Return Statement <-> Function Return Type",
+                    [node.uuid, expression.uuid]
+                )
+
+                return result
             case (false, .declaration(.record(id: _, name: let functionName, genericParameters: let genericParameters, declarations: let declarations, _))):
                 let genericNames: [String] = genericParameters.compactMap { param in
                     switch param {

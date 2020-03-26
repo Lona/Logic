@@ -921,6 +921,16 @@ public extension LGCStatement {
             )
         )
 
+        let returnStatement = LGCSyntaxNode.statement(
+            LGCStatement.returnStatement(
+                id: UUID(),
+                expression: .identifierExpression(
+                    id: UUID(),
+                    identifier: LGCIdentifier(id: UUID(), string: "value", isPlaceholder: true)
+                )
+            )
+        )
+
         let items = [
             LogicSuggestionItem(
                 title: "If condition",
@@ -931,6 +941,11 @@ public extension LGCStatement {
                 title: "For loop",
                 category: suggestionCategoryTitle.uppercased(),
                 node: forLoop
+            ),
+            LogicSuggestionItem(
+                title: "Return statement",
+                category: suggestionCategoryTitle.uppercased(),
+                node: returnStatement
             ),
             LGCExpression.assignmentSuggestionItem,
         ] + LGCDeclaration.suggestions(for: prefix)
