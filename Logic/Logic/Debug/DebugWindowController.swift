@@ -17,6 +17,7 @@ public class DebugWindowController: NSWindowController {
         case unification(constraint: Unification.Constraint, description: String, ids: [UUID])
         case substitution(Unification.Substitution)
         case node(description: String, id: UUID)
+        case evaluationThunk(id: UUID, thunk: Compiler.EvaluationThunk)
     }
 
     public init() {
@@ -167,6 +168,10 @@ public class DebugWindowController: NSWindowController {
                     return "substitution".contains(query) || substitution.debugDescription.lowercased().contains(query)
                 case .node(description: let description, id: let uuid):
                     return uuid.uuidString.lowercased().contains(query) || description.lowercased().contains(query)
+                case .evaluationThunk(id: let uuid, thunk: let thunk):
+                    return "evaluation".contains(query) ||
+                        uuid.uuidString.lowercased().contains(query) ||
+                        thunk.label?.lowercased().contains(query) == true
                 }
             }
         }
@@ -236,6 +241,17 @@ public class DebugWindowController: NSWindowController {
             entries.append(contentsOf: substitutionEntries)
         }
 
+        let evaluationEntries: [Entry] = filterEntries(
+            self.evaluationContext.thunks.map { id, thunk in
+                return Entry.evaluationThunk(id: id, thunk: thunk)
+            }
+        )
+
+        if !evaluationEntries.isEmpty {
+            entries.append(.header(title: "EVALUATION THUNKS"))
+            entries.append(contentsOf: evaluationEntries)
+        }
+
         let nodeEntries: [Entry] = filterEntries(
             rootNode.reduce(initialResult: [], f: { result, node, conf in result + [node] })
                 .map({ Entry.node(description: $0.nodeTypeDescription, id: $0.uuid) })
@@ -246,30 +262,7 @@ public class DebugWindowController: NSWindowController {
             entries.append(contentsOf: nodeEntries)
         }
 
-        self.entries = entries.filter { entry in
-            if suggestionText.isEmpty { return true }
-
-            switch entry {
-            case .import(name: let name):
-                return name.lowercased().contains(query)
-            case .header:
-                return true
-            case .typeBinding(name: let name, id: let uuid, type: let type):
-                return name.lowercased().contains(query) ||
-                    uuid.uuidString.lowercased().contains(query) ||
-                    type.debugDescription.lowercased().contains(query)
-            case .nameBinding(name: let name, id: let uuid):
-                return name.lowercased().contains(query) || uuid.uuidString.lowercased().contains(query)
-            case .unification(constraint: let constraint, let description, let uuids):
-                return constraint.debugDescription.lowercased().contains(query) ||
-                    description.lowercased().contains(query) ||
-                    uuids.contains(where: { id in id.uuidString.lowercased().contains(query) })
-            case .substitution(let substitution):
-                return "substitution".contains(query) || substitution.debugDescription.lowercased().contains(query)
-            case .node(description: let description, id: let uuid):
-                return uuid.uuidString.lowercased().contains(query) || description.lowercased().contains(query)
-            }
-        }
+        self.entries = entries
     }
 
     private func update() {
@@ -289,6 +282,8 @@ public class DebugWindowController: NSWindowController {
                 return .row("Substition", nil, false, nil, nil)
             case .node(description: let description, id: let uuid):
                 return .row(description, nil, false, uuid.shortString, nil)
+            case .evaluationThunk(id: let uuid, thunk: let thunk):
+                return .row(thunk.label ?? "Thunk", nil, false, nil, nil)
             }
         }
 
@@ -445,6 +440,50 @@ public class DebugWindowController: NSWindowController {
                 } else {
                     mdxString = "Node \(uuid) not found in `rootNode`"
                 }
+
+                suggestionWindow.detailView = LightMark.makeScrollView(
+                    markdown: mdxString,
+                    renderingOptions: .init(formattingOptions: .visual)
+                )
+            case .evaluationThunk(id: let uuid, thunk: let thunk):
+
+                func formatThunk(id uuid: UUID) -> String {
+                    let value = evaluationContext.evaluate(uuid: uuid)?.debugDescription ?? "Failed to evaluate"
+                    let label = evaluationContext.thunks[uuid]?.label ?? "?"
+                    return "`\(uuid)`: \(label) - \(value)"
+                }
+
+                let formattedDirectDependencies = thunk.dependencies.map(formatThunk).joined(separator: "\n")
+
+                var remainingDependencies: [UUID] = thunk.dependencies
+                var allDependencies: [UUID] = []
+
+                while let next = remainingDependencies.popLast() {
+                    allDependencies.append(next)
+
+                    if let nextThunk = evaluationContext.thunks[next] {
+                        remainingDependencies.append(contentsOf: nextThunk.dependencies)
+                    }
+                }
+
+                let formattedDependencies = allDependencies.map(formatThunk).joined(separator: "\n")
+
+                let mdxString = """
+                # \(thunk.label ?? "Thunk")
+
+                ### Value
+                \(evaluationContext.evaluate(uuid: uuid)?.debugDescription ?? "Failed to evaluate")
+
+                ### Direct Dependencies
+
+                \(formattedDirectDependencies)
+
+                ### All Dependencies
+
+                \(formattedDependencies)
+
+                \(nodeDescription(uuid: uuid))
+                """
 
                 suggestionWindow.detailView = LightMark.makeScrollView(
                     markdown: mdxString,
