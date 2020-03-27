@@ -90,7 +90,7 @@ class MarkdownDocument: NSDocument {
             return (errors, nil, nil)
         }
 
-        let result = Compiler.evaluate(
+        let result = Compiler.compile(
             program,
             rootNode: program,
             scopeContext: scopeContext,

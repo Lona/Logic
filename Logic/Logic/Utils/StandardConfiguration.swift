@@ -655,7 +655,7 @@ public enum StandardConfiguration {
             Swift.print("Current scope", currentScopeContext.namesInScope)
         }
 
-        let evaluationContext = try? Compiler.evaluate(
+        let evaluationContext = try? Compiler.compile(
             rootNode,
             rootNode: rootNode,
             scopeContext: scopeContext,

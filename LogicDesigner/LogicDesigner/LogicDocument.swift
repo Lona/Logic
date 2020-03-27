@@ -110,6 +110,7 @@ class LogicDocument: NSDocument {
         logicEditor.showsDropdown = true
         logicEditor.showsFilterBar = true
         logicEditor.suggestionFilter = .all
+        logicEditor.showsLineButtons = true
 
 //        logicEditor.rootNode = .topLevelDeclarations(
 //            .init(id: UUID(), declarations: .init([.makePlaceholder()]))
@@ -327,7 +328,7 @@ class LogicDocument: NSDocument {
 
         successfulUnification = (unificationContext, substitution)
 
-        let result = Compiler.evaluate(
+        let result = Compiler.compile(
             program,
             rootNode: program,
             scopeContext: scopeContext,

@@ -197,7 +197,7 @@ extension Compiler {
         }
     }
 
-    public static func evaluate(
+    public static func compile(
         _ node: LGCSyntaxNode,
         rootNode: LGCSyntaxNode,
         scopeContext: ScopeContext,
@@ -214,7 +214,7 @@ extension Compiler {
                 case .failure:
                     return result
                 case .success(let newContext):
-                    return evaluate(
+                    return compile(
                         child,
                         rootNode: rootNode,
                         scopeContext: scopeContext,
@@ -231,7 +231,7 @@ extension Compiler {
         // Pre
         switch node {
         case .statement(.branch(id: _, condition: let condition, block: _)):
-            result = evaluate(
+            result = compile(
                 condition.node,
                 rootNode: rootNode,
                 scopeContext: scopeContext,
@@ -567,7 +567,7 @@ extension Compiler {
                                 case .failure:
                                     return result
                                 case .success(let newContext):
-                                    return evaluate(
+                                    return compile(
                                         child,
                                         rootNode: rootNode,
                                         scopeContext: currentScopeContext,
