@@ -106,19 +106,33 @@ extension Compiler {
         private var cachedCycles: [[UUID]]?
 
         private func detectCycles() -> [[UUID]] {
-            let graph = UnweightedGraph<UUID>()
+            let graph = UnweightedGraph<UUID>(vertices: Array(thunks.keys))
 
-            thunks.keys.forEach { key in
-                _ = graph.addVertex(key)
+            // Adding edges to SwiftGraph is significantly faster when using indices than vertices directly,
+            // so we first determine the index of each vertex
+            var indexOfVertex: [UUID: Int] = [:]
+            graph.vertices.enumerated().forEach { index, vertex in
+                indexOfVertex[vertex] = index
             }
 
             thunks.forEach { (arg) in
                 let (uuid, thunk) = arg
                 thunk.dependencies.forEach { dependency in
-                    graph.addEdge(from: uuid, to: dependency, directed: true)
+                    guard let thunkIndex = indexOfVertex[uuid], let dependencyIndex = indexOfVertex[dependency] else {
+                        Swift.print("WARNING: Missing thunk for \(dependency) in cycle detection")
+                        return
+                    }
+
+                    graph.addEdge(fromIndex: thunkIndex, toIndex: dependencyIndex, directed: true)
                 }
             }
 
+            // First, detect if any cycles exist O(n)
+            if graph.isDAG {
+                return []
+            }
+
+            // If cycles do exist, find them
             return graph.detectCycles()
         }
 
