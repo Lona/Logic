@@ -166,6 +166,9 @@ open class LogicEditor: NSBox {
             canvasView.errorRanges = elementErrors.compactMap { error in
                 //                let topNode = self.rootNode.topNodeWithEqualElements(as: error.uuid, options: formattingOptions, includeTopLevel: false)
 
+                // Check that the error node exists within the current syntaxNode
+                guard let _ = context.syntaxNode.find(id: error.uuid) else { return nil }
+
                 if let selectedRange = context.elementRange(for: error.uuid, includeTopLevel: false) {
                     return selectedRange
                 } else {
