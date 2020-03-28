@@ -17,7 +17,6 @@ public protocol SyntaxNodeProtocol {
     var node: LGCSyntaxNode { get }
     var nodeTypeDescription: String { get }
     var subnodes: [LGCSyntaxNode] { get }
-    var children: [LGCSyntaxNode] { get }
     var isSelectable: Bool { get }
 
     func acceptsLineDrag(rootNode: LGCSyntaxNode) -> Bool
@@ -30,6 +29,7 @@ public protocol SyntaxNodeProtocol {
     func delete(id: UUID) -> Self
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self
     func copy(deep: Bool) -> Self
+    func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode]
 
     func comment(within root: LGCSyntaxNode) -> String?
     func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView
@@ -37,7 +37,7 @@ public protocol SyntaxNodeProtocol {
 }
 
 public extension SyntaxNodeProtocol {
-    var children: [LGCSyntaxNode] {
+    func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         return []
     }
 
@@ -302,7 +302,7 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
-    public var children: [LGCSyntaxNode] {
+    public func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         switch self {
         case .array(let value):
             return value.value.map { $0.node }
@@ -1152,7 +1152,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public var children: [LGCSyntaxNode] {
+    public func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         switch self {
         case .enumeration(let value):
             return value.cases.map { $0.node }
@@ -1160,6 +1160,15 @@ extension LGCDeclaration: SyntaxNodeProtocol {
             return value.declarations.map { $0.node }
         case .namespace(let value):
             return value.declarations.map { $0.node }
+        case .function(let value):
+            switch node {
+            case .functionParameter:
+                return value.parameters.map { $0.node }
+            case .statement:
+                return value.block.map { $0.node }
+            default:
+                return []
+            }
         default:
             return []
         }
@@ -1417,6 +1426,37 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 name: value.name,
                 declarations: .init(updated)
             )
+        case .function(let value):
+            switch childNode {
+            case .functionParameter(let child):
+                var updated = value.parameters.normalizedPlaceholders.map { $0 }
+                updated.insert(child, at: atIndex)
+
+                return .function(
+                    id: value.id,
+                    name: value.name,
+                    returnType: value.returnType,
+                    genericParameters: value.genericParameters,
+                    parameters: .init(updated),
+                    block: value.block,
+                    comment: value.comment
+                )
+            case .statement(let child):
+                var updated = value.block.normalizedPlaceholders.map { $0 }
+                updated.insert(child, at: atIndex)
+
+                return .function(
+                    id: value.id,
+                    name: value.name,
+                    returnType: value.returnType,
+                    genericParameters: value.genericParameters,
+                    parameters: value.parameters,
+                    block: .init(updated),
+                    comment: value.comment
+                )
+            default:
+                return self
+            }
         default:
             return self
         }
@@ -1489,7 +1529,7 @@ extension LGCProgram: SyntaxNodeProtocol {
         return block.map { $0.node }
     }
 
-    public var children: [LGCSyntaxNode] {
+    public func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         return block.map { $0.node }
     }
 
@@ -1572,7 +1612,7 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         return parameters.map { $0.node }
     }
 
-    public var children: [LGCSyntaxNode] {
+    public func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         return parameters.map { $0.node }
     }
 
@@ -1660,7 +1700,7 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
         return declarations.map { $0.node }
     }
 
-    public var children: [LGCSyntaxNode] {
+    public func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode] {
         return declarations.map { $0.node }
     }
 

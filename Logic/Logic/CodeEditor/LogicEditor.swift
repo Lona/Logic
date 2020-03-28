@@ -477,7 +477,7 @@ extension LogicEditor {
 
     // Determine the index of the target within its parent, since we'll be inserting the source node relative to it
     private func findDropIndex(relativeTo node: LGCSyntaxNode, within parent: LGCSyntaxNode, index: Int) -> Int? {
-        let childRanges = parent.contents.children.map {
+        let childRanges = parent.contents.childrenInSameCollection(as: node).map {
             context.elementRange(for: $0.uuid, includeTopLevel: false, useOwnerId: true)
             }.compactMap { $0 }
 

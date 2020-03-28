@@ -44,7 +44,7 @@ extension LGCList where T: SyntaxNodeProtocol {
     }
 
     public func delete(id: UUID) -> LGCList {
-        return LGCList.init(self.map { $0.delete(id: id) })
+        return LGCList.init(self.filter { $0.uuid != id }.map { $0.delete(id: id) })
     }
 }
 

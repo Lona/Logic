@@ -47,7 +47,7 @@ extension LGCSyntaxNode {
         switch node {
         case .declaration:
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
-                let childIndex = targetParent.contents.children.firstIndex(of: node) {
+                let childIndex = targetParent.contents.childrenInSameCollection(as: node).firstIndex(of: node) {
                 let childNode = node.copy(deep: true)
                 let newParent = targetParent.insert(childNode: childNode, atIndex: childIndex + 1)
                 return (self.replace(id: targetParent.uuid, with: newParent), childNode)
@@ -72,15 +72,15 @@ extension LGCSyntaxNode {
         switch node {
         case .declaration:
             if let targetParent = self.findDropTarget(relativeTo: node, accepting: node),
-                let childIndex = targetParent.contents.children.firstIndex(of: node) {
+                let childIndex = targetParent.contents.childrenInSameCollection(as: node).firstIndex(of: node) {
                 let newIndex = childIndex + (position == .above ? 0 : 1)
 
                 // Reuse a placeholder instead of inserting a new one in the same place
-                if newIndex < targetParent.contents.children.count,
-                    let contents = targetParent.contents.children[newIndex].contents as? SyntaxNodePlaceholdable,
+                if newIndex < targetParent.contents.childrenInSameCollection(as: node).count,
+                    let contents = targetParent.contents.childrenInSameCollection(as: node)[newIndex].contents as? SyntaxNodePlaceholdable,
                     contents.isPlaceholder {
 
-                    return (self, targetParent.contents.children[newIndex])
+                    return (self, targetParent.contents.childrenInSameCollection(as: node)[newIndex])
                 } else {
                     let childNode: LGCSyntaxNode = .declaration(.makePlaceholder())
                     let newParent = targetParent.insert(childNode: childNode, atIndex: newIndex)
