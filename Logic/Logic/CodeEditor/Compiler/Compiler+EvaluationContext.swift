@@ -119,7 +119,7 @@ extension Compiler {
                 let (uuid, thunk) = arg
                 thunk.dependencies.forEach { dependency in
                     guard let thunkIndex = indexOfVertex[uuid], let dependencyIndex = indexOfVertex[dependency] else {
-                        Swift.print("WARNING: Missing thunk for \(dependency) in cycle detection")
+//                        Swift.print("WARNING: Missing thunk for \(dependency) in cycle detection")
                         return
                     }
 
