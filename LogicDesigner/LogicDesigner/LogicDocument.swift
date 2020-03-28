@@ -176,57 +176,12 @@ class LogicDocument: NSDocument {
         )
 
         logicEditor.decorationForNodeID = { id in
-            guard let node = self.logicEditor.rootNode.find(id: id) else { return nil }
-
             if let evaluation = self.successfulEvaluation,
-                let colorValue = evaluation.evaluate(uuid: node.uuid)?.colorString {
-                if self.logicEditor.formattingOptions.style == .visual,
-                    let path = self.logicEditor.rootNode.pathTo(id: id),
-                    let parent = path.dropLast().last {
-
-                    switch parent {
-                    case .declaration(.variable):
-                        return nil
-                    default:
-                        break
-                    }
-
-                    if let grandParent = path.dropLast().dropLast().last {
-                        switch (grandParent, parent, node) {
-                        case (.declaration(.variable), .expression(.literalExpression), .literal(.color)):
-                            return nil
-                        default:
-                            break
-                        }
-                    }
-                }
-
+                let colorValue = evaluation.evaluate(uuid: id)?.colorString {
                 return .color(NSColor.parse(css: colorValue) ?? NSColor.black)
             }
-
-//            if let value = successfulEvaluation?.evaluate(uuid: node.uuid, logLevel: .verbose) {
-//                return .label(labelFont, value.debugDescription)
-//            }
-
-//            if let annotation = annotations[node.uuid] {
-//                switch node {
-//                case .literal:
-//                    return nil
-//                default:
-//                    break
-//                }
-//
-//                return .label(labelFont, annotation)
-//            }
-
-            switch node {
-            case .literal(.color(id: _, value: let color)):
-                return .color(NSColor.parse(css: color) ?? NSColor.black)
-            case .identifier(let identifier) where identifier.string.starts(with: "TextStyles."):
-                return .character(TextStyle(size: 18, color: .purple).apply(to: "S"), .purple)
-            default:
-                return nil
-            }
+            
+            return nil
         }
 
         logicEditor.onInsertBelow = { [unowned self] rootNode, node in
