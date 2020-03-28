@@ -1152,6 +1152,19 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
+    public var children: [LGCSyntaxNode] {
+        switch self {
+        case .enumeration(let value):
+            return value.cases.map { $0.node }
+        case .record(let value):
+            return value.declarations.map { $0.node }
+        case .namespace(let value):
+            return value.declarations.map { $0.node }
+        default:
+            return []
+        }
+    }
+
     public var nodeTypeDescription: String {
         return "Declaration"
     }
@@ -1367,24 +1380,45 @@ extension LGCDeclaration: SyntaxNodeProtocol {
 
     public func insert(childNode: LGCSyntaxNode, atIndex: Int) -> LGCDeclaration {
         switch self {
+        case .enumeration(let value):
+            guard case .enumerationCase(let child) = childNode else { return self }
+
+            var updated = value.cases.normalizedPlaceholders.map { $0 }
+            updated.insert(child, at: atIndex)
+
+            return .enumeration(
+                id: value.id,
+                name: value.name,
+                genericParameters: value.genericParameters,
+                cases: .init(updated),
+                comment: value.comment
+            )
+        case .record(let value):
+            guard case .declaration(let child) = childNode else { return self }
+
+            var updated = value.declarations.normalizedPlaceholders.map { $0 }
+            updated.insert(child, at: atIndex)
+
+            return .record(
+                id: value.id,
+                name: value.name,
+                genericParameters: value.genericParameters,
+                declarations: .init(updated),
+                comment: value.comment
+            )
         case .namespace(let value):
             guard case .declaration(let child) = childNode else { return self }
 
             var updated = value.declarations.normalizedPlaceholders.map { $0 }
             updated.insert(child, at: atIndex)
 
-            return .namespace(id: value.id, name: value.name, declarations: .init(updated))
+            return .namespace(
+                id: value.id,
+                name: value.name,
+                declarations: .init(updated)
+            )
         default:
             return self
-        }
-    }
-
-    public var children: [LGCSyntaxNode] {
-        switch self {
-        case .namespace(let value):
-            return value.declarations.map { $0.node }
-        default:
-            return []
         }
     }
 
@@ -1418,6 +1452,14 @@ extension LGCDeclaration: SyntaxNodeProtocol {
     public func acceptsNode(rootNode: LGCSyntaxNode, childNode: LGCSyntaxNode) -> Bool {
         switch (self, childNode) {
         case (.namespace, .declaration):
+            return true
+        case (.record, .declaration):
+            return true
+        case (.enumeration, .enumerationCase):
+            return true
+        case (.function, .functionParameter):
+            return true
+        case (.function, .statement):
             return true
         default:
             return false
