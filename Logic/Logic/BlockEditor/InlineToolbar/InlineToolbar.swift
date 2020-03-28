@@ -31,7 +31,7 @@ private let monospacedMenuTextStyle = TextStyle(family: "Andale Mono", size: 15,
 
 public class InlineToolbar: NSView {
 
-    public enum Command: Equatable {
+    public enum Command: Hashable {
         case replace(String), divider, bold, italic, strikethrough, code, link
 
         var label: String {
@@ -139,12 +139,12 @@ public class InlineToolbar: NSView {
 
             image.isTemplate = true
 
-            Command.imageCache.set(image, for: self)
+            Command.imageCache[self] = image
 
             return image
         }
 
-        private static var imageCache: KeyValueList<Command, NSImage> = [:]
+        private static var imageCache: [Command: NSImage] = [:]
     }
 
     // MARK: Lifecycle

@@ -279,7 +279,7 @@ public class DebugWindowController: NSWindowController {
             case .unification(constraint: let constraint, _, _):
                 return .row(constraint.debugDescription, nil, false, nil, nil)
             case .substitution:
-                return .row("Substition", nil, false, nil, nil)
+                return .row("Substitution", nil, false, nil, nil)
             case .node(description: let description, id: let uuid):
                 return .row(description, nil, false, uuid.shortString, nil)
             case .evaluationThunk(id: let uuid, thunk: let thunk):
@@ -414,7 +414,7 @@ public class DebugWindowController: NSWindowController {
                     renderingOptions: .init(formattingOptions: .visual)
                 )
             case .substitution(let substitution):
-                let description = substitution.map { a, b in
+                let description = substitution.pairs.map { a, b in
                     return "```\n\(a) == \(b)\n```"
                 }.joined(separator: "\n")
 

@@ -487,7 +487,7 @@ extension Compiler {
                             }
                         }
 
-                        return LogicValue(returnType, .record(values: KeyValueList(values)))
+                        return LogicValue(returnType, .record(values: Dictionary(uniqueKeysWithValues: values)))
                     case .arrayAt:
                         func arrayAt(arrayValue: LogicValue?, numberValue: LogicValue?) -> LogicValue {
                             guard let array = arrayValue?.array else { return .unit }
@@ -654,7 +654,7 @@ extension Compiler {
             }
 
             context.add(uuid: functionName.uuid, EvaluationThunk(label: "Record declaration for \(functionName.name)", dependencies: dependencies, { values in
-                var parameterTypes: KeyValueList<String, (Unification.T, LogicValue?)> = [:]
+                var parameterTypes: [String: (Unification.T, LogicValue?)] = [:]
 
                 var index: Int = 0
 
@@ -669,7 +669,7 @@ extension Compiler {
                             index += 1
                         }
 
-                        parameterTypes.set((parameterType, initialValue), for: pattern.name)
+                        parameterTypes[pattern.name] = (parameterType, initialValue)
                     default:
                         break
                     }

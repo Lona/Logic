@@ -125,7 +125,7 @@ public enum Unification {
         case kindMismatch(T, T)
     }
 
-    public typealias Substitution = KeyValueList<T, T>
+    public typealias Substitution = KeyValueMap<T, T>
 
     public struct Constraint: Equatable, CustomDebugStringConvertible {
         var head: T
@@ -141,8 +141,8 @@ public enum Unification {
         }
     }
 
-    public static func unify(constraints: [Constraint], substitution: Substitution = Substitution()) -> Result<Substitution, UnificationError> {
-        var substitution = substitution
+    public static func unify(constraints: [Constraint]) -> Result<Substitution, UnificationError> {
+        let substitution = Substitution()
         var constraints = constraints
 
         while let constraint = constraints.popLast() {
@@ -201,15 +201,15 @@ public enum Unification {
                 Swift.print("Unify generics", head, tail)
                 break
             case (.evar, _):
-                substitution.set(tail, for: head)
+                substitution.add(tail, for: head)
             case (_, .evar):
-                substitution.set(head, for: tail)
+                substitution.add(head, for: tail)
             case (.cons, .fun), (.fun, .cons):
                 return .failure(.kindMismatch(head, tail))
             }
 
             for (index, constraint) in constraints.enumerated() {
-                switch (substitution[constraint.head], substitution[constraint.tail]) {
+                switch (substitution.first(for: constraint.head), substitution.first(for: constraint.tail)) {
                 case (.some(let head), .some(let tail)):
                     constraints[index] = Constraint(head, tail)
                 case (.some(let head), .none):
@@ -228,7 +228,7 @@ public enum Unification {
     public static func substitute(_ substitution: Unification.Substitution, in type: Unification.T) -> Unification.T {
         var type = type
 
-        while let newType = substitution[type] {
+        while let newType = substitution.first(for: type) {
             type = newType
         }
 

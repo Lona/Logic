@@ -22,7 +22,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case arrayAt
         case stringConcat
         case enumInit(caseName: String)
-        case recordInit(members: KeyValueList<String, (Unification.T, LogicValue?)>)
+        case recordInit(members: [String: (Unification.T, LogicValue?)])
         case impl(declarationID: UUID)
         case value(LogicValue)
 
@@ -65,7 +65,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case string(String)
         case array([LogicValue])
         case `enum`(caseName: String, associatedValues: [LogicValue])
-        case record(values: KeyValueList<String, LogicValue?>)
+        case record(values: [String: LogicValue?])
         case function(Function)
 
         public var debugDescription: String {
