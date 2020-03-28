@@ -269,7 +269,7 @@ extension UIColor {
 import AppKit
 
 extension NSColor {
-    public static func parse(css: String) -> NSColor? {
+    private static var parseMemoized: (String) -> NSColor? = Memoize.all { css in
         guard let color = parseCSSColor(css) else { return nil }
 
         return NSColor(
@@ -278,6 +278,10 @@ extension NSColor {
             blue: colorComponent(for: color.b),
             alpha: CGFloat(color.a)
         )
+    }
+
+    public static func parse(css: String) -> NSColor? {
+        return parseMemoized(css)
     }
 }
 #endif
