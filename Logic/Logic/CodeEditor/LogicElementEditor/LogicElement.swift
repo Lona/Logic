@@ -186,6 +186,21 @@ public enum LogicElement {
 
 let titleTextStyle = TextStyle(size: 22, color: Colors.text)
 
+extension Memoize {
+    static let emptyAttributedString = NSAttributedString()
+
+    static let attributedString: (NSFont, NSColor, String) -> NSAttributedString = Memoize.all { font, color, string in
+        return NSAttributedString(string: string, attributes: [
+            NSAttributedString.Key.foregroundColor: color,
+            NSAttributedString.Key.font: font,
+        ])
+    }
+
+    static let attributedStringSize: (NSAttributedString) -> NSSize = Memoize.all { attributedString in
+        return attributedString.size()
+    }
+}
+
 extension LogicElement {
     func measured(
         selected: Bool,
@@ -196,16 +211,9 @@ extension LogicElement {
         decoration: Decoration?) -> LogicMeasuredElement {
 
         func textComponents(color: NSColor, font: NSFont) -> (string: NSAttributedString, rect: CGRect, backgroundRect: CGRect) {
-            let attributedString = NSMutableAttributedString(string: self.value)
-            let range = NSRange(location: 0, length: attributedString.length)
+            let attributedString = Memoize.attributedString(font, color, self.value)
+            let attributedStringSize = Memoize.attributedStringSize(attributedString)
 
-            let attributes: [NSAttributedString.Key: Any] = [
-                NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.font: font,
-            ]
-            attributedString.setAttributes(attributes, range: range)
-
-            let attributedStringSize = attributedString.size()
             let offset = CGPoint(x: origin.x + padding.width, y: origin.y + padding.height)
             let rect = CGRect(origin: offset, size: attributedStringSize)
             let backgroundRect = rect.insetBy(dx: -padding.width, dy: -padding.height)
@@ -213,19 +221,16 @@ extension LogicElement {
             return (attributedString, rect, backgroundRect)
         }
 
-        func textElement(color: NSColor, font: NSFont) -> LogicMeasuredElement {
+        switch self {
+        case .text:
             let (attributedString, rect, backgroundRect) = textComponents(color: color, font: font)
 
             return LogicMeasuredElement(
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
-                backgroundRect: backgroundRect)
-        }
-
-        switch self {
-        case .text:
-            return textElement(color: Colors.textNoneditable, font: font)
+                backgroundRect: backgroundRect
+            )
         case .errorSummary:
             var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: font)
 
@@ -239,7 +244,8 @@ extension LogicElement {
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
-                backgroundRect: backgroundRect)
+                backgroundRect: backgroundRect
+            )
         case .title:
             var (attributedString, rect, backgroundRect) = textComponents(color: self.color, font: titleTextStyle.nsFont)
 
@@ -251,34 +257,37 @@ extension LogicElement {
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
-                backgroundRect: backgroundRect)
+                backgroundRect: backgroundRect
+            )
         case .colorPreview, .shadowPreview:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68, height: 68))
 
             return LogicMeasuredElement(
                 element: self,
-                attributedString: .init(),
+                attributedString: Memoize.emptyAttributedString,
                 attributedStringRect: rect,
-                backgroundRect: rect)
+                backgroundRect: rect
+            )
         case .textStylePreview:
             let rect: CGRect = .init(origin: origin, size: .init(width: 68 * 2, height: 68))
 
             return LogicMeasuredElement(
                 element: self,
-                attributedString: .init(),
+                attributedString: Memoize.emptyAttributedString,
                 attributedStringRect: rect,
-                backgroundRect: rect)
+                backgroundRect: rect
+            )
         case .indentGuide:
             let rect: CGRect = .init(origin: origin, size: .init(width: 1, height: 0))
 
             return LogicMeasuredElement(
                 element: self,
-                attributedString: .init(),
+                attributedString: Memoize.emptyAttributedString,
                 attributedStringRect: rect,
-                backgroundRect: rect)
+                backgroundRect: rect
+            )
         case .coloredText:
             fatalError("Unused")
-//            return textElement(color: selected ? NSColor.systemGreen : color, font: titleTextStyle.nsFont)
         case .dropdown(_, _, let dropdownStyle):
             var (attributedString, rect, backgroundRect) = textComponents(
                 color: dropdownStyle.color,
@@ -291,12 +300,8 @@ extension LogicElement {
 
             switch decoration {
             case .some(.label(let font, let text)):
-                let attributes: [NSAttributedString.Key: Any] = [
-                    NSAttributedString.Key.foregroundColor: NSColor.white,
-                    NSAttributedString.Key.font: font,
-                ]
-                let labelString = NSAttributedString(string: text, attributes: attributes)
-                let labelWidth = labelString.size().width + 5 + 6
+                let labelString = Memoize.attributedString(font, NSColor.white, text)
+                let labelWidth = Memoize.attributedStringSize(labelString).width + 5 + 6
                 
                 backgroundRect.size.width += labelWidth
             case .some(.color), .some(.character):
@@ -310,7 +315,8 @@ extension LogicElement {
                 element: self,
                 attributedString: attributedString,
                 attributedStringRect: rect,
-                backgroundRect: backgroundRect)
+                backgroundRect: backgroundRect
+            )
         }
     }
 }

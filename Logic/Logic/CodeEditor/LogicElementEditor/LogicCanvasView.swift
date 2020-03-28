@@ -1,5 +1,9 @@
 import AppKit
 
+extension Colors {
+    fileprivate static let selectedElementText = NSColor.white.withAlphaComponent(0.3)
+}
+
 // MARK: - NSPasteboard.PasteboardType
 
 public extension NSPasteboard.PasteboardType {
@@ -731,12 +735,8 @@ public class LogicCanvasView: NSView {
 
                     image.draw(in: imageRect)
                 case .some(.label(let font, let text)):
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        NSAttributedString.Key.foregroundColor: NSColor.white,
-                        NSAttributedString.Key.font: font,
-                    ]
-                    let labelString = NSAttributedString(string: text, attributes: attributes)
-                    let labelSize = labelString.size()
+                    let labelString = Memoize.attributedString(font, NSColor.white, text)
+                    let labelSize = Memoize.attributedStringSize(labelString)
                     let labelWidth = labelSize.width + 6
 
                     let size: CGFloat = 13
@@ -763,7 +763,7 @@ public class LogicCanvasView: NSView {
                 if drawSelection {
                     let attributedString = NSMutableAttributedString(attributedString: attributedString)
                     attributedString.addAttributes(
-                        [NSAttributedString.Key.foregroundColor: NSColor.white.withAlphaComponent(0.3)],
+                        [NSAttributedString.Key.foregroundColor: Colors.selectedElementText],
                         range: NSRange(location: 0, length: attributedString.length))
                     attributedString.draw(at: rect.origin)
                 } else {
