@@ -68,6 +68,7 @@ public class LogicCanvasView: NSView {
                 decorationCache: &self._cachedElementDecorations,
                 getElementDecoration: self.getElementDecoration,
                 bounds: rect,
+                clippingRect: nil,
                 hoveredItem: nil,
                 dragDestinationLineIndex: nil,
                 selectedIndex: nil,
@@ -433,6 +434,7 @@ public class LogicCanvasView: NSView {
         decorationCache: inout [UUID: LogicElement.Decoration?],
         getElementDecoration: ((UUID) -> LogicElement.Decoration?)?,
         bounds: NSRect,
+        clippingRect: NSRect?,
         hoveredItem: Item?,
         dragDestinationLineIndex: Int?,
         selectedIndex: Int?,
@@ -554,6 +556,10 @@ public class LogicCanvasView: NSView {
             let rect = measuredText.attributedStringRect
             let backgroundRect = measuredText.backgroundRect
             let attributedString = measuredText.attributedString
+
+            if clippingRect?.intersects(backgroundRect) == false {
+                return
+            }
 
             switch (text) {
             case .colorPreview(_, let color, _, _):
@@ -820,6 +826,7 @@ public class LogicCanvasView: NSView {
             decorationCache: &_cachedElementDecorations,
             getElementDecoration: getElementDecoration,
             bounds: bounds,
+            clippingRect: dirtyRect,
             hoveredItem: hoveredItem,
             dragDestinationLineIndex: dragDestinationLineIndex,
             selectedIndex: selectedIndex,
@@ -1270,6 +1277,7 @@ extension LogicCanvasView {
             decorationCache: &decorationCache,
             getElementDecoration: getElementDecoration,
             bounds: frame,
+            clippingRect: nil,
             hoveredItem: nil,
             dragDestinationLineIndex: nil,
             selectedIndex: nil,
