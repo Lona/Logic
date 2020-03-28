@@ -2,6 +2,7 @@ import AppKit
 
 extension Colors {
     fileprivate static let selectedElementText = NSColor.white.withAlphaComponent(0.3)
+    fileprivate static let previewElementBorder = Colors.text.withAlphaComponent(0.1)
 }
 
 // MARK: - NSPasteboard.PasteboardType
@@ -59,6 +60,7 @@ public class LogicCanvasView: NSView {
             NSGraphicsContext.saveGraphicsState()
             NSGraphicsContext.current?.cgContext.translateBy(x: rect.origin.x, y: rect.origin.y)
             NSGraphicsContext.current?.cgContext.scaleBy(x: scale, y: scale)
+            NSGraphicsContext.current?.cgContext.setAlpha(0.5)
 
             LogicCanvasView.drawCommon(
                 formattedContent: self.formattedContent,
@@ -75,6 +77,8 @@ public class LogicCanvasView: NSView {
                 errorRanges: [],
                 errorLines: [],
                 hasFocus: false,
+                shouldDrawSimplified: true,
+                alignmentScale: scale,
                 style: self.style
             )
 
@@ -438,9 +442,22 @@ public class LogicCanvasView: NSView {
         errorRanges: [Range<Int>],
         errorLines: [Int],
         hasFocus: Bool,
+        shouldDrawSimplified: Bool,
+        alignmentScale: CGFloat,
         style: Style
-        ) {
+    ) {
         NSGraphicsContext.current?.cgContext.setShouldSmoothFonts(false)
+
+        let minimumAlignmentSize = 1 / alignmentScale
+
+        @inline(__always) func alignedRect(_ rect: NSRect) -> NSRect {
+            return NSRect(
+                x: floor(rect.origin.x * alignmentScale) / alignmentScale,
+                y: floor(rect.origin.y * alignmentScale) / alignmentScale,
+                width: max(floor(rect.width * alignmentScale) / alignmentScale, minimumAlignmentSize),
+                height: max(floor(rect.height * alignmentScale) / alignmentScale, minimumAlignmentSize)
+            )
+        }
 
         if let lineIndex = dragDestinationLineIndex {
             NSColor.selectedMenuItemColor.set()
@@ -541,21 +558,26 @@ public class LogicCanvasView: NSView {
             switch (text) {
             case .colorPreview(_, let color, _, _):
                 color.setFill()
-                Colors.text.withAlphaComponent(0.1).setStroke()
-
-                let radius: CGFloat = 4
 
                 let insetRect = backgroundRect.insetBy(dx: style.textPadding.width, dy: style.textPadding.height)
-                let backgroundBezier = NSBezierPath(roundedRect: insetRect, xRadius: radius, yRadius: radius)
 
-                let outlineRect = insetRect.insetBy(dx: 0.5, dy: 0.5)
-                let outlineBezier = NSBezierPath(roundedRect: outlineRect, xRadius: radius, yRadius: radius)
+                if shouldDrawSimplified {
+                    alignedRect(insetRect).fill()
+                } else {
+                    Colors.previewElementBorder.setStroke()
 
-                backgroundBezier.fill()
-                outlineBezier.stroke()
+                    let radius: CGFloat = 4
+                    let backgroundBezier = NSBezierPath(roundedRect: insetRect, xRadius: radius, yRadius: radius)
+
+                    let outlineRect = insetRect.insetBy(dx: 0.5, dy: 0.5)
+                    let outlineBezier = NSBezierPath(roundedRect: outlineRect, xRadius: radius, yRadius: radius)
+
+                    backgroundBezier.fill()
+                    outlineBezier.stroke()
+                }
             case .shadowPreview(let shadow, _, _):
                 NSColor.white.setFill()
-                Colors.text.withAlphaComponent(0.1).setStroke()
+                Colors.previewElementBorder.setStroke()
 
                 let radius: CGFloat = 4
 
@@ -579,7 +601,7 @@ public class LogicCanvasView: NSView {
                 NSGraphicsContext.restoreGraphicsState()
             case .textStylePreview(let textStyle, let previewString, _, _):
                 NSColor.white.setFill()
-                Colors.text.withAlphaComponent(0.1).setStroke()
+                Colors.previewElementBorder.setStroke()
 
                 let radius: CGFloat = 4
 
@@ -609,13 +631,22 @@ public class LogicCanvasView: NSView {
 
                 NSGraphicsContext.restoreGraphicsState()
             case .indentGuide:
-                text.color.setFill()
+                if !shouldDrawSimplified {
+                    text.color.setFill()
 
-                let bezier = NSBezierPath(rect: backgroundRect)
+                    let bezier = NSBezierPath(rect: backgroundRect)
 
-                bezier.fill()
+                    bezier.fill()
+                }
             case .text, .coloredText:
-                attributedString.draw(at: rect.origin)
+                if shouldDrawSimplified {
+                    if attributedString.length > 0, let color = attributedString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? NSColor {
+                        color.setFill()
+                        alignedRect(rect).fill()
+                    }
+                } else {
+                    attributedString.draw(at: rect.origin)
+                }
             case .errorSummary:
                 text.backgroundColor?.setFill()
 
@@ -760,14 +791,21 @@ public class LogicCanvasView: NSView {
                     labelString.draw(at: labelOrigin)
                 }
 
-                if drawSelection {
-                    let attributedString = NSMutableAttributedString(attributedString: attributedString)
-                    attributedString.addAttributes(
-                        [NSAttributedString.Key.foregroundColor: Colors.selectedElementText],
-                        range: NSRange(location: 0, length: attributedString.length))
-                    attributedString.draw(at: rect.origin)
+                if shouldDrawSimplified {
+                    if attributedString.length > 0, let color = attributedString.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? NSColor {
+                        color.setFill()
+                        alignedRect(rect).fill()
+                    }
                 } else {
-                    attributedString.draw(at: rect.origin)
+                    if drawSelection {
+                        let attributedString = NSMutableAttributedString(attributedString: attributedString)
+                        attributedString.addAttributes(
+                            [NSAttributedString.Key.foregroundColor: Colors.selectedElementText],
+                            range: NSRange(location: 0, length: attributedString.length))
+                        attributedString.draw(at: rect.origin)
+                    } else {
+                        attributedString.draw(at: rect.origin)
+                    }
                 }
             }
         }
@@ -791,6 +829,8 @@ public class LogicCanvasView: NSView {
             errorRanges: errorRanges,
             errorLines: errorLines,
             hasFocus: hasFocus,
+            shouldDrawSimplified: false,
+            alignmentScale: 1,
             style: style
         )
 
@@ -1239,6 +1279,8 @@ extension LogicCanvasView {
             errorRanges: [],
             errorLines: [],
             hasFocus: false,
+            shouldDrawSimplified: false,
+            alignmentScale: 1,
             style: style
         )
 
