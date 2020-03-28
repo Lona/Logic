@@ -636,14 +636,10 @@ extension LogicEditor {
 
         let suggestionListHeight = suggestionItems.map { $0.height }.reduce(0, +)
 
-        subwindow.defaultContentWidth = 200
-        subwindow.suggestionView.showsSuggestionDetails = false
-        subwindow.suggestionView.suggestionListWidth = 200
-        subwindow.suggestionText = ""
+        subwindow.style = .contextMenu
         subwindow.placeholderText = "Filter actions"
-
-        subwindow.anchorHorizontallyTo(rect: screenRect, horizontalOffset: 4)
         subwindow.suggestionItems = suggestionItems
+        canvasView.selectedRange = actualRange
 
         func filteredSuggestionItems(query text: String) -> [(Int, SuggestionListItem)] {
             return suggestionItems.enumerated().filter { offset, item in
@@ -669,9 +665,9 @@ extension LogicEditor {
             subwindow.selectedIndex = index
         }
 
-        //        handleActivateElement(nil)
-        canvasView.selectedRange = actualRange
         window.addChildWindow(subwindow, ordered: .above)
+
+        subwindow.anchorHorizontallyTo(rect: screenRect, horizontalOffset: 4)
         subwindow.focusSearchField()
 
         var didHide: Bool = false
