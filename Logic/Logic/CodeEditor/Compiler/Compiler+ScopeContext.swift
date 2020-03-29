@@ -11,9 +11,7 @@ import Foundation
 public extension Compiler {
 
     class ScopeContext {
-        // Values in namespaces are accessible to all scopes, regardless of their order in the code
         public var namespace = Namespace()
-        public var typeNamespace = Namespace()
 
         var currentNamespacePath: [String] = []
 
@@ -44,8 +42,7 @@ public extension Compiler {
 
         public func copy() -> ScopeContext {
             let other = ScopeContext()
-            other.namespace = namespace
-            other.typeNamespace = typeNamespace
+            other.namespace = namespace.copy()
             other.currentNamespacePath = currentNamespacePath
             other.patternToName = patternToName
             other.identifierToPattern = identifierToPattern
@@ -55,14 +52,6 @@ public extension Compiler {
             other.patternNames = patternNames
             other.typeNames = typeNames
             return other
-        }
-
-        func setInCurrentNamespace(key: String, value: UUID) {
-            namespace.set(currentNamespacePath + [key], setTo: value)
-        }
-
-        func setTypeInCurrentNamespace(key: String, value: UUID) {
-            typeNamespace.set(currentNamespacePath + [key], setTo: value)
         }
 
         func pushScope() {
@@ -96,7 +85,7 @@ public extension Compiler {
         }
 
         func qualifiedTypeName(id: UUID) -> [String]? {
-            let found = typeNamespace.pairs.first(where: { (pair) -> Bool in
+            let found = namespace.types.first(where: { (pair) -> Bool in
                 pair.value == id
             })
 
@@ -104,66 +93,22 @@ public extension Compiler {
         }
     }
 
-    private static var builtInTypeConstructorNames: Set<String> = ["Boolean", "Number", "String", "Array", "Color"]
+    static var builtInTypeConstructorNames: Set<String> = ["Boolean", "Number", "String", "Array", "Color"]
 
     static func scopeContext(
         _ node: LGCSyntaxNode,
         targetId: UUID? = nil,
         initialContext: ScopeContext = ScopeContext()
-        ) -> ScopeContext {
-        var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
+    ) -> Result<ScopeContext, NamespaceError> {
 
-        func namespaceDeclarations(_ context: ScopeContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> ScopeContext {
-            config.needsRevisitAfterTraversingChildren = true
-
-            switch (config.isRevisit, node) {
-            case (true, .declaration(.variable(id: _, name: let pattern, annotation: _, initializer: _, _))):
-                context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
-            case (true, .declaration(.function(id: _, name: let functionName, returnType: _, genericParameters: _, parameters: _, block: _, _))):
-                context.setInCurrentNamespace(key: functionName.name, value: functionName.id)
-            case (false, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _, _))):
-                context.setTypeInCurrentNamespace(key: pattern.name, value: pattern.id)
-
-                // Avoid introducing member variables into the namespace
-                config.ignoreChildren = true
-            case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _, _))):
-                // Built-ins should be constructed using literals
-                if builtInTypeConstructorNames.contains(pattern.name) { return context }
-
-                // Create constructor function
-                context.setInCurrentNamespace(key: pattern.name, value: pattern.id)
-            case (true, .declaration(.enumeration(id: _, name: let pattern, genericParameters: _, cases: let cases, _))):
-                context.setTypeInCurrentNamespace(key: pattern.name, value: pattern.id)
-
-                context.pushNamespace(name: pattern.name)
-
-                // Add initializers for each case into the namespace
-                cases.forEach { enumCase in
-                    switch enumCase {
-                    case .placeholder:
-                        break
-                    case .enumerationCase(id: _, name: let caseName, associatedValueTypes: _, _):
-                        context.setInCurrentNamespace(key: caseName.name, value: caseName.id)
-                    }
-                }
-
-                context.popNamespace()
-
-                return context
-            case (false, .declaration(.namespace(id: _, name: let pattern, declarations: _))):
-                context.pushNamespace(name: pattern.name)
-            case (true, .declaration(.namespace(id: _, name: _, declarations: _))):
-                context.popNamespace()
-            default:
-                break
-            }
-
-            return context
+        switch Compiler.namespace(node: node) {
+        case .success(let namespace):
+            initialContext.namespace = namespace
+        case .failure(let error):
+            return .failure(error)
         }
 
-        let contextWithNamespaceDeclarations = node.reduce(config: &traversalConfig, initialResult: initialContext, f: namespaceDeclarations)
-
-        traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
+        var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
         func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> ScopeContext {
             if node.uuid == targetId {
@@ -194,9 +139,10 @@ public extension Compiler {
                 if let pattern = context.patternNames.value(for: identifier.string) {
                     context.identifierToPattern[identifier.uuid] = pattern.uuid
                 // Next, lookup identifier in namespace
-                } else if let patternId = context.namespace.get([identifier.string]) {
+                } else if let patternId = context.namespace.values[[identifier.string]] {
                     context.identifierToPattern[identifier.uuid] = patternId
-                } else if let patternId = context.namespace.get(context.currentNamespacePath + [identifier.string]) {
+                // TODO: Recurse
+                } else if let patternId = context.namespace.values[context.currentNamespacePath + [identifier.string]] {
                     context.identifierToPattern[identifier.uuid] = patternId
                 } else {
                     Swift.print("No identifier: \(identifier.string)", context.patternNames)
@@ -211,7 +157,7 @@ public extension Compiler {
 
                     let keyPath = identifiers.map { $0.string }
 
-                    if let patternId = context.namespace.get(keyPath) {
+                    if let patternId = context.namespace.values[keyPath] {
                         context.identifierToPattern[expression.uuid] = patternId
                     } else {
                         Swift.print("No identifier path: \(keyPath)", context.patternNames)
@@ -295,6 +241,6 @@ public extension Compiler {
             return context
         }
 
-        return node.reduce(config: &traversalConfig, initialResult: contextWithNamespaceDeclarations, f: walk)
+        return .success(node.reduce(config: &traversalConfig, initialResult: initialContext, f: walk))
     }
 }

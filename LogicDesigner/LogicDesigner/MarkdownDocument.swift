@@ -55,7 +55,8 @@ class MarkdownDocument: NSDocument {
     private func evaluate(rootNode: LGCSyntaxNode) -> (
         errors: [LogicEditor.ElementError],
         compiled: (Compiler.UnificationContext, Unification.Substitution)?,
-        evaluated: Compiler.EvaluationContext?) {
+        evaluated: Compiler.EvaluationContext?
+    ) {
 
         var errors: [LogicEditor.ElementError] = []
 
@@ -63,7 +64,17 @@ class MarkdownDocument: NSDocument {
 
         let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
-        let scopeContext = Compiler.scopeContext(program)
+        let scopeContext: Compiler.ScopeContext
+
+        switch Compiler.scopeContext(program) {
+        case .failure(let error):
+            errors.append(
+                .init(uuid: error.nodeID, message: error.localizedDescription)
+            )
+            return (errors, nil, nil)
+        case .success(let value):
+            scopeContext = value
+        }
 
         scopeContext.undefinedIdentifiers.forEach { errorId in
             if case .identifier(let identifierNode)? = rootNode.find(id: errorId) {
@@ -123,7 +134,13 @@ class MarkdownDocument: NSDocument {
 
     let makeSuggestionBuilder: (LGCSyntaxNode, LGCSyntaxNode, LogicFormattingOptions) -> ((String) -> [LogicSuggestionItem]?)? = Memoize.one({
         rootNode, node, formattingOptions in
-        return StandardConfiguration.suggestions(rootNode: rootNode, node: node, formattingOptions: formattingOptions)
+        switch StandardConfiguration.suggestions(rootNode: rootNode, node: node, formattingOptions: formattingOptions) {
+        case .success(let builder):
+            return builder
+        case .failure(let error):
+            Swift.print("ERROR: Failed to make suggestion builder: \(error)")
+            return nil
+        }
     })
 
     private func configure(blocks: [BlockEditor.Block]) {
@@ -177,14 +194,17 @@ class MarkdownDocument: NSDocument {
         let suggestionsForNode: ((LGCSyntaxNode, LGCSyntaxNode, String) -> LogicEditor.ConfiguredSuggestions) = { _, node, query in
 //            Swift.print("-- Suggestion Root \(count) \(rootNode.uuid) --\n" + rootNode.hierarchyDescription())
 
-            let suggestionBuilder = StandardConfiguration.suggestions(rootNode: program, node: node, formattingOptions: formattingOptions)
-
-            if let suggestionBuilder = suggestionBuilder, let suggestions = suggestionBuilder(query) {
-                return .init(suggestions)
-            } else {
-                return .init(node.suggestions(within: rootNode, for: query))
-//                return LogicEditor.defaultSuggestionsForNode(rootNode, node, query)
+            switch StandardConfiguration.suggestions(rootNode: program, node: node, formattingOptions: formattingOptions) {
+            case .success(let builder):
+                if let suggestions = builder(query) {
+                    return .init(suggestions)
+                }
+            case .failure:
+                break
             }
+
+            return .init(node.suggestions(within: rootNode, for: query))
+//            return LogicEditor.defaultSuggestionsForNode(rootNode, node, query)
         }
 
         blocks.forEach { block in

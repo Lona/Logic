@@ -209,7 +209,7 @@ public enum Unification {
             }
 
             for (index, constraint) in constraints.enumerated() {
-                switch (substitution.first(for: constraint.head), substitution.first(for: constraint.tail)) {
+                switch (substitution.firstValue(for: constraint.head), substitution.firstValue(for: constraint.tail)) {
                 case (.some(let head), .some(let tail)):
                     constraints[index] = Constraint(head, tail)
                 case (.some(let head), .none):
@@ -228,7 +228,7 @@ public enum Unification {
     public static func substitute(_ substitution: Unification.Substitution, in type: Unification.T) -> Unification.T {
         var type = type
 
-        while let newType = substitution.first(for: type) {
+        while let newType = substitution.firstValue(for: type) {
             type = newType
         }
 

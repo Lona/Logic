@@ -188,7 +188,7 @@ public class DebugWindowController: NSWindowController {
         }
 
         let nameBindingEntries: [Entry] = filterEntries(
-            self.scopeContext.namespace.pairs
+            self.scopeContext.namespace.values
                 .sorted(by: { a, b in
                     a.key.joined(separator: ".").lowercased() < b.key.joined(separator: ".").lowercased()
                 })

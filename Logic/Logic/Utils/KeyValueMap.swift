@@ -21,7 +21,7 @@ public final class KeyValueMap<Key: Hashable, Value: Equatable> /*: KeyValueColl
         }
     }
 
-    public func first(for key: Key) -> Value? {
+    public func firstValue(for key: Key) -> Value? {
         return dict[key]?.first
     }
 

@@ -30,37 +30,37 @@ extension LGCSyntaxNode {
     private func reduceChildren<Result>(
         config: inout TraversalConfig,
         initialResult context: Result,
-        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) -> Result
-        ) -> Result {
+        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) throws -> Result
+    ) rethrows -> Result {
 
         switch self {
         case .statement(.branch(id: _, condition: let condition, block: let block)):
-            let context2 = condition.node.reduce(config: &config, initialResult: context, f: f)
+            let context2 = try condition.node.reduce(config: &config, initialResult: context, f: f)
 
             if config.ignoreChildren { return context2 }
 
-            return block.map { $0.node }.reduce(config: &config, initialResult: context2, f: f)
+            return try block.map { $0.node }.reduce(config: &config, initialResult: context2, f: f)
         default:
-            return self.subnodes.reduce(config: &config, initialResult: context, f: f)
+            return try self.subnodes.reduce(config: &config, initialResult: context, f: f)
         }
     }
 
     public func reduce<Result>(
         config: inout TraversalConfig,
         initialResult: Result,
-        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) -> Result
-        ) -> Result {
+        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) throws -> Result
+    ) rethrows -> Result {
         if config.stopTraversal { return initialResult }
 
         switch config.order {
         case .post:
-            let context = self.reduceChildren(config: &config, initialResult: initialResult, f: f)
+            let context = try self.reduceChildren(config: &config, initialResult: initialResult, f: f)
 
             if config.stopTraversal { return context }
 
-            return f(context, self, &config)
+            return try f(context, self, &config)
         case .pre:
-            var context = f(initialResult, self, &config)
+            var context = try f(initialResult, self, &config)
 
             let shouldRevisit = config.needsRevisitAfterTraversingChildren
 
@@ -69,13 +69,13 @@ extension LGCSyntaxNode {
             if config.ignoreChildren {
                 config.ignoreChildren = false
             } else {
-                context = self.reduceChildren(config: &config, initialResult: context, f: f)
+                context = try self.reduceChildren(config: &config, initialResult: context, f: f)
             }
 
             if !config.stopTraversal && shouldRevisit {
                 config._isRevisit = true
 
-                context = f(context, self, &config)
+                context = try f(context, self, &config)
 
                 config._isRevisit = false
 
@@ -95,18 +95,28 @@ extension LGCSyntaxNode {
 
         return reduce(config: &config, initialResult: initialResult, f: f)
     }
+
+    public func forEachDescendant(
+        config: inout LGCSyntaxNode.TraversalConfig,
+        f: @escaping (LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) throws -> Void
+    ) rethrows {
+        return try reduce(config: &config, initialResult: (), f: { result, node, config in
+            try f(node, &config)
+            return ()
+        })
+    }
 }
 
 extension Sequence where Iterator.Element == LGCSyntaxNode {
     public func reduce<Result>(
         config: inout LGCSyntaxNode.TraversalConfig,
         initialResult context: Result,
-        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) -> Result
-        ) -> Result {
-        return self.reduce(context) { (result: Result, subnode: LGCSyntaxNode) -> Result in
+        f: @escaping (Result, LGCSyntaxNode, inout LGCSyntaxNode.TraversalConfig) throws -> Result
+    ) rethrows -> Result {
+        return try reduce(context) { (result: Result, subnode: LGCSyntaxNode) -> Result in
             if config.stopTraversal { return result }
 
-            return subnode.reduce(config: &config, initialResult: result, f: f)
+            return try subnode.reduce(config: &config, initialResult: result, f: f)
         }
     }
 }

@@ -205,7 +205,13 @@ class LogicDocument: NSDocument {
 
         let makeSuggestionBuilder: (LGCSyntaxNode, LGCSyntaxNode, LogicFormattingOptions) -> ((String) -> [LogicSuggestionItem]?)? = Memoize.one({
             rootNode, node, formattingOptions in
-            return StandardConfiguration.suggestions(rootNode: rootNode, node: node, formattingOptions: formattingOptions)
+            switch StandardConfiguration.suggestions(rootNode: rootNode, node: node, formattingOptions: formattingOptions) {
+            case .success(let builder):
+                return builder
+            case .failure(let error):
+                Swift.print("ERROR: Failed to make suggestion builder: \(error)")
+                return nil
+            }
         })
 
         logicEditor.suggestionsForNode = { [unowned self] rootNode, node, query in
@@ -238,15 +244,31 @@ class LogicDocument: NSDocument {
             return true
         }
 
+        var errors: [LogicEditor.ElementError] = []
+
         let program: LGCSyntaxNode = .program(root.expandImports(importLoader: Library.load))
 
         debugWindowController.rootNode = program
 
-        let scopeContext = Compiler.scopeContext(program)
+        let scopeContext: Compiler.ScopeContext
+
+        switch Compiler.scopeContext(program) {
+        case .failure(let error):
+            errors.append(
+                .init(uuid: error.nodeID, message: error.localizedDescription)
+            )
+
+            logicEditor.rootNode = rootNode
+            logicEditor.elementErrors = errors
+
+            Swift.print("ERROR: \(error)")
+
+            return true
+        case .success(let value):
+            scopeContext = value
+        }
 
         debugWindowController.scopeContext = scopeContext
-
-        var errors: [LogicEditor.ElementError] = []
 
         scopeContext.undefinedIdentifiers.forEach { errorId in
             if case .identifier(let identifierNode)? = logicEditor.rootNode.find(id: errorId) {

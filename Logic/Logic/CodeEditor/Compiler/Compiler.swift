@@ -8,4 +8,9 @@
 
 import Foundation
 
-public enum Compiler {}
+public enum Compiler {
+    public enum CompilerError: Error {
+        case namespace(Compiler.NamespaceError)
+        case unification(Unification.UnificationError)
+    }
+}

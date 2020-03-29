@@ -150,7 +150,7 @@ public enum StandardConfiguration {
                     return ([pattern.name], pattern.uuid)
                 })
 
-                let namespacePaths = scopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
+                let namespacePaths = scopeContext.namespace.values.compactMap({ keyPath, id -> ([String], UUID)? in
                     // Ignore variables in scope, which are listed by their shortest name
                     if currentScopePaths.contains(where: { id == $1 }) { return nil }
 
@@ -314,16 +314,23 @@ public enum StandardConfiguration {
         substitution: Unification.Substitution
     )
 
-    public static func compile(_ rootNode: LGCSyntaxNode) -> (
+    public static func compile(_ rootNode: LGCSyntaxNode) -> Result<(
         scope: Compiler.ScopeContext,
         unification: Compiler.UnificationContext,
-        substitution: Result<Unification.Substitution, Unification.UnificationError>
-        ) {
-        let scopeContext = Compiler.scopeContext(rootNode)
-        let unificationContext = Compiler.makeUnificationContext(rootNode, scopeContext: scopeContext)
-        let substitutionResult = Unification.unify(constraints: unificationContext.constraints)
-
-        return (scopeContext, unificationContext, substitutionResult)
+        substitution: Unification.Substitution
+    ), Compiler.CompilerError> {
+        return Compiler
+            .scopeContext(rootNode)
+            .mapError({ error in Compiler.CompilerError.namespace(error) })
+            .flatMap({ scopeContext in
+                let unificationContext = Compiler.makeUnificationContext(rootNode, scopeContext: scopeContext)
+                switch Unification.unify(constraints: unificationContext.constraints) {
+                case .success(let substitution):
+                    return .success((scopeContext, unificationContext, substitution))
+                case .failure(let error):
+                    return .failure(.unification(error))
+                }
+            })
     }
 
     public static func suggestions(
@@ -461,9 +468,7 @@ public enum StandardConfiguration {
                     case .memberExpression:
                         guard let flattened = value.expression.flattenedMemberExpression else { break }
 
-                        let namespacePaths = currentScopeContext.namespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
-                            return (keyPath, id)
-                        })
+                        let namespacePaths = currentScopeContext.namespace.values
 
                         guard let (_, patternId) = namespacePaths.first(where: { $0.0 == flattened.map { $0.string } }) else { break }
 
@@ -531,8 +536,8 @@ public enum StandardConfiguration {
                     return ([pattern.name], pattern.uuid)
                 })
 
-                let namespacePaths = currentScopeContext.typeNamespace.pairs.compactMap({ keyPath, id -> ([String], UUID)? in
-                    // Ignore variables in scope, which are listed by their shortest name
+                let namespacePaths = currentScopeContext.namespace.types.compactMap({ keyPath, id -> ([String], UUID)? in
+                    // Ignore names in scope, which are listed by their shortest name
                     if currentScopePaths.contains(where: { id == $1 }) { return nil }
 
                     return (keyPath, id)
@@ -628,55 +633,53 @@ public enum StandardConfiguration {
         node: LGCSyntaxNode,
         formattingOptions: LogicFormattingOptions,
         logLevel: LogLevel = LogLevel.none
-        ) -> ((String) -> [LogicSuggestionItem]?)? {
-        let (scopeContext, unificationContext, substitutionResult) = compile(rootNode)
+    ) -> Result<((String) -> [LogicSuggestionItem]?), Compiler.CompilerError> {
+        switch compile(rootNode) {
+        case .failure(let error):
+            return .failure(error)
+        case .success(let compiled):
+            let (scopeContext, unificationContext, substitution) = compiled
 
-        if logLevel == .verbose {
-            Swift.print("---------")
-            Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
-        }
+            if logLevel == .verbose {
+                Swift.print("---------")
+                Swift.print("Unification context", unificationContext.constraints, unificationContext.nodes)
+                Swift.print("Substitution", substitution)
+            }
 
-        let substitution: Unification.Substitution
+            switch Compiler.scopeContext(rootNode, targetId: node.uuid) {
+            case .failure(let error):
+                return .failure(.namespace(error))
+            case .success(let currentScopeContext):
+                if logLevel == .verbose {
+                    Swift.print("Current scope", currentScopeContext.namesInScope)
+                }
 
-        do {
-            substitution = try substitutionResult.get()
-        } catch let error {
-            Swift.print("Failed to unify, \(error)")
-            return nil
-        }
+                let evaluationContext = try? Compiler.compile(
+                    rootNode,
+                    rootNode: rootNode,
+                    scopeContext: scopeContext,
+                    unificationContext: unificationContext,
+                    substitution: substitution,
+                    context: .init()
+                    ).get()
 
-        if logLevel == .verbose {
-            Swift.print("Substitution", substitution)
-        }
-
-        let currentScopeContext = Compiler.scopeContext(rootNode, targetId: node.uuid)
-
-        if logLevel == .verbose {
-            Swift.print("Current scope", currentScopeContext.namesInScope)
-        }
-
-        let evaluationContext = try? Compiler.compile(
-            rootNode,
-            rootNode: rootNode,
-            scopeContext: scopeContext,
-            unificationContext: unificationContext,
-            substitution: substitution,
-            context: .init()
-            ).get()
-
-        return { query in
-            suggestions(
-                rootNode: rootNode,
-                node: node,
-                query: query,
-                currentScopeContext: currentScopeContext,
-                scopeContext: scopeContext,
-                unificationContext: unificationContext,
-                substitution: substitution,
-                evaluationContext: evaluationContext,
-                formattingOptions: formattingOptions,
-                logLevel: logLevel
-            )
+                return .success(
+                    { query in
+                        suggestions(
+                            rootNode: rootNode,
+                            node: node,
+                            query: query,
+                            currentScopeContext: currentScopeContext,
+                            scopeContext: scopeContext,
+                            unificationContext: unificationContext,
+                            substitution: substitution,
+                            evaluationContext: evaluationContext,
+                            formattingOptions: formattingOptions,
+                            logLevel: logLevel
+                        )
+                    }
+                )
+            }
         }
     }
 
