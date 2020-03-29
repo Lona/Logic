@@ -739,8 +739,13 @@ public class LogicCanvasView: NSView {
                     color.set()
                     let size: CGFloat = 13
                     let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
-                    let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: 2, yRadius: 2)
-                    symbolPath.fill()
+
+                    if shouldDrawSimplified {
+                        alignedRect(symbolRect).fill()
+                    } else {
+                        let symbolPath = NSBezierPath(roundedRect: symbolRect, xRadius: 2, yRadius: 2)
+                        symbolPath.fill()
+                    }
                 case .some(.character(let attributedString, let textStyleColor)):
                     let size: CGFloat = 13
                     let symbolRect = NSRect(x: backgroundRect.minX + 5, y: ceil(backgroundRect.midY - (size / 2)), width: size, height: size)
