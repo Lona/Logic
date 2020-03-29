@@ -88,11 +88,11 @@ extension Compiler {
 
         var currentNamespacePath: [String] = []
 
-        func pushNamespace(name: String) {
+        func pushNamespacePath(name: String) {
             currentNamespacePath = currentNamespacePath + [name]
         }
 
-        func popNamespace() {
+        func popNamespacePath() {
             currentNamespacePath = currentNamespacePath.dropLast()
         }
 
@@ -118,9 +118,13 @@ extension Compiler {
                 case (false, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _, _))):
                     try declareType(name: pattern.name, type: pattern.id)
 
-                    // Avoid introducing member variables into the namespace
-                    config.ignoreChildren = true
+                    // We push to the namespace path and traverse into children.
+                    // Variable declarations will be added to the namespace - we will then turn these into
+                    // getter functions for each member variable.
+                    pushNamespacePath(name: pattern.name)
                 case (true, .declaration(.record(id: _, name: let pattern, genericParameters: _, declarations: _, _))):
+                    popNamespacePath()
+
                     // Built-ins should be constructed using literals
                     if Compiler.builtInTypeConstructorNames.contains(pattern.name) { return }
 
@@ -129,7 +133,7 @@ extension Compiler {
                 case (true, .declaration(.enumeration(id: _, name: let pattern, genericParameters: _, cases: let cases, _))):
                     try declareType(name: pattern.name, type: pattern.id)
 
-                    pushNamespace(name: pattern.name)
+                    pushNamespacePath(name: pattern.name)
 
                     // Add initializers for each case into the namespace
                     try cases.forEach { enumCase in
@@ -141,11 +145,11 @@ extension Compiler {
                         }
                     }
 
-                    popNamespace()
+                    popNamespacePath()
                 case (false, .declaration(.namespace(id: _, name: let pattern, declarations: _))):
-                    pushNamespace(name: pattern.name)
+                    pushNamespacePath(name: pattern.name)
                 case (true, .declaration(.namespace(id: _, name: _, declarations: _))):
-                    popNamespace()
+                    popNamespacePath()
                 default:
                     break
                 }
@@ -159,31 +163,5 @@ extension Compiler {
         }
 
         return .success(context)
-    }
-}
-
-extension Compiler {
-
-    public struct QualifiedNameMap: CustomDebugStringConvertible {
-        public init() {}
-
-        public var debugDescription: String {
-            return pairs.debugDescription
-        }
-
-        public var pairs: [[String]: UUID] = [:]
-
-        public func get(_ keyPath: [String]) -> UUID? {
-            return pairs[keyPath]
-        }
-
-        public mutating func with(_ keyPath: [String], setTo value: UUID) -> QualifiedNameMap {
-            self.pairs[keyPath] = value
-            return self
-        }
-
-        public mutating func set(_ keyPath: [String], setTo value: UUID) {
-            self.pairs[keyPath] = value
-        }
     }
 }

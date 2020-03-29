@@ -204,16 +204,19 @@ public extension Compiler {
                     }
                 }
 
-                // Handle variable initializers manually so we don't introduce their names into scope
+                // Handle variable initializers manually
                 declarations.forEach { declaration in
                     switch declaration {
-                    case .variable(_, _, _, initializer: .some(let initializer), _):
+                    case .variable(_, let variableName, _, initializer: .some(let initializer), _):
                         _ = LGCSyntaxNode.expression(initializer).reduce(config: &config, initialResult: context, f: walk)
+
+                        context.addToScope(pattern: variableName)
                     default:
                         break
                     }
                 }
 
+                // Don't introduce variables names into scope
                 config.ignoreChildren = true
             case (true, .declaration(.record)):
                 context.popNamespace()

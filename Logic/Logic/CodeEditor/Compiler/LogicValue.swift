@@ -25,6 +25,7 @@ public struct LogicValue: CustomDebugStringConvertible {
         case recordInit(members: [String: (Unification.T, LogicValue?)])
         case impl(declarationID: UUID)
         case value(LogicValue)
+        case inline(([LogicValue]) -> LogicValue)
 
         init?(qualifiedName: [String]) {
             switch qualifiedName {
@@ -56,6 +57,10 @@ public struct LogicValue: CustomDebugStringConvertible {
         init(value: LogicValue) {
             self = .value(value)
         }
+
+        init(inline value: @escaping ([LogicValue]) -> LogicValue) {
+            self = .inline(value)
+        }
     }
 
     public indirect enum Memory: CustomDebugStringConvertible {
@@ -79,11 +84,50 @@ public struct LogicValue: CustomDebugStringConvertible {
             case .string(let value):
                 return "\"\(value)\""
             case .array(let values):
-                return "[\(values.map { $0.debugDescription }.joined(separator: ", "))]"
+                switch values.count {
+                case 0:
+                    return "[]"
+                case 1:
+                    return "\(values)"
+                default:
+                    let rows = values.map({ $0.debugDescription })
+                        .joined(separator: "\n")
+                        .split(separator: "\n")
+                        .map({ "  " + $0 })
+                        .joined(separator: "\n")
+
+                    return "[\n\(rows)\n]"
+                }
             case .enum(let caseName, let values):
-                return ".\(caseName)(\(values.map { "\($0)" }.joined(separator: ", ")))"
+                switch values.count {
+                case 0:
+                    return ".\(caseName)()"
+                case 1:
+                    return ".\(caseName)(\(values))"
+                default:
+                    let rows = values.map({ $0.debugDescription })
+                        .joined(separator: "\n")
+                        .split(separator: "\n")
+                        .map({ "  " + $0 })
+                        .joined(separator: "\n")
+
+                    return ".\(caseName)(\n\(rows)\n)"
+                }
             case .record(let values):
-                return "\(values)"
+                switch values.count {
+                case 0:
+                    return "{}"
+                case 1:
+                    return "\(values)"
+                default:
+                    let rows = values.map({ "\($0.key): \($0.value?.debugDescription ?? "?")" })
+                        .joined(separator: "\n")
+                        .split(separator: "\n")
+                        .map({ "  " + $0 })
+                        .joined(separator: "\n")
+
+                    return "{\n\(rows)\n}"
+                }
             case .function(let function):
                 return "\(function)"
             }

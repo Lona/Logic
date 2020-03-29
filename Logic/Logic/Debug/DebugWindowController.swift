@@ -198,7 +198,7 @@ public class DebugWindowController: NSWindowController {
         )
 
         if !nameBindingEntries.isEmpty {
-           entries.append(.header(title: "NAME BINDINGS (SCOPE)"))
+            entries.append(.header(title: "NAME BINDINGS (NAMESPACE)"))
             entries.append(contentsOf: nameBindingEntries)
         }
 

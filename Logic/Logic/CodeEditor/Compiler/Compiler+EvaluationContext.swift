@@ -350,6 +350,8 @@ extension Compiler {
                     switch f {
                     case .value(let value):
                         return value
+                    case .inline(let function):
+                        return function(args)
                     case .colorFromHSL:
                         func makeColor(componentValues: [LogicValue]) -> LogicValue {
                             let numbers: [CGFloat] = componentValues.map { componentValue in
@@ -653,6 +655,27 @@ extension Compiler {
                 }
             }
 
+            declarations.forEach { declaration in
+                switch declaration {
+                case .variable(id: _, name: let pattern, annotation: _, initializer: _, _):
+                    guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
+
+                    // Synthesize member getter
+                    context.add(uuid: pattern.uuid, EvaluationThunk(label: "Getter for \(functionName.name).\(pattern.name)", dependencies: [], { values in
+                        let f = LogicValue.Function.init(inline: { arguments in
+                            if case .record(let members) = arguments.first?.memory,
+                                case let member?? = members[pattern.name] {
+                                return member
+                            }
+                            return .unit
+                        })
+                        return LogicValue(parameterType, .function(f))
+                    }))
+                default:
+                    break
+                }
+            }
+
             context.add(uuid: functionName.uuid, EvaluationThunk(label: "Record declaration for \(functionName.name)", dependencies: dependencies, { values in
                 var parameterTypes: [String: (Unification.T, LogicValue?)] = [:]
 
@@ -663,13 +686,20 @@ extension Compiler {
                     case .variable(id: _, name: let pattern, annotation: _, initializer: let initializer, _):
                         guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { break }
 
-                        var initialValue: LogicValue?
-                        if initializer != nil {
-                            initialValue = values[index]
-                            index += 1
-                        }
+                        // Determine member type from the synthesized getter
+                        // TODO: Should we still expose the original variable's type, rather than grabbing the return value of this function?
+                        switch parameterType {
+                        case .fun(arguments: _, returnType: let returnType):
+                            var initialValue: LogicValue?
+                            if initializer != nil {
+                                initialValue = values[index]
+                                index += 1
+                            }
 
-                        parameterTypes[pattern.name] = (parameterType, initialValue)
+                            parameterTypes[pattern.name] = (returnType, initialValue)
+                        default:
+                            Swift.print("ERROR: Invalid record initializer type")
+                        }
                     default:
                         break
                     }

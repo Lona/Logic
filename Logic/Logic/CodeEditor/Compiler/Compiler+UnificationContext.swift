@@ -52,9 +52,7 @@ extension Compiler {
         ) -> UnificationContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        return rootNode.reduce(config: &traversalConfig, initialResult: initialContext) { (result, node, config) in
-            //            Swift.print("pre", node.nodeTypeDescription)
-
+        func walk(_ result: UnificationContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> UnificationContext {
             config.needsRevisitAfterTraversingChildren = true
 
             switch (config.isRevisit, node) {
@@ -105,27 +103,42 @@ extension Compiler {
                 }
 
                 let universalTypes = genericNames.map { name in Unification.T.gen(genericInScope[name]!) }
+                let returnType: Unification.T = .cons(name: functionName.name, parameters: universalTypes)
 
                 var parameterTypes: [Unification.FunctionArgument] = []
 
                 declarations.forEach { declaration in
                     switch declaration {
-                    case .variable(id: _, name: let pattern, annotation: let annotation, initializer: _, _):
+                    case .variable(id: _, name: let pattern, annotation: let annotation, initializer: let initializer, _):
                         guard let annotation = annotation else { break }
 
                         let annotationType = annotation.unificationType(genericsInScope: [:]) { result.makeGenericName() }
 
                         parameterTypes.append(Unification.FunctionArgument(label: pattern.name, type: annotationType))
 
-                        result.nodes[pattern.uuid] = annotationType
-                        //                        result.constraints.append(Unification.Constraint(annotationType, result.nodes[defaultValue.uuid]!))
-                        result.patternTypes[pattern.uuid] = annotationType
+                        // Synthesize getter function
+
+                        let functionType: Unification.T = .fun(
+                            arguments: [
+                                Unification.FunctionArgument(label: nil, type: returnType)
+                            ],
+                            returnType: annotationType
+                        )
+
+                        result.nodes[pattern.uuid] = functionType
+                        result.patternTypes[pattern.uuid] = functionType
+
+                        if let initializer = initializer {
+                            _ = LGCSyntaxNode.expression(initializer).reduce(config: &config, initialResult: result, f: walk)
+                        }
                     default:
                         break
                     }
                 }
 
-                let returnType: Unification.T = .cons(name: functionName.name, parameters: universalTypes)
+                // Handle children (initializers) manually since we want to hide member variables and only expose getters
+                config.ignoreChildren = true
+
                 let functionType: Unification.T = .fun(arguments: parameterTypes, returnType: returnType)
 
                 result.nodes[functionName.uuid] = functionType
@@ -346,5 +359,7 @@ extension Compiler {
 
             return result
         }
+
+        return rootNode.reduce(config: &traversalConfig, initialResult: initialContext, f: walk)
     }
 }
