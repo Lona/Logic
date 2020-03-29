@@ -107,7 +107,7 @@ extension Compiler {
         do {
             var config: LGCSyntaxNode.TraversalConfig = .init(order: .pre)
 
-            try topLevelNode.forEachDescendant(config: &config) { (node, config) in
+            try topLevelNode.forEachDescendant(config: config) { (node, config) in
                 config.needsRevisitAfterTraversingChildren = true
 
                 switch (config.isRevisit, node) {

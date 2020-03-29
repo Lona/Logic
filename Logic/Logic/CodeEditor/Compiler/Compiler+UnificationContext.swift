@@ -52,7 +52,7 @@ extension Compiler {
         ) -> UnificationContext {
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        func walk(_ result: UnificationContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> UnificationContext {
+        func walk(_ result: UnificationContext, _ node: LGCSyntaxNode, config: LGCSyntaxNode.TraversalConfig) -> UnificationContext {
             config.needsRevisitAfterTraversingChildren = true
 
             switch (config.isRevisit, node) {
@@ -129,7 +129,7 @@ extension Compiler {
                         result.patternTypes[pattern.uuid] = functionType
 
                         if let initializer = initializer {
-                            _ = LGCSyntaxNode.expression(initializer).reduce(config: &config, initialResult: result, f: walk)
+                            _ = LGCSyntaxNode.expression(initializer).reduce(config: config, initialResult: result, f: walk)
                         }
                     default:
                         break
@@ -360,6 +360,6 @@ extension Compiler {
             return result
         }
 
-        return rootNode.reduce(config: &traversalConfig, initialResult: initialContext, f: walk)
+        return rootNode.reduce(config: traversalConfig, initialResult: initialContext, f: walk)
     }
 }

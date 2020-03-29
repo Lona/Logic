@@ -110,7 +110,7 @@ public extension Compiler {
 
         var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
 
-        func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config: inout LGCSyntaxNode.TraversalConfig) -> ScopeContext {
+        func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config: LGCSyntaxNode.TraversalConfig) -> ScopeContext {
             if node.uuid == targetId {
                 config.stopTraversal = true
                 return context
@@ -125,7 +125,7 @@ public extension Compiler {
                 // and we don't want to look them up as names in scope
                 switch typeAnnotation {
                 case .typeIdentifier(_, _, genericArguments: let arguments):
-                    _ = arguments.map { $0.node }.reduce(config: &config, initialResult: context, f: walk)
+                    _ = arguments.map { $0.node }.reduce(config: config, initialResult: context, f: walk)
                 default:
                     break
                 }
@@ -208,7 +208,7 @@ public extension Compiler {
                 declarations.forEach { declaration in
                     switch declaration {
                     case .variable(_, let variableName, _, initializer: .some(let initializer), _):
-                        _ = LGCSyntaxNode.expression(initializer).reduce(config: &config, initialResult: context, f: walk)
+                        _ = LGCSyntaxNode.expression(initializer).reduce(config: config, initialResult: context, f: walk)
 
                         context.addToScope(pattern: variableName)
                     default:
@@ -244,6 +244,6 @@ public extension Compiler {
             return context
         }
 
-        return .success(node.reduce(config: &traversalConfig, initialResult: initialContext, f: walk))
+        return .success(node.reduce(config: traversalConfig, initialResult: initialContext, f: walk))
     }
 }
