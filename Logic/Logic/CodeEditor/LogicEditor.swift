@@ -656,6 +656,8 @@ extension LogicEditor {
             }
         }
 
+        subwindow.onDeleteEmptyInput = self.handleDelete
+
         subwindow.onChangeSuggestionText = { [unowned subwindow] text in
             subwindow.suggestionText = text
             subwindow.suggestionItems = filteredSuggestionItems(query: text).map { offset, item in item }
