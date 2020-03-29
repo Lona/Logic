@@ -123,8 +123,9 @@
 		6B9528D522A0C2710094D9C7 /* CSSColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D422A0C2710094D9C7 /* CSSColor.swift */; };
 		6B9528D822A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */; };
 		6B9F9D3B23049D140000A3BB /* SwiftGraph.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */; };
+		6BB5903724315504002EE0A6 /* Reducible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB5903624315504002EE0A6 /* Reducible.swift */; };
 		6BB64E28230DBFFE00CE2D9E /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */; };
-		6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Traversal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */; };
+		6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Reducible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Reducible.swift */; };
 		6BBD0BFB2292134700EB87A9 /* EnumType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFA2292134700EB87A9 /* EnumType.swift */; };
 		6BBD0BFF2294D92B00EB87A9 /* Unification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0BFE2294D92B00EB87A9 /* Unification.swift */; };
 		6BBD0C032294DA1200EB87A9 /* KeyValueMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BBD0C012294DA1100EB87A9 /* KeyValueMap.swift */; };
@@ -274,8 +275,9 @@
 		6B9528D422A0C2710094D9C7 /* CSSColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSColor.swift; sourceTree = "<group>"; };
 		6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+EvaluationContext.swift"; sourceTree = "<group>"; };
 		6B9F9D3A23049D140000A3BB /* SwiftGraph.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftGraph.framework; path = ../Carthage/Build/Mac/SwiftGraph.framework; sourceTree = "<group>"; };
+		6BB5903624315504002EE0A6 /* Reducible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reducible.swift; sourceTree = "<group>"; };
 		6BB64E27230DBFFE00CE2D9E /* LRUCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
-		6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Traversal.swift"; sourceTree = "<group>"; };
+		6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Reducible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Reducible.swift"; sourceTree = "<group>"; };
 		6BBD0BFA2292134700EB87A9 /* EnumType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumType.swift; sourceTree = "<group>"; };
 		6BBD0BFE2294D92B00EB87A9 /* Unification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unification.swift; sourceTree = "<group>"; };
 		6BBD0C012294DA1100EB87A9 /* KeyValueMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueMap.swift; sourceTree = "<group>"; };
@@ -466,7 +468,7 @@
 				6BEEA13022A6E6EF00905664 /* LGCSyntax+Range.swift */,
 				6BBD0C122298945D00EB87A9 /* LGCSyntax+Selection.swift */,
 				6B44E181223B40C900740318 /* LGCSyntax+Suggestions.swift */,
-				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Traversal.swift */,
+				6BBD0BF82291FF1500EB87A9 /* LGCSyntax+Reducible.swift */,
 				6BF4EF42235554E800548F61 /* MDXInlineNode+EditableString.swift */,
 				6BD9949823443CC100F3F173 /* MDXSyntax.swift */,
 				6B2DC3012349663B00A768A1 /* MDXSyntax+InlineNode.swift */,
@@ -489,6 +491,7 @@
 				6B44E171223B406800740318 /* Formatter */,
 				6B858C2C229EEEAD00DE6216 /* Language */,
 				6B44E176223B40AF00740318 /* LogicElementEditor */,
+				6BB59035243154ED002EE0A6 /* Protocols */,
 				6B44E166223B3E6000740318 /* Suggestions */,
 				6B44E183223B40C900740318 /* Syntax */,
 			);
@@ -653,6 +656,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		6BB59035243154ED002EE0A6 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				6BB5903624315504002EE0A6 /* Reducible.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		6BFA8A532332B0460016FC7B /* assets */ = {
 			isa = PBXGroup;
 			children = (
@@ -781,6 +792,7 @@
 				6BEEA13622A713FA00905664 /* StandardConfiguration.swift in Sources */,
 				6BD9949923443CC100F3F173 /* MDXSyntax.swift in Sources */,
 				6B44E15E223B3DF300740318 /* TextStyle.swift in Sources */,
+				6BB5903724315504002EE0A6 /* Reducible.swift in Sources */,
 				6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */,
 				6B44E178223B40BA00740318 /* LogicElement.swift in Sources */,
 				6BD9948D2343FCE800F3F173 /* ImageLocator.swift in Sources */,
@@ -804,7 +816,7 @@
 				6B858C29229DB30500DE6216 /* LGCTypeAnnotation+Unification.swift in Sources */,
 				6B44E190223B494600740318 /* LogicEditor.swift in Sources */,
 				6B44E15C223B3DDA00740318 /* ResultSectionHeader.swift in Sources */,
-				6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Traversal.swift in Sources */,
+				6BBD0BF92291FF1500EB87A9 /* LGCSyntax+Reducible.swift in Sources */,
 				6B44E15B223B3DDA00740318 /* ResultRow.swift in Sources */,
 				6B44E185223B40CF00740318 /* LGCSyntax.swift in Sources */,
 				6B44E18E223B411C00740318 /* NSBezierPath+Polygon.swift in Sources */,

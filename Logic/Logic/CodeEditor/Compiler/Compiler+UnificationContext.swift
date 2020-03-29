@@ -50,9 +50,9 @@ extension Compiler {
         scopeContext: Compiler.ScopeContext,
         initialContext: UnificationContext = UnificationContext()
         ) -> UnificationContext {
-        var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
+        var traversalConfig =  TraversalConfig(order: .pre)
 
-        func walk(_ result: UnificationContext, _ node: LGCSyntaxNode, config: LGCSyntaxNode.TraversalConfig) -> UnificationContext {
+        func walk(_ result: UnificationContext, _ node: LGCSyntaxNode, config:  TraversalConfig) -> UnificationContext {
             config.needsRevisitAfterTraversingChildren = true
 
             switch (config.isRevisit, node) {

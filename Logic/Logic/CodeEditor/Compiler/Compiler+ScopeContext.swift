@@ -108,9 +108,9 @@ public extension Compiler {
             return .failure(error)
         }
 
-        var traversalConfig = LGCSyntaxNode.TraversalConfig(order: .pre)
+        var traversalConfig =  TraversalConfig(order: .pre)
 
-        func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config: LGCSyntaxNode.TraversalConfig) -> ScopeContext {
+        func walk(_ context: ScopeContext, _ node: LGCSyntaxNode, config:  TraversalConfig) -> ScopeContext {
             if node.uuid == targetId {
                 config.stopTraversal = true
                 return context
