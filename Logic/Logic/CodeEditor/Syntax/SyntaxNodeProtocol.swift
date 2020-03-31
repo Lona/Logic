@@ -56,7 +56,15 @@ public extension SyntaxNodeProtocol {
     }
 
     func find(id: UUID) -> LGCSyntaxNode? {
-        return pathTo(id: id, includeTopLevel: true)?.last
+        if id == uuid { return node }
+
+        for subnode in subnodes {
+            if let found = subnode.find(id: id) {
+                return found
+            }
+        }
+
+        return nil
     }
 
     func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]? {
