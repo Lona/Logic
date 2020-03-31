@@ -38,48 +38,17 @@ public class DebugWindowController: NSWindowController {
 
     public var getLibraryContents: (String) -> LGCSyntaxNode? = Library.load
 
-    public var rootNode: LGCSyntaxNode = .program(.join(programs: [])) {
-        didSet {
-            let imports = rootNode.reduce(initialResult: Set<String>()) { (result, node, config) -> Set<String> in
-                switch node {
-                case .declaration(.importDeclaration(_, name: let name)):
-                    return result.union([name.name])
-                default:
-                    return result
-                }
-            }
+    public var rootNode: LGCSyntaxNode = .program(.join(programs: []))
 
-            self.imports = Array(imports).sorted()
-        }
-    }
+    public var scopeContext: Compiler.ScopeContext = .init()
 
-    public var scopeContext: Compiler.ScopeContext = .init() {
-        didSet {
-            updateEntries()
-        }
-    }
+    public var unificationContext: Compiler.UnificationContext = .init()
 
-    public var unificationContext: Compiler.UnificationContext = .init() {
-        didSet {
-            updateEntries()
-        }
-    }
+    public var substitution: Unification.Substitution = .init()
 
-    public var substitution: Unification.Substitution = .init() {
-        didSet {
-            updateEntries()
-        }
-    }
-
-    public var evaluationContext: Compiler.EvaluationContext = .init() {
-        didSet {
-            updateEntries()
-        }
-    }
+    public var evaluationContext: Compiler.EvaluationContext = .init()
 
     // MARK: Private
-
-    private var didShow: Bool = false
 
     private var selectedIndex: Int? = nil {
         didSet {
@@ -94,14 +63,6 @@ public class DebugWindowController: NSWindowController {
         didSet {
             if suggestionText != oldValue {
                 suggestionWindow.suggestionText = suggestionText
-                updateEntries()
-            }
-        }
-    }
-
-    private var imports: [String] = [] {
-        didSet {
-            if imports != oldValue {
                 updateEntries()
             }
         }
@@ -139,9 +100,6 @@ public class DebugWindowController: NSWindowController {
     }
 
     private func updateEntries() {
-        // For performance, don't update unless we've shown the debug window
-        if !didShow { return }
-
         let query = suggestionText.lowercased()
 
         func filterEntries(_ entries: [Entry]) -> [Entry] {
@@ -177,6 +135,15 @@ public class DebugWindowController: NSWindowController {
         }
 
         var entries: [Entry] = []
+
+        let imports = rootNode.reduce(initialResult: Set<String>()) { (result, node, config) -> Set<String> in
+            switch node {
+            case .declaration(.importDeclaration(_, name: let name)):
+                return result.union([name.name])
+            default:
+                return result
+            }
+        }
 
         let importEntries: [Entry] = filterEntries(
             imports.map { name in .import(name: name) }
@@ -282,7 +249,7 @@ public class DebugWindowController: NSWindowController {
                 return .row("Substitution", nil, false, nil, nil)
             case .node(description: let description, id: let uuid):
                 return .row(description, nil, false, uuid.shortString, nil)
-            case .evaluationThunk(id: let uuid, thunk: let thunk):
+            case .evaluationThunk(id: _, thunk: let thunk):
                 return .row(thunk.label ?? "Thunk", nil, false, nil, nil)
             }
         }
@@ -503,8 +470,6 @@ public class DebugWindowController: NSWindowController {
 
     public override func showWindow(_ sender: Any?) {
         super.showWindow(nil)
-
-        didShow = true
 
         suggestionText = ""
         updateEntries()
