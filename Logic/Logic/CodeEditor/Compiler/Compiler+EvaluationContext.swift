@@ -586,7 +586,7 @@ extension Compiler {
                                     case .cons(name: let typeName, parameters: _):
                                         guard let typeDeclarationID = scopeContext.namespace.types[[typeName]] else { break }
                                         guard case let .declaration(declaration) = rootNode.contents.parentOf(target: typeDeclarationID, includeTopLevel: false) else { break }
-                                        let declaredVariables = declaration.declaredVariables
+                                        let declaredVariables = declaration.declaredRecordVariables
                                         let initializers = declaredVariables.map { $0.2 }
                                         functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument default value for type of \(pattern.name) (recordInit)", dependencies: initializers.map { $0.uuid }, { values in
                                             let members = Array(zip(declaredVariables.map { ($0.0.name) }, values))
@@ -795,7 +795,7 @@ extension LGCSyntaxNode {
 }
 
 extension LGCDeclaration {
-    public var declaredVariables: [(LGCPattern, LGCTypeAnnotation, LGCExpression)] {
+    public var declaredRecordVariables: [(LGCPattern, LGCTypeAnnotation, LGCExpression)] {
         switch self {
         case .record(id: _, name: _, genericParameters: _, declarations: let declarations, _):
             return declarations.compactMap { declaration in
