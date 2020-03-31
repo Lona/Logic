@@ -185,8 +185,7 @@ extension Compiler {
 
     public typealias EvaluationResult = Result<EvaluationContext, Error>
 
-    // TODO: This should work with structs, enums, and functions
-    private static func defaultValue(forType type: Unification.T) -> LogicValue {
+    private static func defaultValue(forTypeBuiltInType type: Unification.T) -> LogicValue? {
         switch type {
         case .cons(name: let name, parameters: _):
             switch name {
@@ -201,13 +200,10 @@ extension Compiler {
             case "Array":
                 return .init(type, .array([]))
             default:
-                return .unit
+                return nil
             }
-        case .fun(_, let returnType):
-            let returnValue = defaultValue(forType: returnType)
-            return .init(type, .function(.value(returnValue)))
-        case .evar, .gen:
-            return .unit
+        case .evar, .gen, .fun:
+            return nil
         }
     }
 
@@ -568,11 +564,41 @@ extension Compiler {
                                         return values[0]
                                     }))
                                 } else {
-                                    functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument from type annotation for \(pattern.name)", dependencies: [], { _ in
-                                        guard let parameterType = unificationContext.patternTypes[pattern.uuid] else { return .unit }
-                                        let resolvedType = Unification.substitute(substitution, in: parameterType)
-                                        return self.defaultValue(forType: resolvedType)
-                                    }))
+                                    func addThunk(value: LogicValue) {
+                                        functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument default value for type of \(pattern.name)", dependencies: [], { _ in
+                                            return value
+                                        }))
+                                    }
+
+                                    guard let parameterType = unificationContext.patternTypes[pattern.uuid] else {
+                                        addThunk(value: .unit)
+                                        return
+                                    }
+
+                                    let resolvedType = Unification.substitute(substitution, in: parameterType)
+
+                                    if let value = self.defaultValue(forTypeBuiltInType: resolvedType) {
+                                        addThunk(value: value)
+                                        return
+                                    }
+
+                                    switch resolvedType {
+                                    case .cons(name: let typeName, parameters: _):
+                                        guard let typeDeclarationID = scopeContext.namespace.types[[typeName]] else { break }
+                                        guard case let .declaration(declaration) = rootNode.contents.parentOf(target: typeDeclarationID, includeTopLevel: false) else { break }
+                                        let declaredVariables = declaration.declaredVariables
+                                        let initializers = declaredVariables.map { $0.2 }
+                                        functionEvaluationContext.add(uuid: pattern.uuid, EvaluationThunk(label: "Function argument default value for type of \(pattern.name) (recordInit)", dependencies: initializers.map { $0.uuid }, { values in
+                                            let members = Array(zip(declaredVariables.map { ($0.0.name) }, values))
+                                            return LogicValue(resolvedType, .record(values: Dictionary(uniqueKeysWithValues: members)))
+                                        }))
+                                        return
+                                    default:
+                                        break
+                                    }
+
+                                    addThunk(value: .unit)
+                                    return
                                 }
                             }
                         }
@@ -676,7 +702,7 @@ extension Compiler {
                 }
             }
 
-            context.add(uuid: functionName.uuid, EvaluationThunk(label: "Record declaration for \(functionName.name)", dependencies: dependencies, { values in
+            context.add(uuid: functionName.uuid, EvaluationThunk(label: "Record initializer for \(functionName.name)", dependencies: dependencies, { values in
                 var parameterTypes: [String: (Unification.T, LogicValue?)] = [:]
 
                 var index: Int = 0
@@ -765,5 +791,23 @@ extension LGCSyntaxNode {
         }
 
         return patterns.map { $0.name }
+    }
+}
+
+extension LGCDeclaration {
+    public var declaredVariables: [(LGCPattern, LGCTypeAnnotation, LGCExpression)] {
+        switch self {
+        case .record(id: _, name: _, genericParameters: _, declarations: let declarations, _):
+            return declarations.compactMap { declaration in
+                switch declaration {
+                case .variable(id: _, name: let name, annotation: .some(let annotation), initializer: .some(let initializer), _):
+                    return (name, annotation, initializer)
+                default:
+                    return nil
+                }
+            }
+        default:
+            return []
+        }
     }
 }
