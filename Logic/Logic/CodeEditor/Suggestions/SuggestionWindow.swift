@@ -117,6 +117,8 @@ public class SuggestionWindow: NSWindow {
 
             if let selectedIndex = self.selectedIndex {
                 self.onSubmit?(selectedIndex)
+            } else if self.canSubmitWithoutSelectedIndex {
+                self.onSubmit?(-1)
             }
         }
 
@@ -285,6 +287,13 @@ public class SuggestionWindow: NSWindow {
     }
 
     public var allowedShrinkingSize = NSSize(width: 180, height: 200)
+
+    /**
+     The entered text can be submitted without any valid suggestion selected.
+
+     When the text input view is displayed without suggestions, there's no need to have suggestions be selected at all.
+     */
+    public var canSubmitWithoutSelectedIndex = false
 
     public var onRequestHide: (() -> Void)?
 
