@@ -18,10 +18,10 @@ public enum Unification {
             }
         }
 
-        var label: String?
-        var type: T
+        public var label: String?
+        public var type: T
 
-        init(label: String? = nil, type: T) {
+        public init(label: String? = nil, type: T) {
             self.label = label
             self.type = type
         }
