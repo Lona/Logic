@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "npx lonac workspace swift . ../../Logic/Logic/Lona/Generated --framework=appkit"
+    "build": "npx lonac workspace swift . ../../Logic/Logic/Lona/Generated --framework=appkit --legacyTokens"
   },
   "dependencies": {
     "lonac": "^0.6.0"

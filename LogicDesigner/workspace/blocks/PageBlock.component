@@ -113,8 +113,8 @@
       "alignSelf" : "stretch",
       "backgroundColor" : "blockBackground",
       "paddingBottom" : 8,
-      "paddingLeft" : 8,
-      "paddingRight" : 8,
+      "paddingLeft" : 12,
+      "paddingRight" : 12,
       "paddingTop" : 8
     },
     "type" : "Lona:View"

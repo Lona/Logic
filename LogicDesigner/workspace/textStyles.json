@@ -43,6 +43,7 @@
       "color" : "editableText",
       "fontSize" : 16,
       "id" : "pageLink",
+      "lineHeight" : 28,
       "name" : "pageLink"
     }
   ]

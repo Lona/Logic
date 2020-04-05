@@ -320,14 +320,14 @@ public class EditableBlock: Equatable {
         case .text:
             return TextBlockContainerView()
         case .page(title: let title, target: let target):
-            return PageBlock(titleText: title, linkTarget: target)
+            return PageBlock(titleText: "→ " + title, linkTarget: target)
         case .tokens(let syntaxNode):
             let view = LogicEditor(rootNode: syntaxNode, formattingOptions: .visual)
             view.fillColor = Colors.blockBackground
             view.cornerRadius = 4
 
             var style = view.canvasStyle
-            style.textMargin = .init(width: 5, height: 6)
+            style.textMargin = .init(width: 8, height: 8)
             view.canvasStyle = style
 
             view.scrollsVertically = false
@@ -351,7 +351,7 @@ public class EditableBlock: Equatable {
             }
         case .page(title: let title, _):
             let view = view as! PageBlock
-            view.title = title
+            view.title = "→ " + title
         case .tokens(let value):
             let view = view as! LogicEditor
             view.rootNode = value
