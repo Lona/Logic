@@ -738,7 +738,7 @@ public enum StandardConfiguration {
         case .replace(let id):
             logicEditor.select(nodeByID: id)
         case .delete(let id):
-            logicEditor.rootNode = logicEditor.rootNode.delete(id: id)
+            logicEditor.rootNode = logicEditor.rootNode.delete(id: id) ?? logicEditor.rootNode
         case .duplicate(let id):
             if let duplicated = logicEditor.rootNode.duplicate(id: id) {
                 logicEditor.rootNode = duplicated.rootNode

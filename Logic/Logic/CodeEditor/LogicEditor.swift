@@ -455,7 +455,6 @@ extension LogicEditor {
 
     private func handleDelete() {
         let formattedContent = context.formatted
-        let elements = formattedContent.elements
 
         func range() -> Range<Int>? {
             if let selectedLine = canvasView.selectedLine {
@@ -468,8 +467,14 @@ extension LogicEditor {
         if let selectedRange = range(),
             let selectedNode = context.topNodeWithEqualRange(as: selectedRange, includeTopLevel: false) {
             let targetNode = canvasView.selectedLine != nil ? rootNode.findDragSource(id: selectedNode.uuid) ?? selectedNode : selectedNode
-            let shouldActivate = onChangeRootNode?(rootNode.delete(id: targetNode.uuid))
-            if shouldActivate == true {
+
+            if let newRootNode = rootNode.delete(id: targetNode.uuid) {
+                let shouldActivate = onChangeRootNode?(newRootNode)
+                if shouldActivate == true {
+                    handleActivateElement(nil)
+                }
+            } else {
+                onRequestDelete?()
                 handleActivateElement(nil)
             }
         }
@@ -505,11 +510,11 @@ extension LogicEditor {
                 if let targetIndex = findDropIndex(relativeTo: targetNode, within: targetParent, index: destinationRange.lowerBound) {
                     let newParent = targetParent.insert(childNode: sourceNode.copy(), atIndex: targetIndex)
 
-                    let newRoot = rootNode
+                    if let newRoot = rootNode
                         .replace(id: targetParent.uuid, with: newParent)
-                        .delete(id: sourceNode.uuid)
-
-                    _ = onChangeRootNode?(newRoot.copy(deep: true))
+                        .delete(id: sourceNode.uuid) {
+                        _ = onChangeRootNode?(newRoot.copy(deep: true))
+                    }
 
                     break
                 }

@@ -26,7 +26,7 @@ public protocol SyntaxNodeProtocol {
     func find(id: UUID) -> LGCSyntaxNode?
     func pathTo(id: UUID, includeTopLevel: Bool) -> [LGCSyntaxNode]?
     func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> Self
-    func delete(id: UUID) -> Self
+    func delete(id: UUID) -> Self?
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self
     func copy(deep: Bool) -> Self
     func childrenInSameCollection(as node: LGCSyntaxNode) -> [LGCSyntaxNode]
@@ -81,8 +81,8 @@ public extension SyntaxNodeProtocol {
         return nil
     }
 
-    func delete(id: UUID) -> Self {
-        return self
+    func delete(id: UUID) -> Self? {
+        return uuid == id ? nil : self
     }
 
     func insert(childNode: LGCSyntaxNode, atIndex: Int) -> Self {
@@ -206,26 +206,19 @@ extension LGCTypeAnnotation: SyntaxNodeProtocol {
         return .typeAnnotation(self)
     }
 
-    public func delete(id: UUID) -> LGCTypeAnnotation {
+    public func delete(id: UUID) -> LGCTypeAnnotation? {
+        if id == uuid { return nil }
+
         switch self {
         case .typeIdentifier, .placeholder:
             return self
         case .functionType(let value):
-            let updatedArguments = value.argumentTypes
-                .filter {
-                    switch $0 {
-                    case .typeIdentifier(let typeIdentifier):
-                        return typeIdentifier.id != id
-                    case .functionType, .placeholder:
-                        return true
-                    }
-                }
-                .map { $0.delete(id: id) }
+            let updatedArguments = value.argumentTypes.compactMap { $0.delete(id: id) }
 
             return LGCTypeAnnotation.functionType(
                 id: value.id,
-                returnType: value.returnType.delete(id: id),
-                argumentTypes: LGCList(updatedArguments)
+                returnType: value.returnType.delete(id: id) ?? LGCTypeAnnotation.makePlaceholder(),
+                argumentTypes: LGCList(updatedArguments).normalizedPlaceholders
             )
         }
     }
@@ -396,19 +389,14 @@ extension LGCLiteral: SyntaxNodeProtocol {
         }
     }
 
-    public func delete(id: UUID) -> LGCLiteral {
+    public func delete(id: UUID) -> LGCLiteral? {
+        if id == uuid { return nil }
+
         switch self {
         case .array(let value):
             return .array(
                 id: value.id,
-                value: LGCList(value.value.filter({
-                    switch $0 {
-                    case .placeholder:
-                        return true
-                    default:
-                        return $0.uuid != id
-                    }
-                }).map { $0.delete(id: id) })
+                value: LGCList(value.value.compactMap { $0.delete(id: id) }).normalizedPlaceholders
             )
         case .boolean, .number, .string, .color, .none:
             return self
@@ -543,16 +531,20 @@ extension LGCFunctionParameter: SyntaxNodeProtocol {
         return .functionParameter(self)
     }
 
-    public func delete(id: UUID) -> LGCFunctionParameter {
+    public func delete(id: UUID) -> LGCFunctionParameter? {
+        if id == uuid { return nil }
+
         switch self {
         case .placeholder:
             return self
         case .parameter(let value):
+            guard let name = value.localName.delete(id: id) else { return nil }
+
             return LGCFunctionParameter.parameter(
                 id: value.id,
-                localName: value.localName.delete(id: id),
-                annotation: value.annotation.delete(id: id),
-                defaultValue: value.defaultValue.delete(id: id),
+                localName: name,
+                annotation: value.annotation.delete(id: id) ?? LGCTypeAnnotation.makePlaceholder(),
+                defaultValue: value.defaultValue.delete(id: id) ?? LGCFunctionParameterDefaultValue.none(id: UUID()),
                 comment: value.comment?.delete(id: id)
             )
         }
@@ -638,14 +630,18 @@ extension LGCGenericParameter: SyntaxNodeProtocol {
         return .genericParameter(self)
     }
 
-    public func delete(id: UUID) -> LGCGenericParameter {
+    public func delete(id: UUID) -> LGCGenericParameter? {
+        if id == uuid { return nil }
+
         switch self {
         case .placeholder:
             return self
         case .parameter(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             return .parameter(
                 id: value.id,
-                name: value.name.delete(id: id)
+                name: name
             )
         }
     }
@@ -715,19 +711,21 @@ extension LGCEnumerationCase: SyntaxNodeProtocol {
         return .enumerationCase(self)
     }
 
-    public func delete(id: UUID) -> LGCEnumerationCase {
+    public func delete(id: UUID) -> LGCEnumerationCase? {
+        if id == uuid { return nil }
+
         switch self {
         case .placeholder:
             return self
         case .enumerationCase(let value):
-            let updated = value.associatedValueTypes
-                .filter { isPlaceholder || $0.uuid != id }
-                .map { $0.delete(id: id) }
+            let updated = value.associatedValueTypes.compactMap { $0.delete(id: id) }
+
+            guard let name = value.name.delete(id: id) else { return nil }
 
             return LGCEnumerationCase.enumerationCase(
                 id: value.id,
-                name: value.name.delete(id: id),
-                associatedValueTypes: LGCList(updated),
+                name: name,
+                associatedValueTypes: LGCList(updated).normalizedPlaceholders,
                 comment: value.comment?.delete(id: id)
             )
         }
@@ -920,25 +918,22 @@ extension LGCExpression: SyntaxNodeProtocol {
         )
     }
 
-    public func delete(id: UUID) -> LGCExpression {
+    public func delete(id: UUID) -> LGCExpression? {
+        if id == uuid { return nil }
+
         switch self {
         case .functionCallExpression(let value):
+            guard let expression = value.expression.delete(id: id) else { return nil }
+
             return .functionCallExpression(
                 id: value.id,
-                expression: value.expression.delete(id: id),
-                arguments: LGCList(
-                    value.arguments.filter({
-                        switch $0 {
-                        case .placeholder:
-                            return true
-                        case .argument(let value):
-                            return value.id != id
-                        }
-                    }).map { $0.delete(id: id) }
-                )
+                expression: expression,
+                arguments: LGCList(value.arguments.compactMap { $0.delete(id: id) }).normalizedPlaceholders
             )
         case .literalExpression(let value):
-            return .literalExpression(id: value.id, literal: value.literal.delete(id: id))
+            guard let literal = value.literal.delete(id: id) else { return nil }
+
+            return .literalExpression(id: value.id, literal: literal)
         case .assignmentExpression, .identifierExpression, .memberExpression, .placeholder:
             return self
         }
@@ -1016,12 +1011,15 @@ extension LGCStatement: SyntaxNodeProtocol {
         return .statement(self)
     }
 
-    public func delete(id: UUID) -> LGCStatement {
+    public func delete(id: UUID) -> LGCStatement? {
+        if id == uuid { return nil }
+
         switch self {
         case .declaration(let value):
-            return .declaration(id: value.id, content: value.content.delete(id: id))
+            guard let content = value.content.delete(id: id) else { return nil }
+            return .declaration(id: value.id, content: content)
         case .returnStatement(let value):
-            return .returnStatement(id: value.id, expression: value.expression.delete(id: id))
+            return .returnStatement(id: value.id, expression: value.expression.delete(id: id) ?? LGCExpression.makePlaceholder())
         default:
             // TODO
             return self
@@ -1209,15 +1207,19 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         }
     }
 
-    public func delete(id: UUID) -> LGCDeclaration {
+    public func delete(id: UUID) -> LGCDeclaration? {
+        if id == uuid { return nil }
+
         switch self {
         case .variable(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             let shouldDeleteAnnotation = value.annotation?.uuid == id
             let shouldDeleteInitializer = value.initializer?.uuid == id
 
             return .variable(
                 id: value.id,
-                name: value.name.delete(id: id),
+                name: name,
                 annotation: shouldDeleteAnnotation
                     ? LGCTypeAnnotation.typeIdentifier(id: UUID(), identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true), genericArguments: .empty)
                     : value.annotation?.delete(id: id),
@@ -1227,60 +1229,49 @@ extension LGCDeclaration: SyntaxNodeProtocol {
                 comment: value.comment?.delete(id: id)
             )
         case .enumeration(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             return .enumeration(
                 id: value.id,
-                name: value.name.delete(id: id),
+                name: name,
                 genericParameters: value.genericParameters.delete(id: id),
-                cases: LGCList(value.cases.filter({
-                    switch $0 {
-                    case .placeholder:
-                        return true
-                    case .enumerationCase(let value):
-                        return value.id != id
-                    }
-                }).map { $0.delete(id: id) }),
+                cases: LGCList(value.cases.compactMap { $0.delete(id: id) }).normalizedPlaceholders,
                 comment: value.comment?.delete(id: id)
             )
         case .record(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             return .record(
                 id: value.id,
-                name: value.name.delete(id: id),
+                name: name,
                 genericParameters: value.genericParameters.delete(id: id),
-                declarations: LGCList(value.declarations.filter({
-                    switch $0 {
-                    case .placeholder:
-                        return true
-                    default:
-                        return $0.uuid != id
-                    }
-                }).map { $0.delete(id: id) }),
+                declarations: LGCList(value.declarations.compactMap { $0.delete(id: id) }).normalizedPlaceholders,
                 comment: value.comment?.delete(id: id)
             )
         case .namespace(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             return .namespace(
                 id: value.id,
-                name: value.name.delete(id: id),
-                declarations: LGCList(value.declarations.filter {
-                    switch $0 {
-                    case .placeholder:
-                        return true
-                    default:
-                        return $0.uuid != id
-                    }
-                    }.map { $0.delete(id: id) })
+                name: name,
+                declarations: LGCList(value.declarations.compactMap { $0.delete(id: id) }).normalizedPlaceholders
             )
         case .function(let value):
+            guard let name = value.name.delete(id: id) else { return nil }
+
             return .function(
                 id: value.id,
-                name: value.name.delete(id: id),
-                returnType: value.returnType.delete(id: id),
+                name: name,
+                returnType: value.returnType.delete(id: id) ?? LGCTypeAnnotation.makePlaceholder(),
                 genericParameters: value.genericParameters.delete(id: id),
-                parameters: value.parameters.delete(id: id),
-                block: value.block.delete(id: id),
+                parameters: value.parameters.delete(id: id).normalizedPlaceholders,
+                block: value.block.delete(id: id).normalizedPlaceholders,
                 comment: value.comment?.delete(id: id)
             )
         case .importDeclaration(let value):
-            return .importDeclaration(id: value.id, name: value.name.delete(id: id))
+            guard let name = value.name.delete(id: id) else { return nil }
+
+            return .importDeclaration(id: value.id, name: name)
         case .placeholder(let value):
             return .placeholder(id: value)
         }
@@ -1549,14 +1540,14 @@ extension LGCProgram: SyntaxNodeProtocol {
         return .program(self)
     }
 
-    public func delete(id: UUID) -> LGCProgram {
-        let updated = block
-            .filter { $0.isPlaceholder || $0.uuid != id }
-            .map { $0.delete(id: id) }
+    public func delete(id: UUID) -> LGCProgram? {
+        if id == uuid { return nil }
+
+        let updated = block.compactMap { $0.delete(id: id) }
 
         return LGCProgram(
             id: self.uuid,
-            block: LGCList(updated)
+            block: LGCList(updated).normalizedPlaceholders
         )
     }
 
@@ -1632,19 +1623,14 @@ extension LGCTopLevelParameters: SyntaxNodeProtocol {
         return .topLevelParameters(self)
     }
 
-    public func delete(id: UUID) -> LGCTopLevelParameters {
-        let updated = parameters.filter { param in
-            switch param {
-            case .placeholder:
-                return true
-            case .parameter(let value):
-                return param.uuid != id && value.localName.id != id
-            }
-            }.map { $0.delete(id: id) }
+    public func delete(id: UUID) -> LGCTopLevelParameters? {
+        if id == uuid { return nil }
+        
+        let updated = parameters.compactMap { $0.delete(id: id) }
 
         return LGCTopLevelParameters(
             id: self.uuid,
-            parameters: LGCList(updated)
+            parameters: LGCList(updated).normalizedPlaceholders
         )
     }
 
@@ -1720,14 +1706,10 @@ extension LGCTopLevelDeclarations: SyntaxNodeProtocol {
         return .topLevelDeclarations(self)
     }
 
-    public func delete(id: UUID) -> LGCTopLevelDeclarations {
-        let updated = declarations.filter {
-            if let namePattern = $0.namePattern, namePattern.id == id {
-                return false
-            }
+    public func delete(id: UUID) -> LGCTopLevelDeclarations? {
+        if id == uuid { return nil }
 
-            return $0.uuid != id
-        }.map { $0.delete(id: id) }
+        let updated = declarations.compactMap { $0.delete(id: id) }
 
         return LGCTopLevelDeclarations(
             id: self.uuid,
@@ -1837,10 +1819,14 @@ extension LGCFunctionCallArgument: SyntaxNodeProtocol {
         }
     }
 
-    public func delete(id: UUID) -> LGCFunctionCallArgument {
+    public func delete(id: UUID) -> LGCFunctionCallArgument? {
+        if id == uuid { return nil }
+
         switch self {
         case .argument(let value):
-            return .argument(id: value.id, label: value.label, expression: value.expression.delete(id: id))
+            guard let expression = value.expression.delete(id: id) else { return nil }
+
+            return .argument(id: value.id, label: value.label, expression: expression)
         case .placeholder(let id):
             return .placeholder(id: id)
         }
@@ -1951,9 +1937,9 @@ extension LGCSyntaxNode {
         return contents.insert(childNode: childNode, atIndex: atIndex).node
     }
 
-    public func delete(id: UUID) -> LGCSyntaxNode {
+    public func delete(id: UUID) -> LGCSyntaxNode? {
         LGCSyntaxNode.lookupCache.remove(key: self.uuid)
-        return contents.delete(id: id).node
+        return contents.delete(id: id)?.node
     }
 
     public func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
