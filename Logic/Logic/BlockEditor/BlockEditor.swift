@@ -80,6 +80,10 @@ open class BlockEditor: NSBox {
         }
     }
 
+    public func select(id: UUID) {
+        blockListView.select(id: id)
+    }
+
     // MARK: Private
 
     private let blockListView = BlockListView()

@@ -317,6 +317,12 @@ public class BlockListView: NSBox {
 
     public var onRequestCreatePage: ((Int, Bool) -> Void)?
 
+    public func select(id: UUID) {
+        guard let row = blocks.firstIndex(where: { $0.id == id }) else { return }
+
+        self.selection = .blocks(.init(location: row, length: 1))
+    }
+
     // MARK: Private
 
     private var selection: BlockListSelection = .none {
