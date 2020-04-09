@@ -85,7 +85,7 @@ open class BlockEditor: NSBox {
         set { blockListView.onChangeSelection = newValue }
     }
 
-    public var onChangeVisibleBlocks: (([BlockEditor.Block]) -> Void)? {
+    public var onChangeVisibleRows: ((Range<Int>) -> Void)? {
         get { blockListView.onChangeVisibleBlocks }
         set { blockListView.onChangeVisibleBlocks = newValue }
     }

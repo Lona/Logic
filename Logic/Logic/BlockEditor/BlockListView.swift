@@ -313,7 +313,7 @@ public class BlockListView: NSBox {
 
     public var onChangeSelection: ((BlockListSelection) -> Void)?
 
-    public var onChangeVisibleBlocks: (([BlockEditor.Block]) -> Void)?
+    public var onChangeVisibleBlocks: ((Range<Int>) -> Void)?
 
     public var onClickLink: ((String) -> Bool)?
 
@@ -329,7 +329,7 @@ public class BlockListView: NSBox {
         let view = blocks[row].view
         let viewFrame = view.convert(view.frame, to: scrollView.documentView!)
 
-        scrollView.documentView!.scrollToVisible(.init(x: 0, y: viewFrame.minY, width: 0, height: 0))
+        scrollView.contentView.scroll(to: viewFrame.origin)
     }
 
     // MARK: Private
@@ -499,9 +499,7 @@ public class BlockListView: NSBox {
         let adjustedRect = visibleRect.insetBy(dx: 0, dy: 20)
         let visibleRows = tableView.rows(in: adjustedRect)
 
-        let visibleBlocks = Array(blocks[visibleRows.lowerBound..<visibleRows.upperBound])
-
-        onChangeVisibleBlocks?(visibleBlocks)
+        onChangeVisibleBlocks?(visibleRows.lowerBound..<visibleRows.upperBound)
     }
 
     public override func viewWillMove(toWindow newWindow: NSWindow?) {
