@@ -22,7 +22,7 @@ extension NSPasteboard {
     }
 }
 
-private enum BlockListSelection: Equatable {
+public enum BlockListSelection: Equatable {
     case none
     case item(Int, NSRange)
     case blocks(NSRange, anchor: Int)
@@ -311,6 +311,10 @@ public class BlockListView: NSBox {
 
     public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
 
+    public var onChangeSelection: ((BlockListSelection) -> Void)?
+
+    public var onChangeVisibleBlocks: (([BlockEditor.Block]) -> Void)?
+
     public var onClickLink: ((String) -> Bool)?
 
     public var onClickPageLink: ((String) -> Bool)?
@@ -320,7 +324,12 @@ public class BlockListView: NSBox {
     public func select(id: UUID) {
         guard let row = blocks.firstIndex(where: { $0.id == id }) else { return }
 
-        self.selection = .blocks(.init(location: row, length: 1))
+        self.selection = .item(row, .empty)
+
+        let view = blocks[row].view
+        let viewFrame = view.convert(view.frame, to: scrollView.documentView!)
+
+        scrollView.documentView!.scrollToVisible(.init(x: 0, y: viewFrame.minY, width: 0, height: 0))
     }
 
     // MARK: Private
@@ -390,6 +399,8 @@ public class BlockListView: NSBox {
                 scrollView.documentView?.scrollToVisible(.init(x: 0, y: viewFrame.maxY, width: 0, height: 0))
             }
         }
+
+        onChangeSelection?(selection)
     }
 
     private var tableView = BlockListTableView()
@@ -466,12 +477,31 @@ public class BlockListView: NSBox {
         scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
         scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
 
+        scrollView.contentView.postsBoundsChangedNotifications = true
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleScroll),
+            name: NSView.boundsDidChangeNotification,
+            object: scrollView.contentView
+        )
+
         addSubview(scrollView)
 
         tableView.reloadData()
         tableView.sizeToFit()
 
         tableView.intercellSpacing = .init(width: 0, height: 6)
+    }
+
+    @objc private func handleScroll(_ sender: AnyObject) {
+        let visibleRect = tableView.visibleRect
+        let adjustedRect = visibleRect.insetBy(dx: 0, dy: 20)
+        let visibleRows = tableView.rows(in: adjustedRect)
+
+        let visibleBlocks = Array(blocks[visibleRows.lowerBound..<visibleRows.upperBound])
+
+        onChangeVisibleBlocks?(visibleBlocks)
     }
 
     public override func viewWillMove(toWindow newWindow: NSWindow?) {

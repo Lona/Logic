@@ -80,6 +80,16 @@ open class BlockEditor: NSBox {
         }
     }
 
+    public var onChangeSelection: ((BlockListSelection) -> Void)? {
+        get { blockListView.onChangeSelection }
+        set { blockListView.onChangeSelection = newValue }
+    }
+
+    public var onChangeVisibleBlocks: (([BlockEditor.Block]) -> Void)? {
+        get { blockListView.onChangeVisibleBlocks }
+        set { blockListView.onChangeVisibleBlocks = newValue }
+    }
+
     public func select(id: UUID) {
         blockListView.select(id: id)
     }
