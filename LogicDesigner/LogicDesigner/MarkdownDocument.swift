@@ -49,6 +49,24 @@ class MarkdownDocument: NSDocument {
         return blockEditor
     }()
 
+    var currentVisibleBlock: Int?
+
+    @IBAction func scrollToNextPrevious(_ sender: AnyObject) {
+        let nextRow = currentVisibleBlock == nil ? blockEditor.blocks.count - 1 : currentVisibleBlock! - 1 
+
+        guard !blockEditor.blocks.isEmpty, nextRow >= 0, nextRow < blockEditor.blocks.count else { return }
+
+        blockEditor.select(id: blockEditor.blocks[nextRow].id)
+    }
+
+    @IBAction func scrollToNextSection(_ sender: AnyObject) {
+        let nextRow = currentVisibleBlock == nil ? 0 : currentVisibleBlock! + 1
+
+        guard nextRow < blockEditor.blocks.count else { return }
+
+        blockEditor.select(id: blockEditor.blocks[nextRow].id)
+    }
+
 //    var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?
 //    var successfulEvaluation: Compiler.EvaluationContext?
 
@@ -236,6 +254,10 @@ class MarkdownDocument: NSDocument {
         containerView.contentViewMargins = .zero
 
         containerView.addSubview(blockEditor)
+
+        blockEditor.onChangeVisibleRows = { [unowned self] rows in
+            self.currentVisibleBlock = rows.first
+        }
 
         blockEditor.onChangeBlocks = { [unowned self] blocks in
             self.blockEditor.blocks = blocks

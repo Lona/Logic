@@ -329,7 +329,7 @@ public class BlockListView: NSBox {
         let view = blocks[row].view
         let viewFrame = view.convert(view.frame, to: scrollView.documentView!)
 
-        scrollView.contentView.scroll(to: viewFrame.origin)
+        scrollView.documentView!.scroll(viewFrame.origin)
     }
 
     // MARK: Private
