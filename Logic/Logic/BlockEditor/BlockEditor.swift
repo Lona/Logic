@@ -90,6 +90,11 @@ open class BlockEditor: NSBox {
         set { blockListView.onChangeVisibleBlocks = newValue }
     }
 
+    public var showsMinimap: Bool {
+        get { blockListView.showsMinimap }
+        set { blockListView.showsMinimap = newValue }
+    }
+
     public func select(id: UUID) {
         blockListView.select(id: id)
     }

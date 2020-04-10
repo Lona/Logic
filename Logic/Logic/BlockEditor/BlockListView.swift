@@ -332,6 +332,40 @@ public class BlockListView: NSBox {
         scrollView.documentView!.scroll(viewFrame.origin)
     }
 
+    public var showsMinimap: Bool = false {
+        didSet {
+            if showsMinimap {
+                minimapScroller.drawKnobSlot = { rect, isHighlighted in
+                    let scale: CGFloat = MinimapScroller.renderingScale
+
+                    NSGraphicsContext.saveGraphicsState()
+                    NSGraphicsContext.current?.cgContext.translateBy(x: rect.origin.x, y: rect.origin.y)
+                    NSGraphicsContext.current?.cgContext.scaleBy(x: scale, y: scale)
+                    NSGraphicsContext.current?.cgContext.setAlpha(0.5)
+
+                    let pdf = self.tableView.dataWithPDF(inside: self.tableView.bounds)
+                    guard let image = NSImage(data: pdf) else { return }
+
+                    var drawingRect = self.tableView.bounds
+                    drawingRect.origin.y += self.verticalPadding
+                    drawingRect.origin.x += 10
+
+                    image.draw(in: drawingRect)
+
+                    NSGraphicsContext.restoreGraphicsState()
+                }
+
+                scrollView.autohidesScrollers = false
+                scrollView.verticalScroller = minimapScroller
+            } else {
+                minimapScroller.drawKnobSlot = nil
+
+                scrollView.autohidesScrollers = true
+                scrollView.verticalScroller = NSScroller()
+            }
+        }
+    }
+
     // MARK: Private
 
     private var selection: BlockListSelection = .none {
@@ -406,6 +440,7 @@ public class BlockListView: NSBox {
     private var tableView = BlockListTableView()
     private let scrollView = NSScrollView()
     private let tableColumn = NSTableColumn(title: "Suggestions", minWidth: 100)
+    private let minimapScroller = MinimapScroller(frame: .zero)
 
     private var dragTargetLine: Int? {
         didSet {

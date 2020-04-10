@@ -59,11 +59,17 @@ public class MinimapScroller: NSScroller {
     }
 
     private var scrollViewContentHeight: CGFloat {
-        return (superview as? NSScrollView)?.contentSize.height ?? 0
+        guard let scrollView = superview as? NSScrollView else { return 0 }
+
+        return scrollView.contentSize.height
     }
 
     private var scrollViewDocumentHeight: CGFloat {
-        return (superview as? NSScrollView)?.documentView?.frame.height ?? 0
+        guard let scrollView = superview as? NSScrollView else { return 0 }
+
+        let padding = scrollView.contentInsets.top + scrollView.contentInsets.bottom
+        
+        return (scrollView.documentView?.frame.height ?? 0) + padding
     }
 
     private var slotDocumentHeight: CGFloat {
@@ -123,7 +129,6 @@ public class MinimapScroller: NSScroller {
 
         let initialPosition = convert(event.locationInWindow, from: nil)
         let initialValue = CGFloat(floatValue)
-        let initialOrigin = scrollView.contentView.frame.origin
 
         let slotHeight = rect(for: .knobSlot).height
         let knobHeight = rect(for: .knob).height
@@ -139,7 +144,13 @@ public class MinimapScroller: NSScroller {
 
                 floatValue = Float(value)
 
-                scrollView.scroll(scrollView.contentView, to: NSPoint(x: initialOrigin.x, y: scrollableHeight * value))
+                scrollView.scroll(
+                    scrollView.contentView,
+                    to: NSPoint(
+                        x: scrollView.contentView.bounds.origin.x,
+                        y: scrollableHeight * value - scrollView.contentInsets.top
+                    )
+                )
             case .leftMouseUp:
                 break trackingLoop
             default:

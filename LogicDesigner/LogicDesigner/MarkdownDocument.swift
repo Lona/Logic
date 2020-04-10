@@ -44,6 +44,7 @@ class MarkdownDocument: NSDocument {
     var blockEditor: BlockEditor = {
         let blockEditor = BlockEditor()
 
+        blockEditor.showsMinimap = true
         blockEditor.blocks = MarkdownFile.makeBlocks(.init(children: []))
 
         return blockEditor
