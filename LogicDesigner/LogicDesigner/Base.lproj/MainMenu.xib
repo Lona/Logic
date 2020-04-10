@@ -69,8 +69,7 @@
                                     <action selector="newDocument:" target="-1" id="4Si-XN-c54"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="New Tokens File" id="6hJ-gv-0je">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="New Tokens File" keyEquivalent="N" id="6hJ-gv-0je">
                                 <connections>
                                     <action selector="newLogicDocument:" target="-1" id="pAh-ZG-UCY"/>
                                 </connections>
