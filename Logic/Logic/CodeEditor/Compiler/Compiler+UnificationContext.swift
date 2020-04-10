@@ -130,6 +130,18 @@ extension Compiler {
 
                         if let initializer = initializer {
                             _ = LGCSyntaxNode.expression(initializer).reduce(config: config, initialResult: result, f: walk)
+
+                            // TODO: If this doesn't exist, we probably need to implement another node
+                            if let initializerType = result.nodes[initializer.uuid] {
+                                result.addConstraint(
+                                    Unification.Constraint(annotationType, initializerType),
+                                    "Record Variable Type Annotation <-> Initializer",
+                                    [node.uuid, initializer.uuid]
+                                )
+                            } else {
+                                Swift.print("WARNING: No initializer type for \(initializer.uuid)")
+                            }
+
                         }
                     default:
                         break
