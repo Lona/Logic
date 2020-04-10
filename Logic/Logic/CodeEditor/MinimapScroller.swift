@@ -47,7 +47,16 @@ public class MinimapScroller: NSScroller {
     // MARK: Measuring
 
     public override class func scrollerWidth(for controlSize: NSControl.ControlSize, scrollerStyle: NSScroller.Style) -> CGFloat {
-        return standardScrollerWidth
+        switch controlSize {
+        case .mini:
+            return standardScrollerWidth
+        case .small:
+            return standardScrollerWidth * 4 / 3
+        case .regular:
+            return standardScrollerWidth * 5 / 3
+        default:
+            return standardScrollerWidth
+        }
     }
 
     public override var floatValue: Float {

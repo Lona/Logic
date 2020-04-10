@@ -574,16 +574,40 @@ public class BlockListView: NSBox {
         return true
     }
 
-    public var horizontalPadding: CGFloat {
-        let width = bounds.width
-        let horizontalPadding = width > 820 ? (width - 700) / 2 : 60
-        return horizontalPadding
+    public var smallWidthBreakpointSize: CGFloat = 820
+    public var largeWidthBreakpointSize: CGFloat = 1200
+    public var minimumHorizontalPadding: CGFloat = 60
+    public var verticalPadding: CGFloat = 80
+
+    private var contentWidthSize: CGFloat {
+        return smallWidthBreakpointSize - minimumHorizontalPadding * 2
     }
 
-    public var verticalPadding: CGFloat = 80
+    public var horizontalPadding: CGFloat {
+        let width = bounds.width
+        let scrollerWidth = showsMinimap ? MinimapScroller.scrollerWidth(for: minimapControlSize(for: width), scrollerStyle: .overlay) : 0
+
+        return (width - scrollerWidth) > smallWidthBreakpointSize
+            ? (width - scrollerWidth - contentWidthSize) / 2
+            : minimumHorizontalPadding
+    }
+
+    private func minimapControlSize(for width: CGFloat) -> NSControl.ControlSize {
+        if bounds.width > largeWidthBreakpointSize {
+            return .regular
+        } else if bounds.width > smallWidthBreakpointSize {
+            return .small
+        } else {
+            return .mini
+        }
+    }
 
     public override func layout() {
         super.layout()
+
+        if showsMinimap {
+            minimapScroller.controlSize = minimapControlSize(for: bounds.width)
+        }
 
         let horizontalPadding = self.horizontalPadding
 
