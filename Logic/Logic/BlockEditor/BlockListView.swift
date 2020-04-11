@@ -334,6 +334,7 @@ public class BlockListView: NSBox {
         let viewFrame = view.convert(view.frame, to: scrollView.contentView)
 
         scrollView.contentView.bounds.origin.y = viewFrame.origin.y
+        scrollView.reflectScrolledClipView(scrollView.contentView)
     }
 
     public var showsMinimap: Bool = false {

@@ -52,20 +52,48 @@ class MarkdownDocument: NSDocument {
 
     var currentVisibleBlock: Int?
 
-    @IBAction func scrollToNextPrevious(_ sender: AnyObject) {
-        let nextRow = currentVisibleBlock == nil ? blockEditor.blocks.count - 1 : currentVisibleBlock! - 1 
+    @IBAction func scrollToPreviousSection(_ sender: AnyObject) {
+        guard let currentVisibleBlock = currentVisibleBlock, currentVisibleBlock > 0 else { return }
 
-        guard !blockEditor.blocks.isEmpty, nextRow >= 0, nextRow < blockEditor.blocks.count else { return }
+        if blockEditor.blocks.isEmpty || currentVisibleBlock <= 0 { return }
 
-        blockEditor.select(id: blockEditor.blocks[nextRow].id)
+        let rest = blockEditor.blocks[0..<currentVisibleBlock]
+
+        guard let header = rest.last(where: {
+            switch $0.content {
+            case .text(_, .h1), .text(_, .h2), .text(_, .h3):
+                return true
+            default:
+                return false
+            }
+        }) else { return }
+
+        Swift.print("currently visible", blockEditor.blocks[currentVisibleBlock], header)
+
+        blockEditor.select(id: header.id)
     }
 
     @IBAction func scrollToNextSection(_ sender: AnyObject) {
-        let nextRow = currentVisibleBlock == nil ? 0 : currentVisibleBlock! + 1
+        let start = currentVisibleBlock != nil ? currentVisibleBlock! + 1 : 0
 
-        guard nextRow < blockEditor.blocks.count else { return }
+        if blockEditor.blocks.isEmpty || start >= blockEditor.blocks.count { return }
 
-        blockEditor.select(id: blockEditor.blocks[nextRow].id)
+        let rest = blockEditor.blocks[start..<blockEditor.blocks.count]
+
+        guard let header = rest.first(where: {
+            switch $0.content {
+            case .text(_, .h1), .text(_, .h2), .text(_, .h3):
+                return true
+            default:
+                return false
+            }
+        }) else { return }
+
+        if let currentVisibleBlock = currentVisibleBlock {
+            Swift.print("currently visible", blockEditor.blocks[currentVisibleBlock], header)
+        }
+
+        blockEditor.select(id: header.id)
     }
 
 //    var successfulUnification: (Compiler.UnificationContext, Unification.Substitution)?

@@ -634,7 +634,7 @@
                             <menuItem isSeparatorItem="YES" id="wId-Ro-MDf"/>
                             <menuItem title="Scroll To Previous Section" keyEquivalent="[" id="Wdo-fl-mRU">
                                 <connections>
-                                    <action selector="scrollToNextPrevious:" target="-1" id="HNB-RC-TGy"/>
+                                    <action selector="scrollToPreviousSection:" target="-1" id="VB6-7u-uxx"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Scroll To Next Section" keyEquivalent="]" id="5Nv-7I-c1C">
