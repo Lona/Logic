@@ -331,9 +331,9 @@ public class BlockListView: NSBox {
         self.selection = .item(row, .empty)
 
         let view = blocks[row].view
-        let viewFrame = view.convert(view.frame, to: scrollView.documentView!)
+        let viewFrame = view.convert(view.frame, to: scrollView.contentView)
 
-        scrollView.documentView!.scroll(viewFrame.origin)
+        scrollView.contentView.bounds.origin.y = viewFrame.origin.y
     }
 
     public var showsMinimap: Bool = false {
