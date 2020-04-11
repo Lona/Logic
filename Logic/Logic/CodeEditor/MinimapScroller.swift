@@ -14,9 +14,17 @@ public class MinimapScroller: NSScroller {
 
     public var drawKnobSlot: ((NSRect, Bool) -> Void)?
 
-    public var knobColor = NSColor.systemBlue.withAlphaComponent(0.2) { didSet { needsDisplay = true } }
+    public var knobColor = MinimapScroller.defaultKnobColor { didSet { needsDisplay = true } }
 
-    public var dividerColor = Colors.divider { didSet { needsDisplay = true } }
+    public var dividerColor = MinimapScroller.defaultDividerColor { didSet { needsDisplay = true } }
+
+    public var fillColor = MinimapScroller.defaultFillColor { didSet { needsDisplay = true } }
+
+    public static var defaultFillColor: NSColor = Colors.blockBackground
+
+    public static var defaultDividerColor: NSColor = NSColor.clear
+
+    public static var defaultKnobColor: NSColor = NSColor.systemBlue.withAlphaComponent(0.2)
 
     public static var renderingScale: CGFloat = 0.2
 
@@ -42,6 +50,13 @@ public class MinimapScroller: NSScroller {
         slotRect.size.width -= 2
         slotRect.origin.y -= slotOverflow * CGFloat(floatValue)
         drawKnobSlot?(slotRect, flag)
+    }
+
+    public override func draw(_ dirtyRect: NSRect) {
+        fillColor.setFill()
+        dirtyRect.fill()
+
+        super.draw(dirtyRect)
     }
 
     // MARK: Measuring
