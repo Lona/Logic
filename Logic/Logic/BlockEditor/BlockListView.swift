@@ -306,6 +306,10 @@ public class BlockListView: NSBox {
             }
 
             needsDisplay = true
+
+            if showsMinimap {
+                minimapScroller.needsDisplay = true
+            }
         }
     }
 
@@ -348,7 +352,7 @@ public class BlockListView: NSBox {
 
                     var drawingRect = self.tableView.bounds
                     drawingRect.origin.y += self.verticalPadding
-                    drawingRect.origin.x += 10
+                    drawingRect.origin.x = max((rect.width / scale - drawingRect.size.width) / 2, 10)
 
                     image.draw(in: drawingRect)
 
@@ -357,11 +361,13 @@ public class BlockListView: NSBox {
 
                 scrollView.autohidesScrollers = false
                 scrollView.verticalScroller = minimapScroller
+                tableView.usesStaticContents = true
             } else {
                 minimapScroller.drawKnobSlot = nil
 
                 scrollView.autohidesScrollers = true
                 scrollView.verticalScroller = NSScroller()
+                tableView.usesStaticContents = false
             }
         }
     }

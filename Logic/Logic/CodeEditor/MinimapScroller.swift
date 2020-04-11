@@ -178,8 +178,6 @@ public class MinimapScroller: NSScroller {
 
             if scrollableHeight <= 0 { return }
 
-            let initialOrigin = scrollView.contentView.frame.origin
-
             let slotHeight = rect(for: .knobSlot).height
             let knobHeight = rect(for: .knob).height
 
@@ -188,7 +186,13 @@ public class MinimapScroller: NSScroller {
 
             floatValue = Float(value)
 
-            scrollView.scroll(scrollView.contentView, to: NSPoint(x: initialOrigin.x, y: scrollableHeight * value))
+            scrollView.scroll(
+                scrollView.contentView,
+                to: NSPoint(
+                    x: scrollView.contentView.bounds.origin.x,
+                    y: scrollableHeight * value - scrollView.contentInsets.top
+                )
+            )
 
             trackKnob(with: event)
         } else {
