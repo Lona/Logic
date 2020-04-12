@@ -516,8 +516,11 @@ public class BlockListView: NSBox {
         scrollView.documentView = tableView
 
         scrollView.automaticallyAdjustsContentInsets = false
-        scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
-        scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
+
+        let leftInset = self.leftInset
+        let rightInset = self.rightInset
+        scrollView.contentInsets = .init(top: verticalPadding, left: leftInset, bottom: verticalPadding, right: rightInset)
+        scrollView.scrollerInsets = .init(top: -verticalPadding, left: -leftInset, bottom: -verticalPadding, right: -rightInset)
 
         scrollView.contentView.postsBoundsChangedNotifications = true
 
@@ -599,6 +602,24 @@ public class BlockListView: NSBox {
             : minimumHorizontalPadding
     }
 
+    public var leftInset: CGFloat {
+        let width = bounds.width
+        let scrollerWidth = showsMinimap && width > 1000
+            ? MinimapScroller.scrollerWidth(for: minimapControlSize(for: width), scrollerStyle: .overlay)
+            : 0
+
+        return horizontalPadding + scrollerWidth / 2
+    }
+
+    public var rightInset: CGFloat {
+        let width = bounds.width
+        let scrollerWidth = showsMinimap && width > 1000
+            ? MinimapScroller.scrollerWidth(for: minimapControlSize(for: width), scrollerStyle: .overlay)
+            : 0
+
+        return horizontalPadding - scrollerWidth / 2
+    }
+
     private func minimapControlSize(for width: CGFloat) -> NSControl.ControlSize {
         if bounds.width > largeWidthBreakpointSize {
             return .regular
@@ -616,11 +637,11 @@ public class BlockListView: NSBox {
             minimapScroller.controlSize = minimapControlSize(for: bounds.width)
         }
 
-        let horizontalPadding = self.horizontalPadding
-
-        if scrollView.contentInsets.left != horizontalPadding {
-            scrollView.contentInsets = .init(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
-            scrollView.scrollerInsets = .init(top: -verticalPadding, left: -horizontalPadding, bottom: -verticalPadding, right: -horizontalPadding)
+        if scrollView.contentInsets.left != leftInset {
+            let leftInset = self.leftInset
+            let rightInset = self.rightInset
+            scrollView.contentInsets = .init(top: verticalPadding, left: leftInset, bottom: verticalPadding, right: rightInset)
+            scrollView.scrollerInsets = .init(top: -verticalPadding, left: -leftInset, bottom: -verticalPadding, right: -rightInset)
         }
     }
 
@@ -704,7 +725,7 @@ public class BlockListView: NSBox {
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
-            x: floor(horizontalPadding - lineButtonSize.width - lineButtonMargin),
+            x: floor(leftInset - lineButtonSize.width - lineButtonMargin),
             y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
@@ -723,7 +744,7 @@ public class BlockListView: NSBox {
         let alignmentHeight = blocks[line].lineButtonAlignmentHeight
 
         let rect = NSRect(
-            x: horizontalPadding - lineButtonSize.width * 2 - lineButtonMargin * 2,
+            x: leftInset - lineButtonSize.width * 2 - lineButtonMargin * 2,
             y: floor(rowRect.maxY - alignmentHeight + (alignmentHeight - lineButtonSize.height) / 2 - 4),
             width: lineButtonSize.width,
             height: lineButtonSize.height)
