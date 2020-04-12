@@ -95,6 +95,11 @@ open class BlockEditor: NSBox {
         set { blockListView.showsMinimap = newValue }
     }
 
+    public var floatingMinimap: Bool {
+        get { blockListView.floatingMinimap }
+        set { blockListView.floatingMinimap = newValue }
+    }
+
     public func select(id: UUID) {
         blockListView.select(id: id)
     }

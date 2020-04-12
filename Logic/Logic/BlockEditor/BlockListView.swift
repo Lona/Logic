@@ -337,6 +337,16 @@ public class BlockListView: NSBox {
         scrollView.reflectScrolledClipView(scrollView.contentView)
     }
 
+    public var floatingMinimap: Bool = false {
+        didSet {
+            needsLayout = true
+
+            if showsMinimap {
+                minimapScroller.needsDisplay = true
+            }
+        }
+    }
+
     public var showsMinimap: Bool = false {
         didSet {
             if showsMinimap {
@@ -604,7 +614,7 @@ public class BlockListView: NSBox {
 
     public var leftInset: CGFloat {
         let width = bounds.width
-        let scrollerWidth = showsMinimap && width > 1000
+        let scrollerWidth = showsMinimap && floatingMinimap && width > 1000
             ? MinimapScroller.scrollerWidth(for: minimapControlSize(for: width), scrollerStyle: .overlay)
             : 0
 
@@ -613,7 +623,7 @@ public class BlockListView: NSBox {
 
     public var rightInset: CGFloat {
         let width = bounds.width
-        let scrollerWidth = showsMinimap && width > 1000
+        let scrollerWidth = showsMinimap && floatingMinimap && width > 1000
             ? MinimapScroller.scrollerWidth(for: minimapControlSize(for: width), scrollerStyle: .overlay)
             : 0
 
