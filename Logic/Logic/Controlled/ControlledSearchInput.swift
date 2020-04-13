@@ -11,7 +11,7 @@ import Foundation
 
 // MARK: - ControlledSearchInput
 
-open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
+open class ControlledSearchInput: NSSearchField, NSControlTextEditingDelegate, NSSearchFieldDelegate {
 
     private struct InternalState {
         var textValue: String
@@ -27,17 +27,13 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
     override public init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
 
-        setUpSelectionObserver()
-        usesSingleLineMode = true
-        self.delegate = self
+        setUp()
     }
 
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
 
-        setUpSelectionObserver()
-        usesSingleLineMode = true
-        self.delegate = self
+        setUp()
     }
 
     // MARK: Public
@@ -71,6 +67,16 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
 
     // MARK: Private
 
+    private func setUp() {
+        if let cell = self.cell as? NSSearchFieldCell {
+            cell.searchButtonCell?.isTransparent = true
+        }
+
+        setUpSelectionObserver()
+        usesSingleLineMode = true
+        self.delegate = self
+    }
+
     private var textDidChangeInCallback = false
 
     private var currentState: InternalState {
@@ -103,6 +109,39 @@ open class ControlledSearchInput: NSTextField, NSControlTextEditingDelegate {
                     else { return }
                 self.previousState.selectedRange = self.currentState.selectedRange
         })
+    }
+}
+
+// MARK: - Mouse Interactions
+
+extension ControlledSearchInput {
+
+    // Override to return this view, instead of the descendant NSTextView.
+    open override func hitTest(_ point: NSPoint) -> NSView? {
+        let found = super.hitTest(point)
+
+        return found?.isDescendant(of: self) == true ? self : found
+    }
+
+    // Handle the cancel button manually, since it wasn't getting triggered otherwise
+    open override func mouseDown(with event: NSEvent) {
+        let point = convert(event.locationInWindow, from: nil)
+        let cancelRect = rectForCancelButton(whenCentered: false)
+
+        if cancelRect.contains(point) {
+            onChangeTextValue?("")
+            return
+        }
+
+        super.mouseDown(with: event)
+    }
+
+    open override func rectForCancelButton(whenCentered isCentered: Bool) -> NSRect {
+        var rect = super.rectForCancelButton(whenCentered: isCentered)
+
+        rect.origin.x += 2
+
+        return rect
     }
 }
 
