@@ -107,7 +107,6 @@ class LogicDocument: NSDocument {
 
         logicEditor.placeholderText = "Search"
         logicEditor.showsMinimap = true
-        logicEditor.showsDropdown = true
         logicEditor.showsFilterBar = true
         logicEditor.suggestionFilter = .all
         logicEditor.showsLineButtons = true

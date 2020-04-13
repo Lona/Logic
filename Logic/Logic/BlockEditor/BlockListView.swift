@@ -770,6 +770,7 @@ public class BlockListView: NSBox {
         let suggestionWindow = SuggestionWindow()
 
         suggestionWindow.showsSearchBar = false
+        suggestionWindow.acceptsKeyboardInputWithHiddenSearchBar = false
         suggestionWindow.showsSuggestionDetails = false
 
         return suggestionWindow
@@ -842,6 +843,7 @@ public class BlockListView: NSBox {
         let subwindow = SuggestionWindow()
 
         subwindow.showsSearchBar = false
+        subwindow.acceptsKeyboardInputWithHiddenSearchBar = false
         subwindow.showsSuggestionDetails = false
 
         let suggestionItems: [SuggestionListItem] = replaceMenuSuggestionItems.map { $0.0 }

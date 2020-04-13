@@ -51,6 +51,12 @@ public class SuggestionWindow: NSWindow {
             style.defaultContentWidth = 256
             return style
         }()
+
+        public static var contextMenuWithoutSearchBar: Style = {
+            var style = Style.contextMenu
+            style.showsSearchBar = false
+            return style
+        }()
     }
 
     public static var contextMenu: SuggestionWindow = {
@@ -223,6 +229,8 @@ public class SuggestionWindow: NSWindow {
 
     var suggestionView = SuggestionView()
 
+    lazy var proxySearchField = ControlledSearchInput(frame: .zero)
+
     private func handleHide() {
         if parent != nil || shouldHideWithoutCheckingParentWindow {
             self.onRequestHide?()
@@ -247,6 +255,8 @@ public class SuggestionWindow: NSWindow {
             suggestionView.showsSuggestionList = style.showsSuggestionList
             suggestionView.showsSuggestionDetails = style.showsSuggestionDetails
             suggestionView.suggestionListWidth = style.suggestionListWidth
+
+            updateProxySearchField()
         }
     }
 
@@ -352,6 +362,48 @@ public class SuggestionWindow: NSWindow {
         set { style.showsSearchBar = newValue }
     }
 
+    public var acceptsKeyboardInputWithHiddenSearchBar: Bool = true {
+        didSet {
+            updateProxySearchField()
+        }
+    }
+
+    private func updateProxySearchField() {
+        if !showsSearchBar && acceptsKeyboardInputWithHiddenSearchBar {
+            contentView?.addSubview(proxySearchField)
+
+            proxySearchField.onPressDownKey = { [unowned self] in
+                self.suggestionView.searchInput.onPressDownKey?()
+            }
+
+            proxySearchField.onPressUpKey = { [unowned self] in
+                self.suggestionView.searchInput.onPressUpKey?()
+            }
+
+            proxySearchField.onSubmit = { [unowned self] in
+                self.suggestionView.searchInput.onSubmit?()
+            }
+
+            proxySearchField.onPressEscape = { [unowned self] in
+                self.suggestionView.searchInput.onPressEscape?()
+            }
+
+            proxySearchField.onPressTab = { [unowned self] in
+                self.suggestionView.searchInput.onPressTab?()
+            }
+
+            proxySearchField.onPressShiftTab = { [unowned self] in
+                self.suggestionView.searchInput.onPressShiftTab?()
+            }
+
+            proxySearchField.onPressDeleteField = { [unowned self] in
+                self.suggestionView.searchInput.onPressDeleteField?()
+            }
+        } else {
+            proxySearchField.removeFromSuperview()
+        }
+    }
+
     public var showsSuggestionDetails: Bool {
         get { return style.showsSuggestionDetails }
         set { style.showsSuggestionDetails = newValue }
@@ -430,12 +482,12 @@ public class SuggestionWindow: NSWindow {
     // MARK: Focus
 
     public override var acceptsFirstResponder: Bool {
-        return showsSearchBar
+        return showsSearchBar || acceptsKeyboardInputWithHiddenSearchBar
     }
 
     public func focusSearchField() {
         makeKey()
-        makeFirstResponder(suggestionView.searchInput)
+        makeFirstResponder(showsSearchBar ? suggestionView.searchInput : proxySearchField)
 
         let selectablePairs = self.suggestionItems.enumerated().filter { $0.element.isSelectable }
 
@@ -529,7 +581,7 @@ public class SuggestionWindow: NSWindow {
 //    }
 
     public override var canBecomeKey: Bool {
-        return showsSearchBar
+        return showsSearchBar || acceptsKeyboardInputWithHiddenSearchBar
     }
 
     // Offset the origin to account for the shadow view's margin
