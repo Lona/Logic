@@ -25,6 +25,7 @@ public class SuggestionSearchBar: NSBox {
     showsOverflowMenu: Bool,
     searchText: String,
     placeholderText: String?,
+    tokenText: String?,
     dropdownIndex: Int,
     dropdownValues: [String],
     dropdownKeyEquivalents: [String])
@@ -36,6 +37,7 @@ public class SuggestionSearchBar: NSBox {
           showsOverflowMenu: showsOverflowMenu,
           searchText: searchText,
           placeholderText: placeholderText,
+          tokenText: tokenText,
           dropdownIndex: dropdownIndex,
           dropdownValues: dropdownValues,
           dropdownKeyEquivalents: dropdownKeyEquivalents))
@@ -90,6 +92,15 @@ public class SuggestionSearchBar: NSBox {
     set {
       if parameters.placeholderText != newValue {
         parameters.placeholderText = newValue
+      }
+    }
+  }
+
+  public var tokenText: String? {
+    get { return parameters.tokenText }
+    set {
+      if parameters.tokenText != newValue {
+        parameters.tokenText = newValue
       }
     }
   }
@@ -191,6 +202,11 @@ public class SuggestionSearchBar: NSBox {
     set { parameters.onPressOverflowMenu = newValue }
   }
 
+  public var onPressToken: (() -> Void)? {
+    get { return parameters.onPressToken }
+    set { parameters.onPressToken = newValue }
+  }
+
   public var parameters: Parameters {
     didSet {
       if parameters != oldValue {
@@ -201,6 +217,8 @@ public class SuggestionSearchBar: NSBox {
 
   // MARK: Private
 
+  private var tokenContainerView = NSBox()
+  private var searchBarTokenView = SearchBarToken()
   private var searchInputContainerView = NSBox()
   private var searchInputView = ControlledSearchInput()
   private var controlledDropdownContainerView = NSBox()
@@ -208,16 +226,17 @@ public class SuggestionSearchBar: NSBox {
   var overflowMenuContainerView = NSBox()
   private var overflowMenuButtonView = OverflowMenuButton()
 
+  private var searchInputContainerViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
   private var searchInputContainerViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownContainerViewTopAnchorTopAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint: NSLayoutConstraint?
-  private var controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint: NSLayoutConstraint?
+  private var tokenContainerViewLeadingAnchorLeadingAnchorConstraint: NSLayoutConstraint?
+  private var tokenContainerViewTopAnchorTopAnchorConstraint: NSLayoutConstraint?
+  private var tokenContainerViewBottomAnchorBottomAnchorConstraint: NSLayoutConstraint?
+  private var searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint: NSLayoutConstraint?
+  private var searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint: NSLayoutConstraint?
+  private var searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint: NSLayoutConstraint?
+  private var searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuContainerViewTopAnchorTopAnchorConstraint: NSLayoutConstraint?
@@ -227,12 +246,24 @@ public class SuggestionSearchBar: NSBox {
   private var overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewHeightAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuButtonViewWidthAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownContainerViewTopAnchorTopAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint: NSLayoutConstraint?
+  private var controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint: NSLayoutConstraint?
   private var overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint: NSLayoutConstraint?
 
   private func setUpViews() {
     boxType = .custom
     borderType = .noBorder
     contentViewMargins = .zero
+    tokenContainerView.boxType = .custom
+    tokenContainerView.borderType = .noBorder
+    tokenContainerView.contentViewMargins = .zero
     searchInputContainerView.boxType = .custom
     searchInputContainerView.borderType = .noBorder
     searchInputContainerView.contentViewMargins = .zero
@@ -243,9 +274,11 @@ public class SuggestionSearchBar: NSBox {
     overflowMenuContainerView.borderType = .noBorder
     overflowMenuContainerView.contentViewMargins = .zero
 
+    addSubview(tokenContainerView)
     addSubview(searchInputContainerView)
     addSubview(controlledDropdownContainerView)
     addSubview(overflowMenuContainerView)
+    tokenContainerView.addSubview(searchBarTokenView)
     searchInputContainerView.addSubview(searchInputView)
     controlledDropdownContainerView.addSubview(controlledDropdownView)
     overflowMenuContainerView.addSubview(overflowMenuButtonView)
@@ -253,17 +286,16 @@ public class SuggestionSearchBar: NSBox {
 
   private func setUpConstraints() {
     translatesAutoresizingMaskIntoConstraints = false
+    tokenContainerView.translatesAutoresizingMaskIntoConstraints = false
     searchInputContainerView.translatesAutoresizingMaskIntoConstraints = false
     controlledDropdownContainerView.translatesAutoresizingMaskIntoConstraints = false
     overflowMenuContainerView.translatesAutoresizingMaskIntoConstraints = false
+    searchBarTokenView.translatesAutoresizingMaskIntoConstraints = false
     searchInputView.translatesAutoresizingMaskIntoConstraints = false
     controlledDropdownView.translatesAutoresizingMaskIntoConstraints = false
     overflowMenuButtonView.translatesAutoresizingMaskIntoConstraints = false
 
     let heightAnchorConstraint = heightAnchor.constraint(equalToConstant: 32)
-    let searchInputContainerViewLeadingAnchorConstraint = searchInputContainerView
-      .leadingAnchor
-      .constraint(equalTo: leadingAnchor)
     let searchInputContainerViewTopAnchorConstraint = searchInputContainerView.topAnchor.constraint(equalTo: topAnchor)
     let searchInputContainerViewBottomAnchorConstraint = searchInputContainerView
       .bottomAnchor
@@ -280,9 +312,62 @@ public class SuggestionSearchBar: NSBox {
     let searchInputViewTrailingAnchorConstraint = searchInputView
       .trailingAnchor
       .constraint(equalTo: searchInputContainerView.trailingAnchor, constant: -10)
+    let searchInputContainerViewLeadingAnchorLeadingAnchorConstraint = searchInputContainerView
+      .leadingAnchor
+      .constraint(equalTo: leadingAnchor)
     let searchInputContainerViewTrailingAnchorTrailingAnchorConstraint = searchInputContainerView
       .trailingAnchor
       .constraint(equalTo: trailingAnchor)
+    let tokenContainerViewLeadingAnchorLeadingAnchorConstraint = tokenContainerView
+      .leadingAnchor
+      .constraint(equalTo: leadingAnchor)
+    let tokenContainerViewTopAnchorTopAnchorConstraint = tokenContainerView.topAnchor.constraint(equalTo: topAnchor)
+    let tokenContainerViewBottomAnchorBottomAnchorConstraint = tokenContainerView
+      .bottomAnchor
+      .constraint(equalTo: bottomAnchor)
+    let searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint = searchInputContainerView
+      .leadingAnchor
+      .constraint(equalTo: tokenContainerView.trailingAnchor)
+    let searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint = searchBarTokenView
+      .leadingAnchor
+      .constraint(equalTo: tokenContainerView.leadingAnchor, constant: 10)
+    let searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint = searchBarTokenView
+      .trailingAnchor
+      .constraint(equalTo: tokenContainerView.trailingAnchor)
+    let searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint = searchBarTokenView
+      .topAnchor
+      .constraint(greaterThanOrEqualTo: tokenContainerView.topAnchor)
+    let searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint = searchBarTokenView
+      .centerYAnchor
+      .constraint(equalTo: tokenContainerView.centerYAnchor)
+    let searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint = searchBarTokenView
+      .bottomAnchor
+      .constraint(lessThanOrEqualTo: tokenContainerView.bottomAnchor)
+    let overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint = overflowMenuContainerView
+      .trailingAnchor
+      .constraint(equalTo: trailingAnchor)
+    let overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint = overflowMenuContainerView
+      .leadingAnchor
+      .constraint(equalTo: searchInputContainerView.trailingAnchor)
+    let overflowMenuContainerViewTopAnchorTopAnchorConstraint = overflowMenuContainerView
+      .topAnchor
+      .constraint(equalTo: topAnchor)
+    let overflowMenuContainerViewBottomAnchorBottomAnchorConstraint = overflowMenuContainerView
+      .bottomAnchor
+      .constraint(equalTo: bottomAnchor)
+    let overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint = overflowMenuButtonView
+      .leadingAnchor
+      .constraint(equalTo: overflowMenuContainerView.leadingAnchor, constant: 5)
+    let overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint = overflowMenuButtonView
+      .trailingAnchor
+      .constraint(equalTo: overflowMenuContainerView.trailingAnchor, constant: -10)
+    let overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint = overflowMenuButtonView
+      .centerYAnchor
+      .constraint(equalTo: overflowMenuContainerView.centerYAnchor)
+    let overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonView
+      .heightAnchor
+      .constraint(equalToConstant: 13)
+    let overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonView.widthAnchor.constraint(equalToConstant: 23)
     let controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint = controlledDropdownContainerView
       .trailingAnchor
       .constraint(equalTo: trailingAnchor)
@@ -310,37 +395,44 @@ public class SuggestionSearchBar: NSBox {
     let controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint = controlledDropdownView
       .bottomAnchor
       .constraint(lessThanOrEqualTo: controlledDropdownContainerView.bottomAnchor)
-    let overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint = overflowMenuContainerView
-      .trailingAnchor
-      .constraint(equalTo: trailingAnchor)
-    let overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint = overflowMenuContainerView
-      .leadingAnchor
-      .constraint(equalTo: searchInputContainerView.trailingAnchor)
-    let overflowMenuContainerViewTopAnchorTopAnchorConstraint = overflowMenuContainerView
-      .topAnchor
-      .constraint(equalTo: topAnchor)
-    let overflowMenuContainerViewBottomAnchorBottomAnchorConstraint = overflowMenuContainerView
-      .bottomAnchor
-      .constraint(equalTo: bottomAnchor)
-    let overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint = overflowMenuButtonView
-      .leadingAnchor
-      .constraint(equalTo: overflowMenuContainerView.leadingAnchor, constant: 5)
-    let overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint = overflowMenuButtonView
-      .trailingAnchor
-      .constraint(equalTo: overflowMenuContainerView.trailingAnchor, constant: -10)
-    let overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint = overflowMenuButtonView
-      .centerYAnchor
-      .constraint(equalTo: overflowMenuContainerView.centerYAnchor)
-    let overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonView
-      .heightAnchor
-      .constraint(equalToConstant: 13)
-    let overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonView.widthAnchor.constraint(equalToConstant: 23)
     let overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint = overflowMenuContainerView
       .leadingAnchor
       .constraint(equalTo: controlledDropdownContainerView.trailingAnchor)
 
+    self.searchInputContainerViewLeadingAnchorLeadingAnchorConstraint =
+      searchInputContainerViewLeadingAnchorLeadingAnchorConstraint
     self.searchInputContainerViewTrailingAnchorTrailingAnchorConstraint =
       searchInputContainerViewTrailingAnchorTrailingAnchorConstraint
+    self.tokenContainerViewLeadingAnchorLeadingAnchorConstraint = tokenContainerViewLeadingAnchorLeadingAnchorConstraint
+    self.tokenContainerViewTopAnchorTopAnchorConstraint = tokenContainerViewTopAnchorTopAnchorConstraint
+    self.tokenContainerViewBottomAnchorBottomAnchorConstraint = tokenContainerViewBottomAnchorBottomAnchorConstraint
+    self.searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint =
+      searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint
+    self.searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint =
+      searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint
+    self.searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint =
+      searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint
+    self.searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint =
+      searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint
+    self.searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint =
+      searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint
+    self.searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint =
+      searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint
+    self.overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint =
+      overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint
+    self.overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint =
+      overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint
+    self.overflowMenuContainerViewTopAnchorTopAnchorConstraint = overflowMenuContainerViewTopAnchorTopAnchorConstraint
+    self.overflowMenuContainerViewBottomAnchorBottomAnchorConstraint =
+      overflowMenuContainerViewBottomAnchorBottomAnchorConstraint
+    self.overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint =
+      overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint
+    self.overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint =
+      overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint
+    self.overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint =
+      overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint
+    self.overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonViewHeightAnchorConstraint
+    self.overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonViewWidthAnchorConstraint
     self.controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint =
       controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint
     self.controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint =
@@ -359,28 +451,12 @@ public class SuggestionSearchBar: NSBox {
       controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint
     self.controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint =
       controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
-    self.overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint =
-      overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint
-    self.overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint =
-      overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint
-    self.overflowMenuContainerViewTopAnchorTopAnchorConstraint = overflowMenuContainerViewTopAnchorTopAnchorConstraint
-    self.overflowMenuContainerViewBottomAnchorBottomAnchorConstraint =
-      overflowMenuContainerViewBottomAnchorBottomAnchorConstraint
-    self.overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint =
-      overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint
-    self.overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint =
-      overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint
-    self.overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint =
-      overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint
-    self.overflowMenuButtonViewHeightAnchorConstraint = overflowMenuButtonViewHeightAnchorConstraint
-    self.overflowMenuButtonViewWidthAnchorConstraint = overflowMenuButtonViewWidthAnchorConstraint
     self.overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint =
       overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint
 
     NSLayoutConstraint.activate(
       [
         heightAnchorConstraint,
-        searchInputContainerViewLeadingAnchorConstraint,
         searchInputContainerViewTopAnchorConstraint,
         searchInputContainerViewBottomAnchorConstraint,
         searchInputViewTopAnchorConstraint,
@@ -390,32 +466,39 @@ public class SuggestionSearchBar: NSBox {
       ] +
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerView.isHidden,
-          overflowMenuContainerViewIsHidden: overflowMenuContainerView.isHidden))
+          overflowMenuContainerViewIsHidden: overflowMenuContainerView.isHidden,
+          tokenContainerViewIsHidden: tokenContainerView.isHidden))
   }
 
   private func conditionalConstraints(
     controlledDropdownContainerViewIsHidden: Bool,
-    overflowMenuContainerViewIsHidden: Bool) -> [NSLayoutConstraint]
+    overflowMenuContainerViewIsHidden: Bool,
+    tokenContainerViewIsHidden: Bool) -> [NSLayoutConstraint]
   {
     var constraints: [NSLayoutConstraint?]
 
-    switch (controlledDropdownContainerViewIsHidden, overflowMenuContainerViewIsHidden) {
-      case (true, true):
-        constraints = [searchInputContainerViewTrailingAnchorTrailingAnchorConstraint]
-      case (false, true):
+    switch (controlledDropdownContainerViewIsHidden, overflowMenuContainerViewIsHidden, tokenContainerViewIsHidden) {
+      case (true, true, true):
         constraints = [
-          controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint,
-          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
-          controlledDropdownContainerViewTopAnchorTopAnchorConstraint,
-          controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint,
-          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
-          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
-          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
-          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
-          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
+          searchInputContainerViewLeadingAnchorLeadingAnchorConstraint,
+          searchInputContainerViewTrailingAnchorTrailingAnchorConstraint
         ]
-      case (true, false):
+      case (true, true, false):
         constraints = [
+          tokenContainerViewLeadingAnchorLeadingAnchorConstraint,
+          tokenContainerViewTopAnchorTopAnchorConstraint,
+          tokenContainerViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewTrailingAnchorTrailingAnchorConstraint,
+          searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint,
+          searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint,
+          searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint,
+          searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint,
+          searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint,
+          searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint
+        ]
+      case (true, false, true):
+        constraints = [
+          searchInputContainerViewLeadingAnchorLeadingAnchorConstraint,
           overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint,
           overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
           overflowMenuContainerViewTopAnchorTopAnchorConstraint,
@@ -426,8 +509,64 @@ public class SuggestionSearchBar: NSBox {
           overflowMenuButtonViewHeightAnchorConstraint,
           overflowMenuButtonViewWidthAnchorConstraint
         ]
-      case (false, false):
+      case (false, true, true):
         constraints = [
+          searchInputContainerViewLeadingAnchorLeadingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
+        ]
+      case (false, true, false):
+        constraints = [
+          tokenContainerViewLeadingAnchorLeadingAnchorConstraint,
+          tokenContainerViewTopAnchorTopAnchorConstraint,
+          tokenContainerViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTrailingAnchorTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint,
+          searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint,
+          searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint,
+          searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint,
+          searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint,
+          searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint
+        ]
+      case (true, false, false):
+        constraints = [
+          tokenContainerViewLeadingAnchorLeadingAnchorConstraint,
+          tokenContainerViewTopAnchorTopAnchorConstraint,
+          tokenContainerViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint,
+          overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint,
+          overflowMenuContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          overflowMenuContainerViewTopAnchorTopAnchorConstraint,
+          overflowMenuContainerViewBottomAnchorBottomAnchorConstraint,
+          searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint,
+          searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint,
+          searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint,
+          searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint,
+          searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint,
+          overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint,
+          overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint,
+          overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint,
+          overflowMenuButtonViewHeightAnchorConstraint,
+          overflowMenuButtonViewWidthAnchorConstraint
+        ]
+      case (false, false, true):
+        constraints = [
+          searchInputContainerViewLeadingAnchorLeadingAnchorConstraint,
           controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
           controlledDropdownContainerViewTopAnchorTopAnchorConstraint,
           controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint,
@@ -435,6 +574,35 @@ public class SuggestionSearchBar: NSBox {
           overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
           overflowMenuContainerViewTopAnchorTopAnchorConstraint,
           overflowMenuContainerViewBottomAnchorBottomAnchorConstraint,
+          controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
+          controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
+          controlledDropdownViewCenterYAnchorControlledDropdownContainerViewCenterYAnchorConstraint,
+          controlledDropdownViewBottomAnchorControlledDropdownContainerViewBottomAnchorConstraint,
+          overflowMenuButtonViewLeadingAnchorOverflowMenuContainerViewLeadingAnchorConstraint,
+          overflowMenuButtonViewTrailingAnchorOverflowMenuContainerViewTrailingAnchorConstraint,
+          overflowMenuButtonViewCenterYAnchorOverflowMenuContainerViewCenterYAnchorConstraint,
+          overflowMenuButtonViewHeightAnchorConstraint,
+          overflowMenuButtonViewWidthAnchorConstraint
+        ]
+      case (false, false, false):
+        constraints = [
+          tokenContainerViewLeadingAnchorLeadingAnchorConstraint,
+          tokenContainerViewTopAnchorTopAnchorConstraint,
+          tokenContainerViewBottomAnchorBottomAnchorConstraint,
+          searchInputContainerViewLeadingAnchorTokenContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewLeadingAnchorSearchInputContainerViewTrailingAnchorConstraint,
+          controlledDropdownContainerViewTopAnchorTopAnchorConstraint,
+          controlledDropdownContainerViewBottomAnchorBottomAnchorConstraint,
+          overflowMenuContainerViewTrailingAnchorTrailingAnchorConstraint,
+          overflowMenuContainerViewLeadingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
+          overflowMenuContainerViewTopAnchorTopAnchorConstraint,
+          overflowMenuContainerViewBottomAnchorBottomAnchorConstraint,
+          searchBarTokenViewLeadingAnchorTokenContainerViewLeadingAnchorConstraint,
+          searchBarTokenViewTrailingAnchorTokenContainerViewTrailingAnchorConstraint,
+          searchBarTokenViewTopAnchorTokenContainerViewTopAnchorConstraint,
+          searchBarTokenViewCenterYAnchorTokenContainerViewCenterYAnchorConstraint,
+          searchBarTokenViewBottomAnchorTokenContainerViewBottomAnchorConstraint,
           controlledDropdownViewLeadingAnchorControlledDropdownContainerViewLeadingAnchorConstraint,
           controlledDropdownViewTrailingAnchorControlledDropdownContainerViewTrailingAnchorConstraint,
           controlledDropdownViewTopAnchorControlledDropdownContainerViewTopAnchorConstraint,
@@ -454,7 +622,14 @@ public class SuggestionSearchBar: NSBox {
   private func update() {
     let controlledDropdownContainerViewIsHidden = controlledDropdownContainerView.isHidden
     let overflowMenuContainerViewIsHidden = overflowMenuContainerView.isHidden
+    let tokenContainerViewIsHidden = tokenContainerView.isHidden
 
+    searchBarTokenView.titleText = "Text"
+    tokenContainerView.isHidden = !false
+    if let tokenText = tokenText {
+      searchBarTokenView.titleText = tokenText
+      tokenContainerView.isHidden = !true
+    }
     controlledDropdownView.selectedIndex = dropdownIndex
     controlledDropdownView.keyEquivalents = dropdownKeyEquivalents
     controlledDropdownView.values = dropdownValues
@@ -469,6 +644,7 @@ public class SuggestionSearchBar: NSBox {
     overflowMenuButtonView.onPressButton = handleOnPressOverflowMenu
     searchInputView.onPressShiftTab = handleOnPressShiftTabKey
     searchInputView.onPressTab = handleOnPressTabKey
+    searchBarTokenView.onPressToken = handleOnPressToken
     searchInputView.onPressUpKey = handleOnPressUpKey
     controlledDropdownView.onChangeIndex = handleOnSelectDropdownIndex
     searchInputView.onSubmit = handleOnSubmit
@@ -479,16 +655,19 @@ public class SuggestionSearchBar: NSBox {
 
     if
     controlledDropdownContainerView.isHidden != controlledDropdownContainerViewIsHidden ||
-      overflowMenuContainerView.isHidden != overflowMenuContainerViewIsHidden
+      overflowMenuContainerView.isHidden != overflowMenuContainerViewIsHidden ||
+        tokenContainerView.isHidden != tokenContainerViewIsHidden
     {
       NSLayoutConstraint.deactivate(
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerViewIsHidden,
-          overflowMenuContainerViewIsHidden: overflowMenuContainerViewIsHidden))
+          overflowMenuContainerViewIsHidden: overflowMenuContainerViewIsHidden,
+          tokenContainerViewIsHidden: tokenContainerViewIsHidden))
       NSLayoutConstraint.activate(
         conditionalConstraints(
           controlledDropdownContainerViewIsHidden: controlledDropdownContainerView.isHidden,
-          overflowMenuContainerViewIsHidden: overflowMenuContainerView.isHidden))
+          overflowMenuContainerViewIsHidden: overflowMenuContainerView.isHidden,
+          tokenContainerViewIsHidden: tokenContainerView.isHidden))
     }
   }
 
@@ -547,6 +726,10 @@ public class SuggestionSearchBar: NSBox {
   private func handleOnPressOverflowMenu() {
     onPressOverflowMenu?()
   }
+
+  private func handleOnPressToken() {
+    onPressToken?()
+  }
 }
 
 // MARK: - Parameters
@@ -557,6 +740,7 @@ extension SuggestionSearchBar {
     public var showsOverflowMenu: Bool
     public var searchText: String
     public var placeholderText: String?
+    public var tokenText: String?
     public var dropdownIndex: Int
     public var dropdownValues: [String]
     public var dropdownKeyEquivalents: [String]
@@ -574,12 +758,14 @@ extension SuggestionSearchBar {
     public var onSelectDropdownIndex: ((Int) -> Void)?
     public var onHighlightDropdownIndex: ((Int?) -> Void)?
     public var onPressOverflowMenu: (() -> Void)?
+    public var onPressToken: (() -> Void)?
 
     public init(
       showsDropdown: Bool,
       showsOverflowMenu: Bool,
       searchText: String,
       placeholderText: String? = nil,
+      tokenText: String? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
       dropdownKeyEquivalents: [String],
@@ -596,12 +782,14 @@ extension SuggestionSearchBar {
       onCloseDropdown: (() -> Void)? = nil,
       onSelectDropdownIndex: ((Int) -> Void)? = nil,
       onHighlightDropdownIndex: ((Int?) -> Void)? = nil,
-      onPressOverflowMenu: (() -> Void)? = nil)
+      onPressOverflowMenu: (() -> Void)? = nil,
+      onPressToken: (() -> Void)? = nil)
     {
       self.showsDropdown = showsDropdown
       self.showsOverflowMenu = showsOverflowMenu
       self.searchText = searchText
       self.placeholderText = placeholderText
+      self.tokenText = tokenText
       self.dropdownIndex = dropdownIndex
       self.dropdownValues = dropdownValues
       self.dropdownKeyEquivalents = dropdownKeyEquivalents
@@ -619,6 +807,7 @@ extension SuggestionSearchBar {
       self.onSelectDropdownIndex = onSelectDropdownIndex
       self.onHighlightDropdownIndex = onHighlightDropdownIndex
       self.onPressOverflowMenu = onPressOverflowMenu
+      self.onPressToken = onPressToken
     }
 
     public init() {
@@ -628,6 +817,7 @@ extension SuggestionSearchBar {
           showsOverflowMenu: false,
           searchText: "",
           placeholderText: nil,
+          tokenText: nil,
           dropdownIndex: 0,
           dropdownValues: [],
           dropdownKeyEquivalents: [])
@@ -638,8 +828,9 @@ extension SuggestionSearchBar {
         lhs.showsOverflowMenu == rhs.showsOverflowMenu &&
           lhs.searchText == rhs.searchText &&
             lhs.placeholderText == rhs.placeholderText &&
-              lhs.dropdownIndex == rhs.dropdownIndex &&
-                lhs.dropdownValues == rhs.dropdownValues && lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents
+              lhs.tokenText == rhs.tokenText &&
+                lhs.dropdownIndex == rhs.dropdownIndex &&
+                  lhs.dropdownValues == rhs.dropdownValues && lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents
     }
   }
 }
@@ -668,6 +859,7 @@ extension SuggestionSearchBar {
       showsOverflowMenu: Bool,
       searchText: String,
       placeholderText: String? = nil,
+      tokenText: String? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
       dropdownKeyEquivalents: [String],
@@ -684,7 +876,8 @@ extension SuggestionSearchBar {
       onCloseDropdown: (() -> Void)? = nil,
       onSelectDropdownIndex: ((Int) -> Void)? = nil,
       onHighlightDropdownIndex: ((Int?) -> Void)? = nil,
-      onPressOverflowMenu: (() -> Void)? = nil)
+      onPressOverflowMenu: (() -> Void)? = nil,
+      onPressToken: (() -> Void)? = nil)
     {
       self
         .init(
@@ -693,6 +886,7 @@ extension SuggestionSearchBar {
             showsOverflowMenu: showsOverflowMenu,
             searchText: searchText,
             placeholderText: placeholderText,
+            tokenText: tokenText,
             dropdownIndex: dropdownIndex,
             dropdownValues: dropdownValues,
             dropdownKeyEquivalents: dropdownKeyEquivalents,
@@ -709,7 +903,8 @@ extension SuggestionSearchBar {
             onCloseDropdown: onCloseDropdown,
             onSelectDropdownIndex: onSelectDropdownIndex,
             onHighlightDropdownIndex: onHighlightDropdownIndex,
-            onPressOverflowMenu: onPressOverflowMenu))
+            onPressOverflowMenu: onPressOverflowMenu,
+            onPressToken: onPressToken))
     }
 
     public init() {
@@ -719,6 +914,7 @@ extension SuggestionSearchBar {
           showsOverflowMenu: false,
           searchText: "",
           placeholderText: nil,
+          tokenText: nil,
           dropdownIndex: 0,
           dropdownValues: [],
           dropdownKeyEquivalents: [])

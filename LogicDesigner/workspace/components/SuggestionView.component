@@ -257,6 +257,18 @@
       "assignee" : [
         "layers",
         "SuggestionSearchBar",
+        "onPressToken"
+      ],
+      "content" : [
+        "parameters",
+        "onPressToken"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SuggestionSearchBar",
         "onChangeSearchText"
       ],
       "content" : [
@@ -286,6 +298,18 @@
       "content" : [
         "parameters",
         "placeholderText"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
+        "SuggestionSearchBar",
+        "tokenText"
+      ],
+      "content" : [
+        "parameters",
+        "tokenText"
       ],
       "type" : "AssignExpr"
     },
@@ -678,6 +702,10 @@
       "type" : "String?"
     },
     {
+      "name" : "tokenText",
+      "type" : "String?"
+    },
+    {
       "name" : "onChangeSearchText",
       "type" : {
         "name" : "Function",
@@ -907,6 +935,12 @@
     },
     {
       "name" : "onPressOverflowMenu",
+      "type" : {
+        "name" : "Function"
+      }
+    },
+    {
+      "name" : "onPressToken",
       "type" : {
         "name" : "Function"
       }

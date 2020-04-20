@@ -20,11 +20,51 @@
       "name" : "Full",
       "params" : {
         "showsDropdown" : true,
-        "showsOverflowMenu" : true
+        "showsOverflowMenu" : true,
+        "tokenText" : "Variable"
       }
     }
   ],
   "logic" : [
+    {
+      "body" : [
+        {
+          "assignee" : [
+            "layers",
+            "SearchBarToken",
+            "titleText"
+          ],
+          "content" : [
+            "tokenText"
+          ],
+          "type" : "AssignExpr"
+        },
+        {
+          "assignee" : [
+            "layers",
+            "TokenContainer",
+            "visible"
+          ],
+          "content" : {
+            "type" : "LitExpr",
+            "value" : {
+              "data" : true,
+              "type" : "Boolean"
+            }
+          },
+          "type" : "AssignExpr"
+        }
+      ],
+      "condition" : {
+        "content" : [
+          "parameters",
+          "tokenText"
+        ],
+        "id" : "tokenText",
+        "type" : "VarDeclExpr"
+      },
+      "type" : "IfExpr"
+    },
     {
       "assignee" : [
         "layers",
@@ -196,6 +236,18 @@
     {
       "assignee" : [
         "layers",
+        "SearchBarToken",
+        "onPressToken"
+      ],
+      "content" : [
+        "parameters",
+        "onPressToken"
+      ],
+      "type" : "AssignExpr"
+    },
+    {
+      "assignee" : [
+        "layers",
         "SearchInput",
         "onPressUpKey"
       ],
@@ -293,6 +345,10 @@
     },
     {
       "name" : "placeholderText",
+      "type" : "String?"
+    },
+    {
+      "name" : "tokenText",
       "type" : "String?"
     },
     {
@@ -414,10 +470,36 @@
       "type" : {
         "name" : "Function"
       }
+    },
+    {
+      "name" : "onPressToken",
+      "type" : {
+        "name" : "Function"
+      }
     }
   ],
   "root" : {
     "children" : [
+      {
+        "children" : [
+          {
+            "id" : "SearchBarToken",
+            "params" : {
+              "titleText" : "Text"
+            },
+            "type" : "SearchBarToken"
+          }
+        ],
+        "id" : "TokenContainer",
+        "params" : {
+          "alignItems" : "center",
+          "alignSelf" : "stretch",
+          "flexDirection" : "row",
+          "paddingLeft" : 10,
+          "visible" : false
+        },
+        "type" : "Lona:View"
+      },
       {
         "children" : [
           {

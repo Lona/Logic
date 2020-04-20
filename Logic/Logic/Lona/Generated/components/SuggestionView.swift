@@ -23,6 +23,7 @@ public class SuggestionView: NSBox {
   public convenience init(
     searchText: String,
     placeholderText: String?,
+    tokenText: String?,
     selectedIndex: Int?,
     dropdownIndex: Int,
     dropdownValues: [String],
@@ -43,6 +44,7 @@ public class SuggestionView: NSBox {
         Parameters(
           searchText: searchText,
           placeholderText: placeholderText,
+          tokenText: tokenText,
           selectedIndex: selectedIndex,
           dropdownIndex: dropdownIndex,
           dropdownValues: dropdownValues,
@@ -90,6 +92,15 @@ public class SuggestionView: NSBox {
     set {
       if parameters.placeholderText != newValue {
         parameters.placeholderText = newValue
+      }
+    }
+  }
+
+  public var tokenText: String? {
+    get { return parameters.tokenText }
+    set {
+      if parameters.tokenText != newValue {
+        parameters.tokenText = newValue
       }
     }
   }
@@ -308,6 +319,11 @@ public class SuggestionView: NSBox {
   public var onPressOverflowMenu: (() -> Void)? {
     get { return parameters.onPressOverflowMenu }
     set { parameters.onPressOverflowMenu = newValue }
+  }
+
+  public var onPressToken: (() -> Void)? {
+    get { return parameters.onPressToken }
+    set { parameters.onPressToken = newValue }
   }
 
   public var parameters: Parameters {
@@ -7764,9 +7780,11 @@ public class SuggestionView: NSBox {
     }
     filterContainerView.isHidden = !showsFilterBar
     filterDividerView.isHidden = !showsFilterBar
+    suggestionSearchBarView.onPressToken = handleOnPressToken
     suggestionSearchBarView.onChangeSearchText = handleOnChangeSearchText
     suggestionSearchBarView.searchText = searchText
     suggestionSearchBarView.placeholderText = placeholderText
+    suggestionSearchBarView.tokenText = tokenText
     suggestionSearchBarView.onPressDownKey = handleOnPressDownKey
     suggestionSearchBarView.onPressUpKey = handleOnPressUpKey
     suggestionListViewView.selectedIndex = selectedIndex
@@ -7902,6 +7920,10 @@ public class SuggestionView: NSBox {
   private func handleOnPressOverflowMenu() {
     onPressOverflowMenu?()
   }
+
+  private func handleOnPressToken() {
+    onPressToken?()
+  }
 }
 
 // MARK: - Parameters
@@ -7910,6 +7932,7 @@ extension SuggestionView {
   public struct Parameters: Equatable {
     public var searchText: String
     public var placeholderText: String?
+    public var tokenText: String?
     public var selectedIndex: Int?
     public var dropdownIndex: Int
     public var dropdownValues: [String]
@@ -7942,10 +7965,12 @@ extension SuggestionView {
     public var onPressFilterRecommended: (() -> Void)?
     public var onPressFilterAll: (() -> Void)?
     public var onPressOverflowMenu: (() -> Void)?
+    public var onPressToken: (() -> Void)?
 
     public init(
       searchText: String,
       placeholderText: String? = nil,
+      tokenText: String? = nil,
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
@@ -7977,10 +8002,12 @@ extension SuggestionView {
       onPressCommandDownKey: (() -> Void)? = nil,
       onPressFilterRecommended: (() -> Void)? = nil,
       onPressFilterAll: (() -> Void)? = nil,
-      onPressOverflowMenu: (() -> Void)? = nil)
+      onPressOverflowMenu: (() -> Void)? = nil,
+      onPressToken: (() -> Void)? = nil)
     {
       self.searchText = searchText
       self.placeholderText = placeholderText
+      self.tokenText = tokenText
       self.selectedIndex = selectedIndex
       self.dropdownIndex = dropdownIndex
       self.dropdownValues = dropdownValues
@@ -8013,6 +8040,7 @@ extension SuggestionView {
       self.onPressFilterRecommended = onPressFilterRecommended
       self.onPressFilterAll = onPressFilterAll
       self.onPressOverflowMenu = onPressOverflowMenu
+      self.onPressToken = onPressToken
     }
 
     public init() {
@@ -8020,6 +8048,7 @@ extension SuggestionView {
         .init(
           searchText: "",
           placeholderText: nil,
+          tokenText: nil,
           selectedIndex: nil,
           dropdownIndex: 0,
           dropdownValues: [],
@@ -8039,20 +8068,21 @@ extension SuggestionView {
     public static func ==(lhs: Parameters, rhs: Parameters) -> Bool {
       return lhs.searchText == rhs.searchText &&
         lhs.placeholderText == rhs.placeholderText &&
-          lhs.selectedIndex == rhs.selectedIndex &&
-            lhs.dropdownIndex == rhs.dropdownIndex &&
-              lhs.dropdownValues == rhs.dropdownValues &&
-                lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents &&
-                  lhs.detailView == rhs.detailView &&
-                    lhs.showsDropdown == rhs.showsDropdown &&
-                      lhs.suggestionFilter == rhs.suggestionFilter &&
-                        lhs.showsFilterBar == rhs.showsFilterBar &&
-                          lhs.suggestionListWidth == rhs.suggestionListWidth &&
-                            lhs.showsSuggestionDetails == rhs.showsSuggestionDetails &&
-                              lhs.showsSearchBar == rhs.showsSearchBar &&
-                                lhs.showsSuggestionArea == rhs.showsSuggestionArea &&
-                                  lhs.showsSuggestionList == rhs.showsSuggestionList &&
-                                    lhs.showsOverflowMenu == rhs.showsOverflowMenu
+          lhs.tokenText == rhs.tokenText &&
+            lhs.selectedIndex == rhs.selectedIndex &&
+              lhs.dropdownIndex == rhs.dropdownIndex &&
+                lhs.dropdownValues == rhs.dropdownValues &&
+                  lhs.dropdownKeyEquivalents == rhs.dropdownKeyEquivalents &&
+                    lhs.detailView == rhs.detailView &&
+                      lhs.showsDropdown == rhs.showsDropdown &&
+                        lhs.suggestionFilter == rhs.suggestionFilter &&
+                          lhs.showsFilterBar == rhs.showsFilterBar &&
+                            lhs.suggestionListWidth == rhs.suggestionListWidth &&
+                              lhs.showsSuggestionDetails == rhs.showsSuggestionDetails &&
+                                lhs.showsSearchBar == rhs.showsSearchBar &&
+                                  lhs.showsSuggestionArea == rhs.showsSuggestionArea &&
+                                    lhs.showsSuggestionList == rhs.showsSuggestionList &&
+                                      lhs.showsOverflowMenu == rhs.showsOverflowMenu
     }
   }
 }
@@ -8079,6 +8109,7 @@ extension SuggestionView {
     public init(
       searchText: String,
       placeholderText: String? = nil,
+      tokenText: String? = nil,
       selectedIndex: Int? = nil,
       dropdownIndex: Int,
       dropdownValues: [String],
@@ -8110,13 +8141,15 @@ extension SuggestionView {
       onPressCommandDownKey: (() -> Void)? = nil,
       onPressFilterRecommended: (() -> Void)? = nil,
       onPressFilterAll: (() -> Void)? = nil,
-      onPressOverflowMenu: (() -> Void)? = nil)
+      onPressOverflowMenu: (() -> Void)? = nil,
+      onPressToken: (() -> Void)? = nil)
     {
       self
         .init(
           Parameters(
             searchText: searchText,
             placeholderText: placeholderText,
+            tokenText: tokenText,
             selectedIndex: selectedIndex,
             dropdownIndex: dropdownIndex,
             dropdownValues: dropdownValues,
@@ -8148,7 +8181,8 @@ extension SuggestionView {
             onPressCommandDownKey: onPressCommandDownKey,
             onPressFilterRecommended: onPressFilterRecommended,
             onPressFilterAll: onPressFilterAll,
-            onPressOverflowMenu: onPressOverflowMenu))
+            onPressOverflowMenu: onPressOverflowMenu,
+            onPressToken: onPressToken))
     }
 
     public init() {
@@ -8156,6 +8190,7 @@ extension SuggestionView {
         .init(
           searchText: "",
           placeholderText: nil,
+          tokenText: nil,
           selectedIndex: nil,
           dropdownIndex: 0,
           dropdownValues: [],

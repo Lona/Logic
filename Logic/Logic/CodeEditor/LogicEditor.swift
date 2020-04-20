@@ -739,7 +739,7 @@ extension LogicEditor {
             return
         }
 
-        subwindow.style = .contextMenu
+        subwindow.style = .contextMenuWithoutSearchBar
         subwindow.suggestionText = ""
 
         let suggestionItems = menu.map { $0.row }
@@ -972,6 +972,13 @@ extension LogicEditor {
     private func showSuggestionWindow(for nodeIndex: Int, syntaxNode: LGCSyntaxNode, categoryFilter: String? = nil) {
         guard let window = self.window else { return }
 
+        switch syntaxNode {
+        case .pattern(let pattern):
+            self.suggestionText = pattern.name
+        default:
+            break
+        }
+
         canvasView.hasFocus = true
 
         let syntaxNodePath = context.uniqueElementPathTo(id: syntaxNode.uuid, includeTopLevel: false)
@@ -1021,14 +1028,25 @@ extension LogicEditor {
             )
         }
 
+        switch syntaxNode {
+        case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
+            childWindow.suggestionView.tokenText = "Custom"
+        case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
+            childWindow.suggestionView.tokenText = "Variable"
+        case .expression:
+            childWindow.suggestionView.tokenText = "Functions"
+        default:
+            childWindow.suggestionView.tokenText = nil
+        }
+
         if let customPlaceholderText = customPlaceholderText {
             childWindow.placeholderText = customPlaceholderText
         } else {
             switch syntaxNode {
             case .pattern:
-                childWindow.placeholderText = "Type a new name and press Enter"
+                childWindow.placeholderText = "Enter a new name"
             case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
-                childWindow.placeholderText = "Type or pick a new value and press Enter"
+                childWindow.placeholderText = "Enter or pick a new value"
             case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
                 childWindow.placeholderText = "Filter variables"
             default:
@@ -1080,7 +1098,15 @@ extension LogicEditor {
             self.showSuggestionWindow(for: nodeIndex, syntaxNode: syntaxNode, categoryFilter: categoryFilter)
         }
 
-        childWindow.onDeleteEmptyInput = handleDelete
+        childWindow.onDeleteEmptyInput = {
+            if self.childWindow.suggestionView.tokenText != nil {
+                self.childWindow.suggestionView.tokenText = nil
+                self.hideSuggestionWindow()
+                self.showActionWindow(for: nodeIndex, syntaxNode: syntaxNode)
+            } else {
+                self.handleDelete()
+            }
+        }
         childWindow.onSelectIndex = { index in
             self.selectedSuggestionIndex = index
 

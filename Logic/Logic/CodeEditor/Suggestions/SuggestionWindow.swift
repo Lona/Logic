@@ -117,6 +117,9 @@ public class SuggestionWindow: NSWindow {
         suggestionView.searchInput.onPressDeleteField = { [unowned self] in
             self.onDeleteEmptyInput?()
         }
+        suggestionView.onPressToken = { [unowned self] in
+            self.onDeleteEmptyInput?()
+        }
 
         suggestionView.onSubmit = {
             self.onPressEnter?()

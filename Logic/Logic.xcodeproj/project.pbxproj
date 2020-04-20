@@ -120,6 +120,7 @@
 		6B858C32229EF3A300DE6216 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B858C31229EF3A300DE6216 /* Library.swift */; };
 		6B87001222ECB98A007C589C /* Memoize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B87001122ECB98A007C589C /* Memoize.swift */; };
 		6B87001422ED12F8007C589C /* MinimapScroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B87001322ED12F8007C589C /* MinimapScroller.swift */; };
+		6B88BE9C244404EB00D6A0A3 /* SearchBarToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B88BE9B244404EB00D6A0A3 /* SearchBarToken.swift */; };
 		6B9528D322A0B35B0094D9C7 /* LGCProgram+Imports.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D222A0B35B0094D9C7 /* LGCProgram+Imports.swift */; };
 		6B9528D522A0C2710094D9C7 /* CSSColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D422A0C2710094D9C7 /* CSSColor.swift */; };
 		6B9528D822A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */; };
@@ -274,6 +275,7 @@
 		6B858C31229EF3A300DE6216 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		6B87001122ECB98A007C589C /* Memoize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memoize.swift; sourceTree = "<group>"; };
 		6B87001322ED12F8007C589C /* MinimapScroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimapScroller.swift; sourceTree = "<group>"; };
+		6B88BE9B244404EB00D6A0A3 /* SearchBarToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchBarToken.swift; sourceTree = "<group>"; };
 		6B9528D222A0B35B0094D9C7 /* LGCProgram+Imports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCProgram+Imports.swift"; sourceTree = "<group>"; };
 		6B9528D422A0C2710094D9C7 /* CSSColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSColor.swift; sourceTree = "<group>"; };
 		6B9528D722A0C9DE0094D9C7 /* Compiler+EvaluationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Compiler+EvaluationContext.swift"; sourceTree = "<group>"; };
@@ -392,6 +394,7 @@
 				6B0F9461233EA0EE007C115E /* OverflowMenuButton.swift */,
 				6B44E14E223B3DB700740318 /* ResultRow.swift */,
 				6B44E14F223B3DB700740318 /* ResultSectionHeader.swift */,
+				6B88BE9B244404EB00D6A0A3 /* SearchBarToken.swift */,
 				6B44E14D223B3DB700740318 /* SuggestionView.swift */,
 				6BC2D44D2263B7AE003A9F63 /* TextStyleRow.swift */,
 			);
@@ -869,6 +872,7 @@
 				6B2484F023398E50000C5C9F /* MarkdownFile.swift in Sources */,
 				6B34148D225417F800CC65D1 /* JavaScript.swift in Sources */,
 				6B858C27229DB29900DE6216 /* Compiler+ScopeContext.swift in Sources */,
+				6B88BE9C244404EB00D6A0A3 /* SearchBarToken.swift in Sources */,
 				6B6E47492402EA040067B2FF /* ImageBackground.swift in Sources */,
 				6B39612C2321CDA900F27CB8 /* FormatterContext.swift in Sources */,
 				6B0F945C233E904B007C115E /* DividerBlock.swift in Sources */,
