@@ -188,7 +188,7 @@ public class SuggestionWindow: NSWindow {
         }
 
         suggestionView.onPressOverflowMenu = { [unowned self] in
-            let rect = self.suggestionView.overflowMenuContainerView.bounds
+            let rect = self.suggestionView.overflowMenuBounds
             let windowRect = self.suggestionView.convert(rect, to: nil)
             let screenRect = self.convertToScreen(windowRect)
 

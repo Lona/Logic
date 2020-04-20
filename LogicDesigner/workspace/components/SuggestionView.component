@@ -56,8 +56,8 @@
     {
       "assignee" : [
         "layers",
-        "OverflowMenuContainer",
-        "visible"
+        "SuggestionSearchBar",
+        "showsOverflowMenu"
       ],
       "content" : [
         "parameters",
@@ -256,8 +256,8 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
-        "onChangeTextValue"
+        "SuggestionSearchBar",
+        "onChangeSearchText"
       ],
       "content" : [
         "parameters",
@@ -268,8 +268,8 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
-        "textValue"
+        "SuggestionSearchBar",
+        "searchText"
       ],
       "content" : [
         "parameters",
@@ -280,7 +280,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "placeholderText"
       ],
       "content" : [
@@ -292,7 +292,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "onPressDownKey"
       ],
       "content" : [
@@ -304,7 +304,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "onPressUpKey"
       ],
       "content" : [
@@ -352,7 +352,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "onSubmit"
       ],
       "content" : [
@@ -364,8 +364,8 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
-        "onPressEscape"
+        "SuggestionSearchBar",
+        "onPressEscapeKey"
       ],
       "content" : [
         "parameters",
@@ -376,8 +376,8 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
-        "onPressTab"
+        "SuggestionSearchBar",
+        "onPressTabKey"
       ],
       "content" : [
         "parameters",
@@ -388,8 +388,8 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
-        "onPressShiftTab"
+        "SuggestionSearchBar",
+        "onPressShiftTabKey"
       ],
       "content" : [
         "parameters",
@@ -400,8 +400,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "onChangeIndex"
+        "SuggestionSearchBar",
+        "onSelectDropdownIndex"
       ],
       "content" : [
         "parameters",
@@ -412,8 +412,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdownContainer",
-        "visible"
+        "SuggestionSearchBar",
+        "showsDropdown"
       ],
       "content" : [
         "parameters",
@@ -424,8 +424,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "values"
+        "SuggestionSearchBar",
+        "dropdownValues"
       ],
       "content" : [
         "parameters",
@@ -436,8 +436,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "keyEquivalents"
+        "SuggestionSearchBar",
+        "dropdownKeyEquivalents"
       ],
       "content" : [
         "parameters",
@@ -448,8 +448,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "selectedIndex"
+        "SuggestionSearchBar",
+        "dropdownIndex"
       ],
       "content" : [
         "parameters",
@@ -460,8 +460,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "onHighlightIndex"
+        "SuggestionSearchBar",
+        "onHighlightDropdownIndex"
       ],
       "content" : [
         "parameters",
@@ -472,8 +472,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "onCloseMenu"
+        "SuggestionSearchBar",
+        "onCloseDropdown"
       ],
       "content" : [
         "parameters",
@@ -484,8 +484,8 @@
     {
       "assignee" : [
         "layers",
-        "ControlledDropdown",
-        "onOpenMenu"
+        "SuggestionSearchBar",
+        "onOpenDropdown"
       ],
       "content" : [
         "parameters",
@@ -508,7 +508,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "onPressCommandDownKey"
       ],
       "content" : [
@@ -520,7 +520,7 @@
     {
       "assignee" : [
         "layers",
-        "SearchInput",
+        "SuggestionSearchBar",
         "onPressCommandUpKey"
       ],
       "content" : [
@@ -556,8 +556,8 @@
     {
       "assignee" : [
         "layers",
-        "OverflowMenuButton",
-        "onPressButton"
+        "SuggestionSearchBar",
+        "onPressOverflowMenu"
       ],
       "content" : [
         "parameters",
@@ -917,73 +917,21 @@
       {
         "children" : [
           {
-            "children" : [
-              {
-                "id" : "SearchInput",
-                "params" : {
-                  "textValue" : "Search"
-                },
-                "type" : "ControlledSearchInput"
-              }
-            ],
-            "id" : "SearchInputContainer",
+            "id" : "SuggestionSearchBar",
             "params" : {
-              "flex" : 1,
-              "paddingBottom" : 5,
-              "paddingLeft" : 10,
-              "paddingRight" : 10,
-              "paddingTop" : 5
-            },
-            "type" : "Lona:View"
-          },
-          {
-            "children" : [
-              {
-                "id" : "ControlledDropdown",
-                "params" : {
-                  "onChangeIndex" : "Text",
-                  "selectedIndex" : 0,
-                  "values" : [
+              "dropdownIndex" : 0,
+              "dropdownKeyEquivalents" : [
 
-                  ]
-                },
-                "type" : "ControlledDropdown"
-              }
-            ],
-            "id" : "ControlledDropdownContainer",
-            "params" : {
-              "alignItems" : "center",
-              "alignSelf" : "stretch",
-              "flexDirection" : "row",
-              "paddingLeft" : 5,
-              "paddingRight" : 5
-            },
-            "type" : "Lona:View"
-          },
-          {
-            "children" : [
-              {
-                "id" : "OverflowMenuButton",
-                "params" : {
+              ],
+              "dropdownValues" : [
 
-                },
-                "type" : "OverflowMenuButton"
-              }
-            ],
-            "id" : "OverflowMenuContainer",
-            "metadata" : {
-              "accessLevel" : {
-                "macos" : "internal"
-              }
+              ],
+              "placeholderText" : "Text",
+              "searchText" : "Text",
+              "showsDropdown" : false,
+              "showsOverflowMenu" : false
             },
-            "params" : {
-              "alignItems" : "center",
-              "alignSelf" : "stretch",
-              "flexDirection" : "row",
-              "paddingLeft" : 5,
-              "paddingRight" : 10
-            },
-            "type" : "Lona:View"
+            "type" : "SuggestionSearchBar"
           }
         ],
         "id" : "Search Area",
