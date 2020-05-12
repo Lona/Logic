@@ -355,6 +355,11 @@ public class SuggestionWindow: NSWindow {
         set { suggestionView.placeholderText = newValue }
     }
 
+    public var tokenText: String? {
+        get { return suggestionView.tokenText }
+        set { suggestionView.tokenText = newValue }
+    }
+
     public var onChangeSuggestionText: ((String) -> Void)? {
         get { return suggestionView.onChangeSearchText }
         set { suggestionView.onChangeSearchText = newValue }

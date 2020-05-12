@@ -1030,13 +1030,13 @@ extension LogicEditor {
 
         switch syntaxNode {
         case .expression where categoryFilter == LGCLiteral.Suggestion.categoryTitle:
-            childWindow.suggestionView.tokenText = "Custom"
+            childWindow.tokenText = "Custom"
         case .expression where categoryFilter == LGCExpression.Suggestion.variablesCategoryTitle:
-            childWindow.suggestionView.tokenText = "Variable"
+            childWindow.tokenText = "Variable"
         case .expression:
-            childWindow.suggestionView.tokenText = "Functions"
+            childWindow.tokenText = "Functions"
         default:
-            childWindow.suggestionView.tokenText = nil
+            childWindow.tokenText = nil
         }
 
         if let customPlaceholderText = customPlaceholderText {
@@ -1099,8 +1099,8 @@ extension LogicEditor {
         }
 
         childWindow.onDeleteEmptyInput = {
-            if self.childWindow.suggestionView.tokenText != nil {
-                self.childWindow.suggestionView.tokenText = nil
+            if self.childWindow.tokenText != nil {
+                self.childWindow.tokenText = nil
                 self.hideSuggestionWindow()
                 self.showActionWindow(for: nodeIndex, syntaxNode: syntaxNode)
             } else {
