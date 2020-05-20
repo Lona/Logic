@@ -23,18 +23,18 @@ public extension Compiler {
         public var undefinedMemberExpressions = Set<UUID>()
 
         // This keeps track of the current scope
-        fileprivate var patternNames = ScopeStack<String, LGCPattern>()
-        fileprivate var typeNames = ScopeStack<String, LGCPattern>()
+        fileprivate var patternNames = ScopeStack<String, LGCIdentifierPattern>()
+        fileprivate var typeNames = ScopeStack<String, LGCIdentifierPattern>()
 
         public var namesInScope: [String] {
             return patternNames.flattened.map { $0.key }
         }
 
-        public var patternsInScope: [LGCPattern] {
+        public var patternsInScope: [LGCIdentifierPattern] {
             return patternNames.flattened.map { $0.value }
         }
 
-        public var typesInScope: [LGCPattern] {
+        public var typesInScope: [LGCIdentifierPattern] {
             return typeNames.flattened.map { $0.value }
         }
 
@@ -74,12 +74,12 @@ public extension Compiler {
             currentNamespacePath = currentNamespacePath.dropLast()
         }
 
-        func addToScope(pattern: LGCPattern) {
+        func addToScope(pattern: LGCIdentifierPattern) {
             patternToName[pattern.id] = pattern.name
             patternNames.set(pattern, for: pattern.name)
         }
 
-        func addTypeToScope(pattern: LGCPattern) {
+        func addTypeToScope(pattern: LGCIdentifierPattern) {
             patternToTypeName[pattern.id] = pattern.name
             typeNames.set(pattern, for: pattern.name)
         }
@@ -137,7 +137,7 @@ public extension Compiler {
 
                 // First, lookup identifier in scope
                 if let pattern = context.patternNames.value(for: identifier.string) {
-                    context.identifierToPattern[identifier.uuid] = pattern.uuid
+                    context.identifierToPattern[identifier.uuid] = pattern.id
                 // Next, lookup identifier in namespace
                 } else if let patternId = context.namespace.values[[identifier.string]] {
                     context.identifierToPattern[identifier.uuid] = patternId

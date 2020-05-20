@@ -973,7 +973,7 @@ extension LogicEditor {
         guard let window = self.window else { return }
 
         switch syntaxNode {
-        case .pattern(let pattern):
+        case .pattern(.identifier(let pattern)):
             self.suggestionText = pattern.name
         default:
             break

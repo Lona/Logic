@@ -33,7 +33,7 @@ I> Info message
     }
 }
 
-public extension LGCPattern {
+public extension LGCIdentifierPattern {
     func documentation(within root: LGCSyntaxNode, for prefix: String, formattingOptions: LogicFormattingOptions) -> NSView {
 //        let parent = root.contents.parentOf(target: uuid, includeTopLevel: false)
 //

@@ -393,12 +393,23 @@ public extension LGCTypeAnnotation {
 }
 
 public extension LGCPattern {
+    func suggestions(within root: LGCSyntaxNode, for prefix: String) -> [LogicSuggestionItem] {
+        switch self {
+        case .identifier(let pattern):
+            return pattern.suggestions(within: root, for: prefix)
+        default:
+            fatalError("Not handled")
+        }
+    }
+}
+
+public extension LGCIdentifierPattern {
     enum Suggestion {
         public static var `preludeImport`: LogicSuggestionItem {
             return LogicSuggestionItem(
                 title: "Prelude",
                 category: "LIBRARIES",
-                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Prelude")),
+                node: LGCSyntaxNode.pattern(.identifier(LGCIdentifierPattern(id: UUID(), name: "Prelude"))),
                 documentation: ({ builder in
                     return LightMark.makeScrollView(markdown: """
 # Prelude
@@ -415,7 +426,7 @@ The Logic type system.
             return LogicSuggestionItem(
                 title: "Color",
                 category: "LIBRARIES",
-                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Color")),
+                node: LGCSyntaxNode.pattern(.identifier(LGCIdentifierPattern(id: UUID(), name: "Color"))),
                 documentation: ({ builder in
                     return LightMark.makeScrollView(markdown: """
 # Color
@@ -430,7 +441,7 @@ The Lona Color library. This contains functions for creating and manipulating cr
             return LogicSuggestionItem(
                 title: "TextStyle",
                 category: "LIBRARIES",
-                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "TextStyle")),
+                node: LGCSyntaxNode.pattern(.identifier(LGCIdentifierPattern(id: UUID(), name: "TextStyle"))),
                 documentation: ({ builder in
                     return LightMark.makeScrollView(markdown: """
 # TextStyle
@@ -445,7 +456,7 @@ The Lona Text Style library. This contains functions for creating and manipulati
             return LogicSuggestionItem(
                 title: "Shadow",
                 category: "LIBRARIES",
-                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: "Shadow")),
+                node: LGCSyntaxNode.pattern(.identifier(LGCIdentifierPattern(id: UUID(), name: "Shadow"))),
                 documentation: ({ builder in
                     return LightMark.makeScrollView(markdown: """
 # Shadow
@@ -476,7 +487,7 @@ The Lona Shadow library. This contains functions for creating and manipulating c
             LogicSuggestionItem(
                 title: "Name: \(prefix)",
                 category: "Pattern".uppercased(),
-                node: LGCSyntaxNode.pattern(LGCPattern(id: UUID(), name: prefix)),
+                node: LGCSyntaxNode.pattern(.identifier(LGCIdentifierPattern(id: UUID(), name: prefix))),
                 disabled: prefix.isEmpty
             )
         ]
@@ -507,7 +518,7 @@ public extension LGCFunctionParameter {
             case .placeholder:
                 return LGCFunctionParameter.parameter(
                     id: UUID(),
-                    localName: LGCPattern(id: UUID(), name: prefix),
+                    localName: LGCIdentifierPattern(id: UUID(), name: prefix),
                     annotation: LGCTypeAnnotation.typeIdentifier(
                         id: UUID(),
                         identifier: LGCIdentifier(id: UUID(), string: "type", isPlaceholder: true),
@@ -519,7 +530,7 @@ public extension LGCFunctionParameter {
             case .parameter(let value):
                 return LGCFunctionParameter.parameter(
                     id: UUID(),
-                    localName: LGCPattern(id: UUID(), name: prefix),
+                    localName: LGCIdentifierPattern(id: UUID(), name: prefix),
                     annotation: value.annotation, // TODO: new id?
                     defaultValue: value.defaultValue, // TODO: new id?
                     comment: nil
@@ -545,14 +556,14 @@ public extension LGCEnumerationCase {
             case .placeholder:
                 return LGCEnumerationCase.enumerationCase(
                     id: UUID(),
-                    name: LGCPattern(id: UUID(), name: prefix),
+                    name: LGCIdentifierPattern(id: UUID(), name: prefix),
                     associatedValueTypes: .next(LGCTypeAnnotation.makePlaceholder(), .empty),
                     comment: nil
                 )
             case .enumerationCase(let value):
                 return LGCEnumerationCase.enumerationCase(
                     id: UUID(),
-                    name: LGCPattern(id: UUID(), name: prefix),
+                    name: LGCIdentifierPattern(id: UUID(), name: prefix),
                     associatedValueTypes: value.associatedValueTypes,
                     comment: nil
                 )
@@ -686,7 +697,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.variable(
                         id: UUID(),
-                        name: LGCPattern(id: nameId, name: query.isEmpty ? "name" : query),
+                        name: LGCIdentifierPattern(id: nameId, name: query.isEmpty ? "name" : query),
                         annotation: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
                             identifier: LGCIdentifier(id: typeId, string: "type", isPlaceholder: true),
@@ -710,7 +721,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.function(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: query.isEmpty ? "name" : query),
+                        name: LGCIdentifierPattern(id: UUID(), name: query.isEmpty ? "name" : query),
                         returnType: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
                             identifier: LGCIdentifier(id: UUID(), string: "Type", isPlaceholder: true),
@@ -732,7 +743,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.function(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCIdentifierPattern(id: UUID(), name: "name"),
                         returnType: LGCTypeAnnotation.typeIdentifier(
                             id: UUID(),
                             identifier: LGCIdentifier(id: UUID(), string: "Void"),
@@ -764,7 +775,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.enumeration(
                         id: UUID(),
-                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
+                        name: LGCIdentifierPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         genericParameters: .empty,
                         cases: .next(.placeholder(id: placeholderId), .empty),
                         comment: nil
@@ -781,7 +792,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.enumeration(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCIdentifierPattern(id: UUID(), name: "name"),
                         genericParameters: .init(
                             [
                                 .parameter(id: UUID(), name: .init(id: UUID(), name: "T")),
@@ -807,7 +818,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.record(
                         id: UUID(),
-                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
+                        name: LGCIdentifierPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         genericParameters: .empty,
                         declarations: .next(.placeholder(id: placeholderId), .empty),
                         comment: nil
@@ -824,7 +835,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.record(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "name"),
+                        name: LGCIdentifierPattern(id: UUID(), name: "name"),
                         genericParameters: .init(
                             [
                                 .parameter(id: UUID(), name: .init(id: UUID(), name: "T")),
@@ -850,7 +861,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.namespace(
                         id: UUID(),
-                        name: LGCPattern(id: patternId, name: query.isEmpty ? "name" : query),
+                        name: LGCIdentifierPattern(id: patternId, name: query.isEmpty ? "name" : query),
                         declarations: .next(.placeholder(id: placeholderId), .empty)
                     )
                 ),
@@ -865,7 +876,7 @@ extension LGCDeclaration {
                 node: LGCSyntaxNode.declaration(
                     LGCDeclaration.importDeclaration(
                         id: UUID(),
-                        name: LGCPattern(id: UUID(), name: "Name")
+                        name: LGCIdentifierPattern(id: UUID(), name: "Name")
                     )
                 )
             )
@@ -911,7 +922,7 @@ public extension LGCStatement {
 
         let forLoop = LGCSyntaxNode.statement(
             LGCStatement.loop(
-                pattern: LGCPattern(id: UUID(), name: "item"),
+                pattern: LGCIdentifierPattern(id: UUID(), name: "item"),
                 expression: LGCExpression.identifierExpression(
                     id: UUID(),
                     identifier: LGCIdentifier(id: UUID(), string: "array", isPlaceholder: true)

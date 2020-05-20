@@ -148,7 +148,7 @@ extension LGCIdentifier: SyntaxNodeFormattable {
     }
 }
 
-extension LGCPattern: SyntaxNodeFormattable {
+extension LGCIdentifierPattern: SyntaxNodeFormattable {
     func formatted(using options: LogicFormattingOptions, bold: Bool) -> FormatterCommand<LogicElement> {
         let element: FormatterCommand<LogicElement> = .element(LogicElement.dropdown(id, name, bold ? .boldVariable : .variable))
 
@@ -170,6 +170,17 @@ extension LGCPattern: SyntaxNodeFormattable {
 
     var formattedAsTitle: FormatterCommand<LogicElement> {
         return .element(.title(id, name))
+    }
+}
+
+extension LGCPattern: SyntaxNodeFormattable {
+    func formatted(using options: LogicFormattingOptions) -> FormatterCommand<LogicElement> {
+        switch self {
+        case .identifier(let value):
+            return value.formatted(using: options)
+        default:
+            fatalError("Not handled")
+        }
     }
 }
 

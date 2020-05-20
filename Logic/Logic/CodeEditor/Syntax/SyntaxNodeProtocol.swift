@@ -94,6 +94,71 @@ public extension SyntaxNodeProtocol {
     }
 }
 
+// MARK: Helpers
+
+extension LGCTuplePattern {
+    func copy(deep: Bool) -> Self {
+        return LGCTuplePattern(id: UUID(), elements: elements.copy(deep: deep))
+    }
+}
+
+extension LGCIdentifierPattern {
+    var uuid: UUID {
+        return id
+    }
+
+    var node: LGCSyntaxNode {
+        return .pattern(.identifier(self))
+    }
+
+    func delete(id: UUID) -> LGCIdentifierPattern? {
+        if self.id == id {
+            return nil
+        } else {
+            return .init(id: self.id, name: name)
+        }
+    }
+
+    func replace(id: UUID, with syntaxNode: LGCIdentifierPattern) -> LGCIdentifierPattern {
+        if self.id == id {
+            return syntaxNode
+        }
+
+        return self
+    }
+
+    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCIdentifierPattern {
+        if self.id == id {
+            switch syntaxNode {
+            case .pattern(.identifier(let value)):
+                return value
+            default:
+                break
+            }
+        }
+
+        return self
+    }
+
+
+//    func replace(id: UUID, with syntaxNode: LGCSyntaxNode) -> LGCSyntaxNode {
+//        if self.id == id {
+//            switch syntaxNode {
+//            case .pattern(.identifier):
+//                return syntaxNode
+//            default:
+//                break
+//            }
+//        }
+//
+//        return self.node
+//    }
+
+    func copy(deep: Bool) -> Self {
+        return .init(id: UUID(), name: name)
+    }
+}
+
 // Utility, not part of the protocol
 extension SyntaxNodeProtocol {
     public func parentOf(target id: UUID, includeTopLevel: Bool) -> LGCSyntaxNode? {
@@ -140,7 +205,28 @@ extension LGCIdentifier: SyntaxNodeProtocol {
 
 extension LGCPattern: SyntaxNodeProtocol {
     public func copy(deep: Bool) -> LGCPattern {
-        return .init(id: UUID(), name: name)
+        switch self {
+        case .identifier(let value):
+            return .identifier(.init(id: UUID(), name: value.name))
+        case .tuple(let value):
+            return .tuple(.init(id: UUID(), elements: value.elements.copy(deep: deep)))
+        case .enumationCase(let value):
+            return .enumationCase(
+                .init(
+                    id: UUID(),
+                    typeIdentifier: value.typeIdentifier.copy(deep: deep),
+                    caseName: value.caseName.copy(deep: deep),
+                    tuple: value.tuple.copy(deep: deep)
+                )
+            )
+        case .valueBinding(let value):
+            return .valueBinding(
+                .init(
+                    id: UUID(),
+                    pattern: value.pattern.copy(deep: deep)
+                )
+            )
+        }
     }
 
     public var subnodes: [LGCSyntaxNode] {
@@ -164,7 +250,18 @@ extension LGCPattern: SyntaxNodeProtocol {
         }
     }
 
-    public var uuid: UUID { return id }
+    public var uuid: UUID {
+        switch self {
+        case .identifier(let value):
+            return value.id
+        case .tuple(let value):
+            return value.id
+        case .enumationCase(let value):
+            return value.id
+        case .valueBinding(let value):
+            return value.id
+        }
+    }
 
     public func movementAfterInsertion(rootNode: LGCSyntaxNode) -> Movement {
         return .next
@@ -1188,7 +1285,7 @@ extension LGCDeclaration: SyntaxNodeProtocol {
         return .declaration(self)
     }
 
-    public var namePattern: LGCPattern? {
+    public var namePattern: LGCIdentifierPattern? {
         switch self {
         case .variable(let value):
             return value.name

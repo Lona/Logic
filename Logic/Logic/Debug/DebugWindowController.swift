@@ -172,8 +172,10 @@ public class DebugWindowController: NSWindowController {
         let typeBindingEntries: [Entry] = filterEntries(
             self.unificationContext.nodes.map { (uuid, type) -> (String, UUID, Unification.T) in
                 switch rootNode.find(id: uuid) {
-                case .pattern(let pattern):
+                case .pattern(.identifier(let pattern)):
                     return (pattern.name, uuid, type)
+                case .pattern:
+                    fatalError("Pattern not handled")
                 case .some(let node):
                     return ("@" + node.nodeTypeDescription, uuid, type)
                 case .none:

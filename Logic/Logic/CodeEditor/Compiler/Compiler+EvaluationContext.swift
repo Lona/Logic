@@ -777,7 +777,7 @@ extension LGCSyntaxNode {
             }
         }
 
-        let patterns: [LGCPattern] = declarations.compactMap { declaration in
+        let patterns: [LGCIdentifierPattern] = declarations.compactMap { declaration in
             switch declaration {
             case .enumeration(_, let pattern, _, _, _),
                  .namespace(_, let pattern, _),
@@ -795,7 +795,7 @@ extension LGCSyntaxNode {
 }
 
 extension LGCDeclaration {
-    public var declaredRecordVariables: [(LGCPattern, LGCTypeAnnotation, LGCExpression)] {
+    public var declaredRecordVariables: [(LGCIdentifierPattern, LGCTypeAnnotation, LGCExpression)] {
         switch self {
         case .record(id: _, name: _, genericParameters: _, declarations: let declarations, _):
             return declarations.compactMap { declaration in

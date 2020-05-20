@@ -32,9 +32,107 @@ public struct LGCComment: Codable & Equatable & Equivalentable {
 }
 
 
+public struct LGCExpressionCondition: Codable & Equatable & Equivalentable {
+  public init(id: UUID, expression: LGCExpression) {
+    self.id = id
+    self.expression = expression
+  }
+
+  public var id: UUID
+  public var expression: LGCExpression
+
+  public func isEquivalentTo(_ node: LGCExpressionCondition) -> Bool {
+    return self.expression == node.expression
+  }
+}
+
+public struct LGCCaseCondition: Codable & Equatable & Equivalentable {
+  public init(id: UUID, pattern: LGCEnumerationCasePattern, initializer: LGCExpression) {
+    self.id = id
+    self.pattern = pattern
+    self.initializer = initializer
+  }
+
+  public var id: UUID
+  public var pattern: LGCEnumerationCasePattern
+  public var initializer: LGCExpression
+
+  public func isEquivalentTo(_ node: LGCCaseCondition) -> Bool {
+    return self.pattern == node.pattern && self.initializer == node.initializer
+  }
+}
+
+public indirect enum LGCCondition: Codable & Equatable & Equivalentable {
+  case expression(LGCExpressionCondition)
+  case `case`(LGCCaseCondition)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "expression":
+        self = .expression(try container.decode(LGCExpressionCondition.self, forKey: .data))
+      case "case":
+        self = .case(try container.decode(LGCCaseCondition.self, forKey: .data))
+      default:
+        fatalError("Failed to decode enum due to invalid case type: \(type).")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .expression(let value):
+        try container.encode("expression", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .case(let value):
+        try container.encode("case", forKey: .type)
+        try container.encode(value, forKey: .data)
+    }
+  }
+
+  // Equivalentable
+
+  public func isEquivalentTo(_ node: LGCCondition) -> Bool {
+    switch (self, node) {
+      case (.expression(let a), .expression(let b)):
+        return a.isEquivalentTo(b)
+      case (.case(let a), .case(let b)):
+        return a.isEquivalentTo(b)
+      default:
+        return false
+    }
+  }
+}
+
+// extension LGCCondition: SyntaxNodePlaceholdable {
+//   public var isPlaceholder: Bool {
+//     switch self {
+//     case .placeholder:
+//       return true
+//     default:
+//       return false
+//     }
+//   }
+
+//   public static func makePlaceholder() -> LGCCondition {
+//     return .placeholder(id: UUID())
+//   }
+// }
+
+
 public indirect enum LGCEnumerationCase: Codable & Equatable & Equivalentable {
   case placeholder(id: UUID)
-  case enumerationCase(id: UUID, name: LGCPattern, associatedValueTypes: LGCList<LGCTypeAnnotation>, comment: Optional<LGCComment>)
+  case enumerationCase(id: UUID, name: LGCIdentifierPattern, associatedValueTypes: LGCList<LGCTypeAnnotation>, comment: Optional<LGCComment>)
 
   // MARK: Codable
 
@@ -62,7 +160,7 @@ public indirect enum LGCEnumerationCase: Codable & Equatable & Equivalentable {
         self =
           .enumerationCase(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             associatedValueTypes: try data.decode(LGCList.self, forKey: .associatedValueTypes),
             comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
       default:
@@ -197,7 +295,7 @@ extension LGCFunctionCallArgument: SyntaxNodePlaceholdable {
 
 
 public indirect enum LGCFunctionParameter: Codable & Equatable & Equivalentable {
-  case parameter(id: UUID, localName: LGCPattern, annotation: LGCTypeAnnotation, defaultValue: LGCFunctionParameterDefaultValue, comment: Optional<LGCComment>)
+  case parameter(id: UUID, localName: LGCIdentifierPattern, annotation: LGCTypeAnnotation, defaultValue: LGCFunctionParameterDefaultValue, comment: Optional<LGCComment>)
   case placeholder(id: UUID)
 
   // MARK: Codable
@@ -225,7 +323,7 @@ public indirect enum LGCFunctionParameter: Codable & Equatable & Equivalentable 
         self =
           .parameter(
             id: try data.decode(UUID.self, forKey: .id),
-            localName: try data.decode(LGCPattern.self, forKey: .localName),
+            localName: try data.decode(LGCIdentifierPattern.self, forKey: .localName),
             annotation: try data.decode(LGCTypeAnnotation.self, forKey: .annotation),
             defaultValue: try data.decode(LGCFunctionParameterDefaultValue.self, forKey: .defaultValue),
             comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
@@ -345,7 +443,7 @@ public indirect enum LGCFunctionParameterDefaultValue: Codable & Equatable & Equ
 
 
 public indirect enum LGCGenericParameter: Codable & Equatable & Equivalentable {
-  case parameter(id: UUID, name: LGCPattern)
+  case parameter(id: UUID, name: LGCIdentifierPattern)
   case placeholder(id: UUID)
 
   // MARK: Codable
@@ -368,7 +466,7 @@ public indirect enum LGCGenericParameter: Codable & Equatable & Equivalentable {
     switch type {
       case "parameter":
         self =
-          .parameter(id: try data.decode(UUID.self, forKey: .id), name: try data.decode(LGCPattern.self, forKey: .name))
+          .parameter(id: try data.decode(UUID.self, forKey: .id), name: try data.decode(LGCIdentifierPattern.self, forKey: .name))
       case "placeholder":
         self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
       default:
@@ -480,8 +578,7 @@ public indirect enum LGCList<T: Equatable & Codable & Equivalentable>: Codable &
 }
 
 extension LGCList where T: SyntaxNodePlaceholdable {
-  public func isEquivalentTo(_ node: Optional<LGCList<T>>) -> Bool {
-    guard let node = node else { return false }
+  public func isEquivalentTo(_ node: LGCList<T>) -> Bool {
     switch (self, node) {
       case (.empty, .empty):
         return true
@@ -496,7 +593,7 @@ extension LGCList where T: SyntaxNodePlaceholdable {
 }
 
 
-public struct LGCPattern: Codable & Equatable & Equivalentable {
+public struct LGCIdentifierPattern: Codable & Equatable & Equivalentable {
   public init(id: UUID, name: String) {
     self.id = id
     self.name = name
@@ -505,11 +602,128 @@ public struct LGCPattern: Codable & Equatable & Equivalentable {
   public var id: UUID
   public var name: String
 
-  public func isEquivalentTo(_ node: LGCPattern) -> Bool {
+  public func isEquivalentTo(_ node: LGCIdentifierPattern) -> Bool {
     return self.name == node.name
   }
 }
 
+public struct LGCTuplePattern: Codable & Equatable & Equivalentable {
+  public init(id: UUID, elements: LGCList<LGCPattern>) {
+    self.id = id
+    self.elements = elements
+  }
+
+  public var id: UUID
+  public var elements: LGCList<LGCPattern>
+
+  public func isEquivalentTo(_ node: LGCTuplePattern) -> Bool {
+    return self.elements.isEquivalentTo(node.elements)
+  }
+}
+
+public struct LGCEnumerationCasePattern: Codable & Equatable & Equivalentable {
+  public init(id: UUID, typeIdentifier: LGCTypeAnnotation, caseName: LGCIdentifier, tuple: LGCTuplePattern) {
+    self.id = id
+    self.typeIdentifier = typeIdentifier
+    self.caseName = caseName
+    self.tuple = tuple
+  }
+
+  public var id: UUID
+  public var typeIdentifier: LGCTypeAnnotation
+  public var caseName: LGCIdentifier
+  public var tuple: LGCTuplePattern
+
+  public func isEquivalentTo(_ node: LGCEnumerationCasePattern) -> Bool {
+    return (
+      self.typeIdentifier.isEquivalentTo(node.typeIdentifier) &&
+      self.caseName.isEquivalentTo(node.caseName) &&
+      self.tuple.isEquivalentTo(node.tuple)
+    )
+  }
+}
+
+public struct LGCValueBindingPattern: Codable & Equatable & Equivalentable {
+  public init(id: UUID, pattern: LGCPattern) {
+    self.id = id
+    self.pattern = pattern
+  }
+
+  public var id: UUID
+  public var pattern: LGCPattern
+
+  public func isEquivalentTo(_ node: LGCValueBindingPattern) -> Bool {
+    return self.pattern.isEquivalentTo(node.pattern)
+  }
+}
+
+public indirect enum LGCPattern: Codable & Equatable & Equivalentable {
+  case identifier(LGCIdentifierPattern)
+  case tuple(LGCTuplePattern)
+  case enumationCase(LGCEnumerationCasePattern)
+  case valueBinding(LGCValueBindingPattern)
+
+  // MARK: Codable
+
+  public enum CodingKeys: CodingKey {
+    case type
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let type = try container.decode(String.self, forKey: .type)
+
+    switch type {
+      case "identifier":
+        self = .identifier(try container.decode(LGCIdentifierPattern.self, forKey: .data))
+      case "tuple":
+        self = .tuple(try container.decode(LGCTuplePattern.self, forKey: .data))
+      case "enumationCase":
+        self = .enumationCase(try container.decode(LGCEnumerationCasePattern.self, forKey: .data))
+      case "valueBinding":
+        self = .valueBinding(try container.decode(LGCValueBindingPattern.self, forKey: .data))
+      default:
+        fatalError("Failed to decode enum due to invalid case type: \(type).")
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .identifier(let value):
+        try container.encode("identifier", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .tuple(let value):
+        try container.encode("tuple", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .enumationCase(let value):
+        try container.encode("enumationCase", forKey: .type)
+        try container.encode(value, forKey: .data)
+      case .valueBinding(let value):
+        try container.encode("valueBinding", forKey: .type)
+        try container.encode(value, forKey: .data)
+    }
+  }
+
+  // Equivalentable
+
+  public func isEquivalentTo(_ node: LGCPattern) -> Bool {
+    switch (self, node) {
+      case (.identifier(let a), .identifier(let b)):
+        return a.isEquivalentTo(b)
+      case (.tuple(let a), .tuple(let b)):
+        return a.isEquivalentTo(b)
+      case (.enumationCase(let a), .enumationCase(let b)):
+        return a.isEquivalentTo(b)
+      case (.valueBinding(let a), .valueBinding(let b)):
+        return a.isEquivalentTo(b)
+      default:
+        return false
+    }
+  }
+}
 
 public protocol SyntaxNodePlaceholdable {
   var isPlaceholder: Bool { get }
@@ -561,12 +775,12 @@ public struct LGCTopLevelParameters: Codable & Equatable & Equivalentable {
 
 
 public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
-  case enumeration(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, cases: LGCList<LGCEnumerationCase>, comment: Optional<LGCComment>)
-  case function(id: UUID, name: LGCPattern, returnType: LGCTypeAnnotation, genericParameters: LGCList<LGCGenericParameter>, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>, comment: Optional<LGCComment>)
-  case importDeclaration(id: UUID, name: LGCPattern)
-  case namespace(id: UUID, name: LGCPattern, declarations: LGCList<LGCDeclaration>)
-  case record(id: UUID, name: LGCPattern, genericParameters: LGCList<LGCGenericParameter>, declarations: LGCList<LGCDeclaration>, comment: Optional<LGCComment>)
-  case variable(id: UUID, name: LGCPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>, comment: Optional<LGCComment>)
+  case enumeration(id: UUID, name: LGCIdentifierPattern, genericParameters: LGCList<LGCGenericParameter>, cases: LGCList<LGCEnumerationCase>, comment: Optional<LGCComment>)
+  case function(id: UUID, name: LGCIdentifierPattern, returnType: LGCTypeAnnotation, genericParameters: LGCList<LGCGenericParameter>, parameters: LGCList<LGCFunctionParameter>, block: LGCList<LGCStatement>, comment: Optional<LGCComment>)
+  case importDeclaration(id: UUID, name: LGCIdentifierPattern)
+  case namespace(id: UUID, name: LGCIdentifierPattern, declarations: LGCList<LGCDeclaration>)
+  case record(id: UUID, name: LGCIdentifierPattern, genericParameters: LGCList<LGCGenericParameter>, declarations: LGCList<LGCDeclaration>, comment: Optional<LGCComment>)
+  case variable(id: UUID, name: LGCIdentifierPattern, annotation: Optional<LGCTypeAnnotation>, initializer: Optional<LGCExpression>, comment: Optional<LGCComment>)
   case placeholder(id: UUID)
 
   // MARK: Codable
@@ -600,7 +814,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .variable(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             annotation: try data.decodeIfPresent(LGCTypeAnnotation.self, forKey: .annotation),
             initializer: try data.decodeIfPresent(LGCExpression.self, forKey: .initializer),
             comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
@@ -608,7 +822,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .function(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             returnType: try data.decode(LGCTypeAnnotation.self, forKey: .returnType),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
             parameters: try data.decode(LGCList.self, forKey: .parameters),
@@ -618,7 +832,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .enumeration(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
             cases: try data.decode(LGCList.self, forKey: .cases),
             comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
@@ -626,7 +840,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .namespace(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             declarations: try data.decode(LGCList.self, forKey: .declarations))
       case "placeholder":
         self = .placeholder(id: try data.decode(UUID.self, forKey: .id))
@@ -634,7 +848,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .record(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name),
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name),
             genericParameters: try data.decode(LGCList.self, forKey: .genericParameters),
             declarations: try data.decode(LGCList.self, forKey: .declarations),
             comment: try data.decodeIfPresent(LGCComment.self, forKey: .comment))
@@ -642,7 +856,7 @@ public indirect enum LGCDeclaration: Codable & Equatable & Equivalentable {
         self =
           .importDeclaration(
             id: try data.decode(UUID.self, forKey: .id),
-            name: try data.decode(LGCPattern.self, forKey: .name))
+            name: try data.decode(LGCIdentifierPattern.self, forKey: .name))
       default:
         fatalError("Failed to decode enum due to invalid case type.")
     }
@@ -974,7 +1188,7 @@ public indirect enum LGCStatement: Codable & Equatable & Equivalentable {
   case branch(id: UUID, condition: LGCExpression, block: LGCList<LGCStatement>)
   case declaration(id: UUID, content: LGCDeclaration)
   case expressionStatement(id: UUID, expression: LGCExpression)
-  case loop(pattern: LGCPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: UUID)
+  case loop(pattern: LGCIdentifierPattern, expression: LGCExpression, block: LGCList<LGCStatement>, id: UUID)
   case returnStatement(id: UUID, expression: LGCExpression)
   case placeholder(id: UUID)
 
@@ -1003,7 +1217,7 @@ public indirect enum LGCStatement: Codable & Equatable & Equivalentable {
       case "loop":
         self =
           .loop(
-            pattern: try data.decode(LGCPattern.self, forKey: .pattern),
+            pattern: try data.decode(LGCIdentifierPattern.self, forKey: .pattern),
             expression: try data.decode(LGCExpression.self, forKey: .expression),
             block: try data.decode(LGCList.self, forKey: .block),
             id: try data.decode(UUID.self, forKey: .id))
