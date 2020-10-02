@@ -12,6 +12,11 @@ extension NSPasteboard.PasteboardType {
     public static var mdx = NSPasteboard.PasteboardType.init("mdx")
 }
 
+public enum TextSelectionType {
+    case line
+    case all
+}
+
 // MARK: - TextBlockContainerView
 
 public class TextBlockContainerView: NSBox {
@@ -235,12 +240,12 @@ public class TextBlockContainerView: NSBox {
         set { blockView.onMoveDown = newValue }
     }
 
-    public var onSelectUp: (() -> Void)? {
+    public var onSelectUp: ((TextSelectionType) -> Void)? {
         get { return blockView.onSelectUp }
         set { blockView.onSelectUp = newValue }
     }
 
-    public var onSelectDown: (() -> Void)? {
+    public var onSelectDown: ((TextSelectionType) -> Void)? {
         get { return blockView.onSelectDown }
         set { blockView.onSelectDown = newValue }
     }
@@ -546,9 +551,9 @@ public class TextBlockView: AttributedTextView {
 
     public var onMoveDown: ((NSRect) -> Void)?
 
-    public var onSelectUp: (() -> Void)?
+    public var onSelectUp: ((TextSelectionType) -> Void)?
 
-    public var onSelectDown: (() -> Void)?
+    public var onSelectDown: ((TextSelectionType) -> Void)?
 
     public var width: CGFloat = 0 {
         didSet {
@@ -678,9 +683,12 @@ public class TextBlockView: AttributedTextView {
             }
         } else if selector == #selector(NSResponder.moveUpAndModifySelection) {
             if currentLineFragmentIndex == 0 {
-                onSelectUp?()
+                onSelectUp?(.line)
                 return
             }
+        } else if selector == #selector(NSResponder.moveToBeginningOfDocumentAndModifySelection) {
+            onSelectUp?(.all)
+            return
         } else if selector == #selector(NSResponder.moveDown) {
             onPressDown?()
 
@@ -691,9 +699,12 @@ public class TextBlockView: AttributedTextView {
             }
         } else if selector == #selector(NSResponder.moveDownAndModifySelection) {
             if currentLineFragmentIndex == lineRects.count - 1 {
-                onSelectDown?()
+                onSelectDown?(.line)
                 return
             }
+        } else if selector == #selector(NSResponder.moveToEndOfDocumentAndModifySelection) {
+            onSelectDown?(.all)
+            return
         }
 
         return super.doCommand(by: selector)

@@ -908,7 +908,7 @@ public class BlockListView: NSBox {
 
     public override func keyDown(with event: NSEvent) {
         let isShiftEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.shift)
-//        let isCommandEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.command)
+        let isCommandEnabled = event.modifierFlags.contains(NSEvent.ModifierFlags.command)
 
 //        switch (event.characters) {
 //        case "d" where isShiftEnabled && isCommandEnabled:
@@ -942,9 +942,17 @@ public class BlockListView: NSBox {
 
                 if isShiftEnabled {
                     if anchor > range.lowerBound {
-                        selection = .blocks(.init(location: range.location, length: range.length - 1), anchor: anchor - 1)
+                        if isCommandEnabled {
+                            selection = .blocks(.init(location: 0, length: range.location + 1), anchor: 0)
+                        } else {
+                            selection = .blocks(.init(location: range.location, length: range.length - 1), anchor: anchor - 1)
+                        }
                     } else {
-                        selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                        if isCommandEnabled {
+                            selection = .blocks(.init(between: 0, and: range.upperBound), anchor: 0)
+                        } else {
+                            selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                        }
                     }
                 } else {
                     selection = .blocks(newRange)
@@ -961,9 +969,17 @@ public class BlockListView: NSBox {
 
                 if isShiftEnabled {
                     if anchor < range.upperBound - 1 {
-                        selection = .blocks(.init(location: range.location + 1, length: range.length - 1), anchor: anchor + 1)
+                        if isCommandEnabled {
+                            selection = .blocks(.init(between: range.upperBound - 1, and: blocks.count), anchor: blocks.count - 1)
+                        } else {
+                            selection = .blocks(.init(location: range.location + 1, length: range.length - 1), anchor: anchor + 1)
+                        }
                     } else {
-                        selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                        if isCommandEnabled {
+                            selection = .blocks(.init(between: range.location, and: blocks.count), anchor: blocks.count - 1)
+                        } else {
+                            selection = .blocks(.merge(ranges: [range, newRange]), anchor: newRange.location)
+                        }
                     }
                 } else {
                     selection = .blocks(newRange, anchor: newRange.location)
@@ -1696,7 +1712,7 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
-            let handleSelect: () -> Void = { [unowned self] in
+            let handleSelect: (TextSelectionType, Bool) -> Void = { [unowned self] selectionType, isDown in
                 switch self.selection {
                 case .blocks:
                     fatalError("Invalid selection when inside text block")
@@ -1706,14 +1722,25 @@ extension BlockListView: NSTableViewDelegate {
                         self.window?.makeFirstResponder(self)
                     }
 
-                    self.selection = .blocks(.init(location: line, length: 1), anchor: line)
+                    switch selectionType {
+                    case .line:
+                        self.selection = .blocks(.init(location: line, length: 1), anchor: line)
+                    case .all:
+                        if (isDown) {
+                            let range: NSRange = .init(between: line, and: self.blocks.count)
+                            self.selection = .blocks(range, anchor: self.blocks.count)
+                        } else {
+                            let range: NSRange = .init(between: 0, and: line + 1)
+                            self.selection = .blocks(range, anchor: 0)
+                        }
+                    }
                 case .none:
                     break
                 }
             }
 
-            view.onSelectUp = handleSelect
-            view.onSelectDown = handleSelect
+            view.onSelectUp = { type in handleSelect(type, false) }
+            view.onSelectDown = { type in handleSelect(type, true) }
 
             view.onPressDown = { [unowned self] in
                 if !BlockListView.commandPaletteVisible { return }
