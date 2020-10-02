@@ -205,14 +205,30 @@ public class BlockListView: NSBox {
         let windowRect = convert(moreButtonRect(for: line), to: nil)
         let screenRect = window.convertToScreen(windowRect)
 
-        blocks[line].wrapperView.showOverflowMenu(at: screenRect)
+        getWrapperView(line).showOverflowMenu(at: screenRect)
+    }
+
+    func getWrapperView(_ block: EditableBlock) -> EditableBlockView {
+        return viewFactory.wrapperView(for: block)
+    }
+
+    func getWrapperView(_ line: Int) -> EditableBlockView {
+        return getWrapperView(blocks[line])
+    }
+
+    func getView(_ block: EditableBlock) -> NSView {
+        return viewFactory.view(for: block)
+    }
+
+    func getView(_ line: Int) -> NSView {
+        return getView(blocks[line])
     }
 
     private func handlePressPlus(line: Int) {
         TooltipManager.shared.hideTooltip()
 
         func showCommandPalette(line: Int) {
-            if let view = blocks[line].view as? TextBlockContainerView {
+            if let view = self.getView(line) as? TextBlockContainerView {
                 let rect = view.firstRect(forCharacterRange: NSRange(location: 0, length: 0))
 
                 commandPaletteAnchor = (line, 0, rect)
@@ -251,11 +267,18 @@ public class BlockListView: NSBox {
         return ok
     }
 
+    public func updateBlockMargins(blocks: [EditableBlock]) {
+        zip(blocks.dropLast(), blocks.dropFirst()).forEach { a, b in
+            let margin = EditableBlock.margin(a, b)
+            self.getWrapperView(a).bottomMargin = margin
+        }
+    }
+
     public var blocks: [BlockEditor.Block] = [] {
         didSet {
             tableView.blocks = blocks
 
-            blocks.updateMargins()
+            updateBlockMargins(blocks: blocks)
 
             let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
 
@@ -265,7 +288,7 @@ public class BlockListView: NSBox {
                     let new = blocks[index]
 
                     if old !== new {
-                        new.updateView()
+                        viewFactory.updateView(block: new)
                     }
                 }
             } else {
@@ -300,7 +323,7 @@ public class BlockListView: NSBox {
             }
 
             if blocks.all(where: { $0.isEmpty }), !blocks.isEmpty {
-                if let view = blocks[0].view as? TextBlockContainerView {
+                if let view = getView(0) as? TextBlockContainerView {
                     view.setPlaceholder(string: "Click here to start!")
                 }
             }
@@ -311,6 +334,13 @@ public class BlockListView: NSBox {
                 minimapScroller.needsDisplay = true
             }
         }
+    }
+
+    var viewFactory = EditableBlockFactory()
+
+    public var transformImageURL: ((URL) -> URL)? {
+        get { return viewFactory.transformImageURL }
+        set { viewFactory.transformImageURL = newValue }
     }
 
     public var onChangeBlocks: (([BlockEditor.Block]) -> Bool)?
@@ -330,7 +360,7 @@ public class BlockListView: NSBox {
 
         self.selection = .item(row, .empty)
 
-        let view = blocks[row].view
+        let view = getView(row)
         let viewFrame = view.convert(view.frame, to: scrollView.contentView)
 
         scrollView.contentView.bounds.origin.y = viewFrame.origin.y
@@ -400,7 +430,7 @@ public class BlockListView: NSBox {
         case .item(let row, _):
             if row >= blocks.count { return }
 
-            let view = blocks[row].view
+            let view = getView(row)
 
             if let view = view as? TextBlockContainerView {
                 view.setSelectedRangesWithoutNotification([NSValue(range: .empty)])
@@ -422,7 +452,7 @@ public class BlockListView: NSBox {
         case .item(let row, let range):
             if row >= blocks.count { return }
 
-            let view = blocks[row].view
+            let view = getView(row)
 
             if let view = view as? TextBlockContainerView {
                 view.setSelectedRangesWithoutNotification([NSValue(range: range)])
@@ -438,7 +468,7 @@ public class BlockListView: NSBox {
             }
 
             if anchor < blocks.count {
-                scrollTargetView = blocks[anchor].view
+                scrollTargetView = getView(anchor)
             }
         }
 
@@ -498,7 +528,7 @@ public class BlockListView: NSBox {
 
         switch selection {
         case .item(let row, _):
-            blocks[row].focus()
+            getView(row).focus()
         default:
             break
         }
@@ -563,7 +593,7 @@ public class BlockListView: NSBox {
                 guard let self = self else { return }
 
                 self.tableView.enumerateAvailableRowViews { rowView, row in
-                    self.blocks[row].updateViewWidth(self.tableView.bounds.width)
+                    self.viewFactory.updateViewWidth(block: self.blocks[row], self.tableView.bounds.width)
                 }
             })
         }
@@ -1172,7 +1202,7 @@ public class BlockListView: NSBox {
                             initialRow = row
 
                             // If the drag is within a text block, perform text selection
-                            if let view = blocks[row].view as? TextBlockContainerView {
+                            if let view = getView(row) as? TextBlockContainerView {
                                 let characterIndex = view.characterIndexForInsertion(at: convert(position, to: view))
 
                                 if let initialIndex = initialIndex {
@@ -1202,9 +1232,9 @@ public class BlockListView: NSBox {
 
                     switch selection {
                     case .item(let row, let range):
-                        let view = blocks[row].view
+                        let view = getView(row)
 
-                        blocks[row].focus()
+                        view.focus()
 
                         if range.length > 0 {
                             (view as? TextBlockContainerView)?.showInlineToolbar(for: range)
@@ -1220,7 +1250,7 @@ public class BlockListView: NSBox {
             }
 
             if didChangeInsertionColor, let row = initialRow {
-                let view = blocks[row].view
+                let view = getView(row)
 
                 if let view = view as? TextBlockContainerView {
                     view.insertionPointColor = NSColor.textColor
@@ -1251,7 +1281,7 @@ public class BlockListView: NSBox {
         case .moreButton(let line):
             handlePressMore(line: line)
         case .item(let line, let point):
-            let view = blocks[line].view
+            let view = getView(line)
 
             if let view = view as? TextBlockContainerView {
                 let pointInView = convert(point, to: view)
@@ -1360,6 +1390,7 @@ extension BlockListView: NSTableViewDelegate {
 
     public func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let item = blocks[row]
+        let wrapperView = getWrapperView(item)
 
         let deleteItemTitle = "Delete"
         let duplicateItemTitle = "Duplicate"
@@ -1370,7 +1401,7 @@ extension BlockListView: NSTableViewDelegate {
         ]
 
         let standardActivateOverflowMenuItem: (Int) -> Void = { [unowned self] index in
-            guard let menuItems = item.overflowMenu?() else { return }
+            guard let menuItems = wrapperView.overflowMenu?() else { return }
 
             let menuItem = menuItems[index]
 
@@ -1393,17 +1424,17 @@ extension BlockListView: NSTableViewDelegate {
             }
         }
 
-        item.overflowMenu = { return standardOverflowMenu }
+        wrapperView.overflowMenu = { return standardOverflowMenu }
 
-        item.onActivateOverflowMenuItem = standardActivateOverflowMenuItem
+        wrapperView.onActivateOverflowMenuItem = standardActivateOverflowMenuItem
 
-        item.onOpenOverflowMenu = {
+        wrapperView.onOpenOverflowMenu = {
             guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
             self.selection = .blocks(.init(location: line, length: 1))
         }
 
-        item.onDeleteBlock = {
+        getWrapperView(item).onDeleteBlock = {
             guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
 
             if self.handleChangeBlocks(self.blocks.removing(at: line)) {
@@ -1413,7 +1444,7 @@ extension BlockListView: NSTableViewDelegate {
 
         switch item.content {
         case .tokens:
-            let view = item.view as! LogicEditor
+            let view = getView(item) as! LogicEditor
 
             view.onClickBackground = { [unowned self] in
                 guard let line = self.blocks.firstIndex(where: { $0.id == item.id }) else { return }
@@ -1439,11 +1470,11 @@ extension BlockListView: NSTableViewDelegate {
 
             view.onFocusNextView = { [unowned self] in
                 if self.blocks.count > row {
-                    self.blocks[row + 1].focus()
+                    self.getView(row + 1).focus()
                 }
             }
         case .text(let textValue, let sizeLevel):
-            let view = item.view as! TextBlockContainerView
+            let view = getView(item) as! TextBlockContainerView
 
 //            Swift.print("Row", row, view)
 
@@ -1475,7 +1506,7 @@ extension BlockListView: NSTableViewDelegate {
 
                         let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .unordered(depth: 1))
                         if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
-                            newBlock.focus()
+                            self.getView(newBlock).focus()
                         }
 
                         return
@@ -1490,7 +1521,7 @@ extension BlockListView: NSTableViewDelegate {
 
                     let newBlock: EditableBlock = .init(id: UUID(), content: .text(remainder, .paragraph), listDepth: .ordered(depth: 1, index: 1))
                     if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
-                        newBlock.focus()
+                        self.getView(newBlock).focus()
                     }
 
                     return
@@ -1530,7 +1561,7 @@ extension BlockListView: NSTableViewDelegate {
 
                 self.selection = .item(row, range)
 
-                if let view = self.blocks[row].view as? TextBlockContainerView {
+                if let view = self.getView(row) as? TextBlockContainerView {
                     if range.length > 0 {
                         view.showInlineToolbar(for: range)
                         self.hideReplaceWithTextMenu()
@@ -1550,7 +1581,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
+                        let nextView = self.getView(nextLine) as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.last!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1577,7 +1608,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item(let line, _):
                     if let nextLine = self.blocks.suffix(from: line + 1).firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
+                        let nextView = self.getView(nextLine) as? TextBlockContainerView {
                         let lineRect = nextView.lineRects.first!
                         let windowRect = self.window!.convertFromScreen(rect)
                         let convertedRect = nextView.convert(windowRect, from: nil)
@@ -1605,7 +1636,7 @@ extension BlockListView: NSTableViewDelegate {
                 if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
                     // Reapply selection/focus
                     self.updateSelection(from: oldSelection, to: self.selection)
-                    newBlock.focus()
+                    self.getView(newBlock).focus()
                 }
             }
 
@@ -1619,7 +1650,7 @@ extension BlockListView: NSTableViewDelegate {
                 if self.handleChangeBlocks(self.blocks.replacing(elementAt: row, with: newBlock)) {
                     // Reapply selection/focus
                     self.updateSelection(from: oldSelection, to: self.selection)
-                    newBlock.focus()
+                    self.getView(newBlock).focus()
                 }
             }
 
@@ -1632,7 +1663,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.firstIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
+                        let nextView = self.getView(nextLine) as? TextBlockContainerView {
 
                         self.selection = .item(nextLine, .init(location: 0, length: 0))
 
@@ -1652,7 +1683,7 @@ extension BlockListView: NSTableViewDelegate {
                     break
                 case .item:
                     if let nextLine = self.blocks.lastIndex(where: { $0.supportsInlineFocus }),
-                        let nextView = self.blocks[nextLine].view as? TextBlockContainerView {
+                        let nextView = self.getView(nextLine) as? TextBlockContainerView {
 
                         let characterIndex = nextView.characterIndexForInsertion(at: NSPoint(x: nextView.bounds.maxX, y: nextView.bounds.maxY))
 
@@ -1879,7 +1910,7 @@ extension BlockListView: NSTableViewDelegate {
                 if line == 0 { return }
 
                 if let previousLine = self.blocks.prefix(upTo: line).lastIndex(where: { $0.supportsMergingText }),
-                    let nextView = self.blocks[previousLine].view as? TextBlockContainerView {
+                    let nextView = self.getView(previousLine) as? TextBlockContainerView {
 
                     let previousBlock = self.blocks[previousLine]
                     let previousTextValue = nextView.textValue
@@ -1913,13 +1944,13 @@ extension BlockListView: NSTableViewDelegate {
         case .divider:
             break
         case .page(_, let target):
-            let view = item.view as! PageBlock
+            let view = getView(item) as! PageBlock
 
             view.onPressBlock = { [unowned self] in
                 _ = self.onClickPageLink?(target)
             }
         case .image(let url):
-            let view = item.view as! ImageBackground
+            let view = getView(item) as! ImageBackground
 
             let replaceImageTitle = "Replace image..."
 
@@ -1980,14 +2011,14 @@ extension BlockListView: NSTableViewDelegate {
                 }
             }
 
-            item.overflowMenu = {
+            getWrapperView(item).overflowMenu = {
                 return [.row(replaceImageTitle, nil, false, nil, nil)] + standardOverflowMenu
             }
 
-            item.onActivateOverflowMenuItem = { index in
+            getWrapperView(item).onActivateOverflowMenuItem = { index in
                 standardActivateOverflowMenuItem(index)
 
-                guard let menuItems = item.overflowMenu?() else { return }
+                guard let menuItems = self.getWrapperView(item).overflowMenu?() else { return }
 
                 let menuItem = menuItems[index]
 
@@ -2000,9 +2031,9 @@ extension BlockListView: NSTableViewDelegate {
             }
         }
 
-        item.updateViewWidth(tableView.bounds.width)
+        viewFactory.updateViewWidth(block: item, tableView.bounds.width)
 
-        return item.wrapperView
+        return getWrapperView(item)
     }
 
     func showLinkEditor(rect: NSRect, initialValue: String) {
@@ -2226,7 +2257,7 @@ extension BlockListView: NSTableViewDelegate {
 
             let newBlock = menuItems[originalIndex].1
 
-            if case .page(_) = menuItems[originalIndex].1.content {
+            if case .page = menuItems[originalIndex].1.content {
                 self.hideCommandPalette()
 
                 self.onRequestCreatePage?(line, true)
@@ -2273,7 +2304,7 @@ extension BlockListView: NSTableViewDelegate {
                 if ok {
                     switch newBlock.content {
                     case .tokens(.declaration(.variable(_, let pattern, _, _, _))):
-                        let view = newBlock.view as! LogicEditor
+                        let view = self.getView(newBlock) as! LogicEditor
 
                         // This is a workaround to solve the window appearing at the wrong x position.
                         // I think we need to force a layout pass for the window to appear in the correct location.

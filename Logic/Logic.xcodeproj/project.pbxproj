@@ -105,6 +105,9 @@
 		6B5B7572215C385400CDC9C6 /* NormalTypeCaseParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */; };
 		6B5B7574215C387E00CDC9C6 /* TypeParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7573215C387E00CDC9C6 /* TypeParameter.swift */; };
 		6B5B7576215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */; };
+		6B6BBC162527AD7900369A26 /* EditableBlockFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6BBC152527AD7900369A26 /* EditableBlockFactory.swift */; };
+		6B6BBC182527B0D700369A26 /* Focusable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6BBC172527B0D700369A26 /* Focusable.swift */; };
+		6B6BBC1A2527C56B00369A26 /* EditableBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6BBC192527C56B00369A26 /* EditableBlockView.swift */; };
 		6B6E47492402EA040067B2FF /* ImageBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6E47482402EA040067B2FF /* ImageBackground.swift */; };
 		6B6F19D3230B3E1300E5AC60 /* Colors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B6F19D2230B3E1200E5AC60 /* Colors.framework */; };
 		6B6F19DD230B56C900E5AC60 /* LGCSyntax+Dragging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6F19DC230B56C900E5AC60 /* LGCSyntax+Dragging.swift */; };
@@ -260,6 +263,9 @@
 		6B5B7571215C385400CDC9C6 /* NormalTypeCaseParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NormalTypeCaseParameter.swift; sourceTree = "<group>"; };
 		6B5B7573215C387E00CDC9C6 /* TypeParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeParameter.swift; sourceTree = "<group>"; };
 		6B5B7575215C38B000CDC9C6 /* GenericTypeParameterSubstitution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTypeParameterSubstitution.swift; sourceTree = "<group>"; };
+		6B6BBC152527AD7900369A26 /* EditableBlockFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableBlockFactory.swift; sourceTree = "<group>"; };
+		6B6BBC172527B0D700369A26 /* Focusable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Focusable.swift; sourceTree = "<group>"; };
+		6B6BBC192527C56B00369A26 /* EditableBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableBlockView.swift; sourceTree = "<group>"; };
 		6B6E47482402EA040067B2FF /* ImageBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBackground.swift; sourceTree = "<group>"; };
 		6B6F19D2230B3E1200E5AC60 /* Colors.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Colors.framework; path = ../Carthage/Build/Mac/Colors.framework; sourceTree = "<group>"; };
 		6B6F19DC230B56C900E5AC60 /* LGCSyntax+Dragging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LGCSyntax+Dragging.swift"; sourceTree = "<group>"; };
@@ -334,13 +340,16 @@
 				6B00CA3F232B0091001907C6 /* BlockEditor.swift */,
 				6B00CA45232BEB1F001907C6 /* BlockListView.swift */,
 				6B0F945F233E9CD5007C115E /* EditableBlock.swift */,
+				6B6BBC152527AD7900369A26 /* EditableBlockFactory.swift */,
+				6B6BBC192527C56B00369A26 /* EditableBlockView.swift */,
+				6B6BBC172527B0D700369A26 /* Focusable.swift */,
+				6B6E47482402EA040067B2FF /* ImageBackground.swift */,
 				6B2DC3092353C2DB00A768A1 /* InlineBlockLayoutManager.swift */,
 				6B00CA3B2329C247001907C6 /* InlineTextTrait.swift */,
 				6B2DC3072353C29600A768A1 /* NSTextView+Measurement.swift */,
 				6BCCE32F23EB3B07004C482E /* OverflowMenuContainer.swift */,
 				6B00CA30232841F6001907C6 /* TextBlockView.swift */,
 				6B00CA362328528A001907C6 /* InlineToolbar */,
-				6B6E47482402EA040067B2FF /* ImageBackground.swift */,
 			);
 			path = BlockEditor;
 			sourceTree = "<group>";
@@ -804,6 +813,7 @@
 				6BB5903724315504002EE0A6 /* Reducible.swift in Sources */,
 				6B4218B4223C2E440060CC9A /* Formatter+LogicElement.swift in Sources */,
 				6B44E178223B40BA00740318 /* LogicElement.swift in Sources */,
+				6B6BBC162527AD7900369A26 /* EditableBlockFactory.swift in Sources */,
 				6BD9948D2343FCE800F3F173 /* ImageLocator.swift in Sources */,
 				6BBD0C0722961B9C00EB87A9 /* NameGenerator.swift in Sources */,
 				6B858C21229DB13A00DE6216 /* ScopeStack.swift in Sources */,
@@ -891,6 +901,7 @@
 				6B44E155223B3DD000740318 /* LNATextField.swift in Sources */,
 				6B44E18C223B40F100740318 /* SuggestionWindow.swift in Sources */,
 				6BCCE33023EB3B07004C482E /* OverflowMenuContainer.swift in Sources */,
+				6B6BBC1A2527C56B00369A26 /* EditableBlockView.swift in Sources */,
 				6B10AC1E22A45FFB0043E46A /* LogicValue.swift in Sources */,
 				6B5B7564215B1ABE00CDC9C6 /* NameCellView.swift in Sources */,
 				6BF4EF43235554E800548F61 /* MDXInlineNode+EditableString.swift in Sources */,
@@ -918,6 +929,7 @@
 				6B44E177223B40BA00740318 /* LogicCanvasView.swift in Sources */,
 				6B5B7560215B1ABE00CDC9C6 /* TypeEntity.swift in Sources */,
 				6B5B7565215B1ABE00CDC9C6 /* EntityCellView.swift in Sources */,
+				6B6BBC182527B0D700369A26 /* Focusable.swift in Sources */,
 				6B44E17B223B40BD00740318 /* Formatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -257,7 +257,7 @@ class MarkdownDocument: NSDocument {
         blocks.forEach { block in
             switch block.content {
             case .tokens:
-                let logicEditor = block.view as! LogicEditor
+                let logicEditor = blockEditor.view(for: block) as! LogicEditor
 
                 logicEditor.formattingOptions = formattingOptions
 

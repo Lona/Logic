@@ -279,7 +279,7 @@ public class TextBlockContainerView: NSBox {
 
     private func update() {}
 
-    public func focus() {
+    public override func focus() {
         if blockView.acceptsFirstResponder {
             window?.makeFirstResponder(blockView)
         }

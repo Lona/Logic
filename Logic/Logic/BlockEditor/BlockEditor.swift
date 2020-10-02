@@ -67,6 +67,16 @@ open class BlockEditor: NSBox {
         set { blockListView.onClickPageLink = newValue }
     }
 
+    /**
+     Transform an image URL before fetching it.
+
+     Use this to transform a local file path into a `file://` URL.
+     */
+    public var transformImageURL: ((URL) -> URL)? {
+        get { return blockListView.transformImageURL }
+        set { blockListView.transformImageURL = newValue }
+    }
+
     public var onRequestCreatePage: ((Int, Bool) -> Void)? {
         get { return blockListView.onRequestCreatePage }
         set { blockListView.onRequestCreatePage = newValue }
@@ -102,6 +112,10 @@ open class BlockEditor: NSBox {
 
     public func select(id: UUID) {
         blockListView.select(id: id)
+    }
+
+    public func view(for block: EditableBlock) -> NSView {
+        return blockListView.getView(block)
     }
 
     // MARK: Private
