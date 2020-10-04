@@ -143,6 +143,10 @@ public class BlockListView: NSBox {
 
     deinit {
         removeTrackingArea(trackingArea)
+
+        blocks.forEach({ block in
+            viewFactory.invalidateCachedImage(for: block)
+        })
     }
 
     // MARK: Public
@@ -280,13 +284,26 @@ public class BlockListView: NSBox {
 
             updateBlockMargins(blocks: blocks)
 
-            let diff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
+            let changedRows: [Int] = oldValue.extendedDiff(blocks).map({ item in
+                switch item {
+                // Clean up the image for the deleted row, so that we don't leak memory
+                case .delete(let row):
+                    return row
+                case .insert(at: let row), .move(from: _, to: let row):
+                    return row
+                }
+            })
 
-            if diff.isEmpty {
+            changedRows.forEach({ row in viewFactory.invalidateCachedImage(for: blocks[row]) })
+
+            let identityDiff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
+
+            if identityDiff.isEmpty {
                 for index in 0..<blocks.count {
                     let old = oldValue[index]
                     let new = blocks[index]
 
+                    // TODO: Is !== meaningful here? They're both structs
                     if old !== new {
                         viewFactory.updateView(block: new)
                     }
@@ -294,7 +311,7 @@ public class BlockListView: NSBox {
             } else {
                 var containsMoves = false
 
-                outer: for element in diff {
+                outer: for element in identityDiff {
                     switch element {
                         case .move:
                             containsMoves = true
@@ -380,22 +397,49 @@ public class BlockListView: NSBox {
     public var showsMinimap: Bool = false {
         didSet {
             if showsMinimap {
-                minimapScroller.drawKnobSlot = { rect, isHighlighted in
-                    let scale: CGFloat = MinimapScroller.renderingScale
+                minimapScroller.drawKnobSlot = { rect, scaledDocumentSize, isHighlighted in
+                    let minimapScale = MinimapScroller.renderingScale
+
+                    let knobMinY = -rect.origin.y
+                    let knobMaxY = knobMinY + rect.height
+
+                    // Convert the top and bottom of the rect to a fraction of the whole document
+                    let minFraction = knobMinY / scaledDocumentSize.height
+                    let maxFraction = knobMaxY / scaledDocumentSize.height
+
+                    let documentHeight = (self.scrollView.documentView?.frame.height ?? 0) + self.verticalPadding * 2
+                    let documentMinY = documentHeight * minFraction
+                    let documentMaxY = documentHeight * maxFraction
+
+                    let tableViewBounds = self.tableView.bounds
+
+                    // The visible portion of the table view
+                    let visibleRect = NSRect(
+                        x: 0,
+                        y: documentMinY - self.verticalPadding,
+                        width: tableViewBounds.width,
+                        height: documentMaxY - documentMinY + self.verticalPadding
+                    )
 
                     NSGraphicsContext.saveGraphicsState()
-                    NSGraphicsContext.current?.cgContext.translateBy(x: rect.origin.x, y: rect.origin.y)
-                    NSGraphicsContext.current?.cgContext.scaleBy(x: scale, y: scale)
+                    NSGraphicsContext.current?.cgContext.translateBy(x: rect.origin.x, y: 0)
+                    NSGraphicsContext.current?.cgContext.scaleBy(x: minimapScale, y: minimapScale)
                     NSGraphicsContext.current?.cgContext.setAlpha(0.5)
 
-                    let pdf = self.tableView.dataWithPDF(inside: self.tableView.bounds)
-                    guard let image = NSImage(data: pdf) else { return }
+                    let rowXOffset = max((rect.width / minimapScale - tableViewBounds.size.width) / 2, 10)
+                    let rowYOffset = self.verticalPadding + rect.origin.y / minimapScale
+                    let visibleRows = self.tableView.rows(in: visibleRect)
 
-                    var drawingRect = self.tableView.bounds
-                    drawingRect.origin.y += self.verticalPadding
-                    drawingRect.origin.x = max((rect.width / scale - drawingRect.size.width) / 2, 10)
+                    Range(visibleRows)?.forEach({ row in
+                        guard let rowImage = self.viewFactory.image(for: self.blocks[row]) else { return }
 
-                    image.draw(in: drawingRect)
+                        var rowRect = self.tableView.rect(ofRow: row)
+                        rowRect.origin.x += rowXOffset
+                        rowRect.origin.y += rowYOffset
+                        rowRect.size = rowImage.size
+
+                        rowImage.draw(in: rowRect)
+                    })
 
                     NSGraphicsContext.restoreGraphicsState()
                 }

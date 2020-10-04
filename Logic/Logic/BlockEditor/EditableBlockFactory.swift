@@ -79,6 +79,21 @@ public class EditableBlockFactory {
         return view
     }
 
+    public func invalidateCachedImage(for block: EditableBlock) {
+        viewImageCache[block.id] = nil
+    }
+
+    public func image(for block: EditableBlock) -> NSImage? {
+        if let cached = viewImageCache[block.id] { return cached }
+
+        let view = self.wrapperView(for: block)
+        let image = NSImage(data: view.dataWithPDF(inside: view.bounds))
+
+        viewImageCache[block.id] = image
+
+        return image
+    }
+
     public func wrapperView(for block: EditableBlock) -> EditableBlockView {
         if let wrapperView = wrapperViewCache[block.id] {
             // TODO: Updating the wrapperView should probably go wherever we update the view.
@@ -104,6 +119,8 @@ public class EditableBlockFactory {
     }
 
     public func updateViewWidth(block: EditableBlock, _ width: CGFloat) {
+        invalidateCachedImage(for: block)
+
         let width = width - block.listDepth.margin
 
         switch block.content {
@@ -126,6 +143,8 @@ public class EditableBlockFactory {
             wrapperView.needsLayout = true
         }
     }
+
+    private var viewImageCache: [UUID: NSImage] = [:]
 
     private var viewCache: [UUID: NSView] = [:]
 

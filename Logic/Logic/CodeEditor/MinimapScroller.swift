@@ -12,7 +12,7 @@ public class MinimapScroller: NSScroller {
 
     // MARK: Public
 
-    public var drawKnobSlot: ((NSRect, Bool) -> Void)?
+    public var drawKnobSlot: ((NSRect, NSSize, Bool) -> Void)?
 
     public var knobColor = MinimapScroller.defaultKnobColor { didSet { needsDisplay = true } }
 
@@ -49,7 +49,10 @@ public class MinimapScroller: NSScroller {
         slotRect.origin.x += 2
         slotRect.size.width -= 2
         slotRect.origin.y -= slotOverflow * CGFloat(floatValue)
-        drawKnobSlot?(slotRect, flag)
+
+        let scaledDocumentSize = NSSize(width: slotRect.width, height: slotDocumentHeight)
+
+        drawKnobSlot?(slotRect, scaledDocumentSize, flag)
     }
 
     public override func draw(_ dirtyRect: NSRect) {

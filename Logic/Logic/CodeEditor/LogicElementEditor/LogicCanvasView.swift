@@ -54,7 +54,7 @@ public class LogicCanvasView: NSView {
 
         registerForDraggedTypes([.logicLineIndex])
 
-        drawScrollerBackground = { [unowned self] rect, isHighlighted in
+        drawScrollerBackground = { [unowned self] rect, _, isHighlighted in
             let scale: CGFloat = MinimapScroller.renderingScale
 
             NSGraphicsContext.saveGraphicsState()
@@ -162,7 +162,7 @@ public class LogicCanvasView: NSView {
     public var onClickBackground: (() -> Void)?
     public var onClickLinePlus: ((Int, NSRect) -> Void)?
     public var onClickLineMore: ((Int, NSRect) -> Void)?
-    public var drawScrollerBackground: ((NSRect, Bool) -> Void)?
+    public var drawScrollerBackground: ((NSRect, NSSize, Bool) -> Void)?
 
     public var onDuplicateCommand: (() -> Void)?
 
