@@ -284,17 +284,28 @@ public class BlockListView: NSBox {
 
             updateBlockMargins(blocks: blocks)
 
-            let changedRows: [Int] = oldValue.extendedDiff(blocks).map({ item in
+            let changedRows: [Int] = oldValue.extendedDiff(blocks).compactMap({ item in
                 switch item {
-                // Clean up the image for the deleted row, so that we don't leak memory
-                case .delete(let row):
-                    return row
+                case .delete:
+                    return nil
                 case .insert(at: let row), .move(from: _, to: let row):
                     return row
                 }
             })
 
             changedRows.forEach({ row in viewFactory.invalidateCachedImage(for: blocks[row]) })
+
+            let deletedRows: [Int] = oldValue.extendedDiff(blocks).compactMap({ item in
+                switch item {
+                case .delete(let row):
+                    return row
+                case .insert, .move:
+                    return nil
+                }
+            })
+
+            // Clean up the image for the deleted row, so that we don't leak memory
+            deletedRows.forEach({ row in viewFactory.invalidateCachedImage(for: oldValue[row]) })
 
             let identityDiff = oldValue.extendedDiff(blocks, isEqual: { a, b in a.id == b.id })
 
